@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="702.0" prefWidth="489.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox layoutX="177.0" layoutY="142.0" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+         <children>
+            <Pane prefHeight="30.0" prefWidth="200.0">
+               <children>
+                  <Label layoutX="14.0" layoutY="8.0" stylesheets="@../../bin/application/commonLabel.css" text="Тип документа:" />
+                  <ComboBox layoutX="119.0" layoutY="4.0" prefHeight="25.0" prefWidth="253.0" />
+               </children>
+            </Pane>
+            <Pane prefHeight="30.0" prefWidth="200.0">
+               <children>
+                  <Label layoutX="88.0" layoutY="6.0" stylesheets="@../../bin/application/commonLabel.css" text="№" />
+                  <TextField layoutX="118.0" layoutY="4.0" prefHeight="25.0" prefWidth="253.0" />
+               </children>
+            </Pane>
+            <Pane prefHeight="30.0" prefWidth="200.0">
+               <children>
+                  <Label layoutX="188.0" layoutY="6.0" stylesheets="@../../bin/application/commonLabel.css" text="действителе до:" />
+                  <DatePicker layoutX="295.0" layoutY="4.0" />
+               </children>
+            </Pane>
+            <Separator prefWidth="200.0" />
+            <Label stylesheets="@../../bin/application/commonLabel.css" text="Наименование метрологической воинской части: " />
+            <TextField />
+            <RadioButton mnemonicParsing="false" prefHeight="30.0" prefWidth="344.0" style="-fx-font-family: Arial Narrow; -fx-font-weight: bold; -fx-font-size: 12;" text="Эталон" />
+            <RadioButton mnemonicParsing="false" prefHeight="30.0" style="-fx-font-family: Arial Narrow; -fx-font-weight: bold; -fx-font-size: 12;" text="Средство измерения" />
+            <Label stylesheets="@../../bin/application/commonLabel.css" text="____________________________________________________" />
+            <HBox prefHeight="30.0" prefWidth="200.0">
+               <children>
+                  <Label prefHeight="23.0" prefWidth="108.0" stylesheets="@../../bin/application/commonLabel.css" text="Заводской номер: " />
+                  <Label prefHeight="27.0" prefWidth="322.0" stylesheets="@../../bin/application/commonLabel.css" text="_____________________________________________" />
+               </children>
+            </HBox>
+            <HBox prefHeight="30.0" prefWidth="200.0">
+               <children>
+                  <Label stylesheets="@../../bin/application/commonLabel.css" text="принадлежащее: " />
+                  <Label stylesheets="@../../bin/application/commonLabel.css" text="__________________________________________________" />
+               </children>
+            </HBox>
+            <HBox prefHeight="30.0" prefWidth="200.0">
+               <children>
+                  <Label prefHeight="16.0" prefWidth="254.0" stylesheets="@../../bin/application/commonLabel.css" text="поверен и на основании результатов " />
+                  <Label prefHeight="16.0" prefWidth="135.0" stylesheets="@../../bin/application/commonLabel.css" text="периодической" />
+                  <Label stylesheets="@../../bin/application/commonLabel.css" text="поверки" />
+               </children>
+            </HBox>
+            <HBox prefHeight="30.0" prefWidth="200.0">
+               <children>
+                  <Label stylesheets="@../../bin/application/commonLabel.css" text="признан " />
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

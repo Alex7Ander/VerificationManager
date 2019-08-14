@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="476.0" prefWidth="781.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SearchDevicePack.SearchDeviceController">
+   <children>
+      <HBox layoutX="331.0" layoutY="100.0" prefHeight="100.0" prefWidth="200.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+         <children>
+            <ListView fx:id="devicesListView" prefHeight="380.0" prefWidth="406.0" style="-fx-font-family: Arial Narrow;" />
+            <Separator orientation="VERTICAL" prefHeight="200.0" />
+            <VBox prefHeight="380.0" prefWidth="356.0">
+               <children>
+                  <Label fx:id="headLabel" stylesheets="@../../bin/application/commonLabel.css" text="Фильтры поиска" />
+                  <Separator prefHeight="15.0" prefWidth="200.0" />
+                  <TitledPane animated="false" prefHeight="70.0" prefWidth="356.0" style="-fx-font-family: Arial Narrow;" text="Наименование СИ">
+                    <content>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <ComboBox fx:id="nameComboBox" layoutY="10.0" onAction="#nameComboBoxChange" prefHeight="25.0" prefWidth="350.0" />
+                           </children>
+                        </AnchorPane>
+                    </content>
+                  </TitledPane>
+                  <TitledPane animated="false" prefHeight="70.0" style="-fx-font-family: Arial Narrow; -fx-font-size: 12;" text="Обозначение типа СИ">
+                    <content>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <ComboBox fx:id="typeComboBox" layoutY="10.0" onAction="#typeComboBoxChange" prefHeight="25.0" prefWidth="350.0" />
+                           </children>
+                        </AnchorPane>
+                    </content>
+                  </TitledPane>
+                  <TitledPane animated="false" prefHeight="70.0" style="-fx-font-family: Arial Narrow;" text="Заводской номер СИ">
+                    <content>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <TextField fx:id="serialNumTextField" layoutY="10.0" onTextChange="#serialNumTextFieldEdit" prefHeight="25.0" prefWidth="350.0" />
+                           </children>
+                        </AnchorPane>
+                    </content>
+                  </TitledPane>
+                  <TitledPane animated="false" prefHeight="70.0" style="-fx-font-family: Arial Narrow;" text="Владелец поверяемого СИ">
+                    <content>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <TextField fx:id="ownerTextField" layoutY="10.0" onTextChange="#ownerTextFieldEdit" prefWidth="350.0" />
+                           </children>
+                        </AnchorPane>
+                    </content>
+                  </TitledPane>
+                  <TitledPane animated="false" prefHeight="70.0" style="-fx-font-family: Arial Narrow;" text="Номер в Гос Реестре">
+                    <content>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <TextField fx:id="gosNumTextField" layoutY="10.0" onTextChange="#gosNumTextFieldEdit" prefHeight="25.0" prefWidth="350.0" />
+                           </children>
+                        </AnchorPane>
+                    </content>
+                  </TitledPane>
+                  <Separator prefHeight="15.0" prefWidth="356.0" />
+                  <Button fx:id="chooseBtn" mnemonicParsing="false" onAction="#chooseBtnClick" prefHeight="57.0" prefWidth="356.0" stylesheets="@../../bin/application/commonButton.css" text="Выбрать" />
+               </children>
+            </VBox>
+         </children>
+      </HBox>
+   </children>
+</AnchorPane>

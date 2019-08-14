@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="661.0" prefWidth="474.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox layoutX="128.0" layoutY="115.0" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+         <children>
+            <Label stylesheets="@../../bin/application/commonLabel.css" text="Поиск свидетельств (извещений) и протоколов поверок" />
+            <Separator prefHeight="20.0" prefWidth="200.0" />
+            <Label stylesheets="@../../bin/application/commonLabel.css" text="Введите временной интервал поиска протоколов: " />
+            <HBox prefHeight="30.0" prefWidth="200.0">
+               <children>
+                  <Label prefHeight="17.0" prefWidth="29.0" stylesheets="@../../bin/application/commonLabel.css" text="С: " />
+                  <DatePicker />
+                  <Separator orientation="VERTICAL" prefHeight="29.0" prefWidth="29.0" />
+                  <Label prefHeight="17.0" prefWidth="46.0" stylesheets="@../../bin/application/commonLabel.css" text="По: " />
+                  <DatePicker />
+               </children>
+            </HBox>
+            <RadioButton mnemonicParsing="false" prefHeight="30.0" prefWidth="200.0" style="-fx-font-family: Arial Narrow; -fx-font-size: 12; -fx-font-weight: bold;" text="Свидетельства о поверке" />
+            <RadioButton mnemonicParsing="false" prefHeight="30.0" prefWidth="200.0" style="-fx-font-family: Arial Narrow; -fx-font-weight: bold; -fx-font-size: 12;" text="Извещения о непригодности" />
+            <Separator prefHeight="10.0" prefWidth="200.0" />
+            <ToggleButton mnemonicParsing="false" prefHeight="45.0" prefWidth="454.0" text="Выбор средства измерения" />
+            <Separator prefHeight="10.0" prefWidth="200.0" />
+            <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="468.0" stylesheets="@../../bin/application/commonButton.css" text="ПОИСК" />
+            <Separator prefHeight="10.0" prefWidth="200.0" />
+            <Label stylesheets="@../../bin/application/commonLabel.css" text="Список проведенных поверок: " />
+            <ListView prefHeight="357.0" prefWidth="454.0" />
+            <Separator prefHeight="10.0" prefWidth="200.0" />
+            <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="512.0" stylesheets="@../../bin/application/commonButton.css" text="Открыть для печати" />
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

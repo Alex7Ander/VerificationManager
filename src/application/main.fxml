@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import java.net.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="398.0" prefWidth="600.0" stylesheets="@../../bin/application/application.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.MainController">
+   <children>
+      <HBox layoutX="38.0" layoutY="87.0" prefHeight="100.0" prefWidth="200.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+         <children>
+            <VBox prefHeight="380.0" prefWidth="196.0">
+               <children>
+                  <Button fx:id="verificationBtn" mnemonicParsing="false" onAction="#verificationBtnClick" onMouseEntered="#mouseOnVerificationBtn" onMouseExited="#mouseOffVerificationBtn" opacity="0.8" prefHeight="55.0" prefWidth="190.0" stylesheets="@commonButton.css" text="Поверка">
+                     <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </padding>
+                  </Button>
+                  <Pane prefHeight="40.0" prefWidth="193.0" />
+                  <Button fx:id="dbEditBtn" mnemonicParsing="false" onAction="#dbEditBtnClick" onMouseEntered="#mouseOnDBEditBtn" onMouseExited="#mouseOffDBEditBtn" opacity="0.8" prefHeight="55.0" prefWidth="190.0" stylesheets="@commonButton.css" text="Редактирование БД" />
+                  <Pane prefHeight="40.0" prefWidth="193.0" />
+                  <Button fx:id="newDeviceBtn" mnemonicParsing="false" onAction="#newDeviceBtnClick" onMouseEntered="#mouseOnNewDeviceBtn" onMouseExited="#mouseOffNewDeviceBtn" opacity="0.8" prefHeight="55.0" prefWidth="190.0" stylesheets="@commonButton.css" text="Прибор" />
+                  <Pane prefHeight="40.0" prefWidth="193.0" />
+                  <Button fx:id="searchOldDocBtn" mnemonicParsing="false" onAction="#searchOldDocBtnClick" onMouseEntered="#mouseOnOldDocSearchBtn" onMouseExited="#mouseOffOldDocSearchBtn" opacity="0.8" prefHeight="55.0" prefWidth="190.0" stylesheets="@commonButton.css" text="Протоколы поверок" />
+               </children>
+            </VBox>
+            <VBox prefHeight="380.0" prefWidth="390.0">
+               <children>
+                  <TextArea fx:id="helpTextArea" prefHeight="363.0" prefWidth="387.0" style="-fx-control-inner-background: #DCDCDC; -fx-border-color: #000000;" />
+                  <Separator prefHeight="13.0" prefWidth="387.0" />
+                  <HBox prefHeight="57.0" prefWidth="387.0">
+                     <children>
+                        <Pane prefHeight="56.0" prefWidth="119.0" />
+                        <Button fx:id="aboutBtn" mnemonicParsing="false" onAction="#aboutBtnClick" onMouseEntered="#mouseOnAboutBtn" onMouseExited="#mouseOffAboutBtn" opacity="0.8" prefHeight="35.0" prefWidth="127.0" stylesheets="@../../bin/application/commonButton.css" text="О программе" />
+                        <Separator orientation="VERTICAL" prefHeight="36.0" prefWidth="14.0" />
+                        <Button id="exitBtn" fx:id="exitBtn" mnemonicParsing="false" onAction="#exitBtnClick" onMouseEntered="#mouseOnExitBtn" onMouseExited="#mouseOffExitBtn" opacity="0.8" prefHeight="35.0" prefWidth="133.0" stylesheets="@../../bin/application/commonButton.css" text="Выход" />
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+         </children>
+      </HBox>
+   </children>
+</AnchorPane>
