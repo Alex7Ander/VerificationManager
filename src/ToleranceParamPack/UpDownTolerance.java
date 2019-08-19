@@ -1,5 +1,6 @@
 package ToleranceParamPack;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -35,6 +36,30 @@ public class UpDownTolerance extends ToleranceParametrs {
 		}
 		if (report.size()>0) return false;
 		else return true;
+	}
+
+	@Override
+	public void saveInDB() throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void deleteFromDB() throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void editInfoInDB() throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void getData() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

@@ -4,18 +4,33 @@ import java.io.File;
 import java.util.ArrayList;
 
 import FileManagePack.FileManager;
+import GUIpack.StringGridFX;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.AnchorPane;
 
 public class ElementController {
 
+	@FXML
+	private Button agreeBtn; 
+	@FXML
+	private Button addFreqBtn;
+	@FXML
+	private Button delFreqBtn;
+		
 	@FXML 
 	private RadioButton primaryVerificationRB;	
 	@FXML 
@@ -36,6 +51,12 @@ public class ElementController {
 	@FXML
 	private ComboBox paramsComboBox;
 	
+	@FXML
+	private ScrollPane scrollPane;
+	@FXML
+	private AnchorPane tablePane;
+	
+	private StringGridFX paramsTable;
 	public ToggleGroup poleCountGroup;
 	ToggleGroup measUnitGroup;
 	ToggleGroup toleranceTypeGroup;
@@ -55,13 +76,6 @@ public class ElementController {
 		this.fourPoleRB.setSelected(true);
 		this.twoPoleRB.setToggleGroup(poleCountGroup);
 		this.fourPoleRB.setToggleGroup(poleCountGroup);
-		/*
-		poleCountGroup.selectedToggleProperty().addListener(new ChangeListener<Toggle>(){           
-            public void changed(ObservableValue<? extends Toggle> changed, Toggle oldValue, Toggle newValue){                              
-                RadioButton selectedBtn = (RadioButton) newValue; // получаем выбранный элемент RadioButton
-            }
-        });
-		*/
 		
 		measUnitGroup = new ToggleGroup();
 		this.vswrRB.setSelected(true);
@@ -84,6 +98,17 @@ public class ElementController {
 		this.paramsComboBox.setItems(listOfParams);
 		this.paramsComboBox.setValue(listOfParams.get(0));
 		lastIndex = 0;
+		
+		ArrayList<String> paramTableHeads = new ArrayList<String>();
+		paramTableHeads.add("Частота, ГГц");
+		paramTableHeads.add("Нижний допуск");
+		paramTableHeads.add("Номинал");
+		paramTableHeads.add("Верхний допуск");
+		paramTableHeads.add("Нижний допуск");
+		paramTableHeads.add("Номинал");
+		paramTableHeads.add("Верхний допуск");
+
+		paramsTable = new StringGridFX(7, 10, 850, 100, scrollPane, tablePane, paramTableHeads);
 	}
 	
 	@FXML
@@ -114,6 +139,21 @@ public class ElementController {
 		this.paramsComboBox.setItems(listOfParams);
 	}
 	
+	@FXML 
+	private void agreeBtnClick() {
+		
+	}
+	
+	@FXML 
+	private void addFreqBtnClick() {
+		paramsTable.addRow();
+	}
+	
+	@FXML
+	private void delFreqBtnClick() {
+		paramsTable.deleteRow(paramsTable.getRowCount());
+	}
+	
 	private void setParams(String paramsIndex, int countOfParams) {
 		try {
 			String path = new File(".").getAbsolutePath();
@@ -129,5 +169,6 @@ public class ElementController {
 			listOfParams.add("S22");
 		}
 	}
-		
+	
+			
 }

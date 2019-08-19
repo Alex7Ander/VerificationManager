@@ -52,6 +52,37 @@ public class DataBaseManager {
 		dbConnection.close();
 	}
 	
+//TCL	
+	public int BeginTransaction() {
+		try {
+			sqlQueryUpdate("BEGIN TRANSACTION");
+			return 0;
+		}
+		catch(SQLException exp) {
+			return -1;
+		}
+	}
+	
+	public int RollBack() {
+		try {
+			sqlQueryUpdate("ROLLBACK");
+			return 0;
+		}
+		catch(SQLException exp) {
+			return -1;
+		}
+	}
+	
+	public int Commit() {
+		try {
+			sqlQueryUpdate("COMMIT");
+			return 0;
+		}
+		catch(SQLException exp) {
+			return -1;
+		}
+	}
+	
 	//Общие методы работы с БД Требуют написания SQl запроса
 	//отправка запроса без получения result set; подходит для Update, Insert, etc.
     public void sqlQueryUpdate(String sqlString) throws SQLException {

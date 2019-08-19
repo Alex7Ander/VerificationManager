@@ -4,12 +4,16 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import AboutMessageForm.AboutMessageWindow;
+import AddNewDeviceNameForm.AddNewDeviceNameWindow;
+import DataBasePack.DataBaseManager;
 import DevicePack.Device;
 import DevicePack.SavingException;
 import FileManagePack.FileManager;
+import SearchDevicePack.SearchDeviceWindow;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -21,45 +25,43 @@ import javafx.scene.control.Labeled;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 public class NewDeviceController {
 
-	public Button createElmentsBtn;
-	public Button saveBtn;
-	public Button addNameBtn;
+	@FXML
+	private Button createElmentsBtn;
+	@FXML
+	private Button saveBtn;
+	@FXML
+	private Button addNameBtn;
 	
-	public ComboBox  namesComboBox;
-	public TextField typeTextField;
-	public TextField serialNumberTextField;
-	public TextField ownerTextField;
-	public TextField gosNumberTextField;
-	public TextField countOfElementsTextField;
+	@FXML
+	private ComboBox  namesComboBox;
+	@FXML
+	private TextField typeTextField;
+	@FXML
+	private TextField serialNumberTextField;
+	@FXML
+	private TextField ownerTextField;
+	@FXML
+	private TextField gosNumberTextField;
+	@FXML
+	private TextField countOfElementsTextField;
 	
-	public VBox elementsButtonBox;
+	@FXML
+	private VBox elementsButtonBox;
 	
 	public ArrayList<ElementWindow> elementsWindow;
 	public ArrayList<Button> elementsButton;
 	
+	private ObservableList<String> listOfNames;
 	int countOfElements;
 
 	@FXML
 	private void initialize(){
-		ObservableList<String> listOfNames = FXCollections.observableArrayList();
-		try {
-			String absPath = new File(".").getAbsolutePath();
-			FileManager.LinesToItems(absPath + "\\files\\sitypes.txt", listOfNames);
-		}
-		catch(Exception exp) {
-			System.out.println("Error: "+ exp.getMessage());
-			listOfNames.clear();
-			listOfNames.add("Рабочий эталон ККПиО");
-			listOfNames.add("Набор нагрузок волноводных");
-			listOfNames.add("Нагрузки волноводные согласованные");
-			listOfNames.add("Комплект поверочный");
-			listOfNames.add("Калибровочный и поверочный комплекты мер");
-			listOfNames.add("Нагрузки волноводные КЗ подвижные");
-		}
-		this.namesComboBox.setItems(listOfNames);
+		listOfNames = FXCollections.observableArrayList();
+		setItemsOfNames();
 	}
 	
 	@FXML
@@ -96,36 +98,51 @@ public class NewDeviceController {
 	}	
 	
 	@FXML
-	public void saveBtnClick(ActionEvent event) {
-		String tName = this.namesComboBox.getValue().toString();		
-		String tType = this.typeTextField.getText();
-		String tSerN = this.serialNumberTextField.getText();
-		String tOwner = this.ownerTextField.getText();
-		String tGosN = this.gosNumberTextField.getText();
+	public void saveBtnClick(ActionEvent event) throws IOException {
 		
-		Device newDevice = new Device(tName, tType, tSerN, tOwner, tGosN);
-		if (tName.length()==0 || tType.length()==0 || tSerN.length()==0){
-			try {
+		String tName = null;
+		try{
+			tName = this.namesComboBox.getValue().toString();		
+		}
+		catch(Exception exp) {
+			AboutMessageWindow errorMessage = new AboutMessageWindow("Ошибка", "Не указано наименование типа создаваемого СИ!");
+			errorMessage.show();
+		}
+		
+		if (tName != null) {
+			String tType = this.typeTextField.getText();
+			String tSerN = this.serialNumberTextField.getText();
+			String tOwner = this.ownerTextField.getText();
+			String tGosN = this.gosNumberTextField.getText();
+			Device newDevice = null;
+			
+			if (tName.length()==0 || tType.length()==0 || tSerN.length()==0){
 				AboutMessageWindow errorMessage = new AboutMessageWindow("Ошибка", "Заполнены не все обходимые поля");
 				errorMessage.show();
 			}
-			catch(IOException exp) {
-				System.out.println("Ошибка вывода сообщения о незаполнености полей: " + exp.getMessage());
-			}
-		}
-		else{
-			try{
+			else{
 				if (tOwner.length() == 0) tOwner = "-";
 				if (tGosN.length() == 0) tGosN = "-";
-				newDevice.saveInDB();
-			}
-			catch(SavingException sExp){
-				try {
-					AboutMessageWindow errorMessage = new AboutMessageWindow("Ошибка", sExp.getDeviceSatausMsg());
-					errorMessage.show();
+				newDevice = new Device(tName, tType, tSerN, tOwner, tGosN);
+				if (!(newDevice.isExist())) {
+					try{
+						DataBaseManager.getDB().BeginTransaction();
+						newDevice.saveInDB();
+						DataBaseManager.getDB().Commit();
+						AboutMessageWindow sucsessMessage = new AboutMessageWindow("Успешно", "Успешное сохранение");
+						sucsessMessage.show();
+						Stage stage = (Stage) saveBtn.getScene().getWindow();
+						stage.close();
+					}
+					catch(SQLException sqlExp){
+						DataBaseManager.getDB().RollBack();
+						AboutMessageWindow errorMessage = new AboutMessageWindow("Ошибка", "Ошибка: " + sqlExp.getMessage());
+						errorMessage.show();
+					}
 				}
-				catch(IOException exp) {
-					System.out.println("Ошибка вывода сообщения о наличии такого СИ: " + exp.getMessage());
+				else {
+					AboutMessageWindow errorMessage = new AboutMessageWindow("Ошибка", "Прибор данного типа с таким серийным номером уже существует!");
+					errorMessage.show();
 				}
 			}
 		}
@@ -134,6 +151,32 @@ public class NewDeviceController {
 	@FXML
 	public void addNameBtnClick(ActionEvent event) {
 		
+		try {
+			//SearchDeviceWindow.getSearchDeviceWindow(verificatedDevice, this).show();
+			AddNewDeviceNameWindow.getNewDeviceWindow(this).show();
+		}
+		catch(IOException ioExp) {
+			//
+		}
+		
+	}
+	
+	public void setItemsOfNames() {
+		try {
+			String absPath = new File(".").getAbsolutePath();
+			FileManager.LinesToItems(absPath + "\\files\\sitypes.txt", listOfNames);
+		}
+		catch(Exception exp) {
+			System.out.println("Error: "+ exp.getMessage());
+			listOfNames.clear();
+			listOfNames.add("Рабочий эталон ККПиО");
+			listOfNames.add("Набор нагрузок волноводных");
+			listOfNames.add("Нагрузки волноводные согласованные");
+			listOfNames.add("Комплект поверочный");
+			listOfNames.add("Калибровочный и поверочный комплекты мер");
+			listOfNames.add("Нагрузки волноводные КЗ подвижные");
+		}
+		this.namesComboBox.setItems(listOfNames);
 	}
 	
 }

@@ -1,18 +1,38 @@
 package DevicePack;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
+import DataBasePack.DataBaseManager;
 import DataBasePack.dbStorable;
 import ToleranceParamPack.ToleranceParametrs;
 import VerificationPack.MeasResult;
 import VerificationPack.Verificatable;
 
-public abstract class Element implements Includable<Device>, Verificatable, dbStorable{
+public class Element implements Includable<Device>, Verificatable, dbStorable{
 
-	public Element(String ElementTableName, int index){
-		//
+	public Element() {
+		
+	}
+	//Конструктор, инициализирующий объект информацией из БД
+	//Вызывается при инициализации устройства перед поверкой
+	public Element(String ElementTableName, int index) throws SQLException{
+		String sqlQuery = "SELECT ElementType, ElementSerNumber, PoleCount, MeasUnit, ToleranceType, PeriodicParamTable, PrimaryParamTable FROM " + ElementTableName + " WHERE id="+index+"";
+		ArrayList<String> fieldName = new ArrayList<String>();
+		ArrayList<ArrayList<String>> arrayResults = new ArrayList<ArrayList<String>>();
+		DataBaseManager.getDB().sqlQueryString(sqlQuery, fieldName, arrayResults);
+		this.type = arrayResults.get(0).get(0);
+		this.serialNumber = arrayResults.get(0).get(1);
+		this.poleCount = Integer.parseInt(arrayResults.get(0).get(2));
+		this.measUnit = arrayResults.get(0).get(3);
+		this.toleranceType = arrayResults.get(0).get(4);
+		this.periodicParamTable = arrayResults.get(0).get(5);
+		this.primaryParamTable = arrayResults.get(0).get(6);
 	}
 	
+	//Конструктор, инициализирующий объект информацией из Графического интерфейса для последующего сохранения в БД
+	//Вызывается при инициализации устройства перед сохранением нового устройства в БД
 	public Element(String Type, String SerialNumber, int PoleCount, String MeasUnit, String ToleranceType, Device MyDevice){
 		this.type = Type;
 		this.serialNumber = SerialNumber;
@@ -27,8 +47,12 @@ public abstract class Element implements Includable<Device>, Verificatable, dbSt
 	protected int poleCount;
 	protected String measUnit;
 	protected String toleranceType;
-	protected Device myDevice;
+	protected String periodicParamTable;
+	protected String primaryParamTable;
 	
+	protected Device myDevice;
+	private MeasResult nominal;
+		
 	public String getType() {return this.type;}
 	public String getSerialNumber() {return this.serialNumber;}
 	public int getPoleCount() {return this.poleCount;}
@@ -40,13 +64,34 @@ public abstract class Element implements Includable<Device>, Verificatable, dbSt
 	
 //dbStorable		
 	@Override
-	public abstract void saveInDB();
+	public void saveInDB() throws SQLException {
+		String sqlString;
+		String addStr = myDevice.getName() + " " + myDevice.getType() + " " + myDevice.getSerialNumber();
+		String strElementsTable = "Elements of " + addStr;
+		String ePerParamTable  = "Periodic for " + addStr + " " + this.type + " " + this.serialNumber;
+		String ePrimParamTable = "Primary for " + addStr + " " + this.type + " " + this.serialNumber;
+		//Внесли запись об элементе
+		sqlString = "INSERT INTO ["+strElementsTable+"] (ElementType, ElementSerNumber, PoleCount, MeasUnit, ToleranceType, PeriodicParamTable, PrimaryParamTable) values ('"+type+"','"+serialNumber+"','"+poleCount+"','"+measUnit+"','"+toleranceType+"','"+ePerParamTable+"','"+ePrimParamTable+"')";
+		AksolDataBase.sqlQueryUpdate(sqlString);
+		//Создание таблиц для первичных и переодических параметров годности
+		sqlString = "CREATE TABLE ["+ePerParamTable+"] (id INTEGER PRIMARY KEY AUTOINCREMENT, freq REAL, m_s11_d REAL, m_s11_n REAL, m_s11_u REAL, p_s11_d REAL, p_s11_n REAL,  p_s11_u REAL)";
+		AksolDataBase.sqlQueryUpdate(sqlString);
+		sqlString = "CREATE TABLE ["+ePrimParamTable+"] (id INTEGER PRIMARY KEY AUTOINCREMENT, freq REAL, m_s11_d REAL, m_s11_n REAL, m_s11_u REAL, p_s11_d REAL, p_s11_n REAL,  p_s11_u REAL)";
+		AksolDataBase.sqlQueryUpdate(sqlString);
+		//Заполняем таблицы с параметрами
+	}
 	@Override
-	public abstract void deleteFromDB();
+	public void deleteFromDB() {
+		
+	}
 	@Override
-	public abstract void editInfoInDB();
+	public void editInfoInDB() {
+		
+	}
 	@Override
-	public abstract void getData();
+	public void getData() {
+		
+	}
 //----------------------------------------	
 	//критерии годности
 	public ToleranceParametrs periodicParametrs;

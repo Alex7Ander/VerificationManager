@@ -13,9 +13,9 @@ public class NewDeviceWindow extends guiWindow{
 	
 	public static NewDeviceWindow getNewDeviceWindow() throws IOException {
 		if (instanceNewDeviceWindow == null) {
-			instanceNewDeviceWindow = new NewDeviceWindow();
+			instanceNewDeviceWindow = new NewDeviceWindow();			
 		}
 		return instanceNewDeviceWindow;
 	}
-
+	
 }

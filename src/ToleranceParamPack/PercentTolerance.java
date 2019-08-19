@@ -1,5 +1,6 @@
 package ToleranceParamPack;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -17,6 +18,30 @@ public class PercentTolerance extends ToleranceParametrs {
 	public boolean checkResult(MeasResult result, HashMap<Double, Double> report) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public void saveInDB() throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void deleteFromDB() throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void editInfoInDB() throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void getData() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

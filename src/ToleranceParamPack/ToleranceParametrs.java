@@ -2,7 +2,6 @@ package ToleranceParamPack;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-
 import DataBasePack.dbStorable;
 import DevicePack.Element;
 import DevicePack.Includable;
@@ -38,27 +37,5 @@ public abstract class ToleranceParametrs implements Includable<Element>, dbStora
 	private Element myElement;
 	@Override
 	public Element getMyOwner() {return myElement;}
-				
-//dbStorable	
-	@Override
-	public void saveInDB() throws SavingException {
-		// TODO Auto-generated method stub
-		
-	}
-	@Override
-	public void deleteFromDB() {
-		// TODO Auto-generated method stub
-		
-	}
-	@Override
-	public void editInfoInDB() {
-		// TODO Auto-generated method stub
-		
-	}
-	@Override
-	public void getData() {
-		// TODO Auto-generated method stub
-		
-	}
-	
+					
 }

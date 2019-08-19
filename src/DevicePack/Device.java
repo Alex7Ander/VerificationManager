@@ -2,6 +2,7 @@ package DevicePack;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import DataBasePack.DataBaseManager;
 import DataBasePack.dbStorable;
@@ -23,9 +24,8 @@ public class Device implements dbStorable {
 	public String getSerialNumber() {return serialNumber;}
 	public String getGosNumber() {return gosNumber;}
 	public String Owner() {return owner;}
-	public int getCountOfElements() {return this.includedElements.size();}
-	
-	
+	public int getCountOfElements() {return this.countOfElements;}
+		
 	public Device(){
 		//
 	}
@@ -34,24 +34,29 @@ public class Device implements dbStorable {
 		this.name = Name;
 		this.type = Type;
 		this.serialNumber = SerialNumber;
-		String sqlQuery = "SELECT Owner, GosNumber, CountOfElements, ElementsTable FROM Devices WHERE TypeOfDevice='"+ Name +"' AND NameOfDevice='"+ Type +"' AND SerialNumber='"+ SerialNumber +"'";
+		String sqlQuery = "SELECT Owner, GosNumber, CountOfElements, ElementsTable FROM Devices WHERE TypeOfDevice='"+ Type +"' AND NameOfDevice='"+ Name +"' AND SerialNumber='"+ SerialNumber +"'";
+		
 		ArrayList<String> fieldName = new ArrayList<String>();
 		fieldName.add("Owner"); 
 		fieldName.add("GosNumber");
 		fieldName.add("CountOfElements");
 		fieldName.add("ElementsTable");
-		ArrayList<ArrayList<String>> arrayResults = new ArrayList<ArrayList<String>>();
+		
+		ArrayList<Element> includedElements = new ArrayList<Element>();
+		ArrayList<ArrayList<String>> arrayResults = new ArrayList<ArrayList<String>>();	
+				
 		DataBaseManager.getDB().sqlQueryString(sqlQuery, fieldName, arrayResults);
+	
 		if (arrayResults.size() > 0) {
 			this.owner = arrayResults.get(0).get(0);
-			this.gosNumber = arrayResults.get(0).get(1);
-			this.countOfElements = Integer.parseInt(arrayResults.get(0).get(2));
-			this.elementsTableName = arrayResults.get(0).get(3);
-			for (int i=0; i<this.countOfElements; i++) {
-				/*
-				Element incElement = new Element(this.elementsTableName, i);
-				this.includedElements.add(incElement);
-				*/
+			this.gosNumber = arrayResults.get(0).get(1);						
+			this.elementsTableName = arrayResults.get(0).get(3);			
+			this.countOfElements = 0;			
+			int predictableCount = Integer.parseInt(arrayResults.get(0).get(2));
+			for (int i=0; i<predictableCount; i++) {			
+				this.includedElements.add(new Element());
+				//this.includedElements.add(new Element(this.elementsTableName, i+1));
+				this.countOfElements++;		
 			}
 		}
 		else {
@@ -67,10 +72,7 @@ public class Device implements dbStorable {
 		this.gosNumber = GosNumber;
 	}
 	
-	
-//dbStorable	
-	@Override
-	public void saveInDB() throws SavingException{
+	public boolean isExist() {
 		String sqlString = null;
 		String addStr = name + " " + type + " " + serialNumber;
 		String strElementsTable = "Elements of " + addStr;
@@ -78,33 +80,35 @@ public class Device implements dbStorable {
 		int isExist = 0;
 		try {
 			isExist = AksolDataBase.sqlQueryCount(sqlString);
+			if (isExist == 0) {
+				return false;
+			}
+			else {
+				return true;
+			}
 		}
 		catch(SQLException exp){
-			throw new SavingException("Ошибка в запроесе [ "+sqlString+" ] при проверке количества приборов с таким именем.\nОбратитесь к разработчикам ПО для разрешения проблемы.");
+			return true;
+		}		 
+	}
+//dbStorable	
+	@Override
+	public void saveInDB() throws SQLException{
+		String sqlString = null;
+		String addStr = name + " " + type + " " + serialNumber;
+		String strElementsTable = "Elements of " + addStr;
+		
+		sqlString = "INSERT INTO [Devices] (NameOfDevice, TypeOfDevice, SerialNumber, Owner, GosNumber, CountOfElements, ElementsTable) values ('"+name+"','"+type+"','"+serialNumber+"','"+owner+"','"+gosNumber+"','"+Integer.toString(this.countOfElements)+"','"+strElementsTable+"')";
+		AksolDataBase.sqlQueryUpdate(sqlString);
+		//Создание таблицы со списком включенных элементов
+		sqlString = "CREATE TABLE ["+strElementsTable+"] (id INTEGER PRIMARY KEY AUTOINCREMENT, ElementType VARCHAR(256), ElementSerNumber VARCHAR(256), PoleCount VARCHAR(256), MeasUnit VARCHAR(256), ToleranceType VARCHAR(256), PeriodicParamTable VARCHAR(256), PrimaryParamTable VARCHAR(256))";
+		AksolDataBase.sqlQueryUpdate(sqlString);
+		for (int i=0; i < this.countOfElements; i++){
+			//Сохранение в БД данных о составных элементах
+			this.includedElements.get(i).saveInDB(); 		
 		}
-		if (isExist > 0) {
-			throw new SavingException("Прибор данного наименования и типа \nс таким серийным номером уже существует!");
-		}
-		else {
-			try {
-				sqlString = "BEGIN TRANSACTION";
-				AksolDataBase.sqlQueryUpdate(sqlString);
-				sqlString = "INSERT INTO [Devices] (TypeOfDevice, NameOfDevice, SerialNumber, Owner, GosNumber, CountOfElements, ElementsTable) values ('"+type+"','"+name+"','"+serialNumber+"','"+owner+"','"+gosNumber+"','"+Integer.toString(this.countOfElements)+"','"+strElementsTable+"')";
-				AksolDataBase.sqlQueryUpdate(sqlString);
-				//Создание таблицы со списком включенных элементов
-				sqlString = "CREATE TABLE ["+strElementsTable+"] (id INTEGER PRIMARY KEY AUTOINCREMENT, ElementType VARCHAR(256), ElementSerNumber VARCHAR(256), PoleCount VARCHAR(256), MeasUnit VARCHAR(256), ToleranceType VARCHAR(256), PeriodicParamTable VARCHAR(256), PrimaryParamTable VARCHAR(256))";
-				AksolDataBase.sqlQueryUpdate(sqlString);
-				for (int i=0; i < this.countOfElements; i++){
-					//Сохранение в БД данных о составных элементах
-					this.includedElements.get(i).saveInDB(); 		
-				}
-				sqlString = "COMMIT";
-				AksolDataBase.sqlQueryUpdate(sqlString);
-			}
-			catch(Exception exp){
-		      new SavingException("При сохранении произошла ошибка! Не выполнен запрос " + sqlString);
-			}
-		}
+		sqlString = "COMMIT";
+		AksolDataBase.sqlQueryUpdate(sqlString);
 	}
 	
 	@Override
@@ -118,6 +122,18 @@ public class Device implements dbStorable {
 	@Override
 	public void getData() {
 		// TODO Auto-generated method stub		
+	}
+	
+	public void addElement(Element element) {
+		this.includedElements.add(element);
+	}
+	
+	public void removeElement(int index) {
+		Iterator<Element> it = this.includedElements.iterator();
+		for (int i=0; i<index; i++) {
+			it.next();
+		}
+		it.remove();
 	}
 	
 	

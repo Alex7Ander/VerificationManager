@@ -4,13 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-
 import AboutMessageForm.AboutMessageWindow;
 import DataBasePack.DataBaseManager;
 import DevicePack.Device;
 import FileManagePack.FileManager;
 import GUIpack.InfoRequestable;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -20,7 +18,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
@@ -100,29 +97,21 @@ public class SearchDeviceController {
 	}
 	
 	@FXML
-	private void chooseBtnClick() {		
-		System.out.println("Метод выбора вызван");
+	private void chooseBtnClick() throws IOException {		
 		int index =  this.devicesListView.getSelectionModel().getSelectedIndex();
 		String cName = listOfDevicesInfo.get(index).get(0);
 		String cType = listOfDevicesInfo.get(index).get(1);
 		String cSerNum = listOfDevicesInfo.get(index).get(2);
 		String text = cName + " " + cType + " " + cSerNum;	
 		this.headLabel.setText(text);
-		try {
+		try {		
 			foundedDevice = new Device(cName, cType, cSerNum);
 			this.myRequester.setDevice(foundedDevice);
-			this.myRequester.representRequestedInfo();
+			this.myRequester.representRequestedInfo();									
 		}
-		catch(SQLException exp) {
-			try {
-				AboutMessageWindow errorWindow = new AboutMessageWindow("Ошибка", "Ошибка доступа к БД. \nОбъект не может быть инициализирован");
-			}
-			catch(IOException ioExp) {
-				//
-			}
+		catch(SQLException exp){
+			AboutMessageWindow errorWindow = new AboutMessageWindow("Ошибка", "Ошибка доступа к БД.\nОбъект не может быть инициализирован");
 		}
-		
-		//
 		Stage stage = (Stage) chooseBtn.getScene().getWindow();
 	    stage.close();
 	}
