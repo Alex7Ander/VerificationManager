@@ -56,7 +56,6 @@ public class VerificationController implements InfoRequestable {
 	@FXML
 	private void searchDeviceBtnClick(ActionEvent event) {
 		try {
-			//verificatedDevice = new Device();
 			SearchDeviceWindow.getSearchDeviceWindow(verificatedDevice, this).show();
 		}
 		catch(IOException exp) {
@@ -99,10 +98,10 @@ public class VerificationController implements InfoRequestable {
 					int countOfParams = this.verificatedDevice.includedElements.get(i).getPoleCount();
 					if (countOfParams == 2) { countOfParams = 1;}
 					if (this.verificatedDevice.includedElements.get(i).getMeasUnit().equals("VSWR")) {
-						this.verificationResult.add(new VSWR_Result(countOfParams));
+						//this.verificationResult.add(new VSWR_Result(countOfParams));
 					}
 					else if (this.verificatedDevice.includedElements.get(i).getMeasUnit().equals("Gamma")) {
-						this.verificationResult.add(new Gamma_Result(countOfParams));
+						//this.verificationResult.add(new Gamma_Result(countOfParams));
 					}
 				}
 			}

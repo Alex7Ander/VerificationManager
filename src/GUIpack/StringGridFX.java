@@ -101,6 +101,15 @@ public class StringGridFX {
 		}
 	}
 	
+	public StringGridFX(int ColCount, int RowCount, double Width, double Height, ScrollPane ScrollContainer, AnchorPane container, ArrayList<String> values, boolean VisibleStatus) {
+		this(ColCount, RowCount, Width, Height, ScrollContainer, container, values);
+		this.setVisible(VisibleStatus);
+	}
+	public StringGridFX(int ColCount, int RowCount, double Width, double Height, ScrollPane ScrollContainer, AnchorPane container, boolean VisibleStatus) {
+		this(ColCount, RowCount, Width, Height, ScrollContainer, container);
+		this.setVisible(VisibleStatus);
+	}
+		
 	public int getColCount() {
 		return this.colCount;
 	}
@@ -205,5 +214,9 @@ public class StringGridFX {
 		for (int i=0; i<this.rowCount; i++) {
 			this.cells.get(i).get(index).setText(columnValues.get(i));
 		}
+	}
+	
+	public void setVisible(boolean visibleStatus) {
+		this.scrollContainer.setVisible(visibleStatus);
 	}
 }

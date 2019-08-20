@@ -9,9 +9,9 @@ import VerificationPack.MeasResult;
 
 public class PercentTolerance extends ToleranceParametrs {
 
-	PercentTolerance(Element ParamsOwnerElement, ArrayList<String> ParametrsNames,
-			ArrayList<ArrayList<Double>> Parametrs) {
-		super(ParamsOwnerElement, ParametrsNames, Parametrs);
+	PercentTolerance(Element ParamsOwnerElement, ArrayList<Double> Freqs,
+			ArrayList<ArrayList<Double>> Parametrs, String TypeByTime) {
+		super(ParamsOwnerElement, Freqs, Parametrs, TypeByTime);
 	}
 
 	@Override

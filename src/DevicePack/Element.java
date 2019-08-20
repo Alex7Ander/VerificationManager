@@ -15,6 +15,7 @@ public class Element implements Includable<Device>, Verificatable, dbStorable{
 	public Element() {
 		
 	}
+	
 	//Конструктор, инициализирующий объект информацией из БД
 	//Вызывается при инициализации устройства перед поверкой
 	public Element(String ElementTableName, int index) throws SQLException{
@@ -33,13 +34,25 @@ public class Element implements Includable<Device>, Verificatable, dbStorable{
 	
 	//Конструктор, инициализирующий объект информацией из Графического интерфейса для последующего сохранения в БД
 	//Вызывается при инициализации устройства перед сохранением нового устройства в БД
-	public Element(String Type, String SerialNumber, int PoleCount, String MeasUnit, String ToleranceType, Device MyDevice){
+	public Element(String Type, String SerialNumber, int PoleCount, String MeasUnit, String ToleranceType, Device MyDevice, MeasResult Nominal, ToleranceParametrs PrimaryTolParams, ToleranceParametrs PeriodicTolParams){
 		this.type = Type;
 		this.serialNumber = SerialNumber;
 		this.poleCount = PoleCount;
 		this.measUnit = MeasUnit;
 		this.toleranceType = ToleranceType;
 		this.myDevice = MyDevice; 
+		this.listOfVerificationsTable = "Verifications of " + this.myDevice.getName() + " " +
+				this.myDevice.getType() + " " + this.myDevice.getSerialNumber() + " "+
+				this.type + " " + this.serialNumber;
+			
+		String addrStr = this.myDevice.getName() + " " + this.myDevice.getType() + " " +this.myDevice.getSerialNumber() + " "+
+				this.type + " " + this.serialNumber;
+		this.primaryParamTable = "Primary for " + addrStr;
+		this.periodicParamTable = "Periodic for " + addrStr;
+		
+		this.nominal = Nominal;
+		this.primaryToleranceParams =  PrimaryTolParams;	
+		this.periodicToleranceParams = PeriodicTolParams;
 	}
 	
 	protected String type;
@@ -47,18 +60,25 @@ public class Element implements Includable<Device>, Verificatable, dbStorable{
 	protected int poleCount;
 	protected String measUnit;
 	protected String toleranceType;
+	
 	protected String periodicParamTable;
 	protected String primaryParamTable;
+	protected String listOfVerificationsTable;
 	
-	protected Device myDevice;
-	private MeasResult nominal;
-		
+	protected Device myDevice; 		//Устройство, которому принадлежит элемент
+	private MeasResult nominal;		//Номиналы значений
+	private ToleranceParametrs primaryToleranceParams;	// 
+	private ToleranceParametrs periodicToleranceParams;
+	
+	//getters
 	public String getType() {return this.type;}
 	public String getSerialNumber() {return this.serialNumber;}
 	public int getPoleCount() {return this.poleCount;}
 	public String getMeasUnit() {return this.measUnit;}
 	public String getToleranceType() {return this.toleranceType;}
-	
+	public String getPeriodicParamTable() {return periodicParamTable;}
+	public String getPrimaryParamTable() {return primaryParamTable;}
+	public String getListOfVerificationsTable() {return listOfVerificationsTable;}
 	@Override
 	public Device getMyOwner() {return this.myDevice;}
 	
@@ -70,15 +90,15 @@ public class Element implements Includable<Device>, Verificatable, dbStorable{
 		String strElementsTable = "Elements of " + addStr;
 		String ePerParamTable  = "Periodic for " + addStr + " " + this.type + " " + this.serialNumber;
 		String ePrimParamTable = "Primary for " + addStr + " " + this.type + " " + this.serialNumber;
-		//Внесли запись об элементе
+		// 3.1 Внесли запись об элементе
 		sqlString = "INSERT INTO ["+strElementsTable+"] (ElementType, ElementSerNumber, PoleCount, MeasUnit, ToleranceType, PeriodicParamTable, PrimaryParamTable) values ('"+type+"','"+serialNumber+"','"+poleCount+"','"+measUnit+"','"+toleranceType+"','"+ePerParamTable+"','"+ePrimParamTable+"')";
 		AksolDataBase.sqlQueryUpdate(sqlString);
-		//Создание таблиц для первичных и переодических параметров годности
-		sqlString = "CREATE TABLE ["+ePerParamTable+"] (id INTEGER PRIMARY KEY AUTOINCREMENT, freq REAL, m_s11_d REAL, m_s11_n REAL, m_s11_u REAL, p_s11_d REAL, p_s11_n REAL,  p_s11_u REAL)";
-		AksolDataBase.sqlQueryUpdate(sqlString);
-		sqlString = "CREATE TABLE ["+ePrimParamTable+"] (id INTEGER PRIMARY KEY AUTOINCREMENT, freq REAL, m_s11_d REAL, m_s11_n REAL, m_s11_u REAL, p_s11_d REAL, p_s11_n REAL,  p_s11_u REAL)";
-		AksolDataBase.sqlQueryUpdate(sqlString);
-		//Заполняем таблицы с параметрами
+		// 3.2 Создание таблицы [Verification of ...]
+		sqlString = "CREATE TABLE Verification of " + (addStr + " " + this.type + " " + this.serialNumber) + "(id INTEGER PRIMARY KEY AUTOINCREMENT, dateOfVerification VARCHAR(20), resultsTableName (512))";
+		// 3.3 Сохранить критерии годности
+		//this.toleranceParams.saveInDB();	
+		// 3.4 Сохраняем номиналы
+		this.nominal.saveInDB();		
 	}
 	@Override
 	public void deleteFromDB() {
