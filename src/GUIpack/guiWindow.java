@@ -26,6 +26,7 @@ public class guiWindow {
 		stage.setScene(scene);
 		stage.setResizable(false);
 		stage.setTitle(title);		
+		
 	}
 	
 	public void show() {

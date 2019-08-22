@@ -22,7 +22,7 @@ public class StringGridFX {
 	private int colCount;
 	private int rowCount;
 	private ScrollPane scrollContainer;
-	private AnchorPane ownerContainer;
+	private Pane ownerContainer;
 	private VBox vBox;
 	
 	private ObservableList<HBox> lines;	
@@ -36,7 +36,7 @@ public class StringGridFX {
 	private double width;
 	private double celWidth;
 	
-	public StringGridFX(int ColCount, int RowCount, double Width, double Height, ScrollPane ScrollContainer, AnchorPane container) {
+	public StringGridFX(int ColCount, int RowCount, double Width, double Height, ScrollPane ScrollContainer, Pane container) {
 		
 		celWidth = Width/ColCount - 1;
 		celHeight = 27;

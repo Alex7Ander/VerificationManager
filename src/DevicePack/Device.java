@@ -21,6 +21,7 @@ public class Device implements dbStorable {
 	
 	public String getType() {return type;}
 	public String getName() {return name;}
+	public String getOwner() {return this.owner;}
 	public String getSerialNumber() {return serialNumber;}
 	public String getGosNumber() {return gosNumber;}
 	public String Owner() {return owner;}
@@ -135,6 +136,7 @@ public class Device implements dbStorable {
 		}
 		it.remove();
 	}
+	
 	
 	
 }

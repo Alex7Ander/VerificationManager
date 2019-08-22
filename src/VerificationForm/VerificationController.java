@@ -118,6 +118,5 @@ public class VerificationController implements InfoRequestable {
 	@Override
 	public void setDevice(Device device) {
 		verificatedDevice = device;
-		System.out.println("In setDevice " + verificatedDevice.getName());
 	}
 }

@@ -10,8 +10,7 @@ import java.io.IOException;
 
 import AboutMessageForm.AboutMessageWindow;
 import DBEditForm.DBEditWindow;
-import NewDeviceForm.ElementWindow;
-import NewDeviceForm.NewDeviceWindow;
+import NewDevicePack.NewDeviceWindow;
 import OldDocSearchPack.OldDocSearchWindow;
 import VerificationForm.*;
 

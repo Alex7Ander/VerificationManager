@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import DevicePack.Includable;
 import GUIpack.guiWindow;
-import NewDeviceForm.NewDeviceController;
+import NewDevicePack.NewDeviceController;
 
 public class AddNewDeviceNameWindow extends guiWindow implements Includable<NewDeviceController> {
 

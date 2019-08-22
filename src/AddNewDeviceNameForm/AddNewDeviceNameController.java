@@ -6,7 +6,7 @@ import java.util.Iterator;
 import AboutMessageForm.AboutMessageWindow;
 import DevicePack.Includable;
 import FileManagePack.FileManager;
-import NewDeviceForm.NewDeviceController;
+import NewDevicePack.NewDeviceController;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
