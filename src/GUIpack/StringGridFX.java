@@ -205,18 +205,33 @@ public class StringGridFX {
 	}
 	
 	public void getColumn(int index, ArrayList<String> columnValues) {
-		for (int i=0; i<this.rowCount; i++) {
+		columnValues.clear();
+		for (int i = 0; i < this.rowCount; i++) {
 			columnValues.add(this.cells.get(i).get(index).getText());
 		}
 	}
 	
+	public void getColumnToDouble(int index, ArrayList<Double> columnValues) throws NumberFormatException {
+		for (int i = 0; i < this.rowCount; i++) {
+			columnValues.add(Double.parseDouble(this.cells.get(i).get(index).getText()));
+		}		
+	}
+	
 	public void setColumn(int index, ArrayList<String> columnValues) {
-		for (int i=0; i<this.rowCount; i++) {
+		for (int i=0; i<columnValues.size(); i++) { // было for (int i=0; i<this.rowCount; i++)
 			this.cells.get(i).get(index).setText(columnValues.get(i));
+		}
+	}
+	
+	public void setColumnFromDouble(int index, ArrayList<Double> columnValues) {
+		for (int i=0; i<this.rowCount; i++) {
+			this.cells.get(i).get(index).setText(columnValues.get(i).toString());
 		}
 	}
 	
 	public void setVisible(boolean visibleStatus) {
 		this.scrollContainer.setVisible(visibleStatus);
 	}
+
+
 }

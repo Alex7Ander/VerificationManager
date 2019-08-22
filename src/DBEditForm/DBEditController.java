@@ -3,6 +3,7 @@ package DBEditForm;
 import java.io.IOException;
 
 import DevicePack.Device;
+import ErrorParamsPack.ErrorParamsWindow;
 import GUIpack.InfoRequestable;
 import GUIpack.StringGridFX;
 import SearchDevicePack.SearchDeviceWindow;
@@ -81,8 +82,8 @@ public class DBEditController implements InfoRequestable {
 	}
 	
 	@FXML
-	private void errorParamsBtnClick() {
-		
+	private void errorParamsBtnClick() throws IOException {
+		ErrorParamsWindow.getErrorParamsWindow().show();
 	}
 	
 	@FXML

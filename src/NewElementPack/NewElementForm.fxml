@@ -16,7 +16,7 @@
                   <Separator prefWidth="200.0" />
                   <HBox prefHeight="100.0" prefWidth="200.0">
                      <children>
-                        <ComboBox fx:id="paramsComboBox" prefHeight="25.0" prefWidth="299.0" />
+                        <ComboBox fx:id="paramsComboBox" onAction="#paramsComboBoxClick" prefHeight="25.0" prefWidth="299.0" />
                         <Separator orientation="VERTICAL" prefHeight="200.0" />
                         <Button fx:id="addFreqBtn" mnemonicParsing="false" onAction="#addFreqBtnClick" prefHeight="26.0" prefWidth="100.0" stylesheets="@../application/commonButton.css" text="+ частота" />
                         <Separator orientation="VERTICAL" prefHeight="200.0" />

@@ -1,9 +1,11 @@
 package NewElementPack;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import FileManagePack.FileManager;
+import FreqTablesPack.FreqTablesWindow;
 import GUIpack.StringGridFX;
 import ToleranceParamPack.ToleranceParametrs;
 import VerificationPack.MeasResult;
@@ -63,11 +65,6 @@ public class NewElementController {
 	private AnchorPane tablePane;
 	
 	private StringGridFX paramsTable;
-	private StringGridFX paramsTable1;
-	private StringGridFX paramsTable2;
-	private StringGridFX paramsTable3;
-	private StringGridFX paramsTable4;
-	private ArrayList<StringGridFX> tables;
 	
 	private ToggleGroup poleCountGroup;
 	private ToggleGroup measUnitGroup;
@@ -86,11 +83,47 @@ public class NewElementController {
 	private MeasResult Nominal;
 	private ToleranceParametrs PrimaryTolParams;
 	private ToleranceParametrs PeriodicTolParams;
+	
+	//Коллекции с введенными значениями
+	int timeIndex;
+	int paramIndex;
+	int savingIndex;
+	String[] keys = {"primary_s11", "primary_s12", "primary_s21", "primary_s22", 
+					 "periodical_s11", "periodical_s12", "periodical_s21", "periodical_s22"};
+	private ArrayList<Double> freqs;
+	
+	private HashMap<String, ArrayList<String>> d_m_s; 	//нижний предел
+	private HashMap<String, ArrayList<String>> m_s; 	//Модуль
+	private HashMap<String, ArrayList<String>> u_m_s;	//верхний предел
+	
+	private HashMap<String, ArrayList<String>> d_p_s;	//нижний предел
+	private HashMap<String, ArrayList<String>> p_s; 	//Фаза
+	private HashMap<String, ArrayList<String>> u_p_s;	//верхний предел
+	
 	//Randomizer
 	
 	@FXML
 	private void initialize() {
-
+		timeIndex = 0;
+		paramIndex = 0;
+		savingIndex = 0;
+		freqs = new ArrayList<Double>();
+		d_m_s = new HashMap<String, ArrayList<String>>();
+		m_s = new HashMap<String, ArrayList<String>>();
+		u_m_s = new HashMap<String, ArrayList<String>>();
+		d_p_s = new HashMap<String, ArrayList<String>>();
+		p_s = new HashMap<String, ArrayList<String>>();
+		u_p_s = new HashMap<String, ArrayList<String>>();
+		for (int i=0; i<8; i++) {
+			d_m_s.put(keys[i], new ArrayList<String>());
+			m_s.put(keys[i], new ArrayList<String>());
+			u_m_s.put(keys[i], new ArrayList<String>());
+			
+			d_p_s.put(keys[i], new ArrayList<String>());
+			p_s.put(keys[i], new ArrayList<String>());
+			u_p_s.put(keys[i], new ArrayList<String>());
+		}
+	
 		listOfParams = FXCollections.observableArrayList();
 		twoPoleTypesList = FXCollections.observableArrayList();
 		fourPoleTypesList = FXCollections.observableArrayList();		
@@ -153,21 +186,22 @@ public class NewElementController {
 	private void vswrRBClick(ActionEvent event) {
 		currentTypeOfParams = "vswr";
 		setParams(currentTypeOfParams, currentCountOfParams);
-		this.paramsComboBox.setItems(listOfParams);
+		paramsComboBox.setItems(listOfParams);
 	}
 	
 	@FXML
 	private void gammaClick(ActionEvent event) {
 		currentTypeOfParams = "gamma";
 		setParams(currentTypeOfParams, currentCountOfParams);
-		this.paramsComboBox.setItems(listOfParams);
+		paramsComboBox.setItems(listOfParams);
 	}
 	
 	@FXML
 	private void twoPoleRBClick(ActionEvent event) {
 		currentCountOfParams = 1;
 		setParams(currentTypeOfParams, currentCountOfParams);
-		this.paramsComboBox.setItems(listOfParams);
+		paramsComboBox.setItems(listOfParams);
+		paramsComboBox.setValue(listOfParams.get(0));
 		elemTypesComboBox.setItems(twoPoleTypesList);
 		elemTypesComboBox.setValue("Нагрузка согласованная");
 	}
@@ -176,7 +210,8 @@ public class NewElementController {
 	private void fourPoleRBClick(ActionEvent event) {
 		currentCountOfParams = 4;
 		setParams(currentTypeOfParams, currentCountOfParams);
-		this.paramsComboBox.setItems(listOfParams);
+		paramsComboBox.setItems(listOfParams);
+		paramsComboBox.setValue(listOfParams.get(0));
 		elemTypesComboBox.setItems(fourPoleTypesList);
 		elemTypesComboBox.setValue("Отрезок линии");
 	}
@@ -193,26 +228,35 @@ public class NewElementController {
 	
 	@FXML
 	private void primaryRBClick() {
-		
+		if (primaryVerificationRB.isSelected()){
+			timeIndex -= 4;
+			int showIndex = paramIndex + timeIndex;		
+			refreshTable(savingIndex, showIndex);
+			savingIndex = showIndex;
+		}
 	}
 	
 	@FXML
-	private void periodicRBClick() {
-		
+	private void periodicRBClick() {		
+		if (periodicVerificationRB.isSelected()) {
+			timeIndex += 4;
+			int showIndex = paramIndex + timeIndex;		
+			refreshTable(savingIndex, showIndex);
+			savingIndex = showIndex;
+		}
 	}
-		
+				
+	@FXML
+	private void paramsComboBoxClick() {		
+		paramIndex = this.paramsComboBox.getSelectionModel().getSelectedIndex();
+		int showIndex = paramIndex + timeIndex;		
+		refreshTable(savingIndex, showIndex);
+		savingIndex = showIndex;
+	}
+	
 	@FXML 
 	private void agreeBtnClick(ActionEvent event) {
-		ArrayList<Double> Freqs = new ArrayList<Double>();
-		/*
-		if (this.vswrRB.isCache()) {
-			
-			Nominal = new VSWR_Result();
-		}
-		else {
-			Nominal = new Gamma_Result();
-		}
-		*/
+		//
 	}
 	
 	@FXML 
@@ -226,19 +270,8 @@ public class NewElementController {
 	}
 	
 	@FXML
-	private void paramsComboBoxClick() {
-		/*
-		int index = this.paramsComboBox.getSelectionModel().getSelectedIndex();
-		for (int i=0; i<tables.size(); i++) {
-			tables.get(i).setVisible(false);
-		}
-		tables.get(index).setVisible(true);
-		*/
-	}
-	
-	@FXML
-	private void freaTablesBtnClick() {
-		
+	private void freaTablesBtnClick() throws IOException {
+		FreqTablesWindow.getFreqTablesWindow(this).show();
 	}
 	
 	private void setParams(String paramsIndex, int countOfParams) {
@@ -254,6 +287,50 @@ public class NewElementController {
 			listOfParams.add("S12");
 			listOfParams.add("S21");
 			listOfParams.add("S22");
+		}
+	}
+	
+	public void setFreqTable(ArrayList<Double> freqTable) {
+		freqs = freqTable;
+		ArrayList<String> columnFreqValues = new ArrayList<String>();
+		for (Double fr : freqTable) {
+			columnFreqValues.add(fr.toString());
+		}
+		
+		int currentRowCount = this.paramsTable.getRowCount();
+		if (currentRowCount < freqTable.size()) {
+			while (this.paramsTable.getRowCount() < freqTable.size()) {
+				this.paramsTable.addRow();
+			}				
+		}
+		else if (currentRowCount > freqTable.size()) {
+			while (this.paramsTable.getRowCount() > freqTable.size()) {
+				this.paramsTable.deleteRow(this.paramsTable.getRowCount());
+			}
+		}
+		
+		this.paramsTable.setColumn(0, columnFreqValues);
+	}
+	
+	public void refreshTable(int savingIndex, int showIndex) {
+		if(savingIndex >= 0 && showIndex >= 0) {
+			this.paramsTable.getColumnToDouble(0, freqs);		
+			this.paramsTable.getColumn(1, d_m_s.get(keys[savingIndex]));
+			this.paramsTable.getColumn(2, m_s.get(keys[savingIndex]));
+			this.paramsTable.getColumn(3, u_m_s.get(keys[savingIndex]));
+			this.paramsTable.getColumn(4, d_p_s.get(keys[savingIndex]));
+			this.paramsTable.getColumn(5, p_s.get(keys[savingIndex]));
+			this.paramsTable.getColumn(6, u_p_s.get(keys[savingIndex]));
+		
+			this.paramsTable.clear();
+		
+			this.paramsTable.setColumnFromDouble(0, freqs);
+			this.paramsTable.setColumn(1, d_m_s.get(keys[showIndex]));
+			this.paramsTable.setColumn(2, m_s.get(keys[showIndex]));
+			this.paramsTable.setColumn(3, u_m_s.get(keys[showIndex]));
+			this.paramsTable.setColumn(4, d_p_s.get(keys[showIndex]));
+			this.paramsTable.setColumn(5, p_s.get(keys[showIndex]));
+			this.paramsTable.setColumn(6, u_p_s.get(keys[showIndex]));
 		}
 	}
 	

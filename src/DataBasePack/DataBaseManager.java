@@ -130,6 +130,18 @@ public class DataBaseManager {
     		arrayResults.add(tempArray);
     	}
     }
+    
+    public void sqlQueryDouble(String sqlString, ArrayList<String> fieldName, ArrayList<ArrayList<Double>> arrayResults) throws SQLException{
+    	ResultSet rSet = this.state.executeQuery(sqlString);
+    	arrayResults.clear();
+    	while(rSet.next()) {
+    		ArrayList<Double> tempArray = new ArrayList<Double>();
+    		for (int i=0; i<fieldName.size(); i++) {
+    			tempArray.add((double) rSet.getFloat(fieldName.get(i)));
+    		}
+    		arrayResults.add(tempArray);
+    	}
+    }
       
     public void sqlQueryMapOfDouble(String sqlString, ArrayList<String> fieldsNames, ArrayList<String> paramsNames, HashMap<String, HashMap<Double, Double>> mapResults) throws SQLException{
     	ResultSet rSet = this.state.executeQuery(sqlString);

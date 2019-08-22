@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="481.0" prefWidth="345.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ErrorParamsPack.ErrorParamsController">
+   <children>
+      <VBox layoutX="83.0" prefHeight="437.0" prefWidth="322.0" AnchorPane.bottomAnchor="35.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="13.0" AnchorPane.topAnchor="10.0">
+         <children>
+            <Label fx:id="label" stylesheets="@../../bin/application/commonLabel.css" text="Параметры погрешности" />
+            <Separator prefWidth="200.0" />
+            <Label stylesheets="@../../bin/application/commonLabel.css" text="Тракт:" />
+            <ComboBox fx:id="tractComboBox" onAction="#tractComboBoxClick" prefHeight="25.0" prefWidth="433.0" />
+            <Pane prefHeight="18.0" prefWidth="433.0" />
+            <HBox prefHeight="35.0" prefWidth="200.0">
+               <children>
+                  <Label stylesheets="@../../bin/application/commonLabel.css" text="a1 = " />
+                  <TextField fx:id="a1TextField" prefHeight="25.0" prefWidth="290.0" />
+               </children>
+            </HBox>
+            <HBox prefHeight="35.0" prefWidth="200.0">
+               <children>
+                  <Label stylesheets="@../../bin/application/commonLabel.css" text="b1 = " />
+                  <TextField fx:id="b1TextField" prefHeight="25.0" prefWidth="290.0" />
+               </children>
+            </HBox>
+            <HBox prefHeight="35.0" prefWidth="200.0">
+               <children>
+                  <Label stylesheets="@../../bin/application/commonLabel.css" text="c1 = " />
+                  <TextField fx:id="c1TextField" prefHeight="25.0" prefWidth="290.0" />
+               </children>
+            </HBox>
+            <HBox prefHeight="35.0" prefWidth="200.0">
+               <children>
+                  <Label stylesheets="@../../bin/application/commonLabel.css" text="d1 = " />
+                  <TextField fx:id="d1TextField" prefHeight="25.0" prefWidth="290.0" />
+               </children>
+            </HBox>
+            <HBox prefHeight="35.0" prefWidth="200.0">
+               <children>
+                  <Label stylesheets="@../../bin/application/commonLabel.css" text="e1 = " />
+                  <TextField fx:id="e1TextField" prefHeight="25.0" prefWidth="290.0" />
+               </children>
+            </HBox>
+            <HBox prefHeight="35.0" prefWidth="200.0">
+               <children>
+                  <Label stylesheets="@../../bin/application/commonLabel.css" text="a2 = " />
+                  <TextField fx:id="a2TextField" prefHeight="25.0" prefWidth="290.0" />
+               </children>
+            </HBox>
+            <HBox prefHeight="35.0" prefWidth="200.0">
+               <children>
+                  <Label stylesheets="@../../bin/application/commonLabel.css" text="b2 = " />
+                  <TextField fx:id="b2TextField" prefHeight="25.0" prefWidth="290.0" />
+               </children>
+            </HBox>
+            <HBox prefHeight="35.0" prefWidth="200.0">
+               <children>
+                  <Label stylesheets="@../../bin/application/commonLabel.css" text="c2 = " />
+                  <TextField fx:id="c2TextField" prefHeight="25.0" prefWidth="290.0" />
+               </children>
+            </HBox>
+            <HBox prefHeight="35.0" prefWidth="200.0">
+               <children>
+                  <Label stylesheets="@../../bin/application/commonLabel.css" text="d2 = " />
+                  <TextField fx:id="d2TextField" prefHeight="25.0" prefWidth="290.0" />
+               </children>
+            </HBox>
+            <Separator prefWidth="200.0" />
+            <Button fx:id="saveBtn" mnemonicParsing="false" onAction="#saveBtnClick" prefHeight="40.0" prefWidth="322.0" stylesheets="@../../bin/application/commonButton.css" text="Сохранить" />
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

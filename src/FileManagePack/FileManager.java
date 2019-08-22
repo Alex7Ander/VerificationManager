@@ -38,6 +38,24 @@ public class FileManager {
 		return collection.size();		
 	}
 	
+	public static int LinesToDouble(String filePath, Collection<Double> collection) throws FileNotFoundException, IOException{
+		collection.clear();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), StandardCharsets.UTF_8));
+        String item = null;
+        while ((item = reader.readLine()) != null) {     	
+        	double currentValue = 0;
+        	try {
+        		currentValue = Double.parseDouble(item);
+        	}
+        	catch(NumberFormatException nfExp) {
+        		//
+        	}
+        	collection.add(currentValue);
+        }
+        reader.close();
+		return collection.size();		
+	}	
+	
 	public static void ItemsToLines(String filePath, List<String> collection) throws IOException {
 		try (BufferedWriter bw = new BufferedWriter(
 			new OutputStreamWriter(new FileOutputStream(filePath, false), "UTF8"))){ 
@@ -47,14 +65,6 @@ public class FileManager {
 				}
 			}
 		}
-		/*
-		try(FileWriter writer = new FileWriter(filePath, false)) {
-			for (int i=0; i<collection.size(); i++) {
-				writer.write(collection.get(i));
-				writer.write("\n");
-			}
-		}	
-		*/	
 	}
 	
 }
