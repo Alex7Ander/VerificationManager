@@ -8,6 +8,7 @@ import DataBasePack.DataBaseManager;
 import DataBasePack.dbStorable;
 import DevicePack.Element;
 import DevicePack.Includable;
+import NewElementPack.NewElementController;
 import javafx.collections.ObservableList;
 
 public class MeasResult implements Includable<Element>, dbStorable{
@@ -16,25 +17,17 @@ public class MeasResult implements Includable<Element>, dbStorable{
 	
 	MeasResult(){};
 	
-	MeasResult(Element ownerElement, ArrayList<Double> Freqs, ArrayList<ArrayList<Double>> Values){
+	MeasResult(NewElementController elCtrl, Element ownerElement){
+		
 		this.myElement = ownerElement;	
 		freqs = new ArrayList<Double>();
 		values = new HashMap<String, HashMap<Double, Double>>();
-		this.countOfParams = Values.size();
-		this.countOfFreq = Freqs.size();
 		
-		for (Double currentFr : Freqs) {
-			this.freqs.add(currentFr);
-		}
-		
-		for (int i=0; i< this.countOfParams; i++) {
-			HashMap<Double, Double> tVals = new HashMap<Double, Double>();
-			for (int j=0; j<Freqs.size(); j++) {
-				tVals.put(Freqs.get(j), Values.get(i).get(j));
-			}
-			values.put(keys[i], tVals);
-		}
-		
+		freqs = elCtrl.getFreqsValues();
+		values = elCtrl.getNominalValues();
+				
+		this.countOfParams = values.size();
+		this.countOfFreq = freqs.size();		
 	}
 	
 	protected String periodType;

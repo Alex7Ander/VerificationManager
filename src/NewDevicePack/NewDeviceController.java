@@ -10,10 +10,14 @@ import AboutMessageForm.AboutMessageWindow;
 import AddNewDeviceNameForm.AddNewDeviceNameWindow;
 import DataBasePack.DataBaseManager;
 import DevicePack.Device;
+import DevicePack.Element;
 import DevicePack.SavingException;
 import FileManagePack.FileManager;
+import NewElementPack.NewElementController;
 import NewElementPack.NewElementWindow;
 import SearchDevicePack.SearchDeviceWindow;
+import VerificationPack.MeasResult;
+import VerificationPack.VSWR_Result;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -130,6 +134,13 @@ public class NewDeviceController  {
 				if (tGosN.length() == 0) tGosN = "-";
 				newDevice = new Device(tName, tType, tSerN, tOwner, tGosN);
 				if (!(newDevice.isExist())) {
+					//Создаем элементы
+					for (int i=0; i<elementsWindow.size(); i++) {
+						NewElementWindow elementWin = elementsWindow.get(i);
+						NewElementController ctrl = (NewElementController) elementWin.getControllerClass();						
+						Element el = new Element(ctrl, newDevice);
+						newDevice.addElement(el);
+					}
 					try{
 						DataBaseManager.getDB().BeginTransaction();
 						newDevice.saveInDB();

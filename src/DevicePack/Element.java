@@ -6,8 +6,11 @@ import java.util.HashMap;
 
 import DataBasePack.DataBaseManager;
 import DataBasePack.dbStorable;
+import NewElementPack.NewElementController;
 import ToleranceParamPack.ToleranceParametrs;
+import VerificationPack.Gamma_Result;
 import VerificationPack.MeasResult;
+import VerificationPack.VSWR_Result;
 import VerificationPack.Verificatable;
 
 public class Element implements Includable<Device>, Verificatable, dbStorable{
@@ -30,6 +33,39 @@ public class Element implements Includable<Device>, Verificatable, dbStorable{
 		this.toleranceType = arrayResults.get(0).get(4);
 		this.periodicParamTable = arrayResults.get(0).get(5);
 		this.primaryParamTable = arrayResults.get(0).get(6);
+	}
+	
+	//Конструктор, инициализирующий объект информацией из Графического интерфейса для последующего сохранения в БД
+	//Вызывается при инициализации устройства перед сохранением нового устройства в БД 
+	public Element(NewElementController elCtrl, Device device) {
+		
+		this.myDevice = device;
+		
+		this.type = elCtrl.getType();
+		this.serialNumber = elCtrl.getSerNum();
+		this.poleCount = elCtrl.getPoleCount();
+		this.measUnit = elCtrl.getMeasUnit();
+		this.toleranceType = elCtrl.getToleranceType();
+		
+		if (this.measUnit.equals("vswr")) {
+			this.nominal = new VSWR_Result(elCtrl, this);
+		}
+		else {
+			this.nominal = new Gamma_Result(elCtrl, this);
+		}
+		
+		if (this.toleranceType.equals("percent")) {
+			
+		}
+		else {
+			
+		}
+		
+		String addrStr = this.myDevice.getName() + " " + this.myDevice.getType() + " " +this.myDevice.getSerialNumber() + " "+
+				this.type + " " + this.serialNumber;
+		this.periodicParamTable = "Periodic for " + addrStr;
+		this.primaryParamTable = "Primary for " + addrStr;
+		this.listOfVerificationsTable = "Verifications of " + addrStr;
 	}
 	
 	//Конструктор, инициализирующий объект информацией из Графического интерфейса для последующего сохранения в БД
@@ -94,9 +130,11 @@ public class Element implements Includable<Device>, Verificatable, dbStorable{
 		sqlString = "INSERT INTO ["+strElementsTable+"] (ElementType, ElementSerNumber, PoleCount, MeasUnit, ToleranceType, PeriodicParamTable, PrimaryParamTable) values ('"+type+"','"+serialNumber+"','"+poleCount+"','"+measUnit+"','"+toleranceType+"','"+ePerParamTable+"','"+ePrimParamTable+"')";
 		AksolDataBase.sqlQueryUpdate(sqlString);
 		// 3.2 Создание таблицы [Verification of ...]
-		sqlString = "CREATE TABLE Verification of " + (addStr + " " + this.type + " " + this.serialNumber) + "(id INTEGER PRIMARY KEY AUTOINCREMENT, dateOfVerification VARCHAR(20), resultsTableName (512))";
+		sqlString = "CREATE TABLE [Measurements of " + (addStr + " " + this.type + " " + this.serialNumber) + "] (id INTEGER PRIMARY KEY AUTOINCREMENT, dateOfVerification VARCHAR(20), resultsTableName VARCHAR(512))";
+		AksolDataBase.sqlQueryUpdate(sqlString);
 		// 3.3 Сохранить критерии годности
-		//this.toleranceParams.saveInDB();	
+		//this.primaryToleranceParams.saveInDB();	
+		//this.periodicToleranceParams.saveInDB();	
 		// 3.4 Сохраняем номиналы
 		this.nominal.saveInDB();		
 	}
@@ -124,5 +162,7 @@ public class Element implements Includable<Device>, Verificatable, dbStorable{
 		else if (result.getPeriodType().equals("primary")) resultOfVerification = primaryParametrs.checkResult(result, report);
 		return resultOfVerification;
 	}
+	
+	
 
 }

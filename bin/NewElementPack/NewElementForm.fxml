@@ -89,6 +89,8 @@
                   </TitledPane>
                   <Separator prefHeight="12.0" prefWidth="311.0" />
                   <Button fx:id="agreeBtn" mnemonicParsing="false" onAction="#agreeBtnClick" prefHeight="46.0" prefWidth="311.0" stylesheets="@../application/commonButton.css" text="Подтвердить" />
+                  <Pane prefHeight="14.0" prefWidth="311.0" />
+                  <Button fx:id="fillTableRand" mnemonicParsing="false" onAction="#fillTableRandClick" prefHeight="49.0" prefWidth="311.0" text="Заполнить таблицу" />
                </children>
             </VBox>
          </children>

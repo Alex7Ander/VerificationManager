@@ -32,6 +32,9 @@ public class Device implements dbStorable {
 	}
 	
 	public Device(String Name, String Type, String SerialNumber) throws SQLException {
+		
+		includedElements = new ArrayList<Element>();
+		
 		this.name = Name;
 		this.type = Type;
 		this.serialNumber = SerialNumber;
@@ -66,6 +69,7 @@ public class Device implements dbStorable {
 	}
 	
 	public Device(String Name, String Type, String SerialNumber, String Owner, String GosNumber){
+		includedElements = new ArrayList<Element>();
 		this.name = Name;
 		this.type = Type;
 		this.serialNumber = SerialNumber;
@@ -105,11 +109,14 @@ public class Device implements dbStorable {
 		sqlString = "CREATE TABLE ["+strElementsTable+"] (id INTEGER PRIMARY KEY AUTOINCREMENT, ElementType VARCHAR(256), ElementSerNumber VARCHAR(256), PoleCount VARCHAR(256), MeasUnit VARCHAR(256), ToleranceType VARCHAR(256), PeriodicParamTable VARCHAR(256), PrimaryParamTable VARCHAR(256))";
 		AksolDataBase.sqlQueryUpdate(sqlString);
 		for (int i=0; i < this.countOfElements; i++){
+			System.out.println("this.countOfElements = " + this.countOfElements);
 			//Сохранение в БД данных о составных элементах
 			this.includedElements.get(i).saveInDB(); 		
 		}
+		/*
 		sqlString = "COMMIT";
 		AksolDataBase.sqlQueryUpdate(sqlString);
+		*/
 	}
 	
 	@Override
@@ -127,16 +134,12 @@ public class Device implements dbStorable {
 	
 	public void addElement(Element element) {
 		this.includedElements.add(element);
+		this.countOfElements++;	
 	}
 	
 	public void removeElement(int index) {
-		Iterator<Element> it = this.includedElements.iterator();
-		for (int i=0; i<index; i++) {
-			it.next();
-		}
-		it.remove();
+		this.includedElements.remove(index);
+		this.countOfElements--;	
 	}
-	
-	
-	
+			
 }

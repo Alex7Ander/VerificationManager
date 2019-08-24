@@ -9,9 +9,12 @@ import FreqTablesPack.FreqTablesWindow;
 import GUIpack.StringGridFX;
 import ToleranceParamPack.ToleranceParametrs;
 import VerificationPack.MeasResult;
+import VerificationPack.VSWR_Result;
+import _tempHelpers.Randomizer;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -20,9 +23,19 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.WindowEvent;
 
 public class NewElementController {
 
+	Randomizer randManager = new Randomizer();
+	@FXML
+	private Button fillTableRand;
+	@FXML
+	private void fillTableRandClick() {
+		Randomizer.fillStringGrid(this.paramsTable, 1);
+	}
+	
+	
 	@FXML
 	private Button agreeBtn; 
 	@FXML
@@ -70,20 +83,17 @@ public class NewElementController {
 	private ToggleGroup measUnitGroup;
 	private ToggleGroup toleranceTypeGroup;
 	private ToggleGroup verificationTypeGroup;
-	
+		
 	ObservableList<String> listOfParams;
 	private int currentCountOfParams;
 	private String currentTypeOfParams;
 	private String currentTypeOfTolerance;
 	private int lastIndex;
-	
-	private ArrayList<Double> Freqs;
-	private HashMap<Integer, ArrayList<ArrayList<Double>>> tableValues;
-	
+/*	
 	private MeasResult Nominal;
 	private ToleranceParametrs PrimaryTolParams;
 	private ToleranceParametrs PeriodicTolParams;
-	
+*/	
 	//Коллекции с введенными значениями
 	int timeIndex;
 	int paramIndex;
@@ -100,7 +110,7 @@ public class NewElementController {
 	private HashMap<String, ArrayList<String>> p_s; 	//Фаза
 	private HashMap<String, ArrayList<String>> u_p_s;	//верхний предел
 	
-	//Randomizer
+	
 	
 	@FXML
 	private void initialize() {
@@ -177,9 +187,7 @@ public class NewElementController {
 		paramTableHeads.add("Верхний допуск");
 		
 		paramsTable = new StringGridFX(7, 10, 850, 100, scrollPane, tablePane, paramTableHeads);		
-		Freqs = new ArrayList<Double>();
-		tableValues = new HashMap<Integer, ArrayList<ArrayList<Double>>>();
-
+		
 	}
 	
 	@FXML
@@ -255,11 +263,6 @@ public class NewElementController {
 	}
 	
 	@FXML 
-	private void agreeBtnClick(ActionEvent event) {
-		//
-	}
-	
-	@FXML 
 	private void addFreqBtnClick(ActionEvent event) {
 		paramsTable.addRow();
 	}
@@ -273,6 +276,12 @@ public class NewElementController {
 	private void freaTablesBtnClick() throws IOException {
 		FreqTablesWindow.getFreqTablesWindow(this).show();
 	}
+	
+	@FXML 
+	private void agreeBtnClick(ActionEvent event) {
+		//
+	}
+//end @FXML methods
 	
 	private void setParams(String paramsIndex, int countOfParams) {
 		try {
@@ -333,5 +342,84 @@ public class NewElementController {
 			this.paramsTable.setColumn(6, u_p_s.get(keys[showIndex]));
 		}
 	}
+		
+//Методы для получения информации об элементе
+	public String getType() {return elemTypesComboBox.getSelectionModel().getSelectedItem().toString();}
+	public String getSerNum() {return serNumberTextField.getText();}
+	public int getPoleCount() {
+		if (this.fourPoleRB.isSelected()) return 4;
+		else return 2;
+	}
+	public String getMeasUnit() {
+		if (this.vswrRB.isSelected()) return "vswr";
+		else return "gamma"; 
+	}
 	
+	public String getToleranceType() {
+		if (this.upDownToleranceRB.isSelected()) return "updown";
+		else return "percent";
+	}
+
+	public ArrayList<Double> getFreqsValues(){
+		return freqs;
+	}		
+	public HashMap<String, HashMap<Double, Double>> getNominalValues(){
+		HashMap<String, HashMap<Double, Double>> nominalValues = new HashMap<String, HashMap<Double, Double>>();
+				
+		HashMap<Double, Double> m_S11 = new HashMap<Double, Double>();
+		HashMap<Double, Double> p_S11 = new HashMap<Double, Double>();
+		
+		HashMap<Double, Double> m_S12 = new HashMap<Double, Double>();
+		HashMap<Double, Double> p_S12 = new HashMap<Double, Double>();
+		
+		HashMap<Double, Double> m_S21 = new HashMap<Double, Double>();
+		HashMap<Double, Double> p_S21 = new HashMap<Double, Double>();
+		
+		HashMap<Double, Double> m_S22 = new HashMap<Double, Double>();
+		HashMap<Double, Double> p_S22 = new HashMap<Double, Double>();
+		int s = freqs.size();		
+		for (int j = 0; j < freqs.size(); j++) {
+			m_S11.put(this.freqs.get(j), Double.parseDouble(this.m_s.get("primary_s11").get(j)));
+			p_S11.put(this.freqs.get(j), Double.parseDouble(this.p_s.get("primary_s11").get(j)));
+			
+			if (this.getPoleCount() == 4) {
+				m_S12.put(this.freqs.get(j), Double.parseDouble(this.m_s.get("primary_s12").get(j)));
+				p_S12.put(this.freqs.get(j), Double.parseDouble(this.p_s.get("primary_s12").get(j)));
+			
+				m_S21.put(this.freqs.get(j), Double.parseDouble(this.m_s.get("primary_s21").get(j)));
+				p_S21.put(this.freqs.get(j), Double.parseDouble(this.p_s.get("primary_s21").get(j)));
+			
+				m_S22.put(this.freqs.get(j), Double.parseDouble(this.m_s.get("primary_s22").get(j)));
+				p_S22.put(this.freqs.get(j), Double.parseDouble(this.p_s.get("primary_s22").get(j)));
+			}
+		}		
+		
+		nominalValues.put("m_S11", m_S11);
+		nominalValues.put("p_S11", p_S11);
+		
+		if (this.getPoleCount() == 4) {
+			nominalValues.put("m_S12", m_S12);
+			nominalValues.put("p_S12", m_S12);
+			nominalValues.put("m_S21", m_S21);
+			nominalValues.put("p_S21", m_S21);
+			nominalValues.put("m_S22", m_S22);
+			nominalValues.put("p_S22", m_S22);
+		}
+				
+		return nominalValues;
+	}
+	
+//Действие по закрытию окна
+	private EventHandler<WindowEvent> closeEventHandler = new EventHandler<WindowEvent>() {
+        @Override
+        public void handle(WindowEvent event) {
+        	int showIndex = paramIndex + timeIndex;		
+    		refreshTable(savingIndex, showIndex);
+    		savingIndex = showIndex;
+        }
+    };
+
+    public javafx.event.EventHandler<WindowEvent> getCloseEventHandler(){
+    	return closeEventHandler;
+    }
 }

@@ -26,7 +26,6 @@ public class guiWindow {
 		stage.setScene(scene);
 		stage.setResizable(false);
 		stage.setTitle(title);		
-		
 	}
 	
 	public void show() {
@@ -35,6 +34,10 @@ public class guiWindow {
 	
 	public void close() {
 		stage.close();
+	}
+	
+	public Object getControllerClass() {
+		return this.loader.getController();
 	}
 	
 
