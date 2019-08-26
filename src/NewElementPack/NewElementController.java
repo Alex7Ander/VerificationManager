@@ -413,9 +413,14 @@ public class NewElementController {
 	private EventHandler<WindowEvent> closeEventHandler = new EventHandler<WindowEvent>() {
         @Override
         public void handle(WindowEvent event) {
-        	int showIndex = paramIndex + timeIndex;		
-    		refreshTable(savingIndex, showIndex);
-    		savingIndex = showIndex;
+			try{
+				int showIndex = paramIndex + timeIndex;		
+				refreshTable(savingIndex, showIndex);
+				savingIndex = showIndex;
+			}
+			catch(Exception exp){
+				//
+			}
         }
     };
 
