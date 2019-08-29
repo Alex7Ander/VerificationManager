@@ -67,4 +67,12 @@ public class FileManager {
 		}
 	}
 	
+	public static void WriteFile(String filePath, String coding, List<String> collection) throws IOException {
+		try(BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filePath, false), coding))){
+				for (int i=0; i<collection.size(); i++) {
+					bw.write(collection.get(i));
+				}
+		}
+	}
+	
 }

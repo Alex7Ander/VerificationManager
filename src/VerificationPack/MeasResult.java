@@ -1,23 +1,54 @@
 package VerificationPack;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
 import DataBasePack.DataBaseManager;
 import DataBasePack.dbStorable;
 import DevicePack.Element;
 import DevicePack.Includable;
+import FileManagePack.ResultReaderManager;
 import NewElementPack.NewElementController;
 import javafx.collections.ObservableList;
 
 public class MeasResult implements Includable<Element>, dbStorable{
 		
-	protected String keys[] = {"m_S11", "p_S11", "m_S12", "p_S12", "m_S21", "p_S21", "m_S22", "p_S22"};
+	//protected String keys[] = {"m_S11", "p_S11", "m_S12", "p_S12", "m_S21", "p_S21", "m_S22", "p_S22"};
 	
-	MeasResult(){};
+	protected int countOfFreq;
+	protected int countOfParams;
+	protected Date dateOfMeas;
 	
-	MeasResult(NewElementController elCtrl, Element ownerElement){
+	public int getCountOfFreq() {return this.countOfFreq;}
+	public int getCountOfParams() {return this.countOfParams;}
+	public Date getDateOfMeas() {return this.dateOfMeas;}
+	public String getDateOfMeasByString() {return this.dateOfMeas.toString();}
+	
+	public HashMap<String, HashMap<Double, Double>> values;
+	public ArrayList<Double> freqs;
+	
+	protected  ObservableList<String> paramsNames;
+	
+	//Получение результатов из файла
+	public MeasResult(String fileWithResults, int resultNumber, Element ownerElement) throws IOException{
+		
+		this.myElement = ownerElement;
+		freqs = new ArrayList<Double>();
+		values = new HashMap<String, HashMap<Double, Double>>();
+		
+		ResultReaderManager resReader = new ResultReaderManager(fileWithResults);			
+		resReader.readResult(resultNumber, freqs, values);
+				
+		this.countOfParams = values.size();
+		this.countOfFreq = freqs.size();
+		this.dateOfMeas = new Date();
+	}
+	
+	//Получение результатов из GUI
+	public MeasResult(NewElementController elCtrl, Element ownerElement){
 		
 		this.myElement = ownerElement;	
 		freqs = new ArrayList<Double>();
@@ -27,23 +58,60 @@ public class MeasResult implements Includable<Element>, dbStorable{
 		values = elCtrl.getNominalValues();
 				
 		this.countOfParams = values.size();
-		this.countOfFreq = freqs.size();		
+		this.countOfFreq = freqs.size();
+		this.dateOfMeas = new Date();
 	}
 	
-	protected String periodType;
-	public String getPeriodType() {return periodType;}
+	//Получение результатов из БД
+	@SuppressWarnings("deprecation")
+	public MeasResult(Element ownerElement, int index) throws SQLException {
+		
+		this.values = new HashMap<String, HashMap<Double, Double>>();
+		this.freqs = new ArrayList<Double>();
+				
+		this.myElement = ownerElement;
+		
+		ArrayList<ArrayList<String>> results = new ArrayList<ArrayList<String>>();
+		ArrayList<String> fieldsNames = new ArrayList<String>();
+		
+		String listOfVerificationsTable = this.myElement.getListOfVerificationsTable();
+		String sqlQuery = "SELECT dateOfVerification, resultsTableName  FROM ["+listOfVerificationsTable+"] WHERE id='"+index+"'";
+		fieldsNames.add("dateOfVerification");
+		fieldsNames.add("resultsTableName");
+		DataBaseManager.getDB().sqlQueryString(sqlQuery, fieldsNames, results);
+		String strDate = results.get(0).get(0);
+
+//!!!!!!!!!!!!!!!!!!!!!!
+		//this.dateOfMeas = new Date(strDate);
+		
+		String resultsTableName =  results.get(0).get(1);
+				
+		String keys[] = {"freq", "m_S11", "p_S11", "m_S12", "p_S12", "m_S21", "p_S21", "m_S22", "p_S22"};
 	
-	protected int countOfFreq;
-	public int getCountOfFreq() {return this.countOfFreq;}
-	
-	protected int countOfParams;
-	public int getCountOfParams() {return this.countOfParams;}
-	
-	public HashMap<String, HashMap<Double, Double>> values;
-	public ArrayList<Double> freqs;
-	
-	protected  ObservableList<String> paramsNames;
-	
+		int countOfKeys = 0;
+		if (this.myElement.getPoleCount() == 2) {
+			countOfKeys = 3;
+		}
+		else {
+			countOfKeys = 9;
+		}
+		fieldsNames.clear();
+		for (int i=0; i<countOfKeys; i++) fieldsNames.add(keys[i]);
+		
+		sqlQuery = "SELECT ";
+		for (int i=0; i<countOfKeys; i++) {
+			sqlQuery += keys[i];
+			if (i != countOfKeys - 1) sqlQuery += ", ";
+		}
+		sqlQuery += " FROM ["+resultsTableName+"]";
+		DataBaseManager.getDB().sqlQueryMapOfDouble(sqlQuery, fieldsNames, this.values);
+		this.countOfParams = this.values.size();
+		
+		sqlQuery = "SELECT freq FROM ["+resultsTableName+"]";
+		DataBaseManager.getDB().sqlQueryDouble(sqlQuery, "freq", this.freqs);
+		this.countOfFreq = this.freqs.size();
+	}
+		
 //Includable<Element>
 	protected Element myElement;
 	@Override
@@ -52,12 +120,15 @@ public class MeasResult implements Includable<Element>, dbStorable{
 //dbStorable
 	@Override
 	public void saveInDB() throws SQLException {
+		
+		String keys[] = {"m_S11", "p_S11", "m_S12", "p_S12", "m_S21", "p_S21", "m_S22", "p_S22"};
+		
 		String listOfVerificationsTable = this.myElement.getListOfVerificationsTable();
-		String dateOfVerification = "";
-		String resultsTableName = "Results of verification " + listOfVerificationsTable.substring(listOfVerificationsTable.indexOf("Verifications of ")) + " at " + dateOfVerification;
-		String sqlQuery = "INSERT INTO " + listOfVerificationsTable + " (dateOfVerification, resultsTableName) values ('"+ dateOfVerification +"','"+ listOfVerificationsTable +"')";
+		String dateOfVerification = this.dateOfMeas.toString();
+		String resultsTableName = "Results of verification " + listOfVerificationsTable.substring(listOfVerificationsTable.indexOf("Measurements of ")) + " at " + dateOfVerification;
+		String sqlQuery = "INSERT INTO [" + listOfVerificationsTable + "] (dateOfVerification, resultsTableName) values ('"+ dateOfVerification +"','"+ resultsTableName +"')";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
-		sqlQuery = "CREATE TABLE " + resultsTableName + " (id INTEGER PRIMARY KEY AUTOINCREMENT, freq VARCHAR(20), ";
+		sqlQuery = "CREATE TABLE [" + resultsTableName + "] (id INTEGER PRIMARY KEY AUTOINCREMENT, freq VARCHAR(20), ";
 		for (int i=0; i<this.countOfParams; i++) {
 			sqlQuery += (keys[i] + " VARCHAR(20)");
 			if (i != this.countOfParams - 1) sqlQuery += ", ";
@@ -68,14 +139,15 @@ public class MeasResult implements Includable<Element>, dbStorable{
 		//Заполняем таблицу resultsTableName с результатами измерений
 		for (int i=0; i<this.countOfFreq; i++) {	
 			
-			sqlQuery = "INSERT INTO " + resultsTableName + " (";
+			sqlQuery = "INSERT INTO [" + resultsTableName + "] (freq, ";
 			
 			for (int j=0; j<this.countOfParams; j++) {
 				sqlQuery += (keys[j]);
 				if (j != this.countOfParams - 1) sqlQuery += ", ";
 			}
 			
-			sqlQuery += " values (";
+			sqlQuery += ") values ('"+freqs.get(i)+"', ";
+			
 			
 			for (int j = 0; j < this.countOfParams; j++) {
 				sqlQuery += ("'"+values.get(keys[j]).get(freqs.get(i)).toString()+"'");
@@ -87,20 +159,31 @@ public class MeasResult implements Includable<Element>, dbStorable{
 			DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
 		}
 	}
+	
 	@Override
 	public void deleteFromDB() throws SQLException {
-		// TODO Auto-generated method stub
+		String dateOfVerification = this.dateOfMeas.toString();
+		String listOfVerificationsTable = this.myElement.getListOfVerificationsTable();
+		String resultsTableName = "Results of verification " + listOfVerificationsTable.substring(listOfVerificationsTable.indexOf("Measurements of ")) + " at " + dateOfVerification;
 		
+		String sqlQuery = "DELETE FROM ["+listOfVerificationsTable+"] WHERE resultsTableName='"+resultsTableName+"'";	
+		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
+		
+		sqlQuery = "DROP TABLE [" + resultsTableName + "]";
+		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
 	}
+	
 	@Override
 	public void editInfoInDB() throws SQLException {
 		// TODO Auto-generated method stub
 		
 	}
+	
 	@Override
 	public void getData() {
 		// TODO Auto-generated method stub
 		
 	}
-
+	
+	
 }

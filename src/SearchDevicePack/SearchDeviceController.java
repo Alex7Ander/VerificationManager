@@ -109,8 +109,9 @@ public class SearchDeviceController {
 			this.myRequester.setDevice(foundedDevice);
 			this.myRequester.representRequestedInfo();									
 		}
-		catch(SQLException exp){
+		catch(SQLException exp){			
 			AboutMessageWindow errorWindow = new AboutMessageWindow("Ошибка", "Ошибка доступа к БД.\nОбъект не может быть инициализирован");
+			errorWindow.show();
 		}
 		Stage stage = (Stage) chooseBtn.getScene().getWindow();
 	    stage.close();

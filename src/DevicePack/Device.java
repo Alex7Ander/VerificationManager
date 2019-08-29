@@ -1,11 +1,13 @@
 package DevicePack;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import DataBasePack.DataBaseManager;
 import DataBasePack.dbStorable;
+import FileManagePack.FileManager;
+import VerificationPack.MeasResult;
 
 public class Device implements dbStorable {
 	
@@ -24,13 +26,14 @@ public class Device implements dbStorable {
 	public String getOwner() {return this.owner;}
 	public String getSerialNumber() {return serialNumber;}
 	public String getGosNumber() {return gosNumber;}
-	public String Owner() {return owner;}
+	public String getElementsTableName() { return this.elementsTableName;}
 	public int getCountOfElements() {return this.countOfElements;}
 		
 	public Device(){
 		//
 	}
 	
+	//Конструктор для извлечения из БД
 	public Device(String Name, String Type, String SerialNumber) throws SQLException {
 		
 		includedElements = new ArrayList<Element>();
@@ -58,8 +61,7 @@ public class Device implements dbStorable {
 			this.countOfElements = 0;			
 			int predictableCount = Integer.parseInt(arrayResults.get(0).get(2));
 			for (int i=0; i<predictableCount; i++) {			
-				this.includedElements.add(new Element());
-				//this.includedElements.add(new Element(this.elementsTableName, i+1));
+				this.includedElements.add(new Element(this, i+1));
 				this.countOfElements++;		
 			}
 		}
@@ -68,6 +70,7 @@ public class Device implements dbStorable {
 		}
 	}
 	
+	//Конструктор перед сохранение в БД
 	public Device(String Name, String Type, String SerialNumber, String Owner, String GosNumber){
 		includedElements = new ArrayList<Element>();
 		this.name = Name;
@@ -106,7 +109,7 @@ public class Device implements dbStorable {
 		sqlString = "INSERT INTO [Devices] (NameOfDevice, TypeOfDevice, SerialNumber, Owner, GosNumber, CountOfElements, ElementsTable) values ('"+name+"','"+type+"','"+serialNumber+"','"+owner+"','"+gosNumber+"','"+Integer.toString(this.countOfElements)+"','"+strElementsTable+"')";
 		AksolDataBase.sqlQueryUpdate(sqlString);
 		//Создание таблицы со списком включенных элементов
-		sqlString = "CREATE TABLE ["+strElementsTable+"] (id INTEGER PRIMARY KEY AUTOINCREMENT, ElementType VARCHAR(256), ElementSerNumber VARCHAR(256), PoleCount VARCHAR(256), MeasUnit VARCHAR(256), ToleranceType VARCHAR(256), PeriodicParamTable VARCHAR(256), PrimaryParamTable VARCHAR(256))";
+		sqlString = "CREATE TABLE ["+strElementsTable+"] (id INTEGER PRIMARY KEY AUTOINCREMENT, ElementType VARCHAR(256), ElementSerNumber VARCHAR(256), PoleCount VARCHAR(256), MeasUnit VARCHAR(256), ToleranceType VARCHAR(256), PeriodicParamTable VARCHAR(256), PrimaryParamTable VARCHAR(256), NominalIndex VARCHAR(10))";
 		AksolDataBase.sqlQueryUpdate(sqlString);
 		for (int i=0; i < this.countOfElements; i++){
 			System.out.println("this.countOfElements = " + this.countOfElements);
@@ -141,5 +144,48 @@ public class Device implements dbStorable {
 		this.includedElements.remove(index);
 		this.countOfElements--;	
 	}
-			
+	
+	public void createIniFile(String psiFilePAth) throws IOException {
+		ArrayList<String> fileStrings = new ArrayList<String>();
+		fileStrings.add("Параметры поверки:\n");
+		fileStrings.add("1.Наименование типа средства измерения <" + this.name + ">\n");
+		fileStrings.add("2.Тип поверяемого средства измерения <" + this.type + ">\n");
+		fileStrings.add("3.Заводской номер <" + this.serialNumber + ">\n");
+		fileStrings.add("4.В состав входят элементов в количестве <" + Integer.toString(this.countOfElements) + ">\n");
+		fileStrings.add("------------------------------------------------------------------\n");
+		for (int i=0; i<this.countOfElements; i++) {
+			fileStrings.add("Элемент № " + Integer.toString(i) + ": " + this.includedElements.get(i).getType() + "\n");
+			fileStrings.add("Серийный номер: " + this.includedElements.get(i).getSerialNumber() + "\n");
+			String ruTextOfMeasUnit;
+			if (this.includedElements.get(i).getMeasUnit().equals("vswr")) {
+				ruTextOfMeasUnit = "КСВН";
+			}
+			else {
+				ruTextOfMeasUnit = "модуль";
+			}
+			fileStrings.add("Измеряемая величина: " + ruTextOfMeasUnit + "\n");
+			int currentCountOfFreq = this.includedElements.get(i).getNominal().getCountOfFreq();
+			for (int j=0; j<currentCountOfFreq; j++) {
+				double currentFreq = this.includedElements.get(i).getNominal().freqs.get(j);
+				fileStrings.add(Double.toString(currentFreq) + "\n");
+			}			
+			if (i < this.countOfElements-1) {
+				fileStrings.add("------------------------------------------------------------------\n");
+			}
+			else {
+				fileStrings.add("------------------------------------------------------------------");
+			}
+		}
+		String coding = "ansi-1251";
+		FileManager.WriteFile(psiFilePAth, coding, fileStrings);
+	}
+	
+	public void createProtocol(ArrayList<MeasResult> results, String protocolFilePath) throws IOException{
+		//
+	}
+	
+	public void createDocument(ArrayList<MeasResult> results, String protocolFilePath) throws IOException {
+		//
+	}
+	
 }

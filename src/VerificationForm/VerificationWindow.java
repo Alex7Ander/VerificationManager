@@ -2,7 +2,6 @@ package VerificationForm;
 
 import java.io.IOException;
 import GUIpack.guiWindow;
-import SearchDevicePack.SearchDeviceWindow;
 
 public class VerificationWindow extends guiWindow{
 

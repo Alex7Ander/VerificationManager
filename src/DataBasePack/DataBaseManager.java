@@ -143,7 +143,7 @@ public class DataBaseManager {
     	}
     }
       
-    public void sqlQueryMapOfDouble(String sqlString, ArrayList<String> fieldsNames, ArrayList<String> paramsNames, HashMap<String, HashMap<Double, Double>> mapResults) throws SQLException{
+    public void sqlQueryMapOfDouble(String sqlString, ArrayList<String> paramsNames, HashMap<String, HashMap<Double, Double>> mapResults) throws SQLException{
     	ResultSet rSet = this.state.executeQuery(sqlString);
     	int countOfParams = paramsNames.size();
     	ArrayList<Double[]> values = new ArrayList<Double[]>();  	
@@ -155,14 +155,15 @@ public class DataBaseManager {
     		values.add(params);
     	}
     	int freqCount = values.size();
-    	for (int i=0; i < paramsNames.size(); i++) {
+    	for (int i=1; i < paramsNames.size(); i++) {
     		HashMap<Double, Double> tempMap = new HashMap<Double, Double>(); 
     		for (int j=0; j < freqCount; j++) {
     			double freq = values.get(j)[0];
     			double value = values.get(j)[i];
     			tempMap.put(freq, value);
     		}
-    		mapResults.put(paramsNames.get(i), tempMap);
+    		String key = paramsNames.get(i);
+    		mapResults.put(key, tempMap);
     	}
     }
     

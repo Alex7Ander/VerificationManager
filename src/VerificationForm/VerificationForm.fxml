@@ -15,7 +15,7 @@
                <children>
                   <Label prefHeight="16.0" prefWidth="135.0" stylesheets="@../../bin/application/commonLabel.css" text="Компонент: " />
                   <Separator orientation="VERTICAL" prefHeight="200.0" />
-                  <ComboBox prefHeight="25.0" prefWidth="300.0" />
+                  <ComboBox fx:id="elementComboBox" onAction="#elementComboBoxChange" prefHeight="25.0" prefWidth="300.0" />
                   <Separator orientation="VERTICAL" prefHeight="200.0" />
                   <Label prefHeight="17.0" prefWidth="194.0" stylesheets="@../../bin/application/commonLabel.css" text="Наименование поверяемого Си:" />
                   <Label fx:id="nameLabel" prefHeight="16.0" prefWidth="460.0" stylesheets="@../../bin/application/commonLabel.css" text="______" />
@@ -26,7 +26,7 @@
                <children>
                   <Label stylesheets="@../../bin/application/commonLabel.css" text="Измеренный параметр:" />
                   <Separator orientation="VERTICAL" prefHeight="200.0" />
-                  <ComboBox prefHeight="25.0" prefWidth="300.0" />
+                  <ComboBox fx:id="parametrComboBox" onAction="#parametrComboBoxChange" prefHeight="25.0" prefWidth="300.0" />
                   <Separator orientation="VERTICAL" prefHeight="200.0" />
                   <Label prefHeight="17.0" prefWidth="194.0" stylesheets="@../../bin/application/commonLabel.css" text="Тип поверяемого СИ:" />
                   <Label fx:id="typeLabel" prefHeight="16.0" prefWidth="229.0" stylesheets="@../../bin/application/commonLabel.css" text="______" />
@@ -50,7 +50,8 @@
                   <Button fx:id="saveBtn" mnemonicParsing="false" onAction="#saveBtnClick" prefWidth="150.0" stylesheets="@../../bin/application/commonButton.css" text="Сохранить" />
                   <Separator orientation="VERTICAL" prefHeight="200.0" />
                   <Button fx:id="createProtocolBtn" mnemonicParsing="false" onAction="#createProtocolBtnClick" prefWidth="150.0" stylesheets="@../../bin/application/commonButton.css" text="Свидетельство" />
-                  <Separator orientation="VERTICAL" prefHeight="44.0" prefWidth="291.0" />
+                  <Button fx:id="fileReadBtn" mnemonicParsing="false" onAction="#fileReadBtnClick" prefHeight="25.0" prefWidth="72.0" text="Button" />
+                  <Separator orientation="VERTICAL" prefHeight="32.0" prefWidth="186.0" />
                   <Button fx:id="closeBtn" mnemonicParsing="false" onAction="#closeBtnClick" prefWidth="150.0" stylesheets="@../../bin/application/commonButton.css" text="Выход" />
                </children>
             </HBox>

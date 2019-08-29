@@ -7,9 +7,6 @@ import java.util.HashMap;
 import FileManagePack.FileManager;
 import FreqTablesPack.FreqTablesWindow;
 import GUIpack.StringGridFX;
-import ToleranceParamPack.ToleranceParametrs;
-import VerificationPack.MeasResult;
-import VerificationPack.VSWR_Result;
 import _tempHelpers.Randomizer;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -63,9 +60,9 @@ public class NewElementController {
 	private RadioButton upDownToleranceRB;
 	
 	@FXML
-	private ComboBox paramsComboBox;
+	private ComboBox<String> paramsComboBox;
 	@FXML
-	private ComboBox elemTypesComboBox;
+	private ComboBox<String> elemTypesComboBox;
 	@FXML
 	private TextField serNumberTextField;
 	
@@ -89,17 +86,13 @@ public class NewElementController {
 	private String currentTypeOfParams;
 	private String currentTypeOfTolerance;
 	private int lastIndex;
-/*	
-	private MeasResult Nominal;
-	private ToleranceParametrs PrimaryTolParams;
-	private ToleranceParametrs PeriodicTolParams;
-*/	
+	
 	//Коллекции с введенными значениями
 	int timeIndex;
 	int paramIndex;
 	int savingIndex;
-	String[] keys = {"primary_s11", "primary_s12", "primary_s21", "primary_s22", 
-					 "periodical_s11", "periodical_s12", "periodical_s21", "periodical_s22"};
+	String[] keys = {"primary_S11", "primary_S12", "primary_S21", "primary_S22", 
+					 "periodic_S11", "periodic_S12", "periodic_S21", "periodic_S22"};
 	private ArrayList<Double> freqs;
 	
 	private HashMap<String, ArrayList<String>> d_m_s; 	//нижний предел
@@ -379,18 +372,18 @@ public class NewElementController {
 		HashMap<Double, Double> p_S22 = new HashMap<Double, Double>();
 		int s = freqs.size();		
 		for (int j = 0; j < freqs.size(); j++) {
-			m_S11.put(this.freqs.get(j), Double.parseDouble(this.m_s.get("primary_s11").get(j)));
-			p_S11.put(this.freqs.get(j), Double.parseDouble(this.p_s.get("primary_s11").get(j)));
+			m_S11.put(this.freqs.get(j), Double.parseDouble(this.m_s.get("primary_S11").get(j)));
+			p_S11.put(this.freqs.get(j), Double.parseDouble(this.p_s.get("primary_S11").get(j)));
 			
 			if (this.getPoleCount() == 4) {
-				m_S12.put(this.freqs.get(j), Double.parseDouble(this.m_s.get("primary_s12").get(j)));
-				p_S12.put(this.freqs.get(j), Double.parseDouble(this.p_s.get("primary_s12").get(j)));
+				m_S12.put(this.freqs.get(j), Double.parseDouble(this.m_s.get("primary_S12").get(j)));
+				p_S12.put(this.freqs.get(j), Double.parseDouble(this.p_s.get("primary_S12").get(j)));
 			
-				m_S21.put(this.freqs.get(j), Double.parseDouble(this.m_s.get("primary_s21").get(j)));
-				p_S21.put(this.freqs.get(j), Double.parseDouble(this.p_s.get("primary_s21").get(j)));
+				m_S21.put(this.freqs.get(j), Double.parseDouble(this.m_s.get("primary_S21").get(j)));
+				p_S21.put(this.freqs.get(j), Double.parseDouble(this.p_s.get("primary_S21").get(j)));
 			
-				m_S22.put(this.freqs.get(j), Double.parseDouble(this.m_s.get("primary_s22").get(j)));
-				p_S22.put(this.freqs.get(j), Double.parseDouble(this.p_s.get("primary_s22").get(j)));
+				m_S22.put(this.freqs.get(j), Double.parseDouble(this.m_s.get("primary_S22").get(j)));
+				p_S22.put(this.freqs.get(j), Double.parseDouble(this.p_s.get("primary_S22").get(j)));
 			}
 		}		
 		
@@ -409,18 +402,90 @@ public class NewElementController {
 		return nominalValues;
 	}
 	
+	public HashMap<String, HashMap<Double, Double>> getToleranceParamsValues(String TypeByTime){
+		HashMap<String, HashMap<Double, Double>> tolParamsValues = new HashMap<String, HashMap<Double, Double>>();
+		
+		HashMap<Double, Double> d_m_S11 = new HashMap<Double, Double>();
+		HashMap<Double, Double> u_m_S11 = new HashMap<Double, Double>();
+		HashMap<Double, Double> d_p_S11 = new HashMap<Double, Double>();
+		HashMap<Double, Double> u_p_S11 = new HashMap<Double, Double>();
+		
+		HashMap<Double, Double> d_m_S12 = new HashMap<Double, Double>();
+		HashMap<Double, Double> u_m_S12 = new HashMap<Double, Double>();
+		HashMap<Double, Double> d_p_S12 = new HashMap<Double, Double>();
+		HashMap<Double, Double> u_p_S12 = new HashMap<Double, Double>();
+		
+		HashMap<Double, Double> d_m_S21 = new HashMap<Double, Double>();
+		HashMap<Double, Double> u_m_S21 = new HashMap<Double, Double>();
+		HashMap<Double, Double> d_p_S21 = new HashMap<Double, Double>();
+		HashMap<Double, Double> u_p_S21 = new HashMap<Double, Double>();
+		
+		HashMap<Double, Double> d_m_S22 = new HashMap<Double, Double>();
+		HashMap<Double, Double> u_m_S22 = new HashMap<Double, Double>();
+		HashMap<Double, Double> d_p_S22 = new HashMap<Double, Double>();
+		HashMap<Double, Double> u_p_S22 = new HashMap<Double, Double>();
+		
+		for (int j = 0; j < freqs.size(); j++) {
+			d_m_S11.put(this.freqs.get(j), Double.parseDouble(this.d_m_s.get(TypeByTime+"_S11").get(j)));
+			u_m_S11.put(this.freqs.get(j), Double.parseDouble(this.u_m_s.get(TypeByTime+"_S11").get(j)));
+			d_p_S11.put(this.freqs.get(j), Double.parseDouble(this.d_p_s.get(TypeByTime+"_S11").get(j)));
+			u_p_S11.put(this.freqs.get(j), Double.parseDouble(this.u_p_s.get(TypeByTime+"_S11").get(j)));
+				
+			if (this.getPoleCount() == 4) {
+				d_m_S12.put(this.freqs.get(j), Double.parseDouble(this.d_m_s.get(TypeByTime+"_S11").get(j)));
+				u_m_S12.put(this.freqs.get(j), Double.parseDouble(this.u_m_s.get(TypeByTime+"_S11").get(j)));
+				d_p_S12.put(this.freqs.get(j), Double.parseDouble(this.d_p_s.get(TypeByTime+"_S11").get(j)));
+				u_p_S12.put(this.freqs.get(j), Double.parseDouble(this.u_p_s.get(TypeByTime+"_S11").get(j)));
+					
+				d_m_S21.put(this.freqs.get(j), Double.parseDouble(this.d_m_s.get(TypeByTime+"_S11").get(j)));
+				u_m_S21.put(this.freqs.get(j), Double.parseDouble(this.u_m_s.get(TypeByTime+"_S11").get(j)));
+				d_p_S21.put(this.freqs.get(j), Double.parseDouble(this.d_p_s.get(TypeByTime+"_S11").get(j)));
+				u_p_S21.put(this.freqs.get(j), Double.parseDouble(this.u_p_s.get(TypeByTime+"_S11").get(j)));
+					
+				d_m_S22.put(this.freqs.get(j), Double.parseDouble(this.d_m_s.get(TypeByTime+"_S11").get(j)));
+				u_m_S22.put(this.freqs.get(j), Double.parseDouble(this.u_m_s.get(TypeByTime+"_S11").get(j)));
+				d_p_S22.put(this.freqs.get(j), Double.parseDouble(this.d_p_s.get(TypeByTime+"_S11").get(j)));
+				u_p_S22.put(this.freqs.get(j), Double.parseDouble(this.u_p_s.get(TypeByTime+"_S11").get(j)));
+			}
+		}		
+		
+		tolParamsValues.put("d_m_S11", d_m_S11);
+		tolParamsValues.put("u_m_S11", u_m_S11);
+		tolParamsValues.put("d_p_S11", d_p_S11);
+		tolParamsValues.put("u_p_S11", u_p_S11);
+		
+		if (this.getPoleCount() == 4) {
+			tolParamsValues.put("d_m_S12", d_m_S12);
+			tolParamsValues.put("u_m_S12", u_m_S12);
+			tolParamsValues.put("d_p_S12", d_p_S12);
+			tolParamsValues.put("u_p_S12", u_p_S12);
+			
+			tolParamsValues.put("d_m_S21", d_m_S21);
+			tolParamsValues.put("u_m_S21", u_m_S21);
+			tolParamsValues.put("d_p_S21", d_p_S21);
+			tolParamsValues.put("u_p_S21", u_p_S21);
+			
+			tolParamsValues.put("d_m_S22", d_m_S22);
+			tolParamsValues.put("u_m_S22", u_m_S22);
+			tolParamsValues.put("d_p_S22", d_p_S22);
+			tolParamsValues.put("u_p_S22", u_p_S22);
+		}
+		
+		return tolParamsValues;
+	}
+	
 //Действие по закрытию окна
 	private EventHandler<WindowEvent> closeEventHandler = new EventHandler<WindowEvent>() {
         @Override
         public void handle(WindowEvent event) {
-			try{
-				int showIndex = paramIndex + timeIndex;		
-				refreshTable(savingIndex, showIndex);
-				savingIndex = showIndex;
-			}
-			catch(Exception exp){
-				//
-			}
+        	try {
+        		int showIndex = paramIndex + timeIndex;		
+        		refreshTable(savingIndex, showIndex);
+        		savingIndex = showIndex;
+        	}
+        	catch(Exception exp) {
+        		//
+        	}
         }
     };
 

@@ -43,8 +43,6 @@ public class StringGridFX {
 		height = 27 * RowCount + 5;
 		width = Width;
 		
-		System.out.println("Container width is " + width);
-		
 		scrollContainer = ScrollContainer;
 		scrollContainer.setHbarPolicy(ScrollBarPolicy.AS_NEEDED);
 		
