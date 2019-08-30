@@ -2,7 +2,11 @@ package VerificationPack;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -21,12 +25,14 @@ public class MeasResult implements Includable<Element>, dbStorable{
 	protected int countOfFreq;
 	protected int countOfParams;
 	protected Date dateOfMeas;
+	protected String datePattern = "DD/MM/yyyy HH:mm:ss";
 	
 	public int getCountOfFreq() {return this.countOfFreq;}
 	public int getCountOfParams() {return this.countOfParams;}
 	public Date getDateOfMeas() {return this.dateOfMeas;}
-	public String getDateOfMeasByString() {return this.dateOfMeas.toString();}
-	
+	public String getDateOfMeasByString() {
+		return new SimpleDateFormat(datePattern).format(this.dateOfMeas);
+	}	
 	public HashMap<String, HashMap<Double, Double>> values;
 	public ArrayList<Double> freqs;
 	
@@ -44,7 +50,7 @@ public class MeasResult implements Includable<Element>, dbStorable{
 				
 		this.countOfParams = values.size();
 		this.countOfFreq = freqs.size();
-		this.dateOfMeas = new Date();
+		this.dateOfMeas = Calendar.getInstance().getTime();
 	}
 	
 	//Получение результатов из GUI
@@ -59,11 +65,10 @@ public class MeasResult implements Includable<Element>, dbStorable{
 				
 		this.countOfParams = values.size();
 		this.countOfFreq = freqs.size();
-		this.dateOfMeas = new Date();
+		this.dateOfMeas = Calendar.getInstance().getTime();
 	}
 	
 	//Получение результатов из БД
-	@SuppressWarnings("deprecation")
 	public MeasResult(Element ownerElement, int index) throws SQLException {
 		
 		this.values = new HashMap<String, HashMap<Double, Double>>();
@@ -79,10 +84,16 @@ public class MeasResult implements Includable<Element>, dbStorable{
 		fieldsNames.add("dateOfVerification");
 		fieldsNames.add("resultsTableName");
 		DataBaseManager.getDB().sqlQueryString(sqlQuery, fieldsNames, results);
+		
+		//Дата
+		DateFormat df = new SimpleDateFormat(datePattern);
 		String strDate = results.get(0).get(0);
-
-//!!!!!!!!!!!!!!!!!!!!!!
-		//this.dateOfMeas = new Date(strDate);
+		try {
+			this.dateOfMeas = df.parse(strDate);
+		}
+		catch(ParseException pExp) {
+			this.dateOfMeas = Calendar.getInstance().getTime();
+		}
 		
 		String resultsTableName =  results.get(0).get(1);
 				
@@ -122,9 +133,11 @@ public class MeasResult implements Includable<Element>, dbStorable{
 	public void saveInDB() throws SQLException {
 		
 		String keys[] = {"m_S11", "p_S11", "m_S12", "p_S12", "m_S21", "p_S21", "m_S22", "p_S22"};
+
+		DateFormat df = new SimpleDateFormat(datePattern);
+		String dateOfVerification = df.format(this.dateOfMeas);
 		
-		String listOfVerificationsTable = this.myElement.getListOfVerificationsTable();
-		String dateOfVerification = this.dateOfMeas.toString();
+		String listOfVerificationsTable = this.myElement.getListOfVerificationsTable();		
 		String resultsTableName = "Results of verification " + listOfVerificationsTable.substring(listOfVerificationsTable.indexOf("Measurements of ")) + " at " + dateOfVerification;
 		String sqlQuery = "INSERT INTO [" + listOfVerificationsTable + "] (dateOfVerification, resultsTableName) values ('"+ dateOfVerification +"','"+ resultsTableName +"')";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
@@ -147,7 +160,6 @@ public class MeasResult implements Includable<Element>, dbStorable{
 			}
 			
 			sqlQuery += ") values ('"+freqs.get(i)+"', ";
-			
 			
 			for (int j = 0; j < this.countOfParams; j++) {
 				sqlQuery += ("'"+values.get(keys[j]).get(freqs.get(i)).toString()+"'");

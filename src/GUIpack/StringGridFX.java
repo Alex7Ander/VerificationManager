@@ -91,11 +91,9 @@ public class StringGridFX {
 	
 	public StringGridFX(int ColCount, int RowCount, double Width, double Height, ScrollPane ScrollContainer, AnchorPane container, ArrayList<String> values) {
 		this(ColCount, RowCount, Width, Height, ScrollContainer, container);
-		int count = heads.size();
-		int i = 0;
-		while(i != count) {
+		
+		for (int i = 0; i < ColCount; i++) {
 			this.heads.get(i).setText(values.get(i));
-			i++;
 		}
 	}
 	

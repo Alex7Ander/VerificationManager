@@ -3,6 +3,10 @@ package StartVerificationPack;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.UnknownHostException;
 
 import AboutMessageForm.AboutMessageWindow;
 import ProtocolCreatePack.ProtocolCreateWindow;
@@ -90,7 +94,6 @@ public class StartVerificationController {
 		if (!chekEnvironment()) {
 			AboutMessageWindow msgWin = new AboutMessageWindow("Внимание", envStatusString);
 			msgWin.show();
-			return;
 		}
 		
 		if(!checkVerType()) {
@@ -111,7 +114,7 @@ public class StartVerificationController {
 			if (answer == 0) {
 				this.badViewRB.setSelected(true);
 				String[] docTypes = {"Извещение о непригодности"};
-				ProtocolCreateWindow.getProtocolCreateWindow(docTypes).show();
+				ProtocolCreateWindow.getProtocolCreateWindow(docTypes, null).show();
 				return;
 			}
 			else {
@@ -126,7 +129,7 @@ public class StartVerificationController {
 			if (answer == 0) {
 				this.badWorkRB.setSelected(true);
 				String[] docTypes = {"Извещение о непригодности"};
-				ProtocolCreateWindow.getProtocolCreateWindow(docTypes).show();
+				ProtocolCreateWindow.getProtocolCreateWindow(docTypes, null).show();
 				return;
 			}
 			else {
@@ -139,6 +142,39 @@ public class StartVerificationController {
 		File file =new File(absPath + "\\measurment\\Project1.exe");
 		Desktop.getDesktop().open(file);
 		
+		//
+		ServerSocket servS = new ServerSocket(5055);
+		Socket s = null;
+		while(true) {
+			s = servS.accept();
+			InputStream inS = s.getInputStream();
+			byte[] buffer = new byte[1024];
+			String str = new String(buffer);
+			//int b = inS.read(buffer);
+			if (true) {
+				System.out.println("Сообщение получено");
+				//fileReadBtnClick();
+				break;
+			}
+		}
+		s.close();		
+		
+		/*
+		Thread waitThr = new Thread(()->{
+			try {
+					
+			}
+			catch(UnknownHostException uhExp) {
+				System.out.println("UnknownHostException " + uhExp.getMessage());
+			}
+			catch(IOException ioExp) {
+				System.out.println("IOException " + ioExp.getMessage());
+			}
+		}, "waitThread");
+		
+		waitThr.start();
+		//waitThr.join();
+		*/
 	}
 	
 	private boolean chekEnvironment() {

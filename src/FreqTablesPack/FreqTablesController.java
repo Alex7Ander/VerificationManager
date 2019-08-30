@@ -25,10 +25,12 @@ public class FreqTablesController implements Includable<NewElementController> {
 	
 	private NewElementController myOwner;
 	private ArrayList<Double> freqs;
+
 	
-	void setMyOwner(NewElementController elemntController){
+	public void setMyOwner(NewElementController elemntController){
 		myOwner = elemntController;
 	}
+	
 	
 	@FXML
 	private void initialize() {		
@@ -47,12 +49,14 @@ public class FreqTablesController implements Includable<NewElementController> {
 		
 	    Stage stage = (Stage) exitBtn.getScene().getWindow();
 	    stage.close();
+	    FreqTablesWindow.deleteFreqTablesWindow();
 	}
 	
 	@FXML
 	private void exitBtnClick() {
 	    Stage stage = (Stage) exitBtn.getScene().getWindow();
 	    stage.close();
+	    FreqTablesWindow.deleteFreqTablesWindow();
 	}
 
 	@Override

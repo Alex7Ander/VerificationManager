@@ -149,6 +149,7 @@ public class NewDeviceController  {
 						sucsessMessage.show();
 						Stage stage = (Stage) saveBtn.getScene().getWindow();
 						stage.close();
+						NewDeviceWindow.deleteNewDeviceWindow();
 					}
 					catch(SQLException sqlExp){
 						DataBaseManager.getDB().RollBack();

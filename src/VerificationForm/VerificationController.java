@@ -2,19 +2,22 @@ package VerificationForm;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.sql.SQLException;
 import java.util.ArrayList;
-
 import AboutMessageForm.AboutMessageWindow;
 import DevicePack.Device;
 import DevicePack.Element;
 import FileManagePack.FileManager;
 import GUIpack.InfoRequestable;
 import GUIpack.StringGridFX;
+import ProtocolCreatePack.ProtocolCreateWindow;
 import SearchDevicePack.SearchDeviceWindow;
 import StartVerificationPack.StartVerificationWindow;
-import VerificationPack.Gamma_Result;
 import VerificationPack.MeasResult;
-import VerificationPack.VSWR_Result;
 import _tempHelpers.Adapter;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -24,8 +27,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
@@ -66,7 +67,6 @@ public class VerificationController implements InfoRequestable {
 	private ArrayList<String> phaseColumn;
 	private ArrayList<String> phaseErrorColumn;
 	private ArrayList<String> phaseSolutColumn;
-	
 //Результат поверки
 	private ArrayList<MeasResult> verificationResult;	
 //Ссылка на поверяемое СИ
@@ -94,21 +94,32 @@ public class VerificationController implements InfoRequestable {
 		currentElementIndex = 0;
 		currentParamIndex = 0;
 		
-		resultTable = new StringGridFX(7, 10, 1110, 100, scrollPane, tablePane);		 
+		
+		ArrayList<String> heads = new ArrayList<String>();
+		heads.add("Частота, ГГц");	
+		heads.add("Измер. знач. модуля");	
+		heads.add("Погрешность");	
+		heads.add("Годен/не годен");	
+		heads.add("Измер. знач. фазы");	
+		heads.add("Погрешность");	
+		heads.add("Годен/не годен");	
+		resultTable = new StringGridFX(7, 10, 1110, 100, scrollPane, tablePane, heads);		 
 	}
 	
 	@FXML
 	private void searchDeviceBtnClick(ActionEvent event) throws IOException {
 		SearchDeviceWindow.getSearchDeviceWindow(verificatedDevice, this).show();
 	}
-	
+
+//Нажатие на кнопку Start
 	@FXML
-	private void startBtnClick(ActionEvent event) throws IOException {
+	private void startBtnClick(ActionEvent event) throws IOException, InterruptedException {
 		if(verificatedDevice != null) {
 			String absPath = new File(".").getAbsolutePath();
 			String psiFilePath = absPath + "\\measurment\\PSI.ini";
 			verificatedDevice.createIniFile(psiFilePath);
 			StartVerificationWindow.getVerificationWindow().show();
+			
 		}
 		else{
 			AboutMessageWindow msgWin = new AboutMessageWindow("Ошибка","Вы не выбрали средство измерения для поверки");
@@ -120,7 +131,15 @@ public class VerificationController implements InfoRequestable {
 	@FXML
 	private void saveBtnClick(ActionEvent event) throws IOException {
 		if (verificationResult.size() != 0) {
-			//
+			for (int i=0; i<verificationResult.size(); i++) {
+				try {
+					verificationResult.get(i).saveInDB();
+				}
+				catch(SQLException sqlExp) {
+					AboutMessageWindow msgWin = new AboutMessageWindow("Ошибка", "Не удалось сохранить результаты в БД");
+					msgWin.show();
+				}
+			}
 		}
 		else {
 			AboutMessageWindow msgWin = new AboutMessageWindow("Ошибка","Процедура поверки еще не закончена");
@@ -132,7 +151,8 @@ public class VerificationController implements InfoRequestable {
 	@FXML
 	private void createProtocolBtnClick(ActionEvent event) throws IOException {
 		if (verificationResult.size() != 0) {
-			//
+			String[] docTypes = {"Свидетельство о поверке", "Извещение о непригодности"};			
+			ProtocolCreateWindow.getProtocolCreateWindow(docTypes, verificationResult).show();
 		}
 		else {
 			AboutMessageWindow msgWin = new AboutMessageWindow("Ошибка","Процедура поверки еще не закончена");
@@ -172,6 +192,8 @@ public class VerificationController implements InfoRequestable {
 	@FXML
 	private void parametrComboBoxChange() {
 		currentParamIndex = this.parametrComboBox.getSelectionModel().getSelectedIndex(); 
+		
+		
 		fillTable();
 	}
 	

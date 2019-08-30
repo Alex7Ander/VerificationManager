@@ -19,4 +19,8 @@ public class NewDeviceWindow extends guiWindow {
 		return instanceNewDeviceWindow;
 	}
 	
+	public static void deleteNewDeviceWindow() {
+		instanceNewDeviceWindow = null;
+	}
+
 }

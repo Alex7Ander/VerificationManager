@@ -9,7 +9,7 @@ public class OldDocSearchWindow extends guiWindow {
 	private static OldDocSearchWindow instanceOldDocSearchWindow;
 	
 	private OldDocSearchWindow() throws IOException {
-		super("Поиск протоколов поверки", "OldDocSearchForm.fxml");
+		super("Поиск протоколов поверки", "OldDocForm.fxml");
 	}
 	
 	public static OldDocSearchWindow getOldDocSearchWindow() throws IOException{
