@@ -26,9 +26,9 @@ public class SearchDeviceController {
 	@FXML
 	private Button chooseBtn;
 	@FXML
-	private ComboBox nameComboBox;
+	private ComboBox<String> nameComboBox;
 	@FXML
-	private ComboBox typeComboBox;
+	private ComboBox<String> typeComboBox;
 	@FXML
 	private TextField serialNumTextField;
 	@FXML
@@ -36,7 +36,7 @@ public class SearchDeviceController {
 	@FXML
 	private TextField gosNumTextField;	
 	@FXML
-	private ListView devicesListView;
+	private ListView<String> devicesListView;
 	@FXML
 	private Label headLabel;
 	

@@ -24,26 +24,46 @@ public class UpDownTolerance extends ToleranceParametrs {
 	}
 
 	@Override
-	public boolean checkResult(MeasResult result, HashMap<Double, Double> report) {
+	public boolean checkResult(MeasResult result) {
+		boolean resultOfCheck = true;
 		int currentCountOfFreq = result.getCountOfFreq();
-		for (int i=0; i < this.getCountOfParams(); i++) {
+		int countOfParams = result.getMyOwner().getPoleCount();
+		if (countOfParams == 2) countOfParams = 1;
+		String[] cKeys = {"S11", "S12", "S21", "S22"};
+		for (int i=0; i < countOfParams; i++) {
+			
+			HashMap<Double, String> decisionsG = new HashMap<Double, String>();
+			HashMap<Double, String> decisionsPhi = new HashMap<Double, String>();
+			
 			for (int j=0; j < currentCountOfFreq; j++) {
 				double cFreq = result.freqs.get(j);
-				double down = this.values.get("").get(cFreq);
-				double up = this.values.get("").get(cFreq); 
-				double res = result.values.get("").get(cFreq);
-				
-				if (res > up) {
-					double delta = res - up;
-					report.put(cFreq, delta);
+								
+				double resG = result.values.get("m_" + cKeys[i]).get(cFreq);
+				double downG = this.values.get("d_m_" + cKeys[i]).get(cFreq);
+				double upG = this.values.get("u_m_" + cKeys[i]).get(cFreq); 				
+				if(resG > upG || resG < downG) {
+					decisionsG.put(cFreq, "Не годен");
+					resultOfCheck = false;
 				}
-				else if (res < down) {
-					double delta = res - down;
-					report.put(cFreq, delta);
+				else {
+					decisionsG.put(cFreq, "Годен");
+				}
+				
+				double resPhi = result.values.get("p_" + cKeys[i]).get(cFreq);
+				double downPhi = this.values.get("d_p_" + cKeys[i]).get(cFreq);
+				double upPhi = this.values.get("u_p_" + cKeys[i]).get(cFreq); 
+				if(resPhi > upPhi || resPhi < downPhi) {
+					decisionsPhi.put(cFreq, "Не годен");
+					resultOfCheck = false;
+				}
+				else {
+					decisionsPhi.put(cFreq, "Годен");
 				}
 			}
+			
+			result.suitabilityDecision.put(cKeys[i], decisionsG);
+			result.suitabilityDecision.put(cKeys[i], decisionsPhi);
 		}
-		if (report.size()>0) return false;
-		else return true;
+		return resultOfCheck;
 	}
 }

@@ -8,6 +8,7 @@ import DataBasePack.DataBaseManager;
 import DataBasePack.dbStorable;
 import DevicePack.Element;
 import DevicePack.Includable;
+import ErrorParamsPack.ErrorParams;
 import NewElementPack.NewElementController;
 import VerificationPack.MeasResult;
 
@@ -22,6 +23,10 @@ public abstract class ToleranceParametrs implements Includable<Element>, dbStora
 	protected String typeByTime;
 	public HashMap<String, HashMap<Double, Double>> values;
 	public ArrayList<Double> freqs;
+	/*
+	public HashMap<String, HashMap<Double, Double>> Error_gamma;
+	public HashMap<String, HashMap<Double, Double>> Error_phi;
+	*/
 	
 	public int getCountOfParams() {return this.countOfParams;}
 	public int getCountOfFreq() {return this.countOfFreq;}
@@ -105,8 +110,69 @@ public abstract class ToleranceParametrs implements Includable<Element>, dbStora
 	}
 	
 
+	public void measError(MeasResult result) throws SQLException {
+		ErrorParams er = new ErrorParams();
+		String tract = "";
 		
-	public abstract boolean checkResult(MeasResult result, HashMap<Double, Double> report);
+		int countOfParams = result.getMyOwner().getPoleCount();
+		if (countOfParams == 2) countOfParams = 1;
+		
+		String[] cKeys = {"S11", "S12", "S21", "S22"};
+		
+		for (int j=0; j < countOfParams; j++) {
+			HashMap<Double, Double> errorsG = new HashMap<Double, Double>();
+			HashMap<Double, Double> errorsPhi = new HashMap<Double, Double>();
+			for (int i=0; i < result.getCountOfFreq(); i++) {			
+				double cFreq = result.freqs.get(i);
+				if (cFreq < 53.57) {
+					tract = "5,2";
+				}
+				else if (cFreq >= 53.57 && cFreq < 78.33){
+					tract = "3,6";
+				}
+				else if (cFreq >= 78.33 && cFreq < 118.1) {
+					tract = "2,4";
+				}
+				else {
+					tract = "1,6";
+				}
+			
+				double a1 = er.getA1(tract);
+				double b1 = er.getB1(tract);
+				double c1 = er.getC1(tract);
+				double d1 = er.getE1(tract);
+				double e1 = er.getE1(tract);
+				double a2 = er.getA2(tract);
+				double b2 = er.getB2(tract);
+				double c2 = er.getC2(tract);
+				double d2 = er.getD2(tract);
+			
+				double G = result.values.get("m_" + cKeys[j]).get(cFreq);
+				//double phi = result.values.get("p_" + cKeys[j]).get(cFreq);
+				
+				double nspG = (a1*G + b1)*cFreq + c1*G*G + d1*G + e1;
+				double nspPhi = (a2*G + b2)*cFreq + c2*Math.pow(G, d2);
+				
+				double skoG = result.values.get("sko_m_" + cKeys[j]).get(cFreq);
+				double skoPhi = result.values.get("sko_p_" + cKeys[j]).get(cFreq);
+				
+				double errG = 2*Math.pow((nspG*nspG/3 + skoG*skoG), 0.5);
+				double errPhi = 2*Math.pow(nspPhi*nspPhi/3 + skoPhi*skoPhi, 0.5);
+				
+				errG = ((double)Math.round(errG*1000))/1000;
+				errPhi = ((double)Math.round(errPhi*1000))/1000;
+				
+				errorsG.put(cFreq, errG);
+				errorsPhi.put(cFreq, errPhi);
+			}
+			result.values.put("err_m_" + cKeys[j], errorsG);
+			result.values.put("err_p_" + cKeys[j], errorsPhi);
+		}
+		
+	}
+//Абстрактный метод, который должен быть переопредел классими наследниками для определения пригодности 
+//устройства по тому или иному способу
+	public abstract boolean checkResult(MeasResult result);
 	
 //Includable<Element>	
 	private Element myElement;

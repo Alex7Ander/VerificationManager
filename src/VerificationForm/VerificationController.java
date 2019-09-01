@@ -1,5 +1,6 @@
 package VerificationForm;
 
+import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,6 +9,8 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+
 import AboutMessageForm.AboutMessageWindow;
 import DevicePack.Device;
 import DevicePack.Element;
@@ -16,8 +19,10 @@ import GUIpack.InfoRequestable;
 import GUIpack.StringGridFX;
 import ProtocolCreatePack.ProtocolCreateWindow;
 import SearchDevicePack.SearchDeviceWindow;
+import StartVerificationPack.StartVerificationController;
 import StartVerificationPack.StartVerificationWindow;
 import VerificationPack.MeasResult;
+import VerificationPack.VerificationProcedure;
 import _tempHelpers.Adapter;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -48,10 +53,10 @@ public class VerificationController implements InfoRequestable {
 	@FXML
 	private Label serNumLabel;
 	@FXML
-	private ComboBox elementComboBox;
+	private ComboBox<String> elementComboBox;
 	private ObservableList<String> listOfElements;
 	@FXML
-	private ComboBox parametrComboBox;
+	private ComboBox<String> parametrComboBox;
 	private ObservableList<String> listOfParametrs;
 	
 //Таблица с результатами	
@@ -67,6 +72,8 @@ public class VerificationController implements InfoRequestable {
 	private ArrayList<String> phaseColumn;
 	private ArrayList<String> phaseErrorColumn;
 	private ArrayList<String> phaseSolutColumn;
+//Процедура поверки
+	VerificationProcedure verification;
 //Результат поверки
 	private ArrayList<MeasResult> verificationResult;	
 //Ссылка на поверяемое СИ
@@ -115,11 +122,7 @@ public class VerificationController implements InfoRequestable {
 	@FXML
 	private void startBtnClick(ActionEvent event) throws IOException, InterruptedException {
 		if(verificatedDevice != null) {
-			String absPath = new File(".").getAbsolutePath();
-			String psiFilePath = absPath + "\\measurment\\PSI.ini";
-			verificatedDevice.createIniFile(psiFilePath);
-			StartVerificationWindow.getVerificationWindow().show();
-			
+			StartVerificationWindow.getVerificationWindow().show();						
 		}
 		else{
 			AboutMessageWindow msgWin = new AboutMessageWindow("Ошибка","Вы не выбрали средство измерения для поверки");
@@ -159,7 +162,7 @@ public class VerificationController implements InfoRequestable {
 			msgWin.show();
 		}
 	}
-	
+
 	@FXML
 	private void elementComboBoxChange() {
 		int elPoleCount = this.verificatedDevice.includedElements.get(currentElementIndex).getPoleCount();		
@@ -191,9 +194,7 @@ public class VerificationController implements InfoRequestable {
 	
 	@FXML
 	private void parametrComboBoxChange() {
-		currentParamIndex = this.parametrComboBox.getSelectionModel().getSelectedIndex(); 
-		
-		
+		currentParamIndex = this.parametrComboBox.getSelectionModel().getSelectedIndex(); 		
 		fillTable();
 	}
 	
@@ -203,14 +204,35 @@ public class VerificationController implements InfoRequestable {
 	@FXML
 	private void fileReadBtnClick() {
 		int countOfRes = this.verificatedDevice.getCountOfElements();
-		try {
+		try {		
 			for (int i=0; i<countOfRes; i++) {
 				String absPath = new File(".").getAbsolutePath();
 				String resFilePath = absPath + "\\measurment\\protocol.ini";
 
 				MeasResult rs = new MeasResult(resFilePath, i+1, this.verificatedDevice.includedElements.get(i));
-
+				
 				this.verificationResult.add(rs);
+				
+				if (this.verification.getTypeByTime().equals("primary")) {
+					try {
+						this.verificatedDevice.includedElements.get(i).getPrimaryToleranceParams().measError(rs);
+					}
+					catch(SQLException exp) {
+						//
+					}
+					this.verificatedDevice.includedElements.get(i).getPrimaryToleranceParams().checkResult(rs);
+				}
+				else {
+					try {
+						this.verificatedDevice.includedElements.get(i).getPeriodicToleranceParams().measError(rs);
+					}
+					catch(SQLException exp) {
+						//
+					}
+					this.verificatedDevice.includedElements.get(i).getPeriodicToleranceParams().checkResult(rs);
+				}
+							
+				//Заполним таблицу
 				fillTable();
 			}
 		}
@@ -225,11 +247,32 @@ public class VerificationController implements InfoRequestable {
 		}
 	}
 //---------------------------
+	
+	public void StartVerification() throws IOException {
+		
+		String absPath = new File(".").getAbsolutePath();
+		
+		//Получение информации об окружающей среде
+		verification = new VerificationProcedure();
+		verification.setPrimaryInformation((StartVerificationController)StartVerificationWindow.getVerificationWindow().getControllerClass());
+		
+		//Создание файла psi.ini
+		String psiFilePath = absPath + "\\measurment\\PSI.ini";
+		verificatedDevice.createIniFile(psiFilePath);
+		
+		//Запуск программы measurment
+		File file =new File(absPath + "\\measurment\\Project1.exe");
+		Desktop.getDesktop().open(file);
+		
+		//Запуск сервера, ожидающего ответа о завершении измерений
+		
+	}
+	
 	private void fillTable() {
-		String keys[] = {"m_S11", "er_m_S11", "p_S11", "er_p_S11", 
-				 		 "m_S12", "er_m_S12", "p_S12", "er_p_S12",
-				 		 "m_S21", "er_m_S21", "p_S21", "er_p_S21", 
-				 		 "m_S22", "er_m_S22", "p_S22", "er_p_S22"};
+		String keys[] = {"m_S11", "err_m_S11", "p_S11", "err_p_S11", 
+				 		 "m_S12", "err_m_S12", "p_S12", "err_p_S12",
+				 		 "m_S21", "err_m_S21", "p_S21", "err_p_S21", 
+				 		 "m_S22", "err_m_S22", "p_S22", "err_p_S22"};
 		
 		ArrayList<Double> fr = this.verificationResult.get(currentElementIndex).freqs;
 		int countOfFreq = fr.size();
@@ -253,6 +296,12 @@ public class VerificationController implements InfoRequestable {
 		
 		ArrayList<Double> column5 = Adapter.HashMapToArrayList(fr, this.verificationResult.get(currentElementIndex).values.get(keys[3 + currentParamIndex]));
 		this.resultTable.setColumnFromDouble(5, column5);
+		
+		ArrayList<String> column3 = Adapter.HashMapToArrayList(fr, this.verificationResult.get(currentElementIndex).suitabilityDecision.get(keys[currentParamIndex])); 
+		this.resultTable.setColumn(3, column3);
+		
+		ArrayList<String> column6 = Adapter.HashMapToArrayList(fr, this.verificationResult.get(currentElementIndex).suitabilityDecision.get(keys[2 + currentParamIndex])); 
+		this.resultTable.setColumn(6, column6);
 	}
 //---------------------------	
 	@Override

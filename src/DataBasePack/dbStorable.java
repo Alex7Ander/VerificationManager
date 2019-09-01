@@ -3,6 +3,7 @@ package DataBasePack;
 import java.sql.SQLException;
 
 import DevicePack.SavingException;
+import VerificationPack.MeasResult;
 
 public interface dbStorable {
 

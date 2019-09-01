@@ -10,6 +10,8 @@ public class StartVerificationWindow  extends guiWindow {
 	
 	private StartVerificationWindow() throws IOException{
 		super("Подготовка к поверке", "StartVerificationForm.fxml");
+		StartVerificationController ctrl = (StartVerificationController) this.loader.getController();
+		ctrl.setWindow(this);
 	}
 		
 	public static StartVerificationWindow getVerificationWindow() throws IOException {
@@ -18,5 +20,6 @@ public class StartVerificationWindow  extends guiWindow {
 		}
 		return instanceStartVerificationWindow;
 	}
+	
 	
 }

@@ -1,15 +1,11 @@
 package StartVerificationPack;
 
-import java.awt.Desktop;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.UnknownHostException;
 
-import AboutMessageForm.AboutMessageWindow;
+import java.io.IOException;
+
 import ProtocolCreatePack.ProtocolCreateWindow;
+import VerificationForm.VerificationController;
+import VerificationForm.VerificationWindow;
 import YesNoDialogPack.YesNoWindow;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -44,7 +40,6 @@ public class StartVerificationController {
 	private RadioButton badWorkRB;
 	private ToggleGroup workGroup;
 	
-	private String currentVerificationType;
 	private double currentTemparature;
 	private double currentAtmPreasure;
 	private double currentAirHumidity;
@@ -63,6 +58,9 @@ public class StartVerificationController {
 	@FXML
 	private Button startBtn;
 	
+	private StartVerificationWindow myWindow;
+	public void setWindow(StartVerificationWindow win) { this.myWindow = win;}
+	
 	@FXML
 	private void initialize() {
 		verGroup = new ToggleGroup();
@@ -80,20 +78,23 @@ public class StartVerificationController {
 
 	@FXML
 	private void primaryVerRBClick() {
-		currentVerificationType = "primary";
+		//
 	}
 	
 	@FXML
 	private void periodicVerRB() {
-		currentVerificationType = "periodic";
+		//
 	}
 	
 	@FXML
 	private void startBtnClick() throws IOException {
 		
 		if (!chekEnvironment()) {
-			AboutMessageWindow msgWin = new AboutMessageWindow("Внимание", envStatusString);
-			msgWin.show();
+			YesNoWindow ynWin = new YesNoWindow("Внимание", envStatusString + "\nЖелаете продолжить?");
+			int answer = ynWin.showAndWait();
+			if (answer == 0) {
+				return;
+			}
 		}
 		
 		if(!checkVerType()) {
@@ -137,44 +138,11 @@ public class StartVerificationController {
 			}
 		}
 		
-		//Запуск программы measurment
-		String absPath = new File(".").getAbsolutePath();
-		File file =new File(absPath + "\\measurment\\Project1.exe");
-		Desktop.getDesktop().open(file);
-		
-		//
-		ServerSocket servS = new ServerSocket(5055);
-		Socket s = null;
-		while(true) {
-			s = servS.accept();
-			InputStream inS = s.getInputStream();
-			byte[] buffer = new byte[1024];
-			String str = new String(buffer);
-			//int b = inS.read(buffer);
-			if (true) {
-				System.out.println("Сообщение получено");
-				//fileReadBtnClick();
-				break;
-			}
+		if(VerificationWindow.getVerificationWindow() != null) {
+			VerificationController vCtrl = (VerificationController)VerificationWindow.getVerificationWindow().getControllerClass();
+			vCtrl.StartVerification();
+			this.myWindow.close();
 		}
-		s.close();		
-		
-		/*
-		Thread waitThr = new Thread(()->{
-			try {
-					
-			}
-			catch(UnknownHostException uhExp) {
-				System.out.println("UnknownHostException " + uhExp.getMessage());
-			}
-			catch(IOException ioExp) {
-				System.out.println("IOException " + ioExp.getMessage());
-			}
-		}, "waitThread");
-		
-		waitThr.start();
-		//waitThr.join();
-		*/
 	}
 	
 	private boolean chekEnvironment() {
@@ -224,6 +192,14 @@ public class StartVerificationController {
 	private boolean checkWork() {
 		if (this.goodWorkRB.isSelected()) return true;
 		else return false;
+	}
+	
+	public String getStrTemperatur() {return this.temperatureTextField.getText();}
+	public String getStrAirHumidity() {return this.airHumidityTextField.getText();}
+	public String getStrAtmPreasure() {return this.atmPreasureTextField.getText();}
+	public String getTypeBytime() {
+		if (this.primaryVerRB.isSelected()) return "primary";
+		else return "periodic";
 	}
 	
 }

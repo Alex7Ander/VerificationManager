@@ -21,7 +21,11 @@ import javafx.collections.ObservableList;
 public class MeasResult implements Includable<Element>, dbStorable{
 		
 	//protected String keys[] = {"m_S11", "p_S11", "m_S12", "p_S12", "m_S21", "p_S21", "m_S22", "p_S22"};
-	
+	/*		String keys[] = {"m_S11", "sko_m_S11", "err_m_S11", "p_S11", "sko_p_S11", "err_m_S11", 
+	 						 "m_S12", "sko_m_S12", "err_m_S12", "p_S12", "sko_p_S12", "err_m_S12",
+	 						 "m_S21", "sko_m_S21", "err_m_S121", "p_S21", "sko_p_S21", "err_m_S21", 
+	 						 "m_S22", "sko_m_S22", "err_m_S22", "p_S22", "sko_p_S22", "err_m_S22",};
+	*/
 	protected int countOfFreq;
 	protected int countOfParams;
 	protected Date dateOfMeas;
@@ -33,7 +37,12 @@ public class MeasResult implements Includable<Element>, dbStorable{
 	public String getDateOfMeasByString() {
 		return new SimpleDateFormat(datePattern).format(this.dateOfMeas);
 	}	
+	
+	//Измеренные значения 
 	public HashMap<String, HashMap<Double, Double>> values;
+	//Решения о пригодности
+	public HashMap<String, HashMap<Double, String>> suitabilityDecision;
+	//Списко частот (может использоваться списком ключей для 2-го HashMap)
 	public ArrayList<Double> freqs;
 	
 	protected  ObservableList<String> paramsNames;
@@ -44,6 +53,7 @@ public class MeasResult implements Includable<Element>, dbStorable{
 		this.myElement = ownerElement;
 		freqs = new ArrayList<Double>();
 		values = new HashMap<String, HashMap<Double, Double>>();
+		suitabilityDecision = new HashMap<String, HashMap<Double, String>>();
 		
 		ResultReaderManager resReader = new ResultReaderManager(fileWithResults);			
 		resReader.readResult(resultNumber, freqs, values);
