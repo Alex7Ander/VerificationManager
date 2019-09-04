@@ -72,6 +72,7 @@ public class VerificationController implements InfoRequestable {
 	private ArrayList<String> phaseColumn;
 	private ArrayList<String> phaseErrorColumn;
 	private ArrayList<String> phaseSolutColumn;
+	
 //Процедура поверки
 	VerificationProcedure verification;
 //Результат поверки
@@ -100,8 +101,7 @@ public class VerificationController implements InfoRequestable {
 		
 		currentElementIndex = 0;
 		currentParamIndex = 0;
-		
-		
+		   		
 		ArrayList<String> heads = new ArrayList<String>();
 		heads.add("Частота, ГГц");	
 		heads.add("Измер. знач. модуля");	

@@ -19,7 +19,7 @@ public class ProtocolCreateThread extends Thread {
 	}
 	
 	public void run() {
-		//Скопировать файл
+		//Скопировать файл 
 		String absPath = new File(".").getAbsolutePath();
 		String pathFrom = new File(".").getAbsolutePath() + "\\files\\protocolsTemplates\\PRT.xlsx";
 		String pathTo = new File(".").getAbsolutePath() + "\\Protocols\\" + this.protocolName;
@@ -27,7 +27,6 @@ public class ProtocolCreateThread extends Thread {
 		File dist = new File(pathTo);
 		try {
 			Files.copy(source.toPath(), dist.toPath());
-			
 			//Заполнение файла
 			fillFile();
 		} catch (IOException e) {
@@ -36,6 +35,9 @@ public class ProtocolCreateThread extends Thread {
 	}
 	
 	private void fillFile() {
+		
 		//
+		
 	}
+	
 }
