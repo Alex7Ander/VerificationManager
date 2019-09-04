@@ -14,6 +14,8 @@ import VerificationPack.Gamma_Result;
 import VerificationPack.MeasResult;
 import VerificationPack.VSWR_Result;
 import VerificationPack.Verificatable;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 public class Element implements Includable<Device>, Verificatable, dbStorable{
 
@@ -67,7 +69,7 @@ public class Element implements Includable<Device>, Verificatable, dbStorable{
 		this.nominalIndex = Integer.parseInt(arrayResults.get(0).get(7));
 		String addrStr = this.myDevice.getName() + " " + this.myDevice.getType() + " " +this.myDevice.getSerialNumber() + " "+
 				 this.type + " " + this.serialNumber;
-		this.listOfVerificationsTable = "Measurements of " + addrStr;
+		this.listOfVerificationsTable = "Список таблиц с результатами измерений для " + addrStr;
 		//Получим номиналы на элемент 
 		if (this.measUnit.equals("vswr")) {
 			this.nominal = new VSWR_Result(this, nominalIndex);
@@ -117,9 +119,9 @@ public class Element implements Includable<Device>, Verificatable, dbStorable{
 		
 		String addrStr = this.myDevice.getName() + " " + this.myDevice.getType() + " " +this.myDevice.getSerialNumber() + " "+
 						 this.type + " " + this.serialNumber;
-		this.periodicParamTable = "Periodic for " + addrStr;
-		this.primaryParamTable = "Primary for " + addrStr;
-		this.listOfVerificationsTable = "Measurements of " + addrStr;
+		this.periodicParamTable = "Критерии периодической поверки для " + addrStr;
+		this.primaryParamTable = "Критерии первичной поверки для " + addrStr;
+		this.listOfVerificationsTable = "Список таблиц с результатами измерений для " + addrStr;
 	}
 
 	//getters
@@ -141,12 +143,12 @@ public class Element implements Includable<Device>, Verificatable, dbStorable{
 	@Override
 	public void saveInDB() throws SQLException {
 		String addStr = myDevice.getName() + " " + myDevice.getType() + " " + myDevice.getSerialNumber();
-		String strElementsTable = "Elements of " + addStr;
+		String strElementsTable = this.myDevice.getElementsTableName();
 		// 3.1 Внесли запись об элементе
 		String sqlString = "INSERT INTO ["+strElementsTable+"] (ElementType, ElementSerNumber, PoleCount, MeasUnit, ToleranceType, PeriodicParamTable, PrimaryParamTable, NominalIndex) values ('"+type+"','"+serialNumber+"','"+poleCount+"','"+measUnit+"','"+toleranceType+"','"+periodicParamTable +"','"+primaryParamTable+"','"+Integer.toString(nominalIndex)+"')";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlString);
-		// 3.2 Создание таблицы [Measurements of ...]
-		sqlString = "CREATE TABLE [Measurements of " + (addStr + " " + this.type + " " + this.serialNumber) + "] (id INTEGER PRIMARY KEY AUTOINCREMENT, dateOfVerification VARCHAR(60), resultsTableName VARCHAR(512))";
+		// 3.2 Создание таблицы [Список таблиц с результатами измерений для ...]
+		sqlString = "CREATE TABLE [Список таблиц с результатами измерений для " + (addStr + " " + this.type + " " + this.serialNumber) + "] (id INTEGER PRIMARY KEY AUTOINCREMENT, dateOfVerification VARCHAR(60), resultsTableName VARCHAR(512))";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlString);
 		// 3.3 Сохранить критерии годности
 		this.primaryToleranceParams.saveInDB();	
@@ -159,8 +161,8 @@ public class Element implements Includable<Device>, Verificatable, dbStorable{
 	public void deleteFromDB() throws SQLException {
 		
 		String addStr = myDevice.getName() + " " + myDevice.getType() + " " + myDevice.getSerialNumber();	
-		String strElementsTable = "Elements of " + addStr;
-		String measurementsOfTableName = "Measurements of " + addStr + " " + this.type + " " + this.serialNumber;
+		String strElementsTable = this.myDevice.getElementsTableName();
+		String measurementsOfTableName = "Список таблиц с результатами измерений для " + addStr + " " + this.type + " " + this.serialNumber;
 		
 		//Удалить номинал
 		this.nominal.deleteFromDB();
@@ -192,6 +194,22 @@ public class Element implements Includable<Device>, Verificatable, dbStorable{
 		return resultOfVerification;
 	}
 	
-	
+	public ArrayList<ArrayList<String>> getListOfVerifications() throws SQLException {
+		
+		String addStr = myDevice.getName() + " " + myDevice.getType() + " " + myDevice.getSerialNumber();	
+		String strElementsTable = this.myDevice.getElementsTableName();
+		String measurementsOfTableName = "Список таблиц с результатами измерений для " + addStr + " " + this.type + " " + this.serialNumber;
+		String sqlString = "SELECT id, dateOfVerification, resultsTableName FROM ["+measurementsOfTableName+"]";
+		
+		ArrayList<String> fieldName = new ArrayList<String>();
+		fieldName.add("id");
+		fieldName.add("dateOfVerification");
+		fieldName.add("resultsTableName");
+		ArrayList<ArrayList<String>> arrayResults = new ArrayList<ArrayList<String>>();
+		
+		DataBaseManager.getDB().sqlQueryString(sqlString, fieldName, arrayResults);
+			
+		return arrayResults;
+	}
 
 }

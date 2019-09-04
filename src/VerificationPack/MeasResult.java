@@ -29,7 +29,7 @@ public class MeasResult implements Includable<Element>, dbStorable{
 	protected int countOfFreq;
 	protected int countOfParams;
 	protected Date dateOfMeas;
-	protected String datePattern = "DD/MM/yyyy HH:mm:ss";
+	protected String datePattern = "dd/MM/yyyy HH:mm:ss";
 	
 	public int getCountOfFreq() {return this.countOfFreq;}
 	public int getCountOfParams() {return this.countOfParams;}
@@ -107,19 +107,47 @@ public class MeasResult implements Includable<Element>, dbStorable{
 		
 		String resultsTableName =  results.get(0).get(1);
 				
-		String keys[] = {"freq", "m_S11", "p_S11", "m_S12", "p_S12", "m_S21", "p_S21", "m_S22", "p_S22"};
+		//String keys[] = {"freq", "m_S11", "p_S11", "m_S12", "p_S12", "m_S21", "p_S21", "m_S22", "p_S22"};
 	
+		//Получим частоты
+		sqlQuery = "SELECT freq FROM ["+resultsTableName+"]";
+		DataBaseManager.getDB().sqlQueryDouble(sqlQuery, "freq", this.freqs);
+		this.countOfFreq = this.freqs.size();
+		
+		String keys[] = {"m_S11", "sko_m_S11", "err_m_S11", "p_S11", "sko_p_S11", "err_p_S11", 
+				 "m_S12", "sko_m_S12", "err_m_S12", "p_S12", "sko_p_S12", "err_p_S12",
+				 "m_S21", "sko_m_S21", "err_m_S21", "p_S21", "sko_p_S21", "err_p_S21", 
+				 "m_S22", "sko_m_S22", "err_m_S22", "p_S22", "sko_p_S22", "err_p_S22"};
+		/*
 		int countOfKeys = 0;
 		if (this.myElement.getPoleCount() == 2) {
-			countOfKeys = 3;
+			countOfKeys = 6;
 		}
 		else {
-			countOfKeys = 9;
+			countOfKeys = 24;
 		}
 		fieldsNames.clear();
 		for (int i=0; i<countOfKeys; i++) fieldsNames.add(keys[i]);
-		
-		sqlQuery = "SELECT ";
+		*/
+		//Получим значения параметров
+		for (String key : keys) {
+			try {
+				sqlQuery = "SELECT " + key + " FROM ["+resultsTableName+"]";
+				ArrayList<Double> arrayResults = new ArrayList<Double>();
+				DataBaseManager.getDB().sqlQueryDouble(sqlQuery, key, arrayResults);
+				
+				HashMap<Double, Double> tempHM = new HashMap<Double, Double>();
+				for (int i=0; i<this.countOfFreq; i++) {
+					tempHM.put(freqs.get(i), arrayResults.get(i));
+				}
+				this.values.put(key, tempHM);
+			}
+			catch(Exception exp) {
+				continue;
+			}
+		}
+		/*
+		sqlQuery = "SELECT freq, ";
 		for (int i=0; i<countOfKeys; i++) {
 			sqlQuery += keys[i];
 			if (i != countOfKeys - 1) sqlQuery += ", ";
@@ -127,10 +155,8 @@ public class MeasResult implements Includable<Element>, dbStorable{
 		sqlQuery += " FROM ["+resultsTableName+"]";
 		DataBaseManager.getDB().sqlQueryMapOfDouble(sqlQuery, fieldsNames, this.values);
 		this.countOfParams = this.values.size();
+		*/
 		
-		sqlQuery = "SELECT freq FROM ["+resultsTableName+"]";
-		DataBaseManager.getDB().sqlQueryDouble(sqlQuery, "freq", this.freqs);
-		this.countOfFreq = this.freqs.size();
 	}
 		
 //Includable<Element>
@@ -141,20 +167,39 @@ public class MeasResult implements Includable<Element>, dbStorable{
 //dbStorable
 	@Override
 	public void saveInDB() throws SQLException {
+		//String keys[] = {"m_S11", "p_S11", "m_S12", "p_S12", "m_S21", "p_S21", "m_S22", "p_S22"};
 		
-		String keys[] = {"m_S11", "p_S11", "m_S12", "p_S12", "m_S21", "p_S21", "m_S22", "p_S22"};
-
+		String keys[] = {"m_S11", "sko_m_S11", "err_m_S11", "p_S11", "sko_p_S11", "err_p_S11", 
+				 "m_S12", "sko_m_S12", "err_m_S12", "p_S12", "sko_p_S12", "err_p_S12",
+				 "m_S21", "sko_m_S21", "err_m_S21", "p_S21", "sko_p_S21", "err_p_S21", 
+				 "m_S22", "sko_m_S22", "err_m_S22", "p_S22", "sko_p_S22", "err_p_S22"};
+		ArrayList<String> currentKeys = new ArrayList<String>();
+		//Перепишем все параметры, которые необходимо сохранить в список currentKeys
+		for (String k: keys) {
+			try {
+				int size = this.values.get(k).size();
+				if (size > 0) {
+					currentKeys.add(k);
+				}
+			}
+			catch(Exception exp) {
+				
+			}
+		}
+						
 		DateFormat df = new SimpleDateFormat(datePattern);
 		String dateOfVerification = df.format(this.dateOfMeas);
 		
-		String listOfVerificationsTable = this.myElement.getListOfVerificationsTable();		
-		String resultsTableName = "Results of verification " + listOfVerificationsTable.substring(listOfVerificationsTable.indexOf("Measurements of ")) + " at " + dateOfVerification;
+		String listOfVerificationsTable = this.myElement.getListOfVerificationsTable();
+		String resultsTableName = "Результат поверки " + 
+				this.myElement.getMyOwner().getName() + " " + this.myElement.getMyOwner().getType() + " " + this.myElement.getMyOwner().getSerialNumber() + " " + this.myElement.getType() + " " + this.myElement.getSerialNumber() +
+				" проведенной " + dateOfVerification;
 		String sqlQuery = "INSERT INTO [" + listOfVerificationsTable + "] (dateOfVerification, resultsTableName) values ('"+ dateOfVerification +"','"+ resultsTableName +"')";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
 		sqlQuery = "CREATE TABLE [" + resultsTableName + "] (id INTEGER PRIMARY KEY AUTOINCREMENT, freq VARCHAR(20), ";
-		for (int i=0; i<this.countOfParams; i++) {
-			sqlQuery += (keys[i] + " VARCHAR(20)");
-			if (i != this.countOfParams - 1) sqlQuery += ", ";
+		for (int i = 0; i < currentKeys.size(); i++) {
+			sqlQuery += (currentKeys.get(i) + " VARCHAR(20)");
+			if (i != currentKeys.size() - 1) sqlQuery += ", ";
 		}
 		sqlQuery += ")";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
@@ -164,16 +209,16 @@ public class MeasResult implements Includable<Element>, dbStorable{
 			
 			sqlQuery = "INSERT INTO [" + resultsTableName + "] (freq, ";
 			
-			for (int j=0; j<this.countOfParams; j++) {
-				sqlQuery += (keys[j]);
-				if (j != this.countOfParams - 1) sqlQuery += ", ";
+			for (int j = 0; j < currentKeys.size(); j++) {
+				sqlQuery += (currentKeys.get(j));
+				if (j != currentKeys.size() - 1) sqlQuery += ", ";
 			}
 			
 			sqlQuery += ") values ('"+freqs.get(i)+"', ";
 			
-			for (int j = 0; j < this.countOfParams; j++) {
-				sqlQuery += ("'"+values.get(keys[j]).get(freqs.get(i)).toString()+"'");
-				if (j != this.countOfParams - 1) sqlQuery += ", ";
+			for (int j = 0; j < currentKeys.size(); j++) {
+				sqlQuery += ("'"+values.get(currentKeys.get(j)).get(freqs.get(i)).toString()+"'");
+				if (j != currentKeys.size() - 1) sqlQuery += ", ";
 			}
 			
 			sqlQuery += ")";

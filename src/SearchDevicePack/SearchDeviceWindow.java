@@ -16,6 +16,7 @@ public class SearchDeviceWindow extends guiWindow{
 		SearchDeviceController controller = (SearchDeviceController) loader.getController();
 		controller.setDevice(incomingDevice);
 		controller.setRequester(incomingRequester);
+		this.stage.setOnCloseRequest(controller.getCloseEventHandler());
 	}
 		
 	public static SearchDeviceWindow getSearchDeviceWindow(Device incomingDevice, InfoRequestable incomingRequester) throws IOException {
@@ -23,6 +24,10 @@ public class SearchDeviceWindow extends guiWindow{
 			instanceSearchDeviceWindow = new SearchDeviceWindow(incomingDevice, incomingRequester);				
 		}
 		return instanceSearchDeviceWindow;
+	}
+	
+	public static void deleteWindow() {
+		instanceSearchDeviceWindow = null;
 	}
 	
 }

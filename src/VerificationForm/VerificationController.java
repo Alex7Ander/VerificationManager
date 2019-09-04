@@ -137,6 +137,8 @@ public class VerificationController implements InfoRequestable {
 			for (int i=0; i<verificationResult.size(); i++) {
 				try {
 					verificationResult.get(i).saveInDB();
+					AboutMessageWindow msgWin = new AboutMessageWindow("Успешно", "Результаты поверки сохранены в БД");
+					msgWin.show();
 				}
 				catch(SQLException sqlExp) {
 					AboutMessageWindow msgWin = new AboutMessageWindow("Ошибка", "Не удалось сохранить результаты в БД");
@@ -203,6 +205,11 @@ public class VerificationController implements InfoRequestable {
 	private Button fileReadBtn;
 	@FXML
 	private void fileReadBtnClick() {
+		if (this.verification == null) {
+			return;
+		}
+		
+		this.verificationResult.clear();
 		int countOfRes = this.verificatedDevice.getCountOfElements();
 		try {		
 			for (int i=0; i<countOfRes; i++) {

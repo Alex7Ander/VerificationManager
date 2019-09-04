@@ -20,6 +20,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 public class SearchDeviceController {
 	
@@ -185,12 +186,7 @@ public class SearchDeviceController {
 			typeComboBox.setItems(listOfTypes);			
 		}
 		catch(SQLException sqlExp) {
-			//Ошабка доступа к БД
-			System.out.println("Ошибка доступа к БД: " + sqlExp.getMessage());
-		}
-		catch(Exception exp) {
-			//Здесь на NullPointerException необходимо проверить
-			System.out.println("Ошибка: " + exp.getMessage());
+			//Ошибка доступа к БД
 		}
 	}
 	
@@ -210,5 +206,16 @@ public class SearchDeviceController {
 		}
 		return filterString;
 	}
+	
+    private javafx.event.EventHandler<WindowEvent> closeEventHandler = new javafx.event.EventHandler<WindowEvent>() {
+        @Override
+        public void handle(WindowEvent event) {
+        	SearchDeviceWindow.deleteWindow();
+        }
+    };
+
+    public javafx.event.EventHandler<WindowEvent> getCloseEventHandler(){
+    	return closeEventHandler;
+    }
 		
 }

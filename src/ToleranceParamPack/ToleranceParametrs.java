@@ -23,10 +23,6 @@ public abstract class ToleranceParametrs implements Includable<Element>, dbStora
 	protected String typeByTime;
 	public HashMap<String, HashMap<Double, Double>> values;
 	public ArrayList<Double> freqs;
-	/*
-	public HashMap<String, HashMap<Double, Double>> Error_gamma;
-	public HashMap<String, HashMap<Double, Double>> Error_phi;
-	*/
 	
 	public int getCountOfParams() {return this.countOfParams;}
 	public int getCountOfFreq() {return this.countOfFreq;}

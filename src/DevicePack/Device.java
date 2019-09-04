@@ -78,16 +78,17 @@ public class Device implements dbStorable {
 		this.serialNumber = SerialNumber;
 		this.owner = Owner;
 		this.gosNumber = GosNumber;
+		this.elementsTableName = "";
 	}
 	
 	public boolean isExist() {
 		String sqlString = null;
 		String addStr = name + " " + type + " " + serialNumber;
-		String strElementsTable = "Elements of " + addStr;
+		String strElementsTable = "Элементы для " + addStr;
 		sqlString = "SELECT COUNT(*) FROM Devices WHERE TypeOfDevice='"+this.type+"' AND NameOfDevice='"+ this.name +"' AND SerialNumber='" + this.serialNumber + "'";
 		int isExist = 0;
 		try {
-			isExist = AksolDataBase.sqlQueryCount(sqlString);
+			isExist = DataBaseManager.getDB().sqlQueryCount(sqlString);
 			if (isExist == 0) {
 				return false;
 			}
@@ -104,32 +105,38 @@ public class Device implements dbStorable {
 	public void saveInDB() throws SQLException{
 		String sqlString = null;
 		String addStr = name + " " + type + " " + serialNumber;
-		String strElementsTable = "Elements of " + addStr;
+		String strElementsTable = "Элементы для " + addStr;
 		
 		sqlString = "INSERT INTO [Devices] (NameOfDevice, TypeOfDevice, SerialNumber, Owner, GosNumber, CountOfElements, ElementsTable) values ('"+name+"','"+type+"','"+serialNumber+"','"+owner+"','"+gosNumber+"','"+Integer.toString(this.countOfElements)+"','"+strElementsTable+"')";
-		AksolDataBase.sqlQueryUpdate(sqlString);
+		DataBaseManager.getDB().sqlQueryUpdate(sqlString);
 		//Создание таблицы со списком включенных элементов
 		sqlString = "CREATE TABLE ["+strElementsTable+"] (id INTEGER PRIMARY KEY AUTOINCREMENT, ElementType VARCHAR(256), ElementSerNumber VARCHAR(256), PoleCount VARCHAR(256), MeasUnit VARCHAR(256), ToleranceType VARCHAR(256), PeriodicParamTable VARCHAR(256), PrimaryParamTable VARCHAR(256), NominalIndex VARCHAR(10))";
-		AksolDataBase.sqlQueryUpdate(sqlString);
+		DataBaseManager.getDB().sqlQueryUpdate(sqlString);
+		this.elementsTableName = strElementsTable;
 		for (int i=0; i < this.countOfElements; i++){
 			System.out.println("this.countOfElements = " + this.countOfElements);
 			//Сохранение в БД данных о составных элементах
 			this.includedElements.get(i).saveInDB(); 		
 		}
-		/*
-		sqlString = "COMMIT";
-		AksolDataBase.sqlQueryUpdate(sqlString);
-		*/
 	}
 	
 	@Override
-	public void deleteFromDB() {
-		// TODO Auto-generated method stub
+	public void deleteFromDB() throws SQLException {
+		for (Element elm : this.includedElements) {
+			elm.deleteFromDB();
+		}
+		this.includedElements.clear();
+		String sqlQuery = "DROP TABLE [" + this.elementsTableName + "]";
+		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
+		sqlQuery = "DELETE FROM [Devices] WHERE NameOfDevice='"+this.name+"' AND TypeOfDevice='"+this.type+"' AND SerialNumber='"+this.serialNumber+"'";
+		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
 	}
+	
 	@Override
-	public void editInfoInDB() {
+	public void editInfoInDB() throws SQLException {
 		// TODO Auto-generated method stub
 	}
+	
 	@Override
 	public void getData() {
 		// TODO Auto-generated method stub		
@@ -137,7 +144,7 @@ public class Device implements dbStorable {
 	
 	public void addElement(Element element) {
 		this.includedElements.add(element);
-		this.countOfElements++;	
+		this.countOfElements = this.includedElements.size();	
 	}
 	
 	public void removeElement(int index) {
@@ -178,14 +185,6 @@ public class Device implements dbStorable {
 		}
 		String coding = "ansi-1251";
 		FileManager.WriteFile(psiFilePAth, coding, fileStrings);
-	}
-	
-	public void createProtocol(ArrayList<MeasResult> results, String protocolFilePath) throws IOException{
-		//
-	}
-	
-	public void createDocument(ArrayList<MeasResult> results, String protocolFilePath) throws IOException {
-		//
 	}
 	
 }

@@ -75,7 +75,7 @@
                   </TitledPane>
                   <Label stylesheets="@../../bin/application/commonLabel.css" text="Составные элементы данного СИ:" />
                   <Separator prefWidth="200.0" />
-                  <ListView fx:id="elementsListView" prefHeight="305.0" prefWidth="374.0" />
+                  <ListView fx:id="elementsListView" onMouseClicked="#elementsListViewClick" prefHeight="305.0" prefWidth="374.0" />
                </children>
             </VBox>
             <Separator orientation="VERTICAL" prefHeight="200.0" />
@@ -88,7 +88,9 @@
                         <RadioButton fx:id="resultsRB" layoutX="14.0" layoutY="6.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="236.0" styleClass="radiobutton" stylesheets="@../../bin/application/commonRadioButton.css" text="Результаты поверки" />
                         <RadioButton fx:id="paramsRB" layoutX="14.0" layoutY="37.0" mnemonicParsing="false" styleClass="radiobutton" stylesheets="@../../bin/application/commonRadioButton.css" text="Критерии годности" />
                         <Label layoutX="197.0" layoutY="7.0" stylesheets="@../../bin/application/commonLabel.css" text="Дата проведения поверки:" />
-                        <ComboBox fx:id="verificationDataComboBox" layoutX="359.0" layoutY="2.0" prefHeight="25.0" prefWidth="460.0" />
+                        <ComboBox fx:id="verificationDateComboBox" layoutX="359.0" layoutY="2.0" onAction="#verificationDataComboBoxClick" prefHeight="25.0" prefWidth="460.0" />
+                        <Label layoutX="197.0" layoutY="37.0" stylesheets="@../../bin/application/commonLabel.css" text="Измеряемая величина:" />
+                        <ComboBox fx:id="currentMeasUnitComboBox" layoutX="359.0" layoutY="33.0" prefHeight="25.0" prefWidth="460.0" />
                      </children>
                   </Pane>
                   <ScrollPane fx:id="scrollPane" prefHeight="567.0" prefWidth="827.0">
