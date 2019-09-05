@@ -7,6 +7,7 @@ import java.util.HashMap;
 import FileManagePack.FileManager;
 import FreqTablesPack.FreqTablesWindow;
 import GUIpack.StringGridFX;
+import YesNoDialogPack.YesNoWindow;
 import _tempHelpers.Randomizer;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -15,6 +16,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
@@ -31,8 +33,7 @@ public class NewElementController {
 	private void fillTableRandClick() {
 		Randomizer.fillStringGrid(this.paramsTable, 1);
 	}
-	
-	
+		
 	@FXML
 	private Button agreeBtn; 
 	@FXML
@@ -41,7 +42,40 @@ public class NewElementController {
 	private Button delFreqBtn;
 	@FXML
 	private Button freqTablesBtn;
-		
+	
+//Элементы для автозаполнения таблицы
+	//кнопки
+	@FXML
+	private Button autoDownModuleBtn;
+	@FXML
+	private Button autoModuleBtn;
+	@FXML
+	private Button autoUpModuleBtn;
+	@FXML
+	private Button autoDownPhaseBtn;
+	@FXML
+	private Button autoPhaseBtn;
+	@FXML
+	private Button autoUpPhaseBtn;
+	//текстовые поля
+	@FXML
+	private TextField moduleTextField;
+	@FXML
+	private TextField downModuleTextField;
+	@FXML
+	private TextField upModuleTextField;
+	@FXML
+	private TextField phaseTextField;
+	@FXML
+	private TextField downPhaseTextField;
+	@FXML
+	private TextField upPhaseTextField;
+	
+	@FXML
+	private Label moduleLabel;
+	@FXML
+	private Label phaseLable;
+	
 	@FXML 
 	private RadioButton primaryVerificationRB;	
 	@FXML 
@@ -95,38 +129,49 @@ public class NewElementController {
 					 "periodic_S11", "periodic_S12", "periodic_S21", "periodic_S22"};
 	private ArrayList<Double> freqs;
 	
-	private HashMap<String, ArrayList<String>> d_m_s; 	//нижний предел
-	private HashMap<String, ArrayList<String>> m_s; 	//Модуль
-	private HashMap<String, ArrayList<String>> u_m_s;	//верхний предел
-	
-	private HashMap<String, ArrayList<String>> d_p_s;	//нижний предел
-	private HashMap<String, ArrayList<String>> p_s; 	//Фаза
-	private HashMap<String, ArrayList<String>> u_p_s;	//верхний предел
-	
-	
+	private ArrayList<String> strFreqs;
+	private HashMap<String, ArrayList<String>> m_s;
+	private HashMap<String, ArrayList<String>> p_s;	
+	private HashMap<String, ArrayList<String>> d_m_s; 	//нижний предел модуля
+	private HashMap<String, ArrayList<String>> u_m_s;	//верхний предел модуля	
+	private HashMap<String, ArrayList<String>> d_p_s;	//нижний предел фазы
+	private HashMap<String, ArrayList<String>> u_p_s;	//верхний предел фазы
+		
+	private NewElementWindow myWindow;	
+	public void setWindow(NewElementWindow window) {
+		myWindow = window;
+	}
 	
 	@FXML
-	private void initialize() {
+	private void initialize() {	
+		
+		this.fillTableRand.setVisible(false);
+		
 		timeIndex = 0;
 		paramIndex = 0;
 		savingIndex = 0;
+		
 		freqs = new ArrayList<Double>();
-		d_m_s = new HashMap<String, ArrayList<String>>();
+		
+		strFreqs = new ArrayList<String>();
 		m_s = new HashMap<String, ArrayList<String>>();
-		u_m_s = new HashMap<String, ArrayList<String>>();
-		d_p_s = new HashMap<String, ArrayList<String>>();
 		p_s = new HashMap<String, ArrayList<String>>();
+		d_m_s = new HashMap<String, ArrayList<String>>();		
+		u_m_s = new HashMap<String, ArrayList<String>>();
+		d_p_s = new HashMap<String, ArrayList<String>>();		
 		u_p_s = new HashMap<String, ArrayList<String>>();
-		for (int i=0; i<8; i++) {
-			d_m_s.put(keys[i], new ArrayList<String>());
-			m_s.put(keys[i], new ArrayList<String>());
-			u_m_s.put(keys[i], new ArrayList<String>());
+		
+		for (int i = 0; i < keys.length; i++) {
+			d_m_s.put(keys[i], new ArrayList<String>(10));
+			m_s.put(keys[i], new ArrayList<String>(10));
+			u_m_s.put(keys[i], new ArrayList<String>(10));
 			
-			d_p_s.put(keys[i], new ArrayList<String>());
-			p_s.put(keys[i], new ArrayList<String>());
-			u_p_s.put(keys[i], new ArrayList<String>());
+			d_p_s.put(keys[i], new ArrayList<String>(10));
+			p_s.put(keys[i], new ArrayList<String>(10));
+			u_p_s.put(keys[i], new ArrayList<String>(10));
 		}
-	
+
+		
 		listOfParams = FXCollections.observableArrayList();
 		twoPoleTypesList = FXCollections.observableArrayList();
 		fourPoleTypesList = FXCollections.observableArrayList();		
@@ -181,6 +226,55 @@ public class NewElementController {
 		
 		paramsTable = new StringGridFX(7, 10, 850, 100, scrollPane, tablePane, paramTableHeads);		
 		
+	}
+	
+	@FXML
+	private void autoDownModuleBtnClick() {
+		int stop = this.paramsTable.getRowCount();
+		String text = this.downModuleTextField.getText();
+		for (int i=0; i<stop; i++) {
+			this.paramsTable.setCellValue(1, i, text);
+		}
+	}
+	@FXML
+	private void autoModuleBtnClick() {
+		int stop = this.paramsTable.getRowCount();
+		String text = this.moduleTextField.getText();
+		for (int i=0; i<stop; i++) {
+			this.paramsTable.setCellValue(2, i, text);
+		}
+	}
+	@FXML
+	private void autoUpModuleBtnClick() {
+		int stop = this.paramsTable.getRowCount();
+		String text = this.upModuleTextField.getText();
+		for (int i=0; i<stop; i++) {
+			this.paramsTable.setCellValue(3, i, text);
+		}
+	}
+	@FXML
+	private void autoDownPhaseBtnClick() {
+		int stop = this.paramsTable.getRowCount();
+		String text = this.downPhaseTextField.getText();
+		for (int i=0; i<stop; i++) {
+			this.paramsTable.setCellValue(4, i, text);
+		}
+	}
+	@FXML
+	private void autoPhaseBtnClick() {
+		int stop = this.paramsTable.getRowCount();
+		String text = this.phaseTextField.getText();
+		for (int i=0; i<stop; i++) {
+			this.paramsTable.setCellValue(5, i, text);
+		}
+	}
+	@FXML
+	private void autoUpPhaseBtnClick() {
+		int stop = this.paramsTable.getRowCount();
+		String text = this.upPhaseTextField.getText();
+		for (int i=0; i<stop; i++) {
+			this.paramsTable.setCellValue(6, i, text);
+		}
 	}
 	
 	@FXML
@@ -253,6 +347,8 @@ public class NewElementController {
 		int showIndex = paramIndex + timeIndex;		
 		refreshTable(savingIndex, showIndex);
 		savingIndex = showIndex;
+		String item = paramsComboBox.getSelectionModel().getSelectedItem().toString();
+		this.moduleLabel.setText(item);
 	}
 	
 	@FXML 
@@ -266,13 +362,13 @@ public class NewElementController {
 	}
 	
 	@FXML
-	private void freaTablesBtnClick() throws IOException {
+	private void freqTablesBtnClick() throws IOException {
 		FreqTablesWindow.getFreqTablesWindow(this).show();
 	}
 	
 	@FXML 
-	private void agreeBtnClick(ActionEvent event) {
-		//
+	private void agreeBtnClick(ActionEvent event) throws IOException {
+		myWindow.close();
 	}
 //end @FXML methods
 	
@@ -281,6 +377,7 @@ public class NewElementController {
 			String path = new File(".").getAbsolutePath();
 			if (paramsIndex.equals("vswr")) path += "\\files\\vswr.txt";
 			else if (paramsIndex.equals("gamma")) path += "\\files\\gamma.txt";
+			listOfParams.clear();
 			FileManager.LinesToItems(path, countOfParams, listOfParams);			
 		}
 		catch(Exception exp) {
@@ -316,7 +413,7 @@ public class NewElementController {
 	
 	public void refreshTable(int savingIndex, int showIndex) {
 		if(savingIndex >= 0 && showIndex >= 0) {
-			this.paramsTable.getColumnToDouble(0, freqs);		
+			this.paramsTable.getColumn(0, strFreqs);		
 			this.paramsTable.getColumn(1, d_m_s.get(keys[savingIndex]));
 			this.paramsTable.getColumn(2, m_s.get(keys[savingIndex]));
 			this.paramsTable.getColumn(3, u_m_s.get(keys[savingIndex]));
@@ -326,7 +423,7 @@ public class NewElementController {
 		
 			this.paramsTable.clear();
 		
-			this.paramsTable.setColumnFromDouble(0, freqs);
+			this.paramsTable.setColumn(0, strFreqs);
 			this.paramsTable.setColumn(1, d_m_s.get(keys[showIndex]));
 			this.paramsTable.setColumn(2, m_s.get(keys[showIndex]));
 			this.paramsTable.setColumn(3, u_m_s.get(keys[showIndex]));
@@ -355,7 +452,8 @@ public class NewElementController {
 
 	public ArrayList<Double> getFreqsValues(){
 		return freqs;
-	}		
+	}	
+	
 	public HashMap<String, HashMap<Double, Double>> getNominalValues(){
 		HashMap<String, HashMap<Double, Double>> nominalValues = new HashMap<String, HashMap<Double, Double>>();
 				
@@ -474,6 +572,31 @@ public class NewElementController {
 		return tolParamsValues;
 	}
 	
+	public int checkInputedValues() {
+		int returnedvalue = 0;
+		
+		ArrayList<HashMap<String, ArrayList<String>>> hashMaps = new ArrayList<HashMap<String, ArrayList<String>>>();
+		hashMaps.add(d_m_s);
+		hashMaps.add(m_s);
+		hashMaps.add(u_m_s);
+		hashMaps.add(d_p_s);
+		hashMaps.add(p_s);
+		hashMaps.add(u_p_s);
+		
+		for (int i=0; i<hashMaps.size(); i++) {			
+			for (String key : keys) {
+				for (int j=0; j<this.strFreqs.size(); j++) {
+					String cValue = hashMaps.get(i).get(key).get(j);
+					if (cValue.length()==0) {
+						returnedvalue = -1;
+						break;
+					}
+				}
+			}
+		}		
+		return returnedvalue;
+	}
+	
 //Действие по закрытию окна
 	private EventHandler<WindowEvent> closeEventHandler = new EventHandler<WindowEvent>() {
         @Override
@@ -482,6 +605,17 @@ public class NewElementController {
         		int showIndex = paramIndex + timeIndex;		
         		refreshTable(savingIndex, showIndex);
         		savingIndex = showIndex;
+        		
+        		freqs.clear();
+        		for (int i=0; i<paramsTable.getRowCount(); i++) {
+        			try {
+        				double val = Double.parseDouble(paramsTable.getCellValue(0, i));
+        				freqs.add(val);
+        			}
+        			catch(NumberFormatException nfExp) {
+        				freqs.add(0.0);
+        			}
+        		}
         	}
         	catch(Exception exp) {
         		//

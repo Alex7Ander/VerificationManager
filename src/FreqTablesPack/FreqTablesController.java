@@ -38,7 +38,7 @@ public class FreqTablesController implements Includable<NewElementController> {
 				new String("3,6"), new String("2,4"), new String("1,2")));
 		freqTableComboBox.setValue("5,2");
 	}
-	
+		
 	@FXML
 	private void continueBtnClick() throws FileNotFoundException, IOException {
 		freqs = new ArrayList<Double>();

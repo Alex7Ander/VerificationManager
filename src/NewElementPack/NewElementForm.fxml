@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="569.0" prefWidth="1209.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="NewElementPack.NewElementController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="666.0" prefWidth="1209.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="NewElementPack.NewElementController">
    <children>
       <HBox prefHeight="549.0" prefWidth="1024.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
          <children>
@@ -14,35 +14,72 @@
                <children>
                   <Label stylesheets="@../application/commonLabel.css" text="Параметры" />
                   <Separator prefWidth="200.0" />
-                  <HBox prefHeight="100.0" prefWidth="200.0">
+                  <HBox prefHeight="32.0" prefWidth="869.0">
                      <children>
-                        <ComboBox fx:id="paramsComboBox" onAction="#paramsComboBoxClick" prefHeight="25.0" prefWidth="299.0" />
+                        <ComboBox fx:id="paramsComboBox" onAction="#paramsComboBoxClick" prefHeight="25.0" prefWidth="245.0" />
                         <Separator orientation="VERTICAL" prefHeight="200.0" />
-                        <Button fx:id="addFreqBtn" mnemonicParsing="false" onAction="#addFreqBtnClick" prefHeight="26.0" prefWidth="100.0" stylesheets="@../application/commonButton.css" text="+ частота" />
+                        <Button fx:id="addFreqBtn" mnemonicParsing="false" onAction="#addFreqBtnClick" prefHeight="26.0" prefWidth="118.0" stylesheets="@../application/commonButton.css" text="+ частота" />
                         <Separator orientation="VERTICAL" prefHeight="200.0" />
-                        <Button fx:id="delFreqBtn" mnemonicParsing="false" onAction="#delFreqBtnClick" prefWidth="100.0" stylesheets="@../application/commonButton.css" text="- частота" />
+                        <Button fx:id="delFreqBtn" mnemonicParsing="false" onAction="#delFreqBtnClick" prefHeight="26.0" prefWidth="119.0" stylesheets="@../application/commonButton.css" text="- частота" />
                         <Separator orientation="VERTICAL" prefHeight="200.0" />
-                        <Button fx:id="freqTablesBtn" mnemonicParsing="false" onAction="#freaTablesBtnClick" prefWidth="100.0" stylesheets="@../application/commonButton.css" text="Сетка" />
+                        <Button fx:id="freqTablesBtn" mnemonicParsing="false" onAction="#freqTablesBtnClick" prefHeight="26.0" prefWidth="114.0" stylesheets="@../application/commonButton.css" text="Сетка" />
                         <Separator orientation="VERTICAL" prefHeight="200.0" />
-                        <TitledPane animated="false" prefHeight="100.0" prefWidth="249.0" style="-fx-font-family: Arial Narrow; -fx-font-size: 14; -fx-font-weight: bold;" text="Тип поверки" underline="true">
-                          <content>
-                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="74.0" prefWidth="224.0">
-                                 <children>
-                                    <RadioButton fx:id="primaryVerificationRB" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#primaryRBClick" prefHeight="17.0" prefWidth="232.0" text="Первичная" />
-                                    <RadioButton fx:id="periodicVerificationRB" layoutX="14.0" layoutY="43.0" mnemonicParsing="false" onAction="#periodicRBClick" prefHeight="17.0" prefWidth="231.0" text="Периодическая" />
-                                 </children>
-                              </AnchorPane>
-                          </content>
-                        </TitledPane>
                      </children>
                   </HBox>
                   <AnchorPane prefHeight="28.0" prefWidth="721.0">
                      <children>
-                        <Label layoutX="201.0" layoutY="6.0" stylesheets="@../application/commonLabel.css" text="КСВН 1- го порта" />
-                        <Label layoutX="535.0" layoutY="6.0" stylesheets="@../application/commonLabel.css" text="Фаза" />
+                        <Label fx:id="moduleLabel" layoutX="127.0" layoutY="6.0" stylesheets="@../application/commonLabel.css" text="КСВН 1- го порта" />
+                        <Label fx:id="phaseLable" layoutX="492.0" layoutY="6.0" stylesheets="@../application/commonLabel.css" text="Фаза" />
                      </children>
                   </AnchorPane>
-                  <ScrollPane fx:id="scrollPane" prefHeight="400.0" prefWidth="870.0">
+                  <HBox prefHeight="35.0" prefWidth="869.0">
+                     <children>
+                        <VBox prefHeight="200.0" prefWidth="120.0" />
+                        <Separator orientation="VERTICAL" prefHeight="200.0" />
+                        <VBox prefHeight="200.0" prefWidth="115.0">
+                           <children>
+                              <TextField fx:id="downModuleTextField" prefWidth="120.0" />
+                              <Button fx:id="autoDownModuleBtn" mnemonicParsing="false" onAction="#autoDownModuleBtnClick" prefWidth="120.0" />
+                           </children>
+                        </VBox>
+                        <Separator orientation="VERTICAL" prefHeight="200.0" />
+                        <VBox prefHeight="200.0" prefWidth="115.0">
+                           <children>
+                              <TextField fx:id="moduleTextField" />
+                              <Button fx:id="autoModuleBtn" mnemonicParsing="false" onAction="#autoModuleBtnClick" prefWidth="120.0" />
+                           </children>
+                        </VBox>
+                        <Separator orientation="VERTICAL" prefHeight="200.0" />
+                        <VBox prefHeight="200.0" prefWidth="115.0">
+                           <children>
+                              <TextField fx:id="upModuleTextField" />
+                              <Button fx:id="autoUpModuleBtn" mnemonicParsing="false" onAction="#autoUpModuleBtnClick" prefWidth="120.0" />
+                           </children>
+                        </VBox>
+                        <Separator orientation="VERTICAL" prefHeight="200.0" />
+                        <VBox prefHeight="200.0" prefWidth="115.0">
+                           <children>
+                              <TextField fx:id="downPhaseTextField" />
+                              <Button fx:id="autoDownPhaseBtn" mnemonicParsing="false" onAction="#autoDownPhaseBtnClick" prefWidth="120.0" />
+                           </children>
+                        </VBox>
+                        <Separator orientation="VERTICAL" prefHeight="200.0" />
+                        <VBox prefHeight="200.0" prefWidth="115.0">
+                           <children>
+                              <TextField fx:id="phaseTextField" />
+                              <Button fx:id="autoPhaseBtn" mnemonicParsing="false" onAction="#autoPhaseBtnClick" prefWidth="120.0" />
+                           </children>
+                        </VBox>
+                        <Separator orientation="VERTICAL" prefHeight="200.0" />
+                        <VBox prefHeight="200.0" prefWidth="115.0">
+                           <children>
+                              <TextField fx:id="upPhaseTextField" />
+                              <Button fx:id="autoUpPhaseBtn" mnemonicParsing="false" onAction="#autoUpPhaseBtnClick" prefWidth="120.0" />
+                           </children>
+                        </VBox>
+                     </children>
+                  </HBox>
+                  <ScrollPane fx:id="scrollPane" prefHeight="514.0" prefWidth="869.0">
                      <content>
                         <AnchorPane fx:id="tablePane" prefHeight="399.0" prefWidth="852.0" />
                      </content>
@@ -54,7 +91,7 @@
                <children>
                   <Label stylesheets="@../application/commonLabel.css" text="Тип:" />
                   <ComboBox fx:id="elemTypesComboBox" prefHeight="25.0" prefWidth="319.0" />
-                  <Label stylesheets="@../application/commonLabel.css" text="Заводской номер:" />
+                  <Label stylesheets="@../application/commonLabel.css" text="Обозначение и заводской номер:" />
                   <TextField fx:id="serNumberTextField" />
                   <Separator prefHeight="14.0" prefWidth="311.0" />
                   <TitledPane animated="false" prefHeight="110.0" style="-fx-font-size: 14; -fx-font-weight: bold; -fx-font-family: Arial Narrow;" text="2/4-х полюсник" underline="true">
@@ -88,9 +125,20 @@
                     </content>
                   </TitledPane>
                   <Separator prefHeight="12.0" prefWidth="311.0" />
+                  <TitledPane animated="false" prefHeight="100.0" prefWidth="249.0" style="-fx-font-family: Arial Narrow; -fx-font-size: 14; -fx-font-weight: bold;" text="Тип поверки" underline="true">
+                    <content>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="74.0" prefWidth="224.0">
+                           <children>
+                              <RadioButton fx:id="primaryVerificationRB" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#primaryRBClick" prefHeight="17.0" prefWidth="232.0" text="Первичная" />
+                              <RadioButton fx:id="periodicVerificationRB" layoutX="14.0" layoutY="43.0" mnemonicParsing="false" onAction="#periodicRBClick" prefHeight="17.0" prefWidth="231.0" text="Периодическая" />
+                           </children>
+                        </AnchorPane>
+                    </content>
+                  </TitledPane>
+                  <Separator prefHeight="11.0" prefWidth="311.0" />
                   <Button fx:id="agreeBtn" mnemonicParsing="false" onAction="#agreeBtnClick" prefHeight="46.0" prefWidth="311.0" stylesheets="@../application/commonButton.css" text="Подтвердить" />
                   <Pane prefHeight="14.0" prefWidth="311.0" />
-                  <Button fx:id="fillTableRand" mnemonicParsing="false" onAction="#fillTableRandClick" prefHeight="49.0" prefWidth="311.0" text="Заполнить таблицу" />
+                  <Button fx:id="fillTableRand" mnemonicParsing="false" onAction="#fillTableRandClick" prefHeight="31.0" prefWidth="311.0" text="Заполнить таблицу" />
                </children>
             </VBox>
          </children>

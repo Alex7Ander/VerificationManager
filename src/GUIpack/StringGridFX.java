@@ -221,7 +221,7 @@ public class StringGridFX {
 	}
 	
 	public void setColumnFromDouble(int index, ArrayList<Double> columnValues) {
-		for (int i=0; i<this.rowCount; i++) {
+		for (int i=0; i < this.rowCount; i++) {
 			this.cells.get(i).get(index).setText(columnValues.get(i).toString());
 		}
 	}

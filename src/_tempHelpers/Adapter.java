@@ -13,4 +13,15 @@ public class Adapter {
 		}
 		return arrayList;
 	}
+	
+	public static double textToDouble(String text, double defValue) {
+		try {
+			text.replace(',', '.');
+			double val = Double.parseDouble(text); 
+			return val;
+		}
+		catch(Exception exp){
+			return defValue;
+		}
+	}
 }
