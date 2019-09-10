@@ -230,5 +230,10 @@ public class StringGridFX {
 		this.scrollContainer.setVisible(visibleStatus);
 	}
 
+	public void delete() {
+		for (HBox line : lines) {
+			this.ownerContainer.getChildren().remove(line);
+		}				
+	}
 
 }

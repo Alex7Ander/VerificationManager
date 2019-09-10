@@ -7,7 +7,6 @@ import java.util.HashMap;
 import FileManagePack.FileManager;
 import FreqTablesPack.FreqTablesWindow;
 import GUIpack.StringGridFX;
-import YesNoDialogPack.YesNoWindow;
 import _tempHelpers.Randomizer;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -42,6 +41,8 @@ public class NewElementController {
 	private Button delFreqBtn;
 	@FXML
 	private Button freqTablesBtn;
+	@FXML
+	private Button cloneS11ToS22Btn;
 	
 //Элементы для автозаполнения таблицы
 	//кнопки
@@ -118,8 +119,7 @@ public class NewElementController {
 	ObservableList<String> listOfParams;
 	private int currentCountOfParams;
 	private String currentTypeOfParams;
-	private String currentTypeOfTolerance;
-	private int lastIndex;
+	//private int lastIndex;
 	
 	//Коллекции с введенными значениями
 	int timeIndex;
@@ -146,11 +146,24 @@ public class NewElementController {
 	private void initialize() {	
 		
 		this.fillTableRand.setVisible(false);
+		this.agreeBtn.setVisible(false);
+		//Создаем таблицу
+		int initialfreqCount = 10;
+		ArrayList<String> paramTableHeads = new ArrayList<String>();
+		paramTableHeads.add("Частота, ГГц");
+		paramTableHeads.add("Нижний допуск");
+		paramTableHeads.add("Номинал");
+		paramTableHeads.add("Верхний допуск");
+		paramTableHeads.add("Нижний допуск");
+		paramTableHeads.add("Номинал");
+		paramTableHeads.add("Верхний допуск");
+		paramsTable = new StringGridFX(7, initialfreqCount, 850, 100, scrollPane, tablePane, paramTableHeads);
 		
 		timeIndex = 0;
 		paramIndex = 0;
 		savingIndex = 0;
 		
+		//Частоты в виде double
 		freqs = new ArrayList<Double>();
 		
 		strFreqs = new ArrayList<String>();
@@ -170,7 +183,6 @@ public class NewElementController {
 			p_s.put(keys[i], new ArrayList<String>(10));
 			u_p_s.put(keys[i], new ArrayList<String>(10));
 		}
-
 		
 		listOfParams = FXCollections.observableArrayList();
 		twoPoleTypesList = FXCollections.observableArrayList();
@@ -213,19 +225,6 @@ public class NewElementController {
 		setParams(currentTypeOfParams, currentCountOfParams);
 		this.paramsComboBox.setItems(listOfParams);
 		this.paramsComboBox.setValue(listOfParams.get(0));
-		lastIndex = 0;
-		
-		ArrayList<String> paramTableHeads = new ArrayList<String>();
-		paramTableHeads.add("Частота, ГГц");
-		paramTableHeads.add("Нижний допуск");
-		paramTableHeads.add("Номинал");
-		paramTableHeads.add("Верхний допуск");
-		paramTableHeads.add("Нижний допуск");
-		paramTableHeads.add("Номинал");
-		paramTableHeads.add("Верхний допуск");
-		
-		paramsTable = new StringGridFX(7, 10, 850, 100, scrollPane, tablePane, paramTableHeads);		
-		
 	}
 	
 	@FXML
@@ -370,6 +369,32 @@ public class NewElementController {
 	private void agreeBtnClick(ActionEvent event) throws IOException {
 		myWindow.close();
 	}
+	
+	@SuppressWarnings("unlikely-arg-type")
+	@FXML
+	private void cloneS11ToS22BtnClick() {	
+		try {
+			ArrayList<HashMap<String, ArrayList<String>>> hashMaps = new ArrayList<HashMap<String, ArrayList<String>>>();
+			hashMaps.add(m_s);
+			hashMaps.add(p_s);
+			hashMaps.add(d_m_s);
+			hashMaps.add(u_m_s);
+			hashMaps.add(d_p_s);
+			hashMaps.add(u_p_s);
+			for (@SuppressWarnings("unused") HashMap<String, ArrayList<String>> hashMap : hashMaps) {
+				hashMaps.remove("primary_S22");
+				ArrayList<String> cloneHMPrim = m_s.get("primary_S11");
+				m_s.put("primary_S22", cloneHMPrim);
+			
+				hashMaps.remove("periodic_S22");
+				ArrayList<String> cloneHMPeriod = m_s.get("periodic_S11");
+				m_s.put("periodic_S22", cloneHMPeriod);
+			}
+		}
+		catch(Exception exp) {
+			//
+		}
+	}
 //end @FXML methods
 	
 	private void setParams(String paramsIndex, int countOfParams) {
@@ -468,7 +493,7 @@ public class NewElementController {
 		
 		HashMap<Double, Double> m_S22 = new HashMap<Double, Double>();
 		HashMap<Double, Double> p_S22 = new HashMap<Double, Double>();
-		int s = freqs.size();		
+	
 		for (int j = 0; j < freqs.size(); j++) {
 			m_S11.put(this.freqs.get(j), Double.parseDouble(this.m_s.get("primary_S11").get(j)));
 			p_S11.put(this.freqs.get(j), Double.parseDouble(this.p_s.get("primary_S11").get(j)));

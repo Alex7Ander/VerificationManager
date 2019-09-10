@@ -18,12 +18,13 @@
                      <children>
                         <ComboBox fx:id="paramsComboBox" onAction="#paramsComboBoxClick" prefHeight="25.0" prefWidth="245.0" />
                         <Separator orientation="VERTICAL" prefHeight="200.0" />
-                        <Button fx:id="addFreqBtn" mnemonicParsing="false" onAction="#addFreqBtnClick" prefHeight="26.0" prefWidth="118.0" stylesheets="@../application/commonButton.css" text="+ частота" />
+                        <Button fx:id="addFreqBtn" mnemonicParsing="false" onAction="#addFreqBtnClick" prefHeight="26.0" prefWidth="115.0" stylesheets="@../application/commonButton.css" text="+ частота" />
                         <Separator orientation="VERTICAL" prefHeight="200.0" />
-                        <Button fx:id="delFreqBtn" mnemonicParsing="false" onAction="#delFreqBtnClick" prefHeight="26.0" prefWidth="119.0" stylesheets="@../application/commonButton.css" text="- частота" />
+                        <Button fx:id="delFreqBtn" mnemonicParsing="false" onAction="#delFreqBtnClick" prefHeight="26.0" prefWidth="115.0" stylesheets="@../application/commonButton.css" text="- частота" />
                         <Separator orientation="VERTICAL" prefHeight="200.0" />
-                        <Button fx:id="freqTablesBtn" mnemonicParsing="false" onAction="#freqTablesBtnClick" prefHeight="26.0" prefWidth="114.0" stylesheets="@../application/commonButton.css" text="Сетка" />
+                        <Button fx:id="freqTablesBtn" mnemonicParsing="false" onAction="#freqTablesBtnClick" prefHeight="26.0" prefWidth="115.0" stylesheets="@../application/commonButton.css" text="Сетка" />
                         <Separator orientation="VERTICAL" prefHeight="200.0" />
+                        <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="254.0" stylesheets="@../../bin/application/commonButton.css" text="Дублировать S11 на S22" />
                      </children>
                   </HBox>
                   <AnchorPane prefHeight="28.0" prefWidth="721.0">
@@ -93,7 +94,7 @@
                   <ComboBox fx:id="elemTypesComboBox" prefHeight="25.0" prefWidth="319.0" />
                   <Label stylesheets="@../application/commonLabel.css" text="Обозначение и заводской номер:" />
                   <TextField fx:id="serNumberTextField" />
-                  <Separator prefHeight="14.0" prefWidth="311.0" />
+                  <Separator prefHeight="10.0" prefWidth="311.0" />
                   <TitledPane animated="false" prefHeight="110.0" style="-fx-font-size: 14; -fx-font-weight: bold; -fx-font-family: Arial Narrow;" text="2/4-х полюсник" underline="true">
                      <content>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="0.0" prefWidth="309.0">
@@ -104,6 +105,7 @@
                         </AnchorPane>
                      </content>
                   </TitledPane>
+                  <Separator prefHeight="10.0" prefWidth="200.0" />
                   <TitledPane animated="false" prefHeight="110.0" style="-fx-font-size: 14; -fx-font-weight: bold; -fx-font-family: Arial Narrow;" text="Измеряемая величина" underline="true">
                     <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="80.0" prefWidth="200.0">
@@ -114,17 +116,18 @@
                         </AnchorPane>
                     </content>
                   </TitledPane>
+                  <Separator prefHeight="10.0" prefWidth="200.0" />
                   <TitledPane animated="false" prefHeight="110.0" style="-fx-font-family: Arial Narrow; -fx-font-size: 14; -fx-font-weight: bold;" text="Тип допуска" underline="true">
                     <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
                               <RadioButton fx:id="upDownToleranceRB" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#upDownToleranceRBClick" text="Верхний/нижний предел" />
-                              <RadioButton fx:id="percentToleranceRB" layoutX="14.0" layoutY="52.0" mnemonicParsing="false" onAction="#percentToleranceRBClick" text="\% от наминала" />
+                              <RadioButton fx:id="percentToleranceRB" layoutX="14.0" layoutY="52.0" mnemonicParsing="false" onAction="#percentToleranceRBClick" text="\\% от номинала" />
                            </children>
                         </AnchorPane>
                     </content>
                   </TitledPane>
-                  <Separator prefHeight="12.0" prefWidth="311.0" />
+                  <Separator prefHeight="10.0" prefWidth="311.0" />
                   <TitledPane animated="false" prefHeight="100.0" prefWidth="249.0" style="-fx-font-family: Arial Narrow; -fx-font-size: 14; -fx-font-weight: bold;" text="Тип поверки" underline="true">
                     <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="74.0" prefWidth="224.0">
@@ -135,10 +138,10 @@
                         </AnchorPane>
                     </content>
                   </TitledPane>
-                  <Separator prefHeight="11.0" prefWidth="311.0" />
-                  <Button fx:id="agreeBtn" mnemonicParsing="false" onAction="#agreeBtnClick" prefHeight="46.0" prefWidth="311.0" stylesheets="@../application/commonButton.css" text="Подтвердить" />
-                  <Pane prefHeight="14.0" prefWidth="311.0" />
-                  <Button fx:id="fillTableRand" mnemonicParsing="false" onAction="#fillTableRandClick" prefHeight="31.0" prefWidth="311.0" text="Заполнить таблицу" />
+                  <Separator prefHeight="10.0" prefWidth="311.0" />
+                  <Button fx:id="agreeBtn" mnemonicParsing="false" onAction="#agreeBtnClick" prefHeight="19.0" prefWidth="311.0" stylesheets="@../application/commonButton.css" text="Подтвердить" />
+                  <Pane prefHeight="5.0" prefWidth="311.0" />
+                  <Button fx:id="fillTableRand" mnemonicParsing="false" onAction="#fillTableRandClick" prefHeight="13.0" prefWidth="311.0" text="Заполнить таблицу" />
                </children>
             </VBox>
          </children>

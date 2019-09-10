@@ -289,7 +289,7 @@ public class VerificationController implements InfoRequestable {
 		else if (this.resultTable.getRowCount() > countOfFreq) {
 			while (this.resultTable.getRowCount() != countOfFreq) this.resultTable.deleteRow(this.resultTable.getRowCount());
 		}
-		
+		  
 		this.resultTable.setColumnFromDouble(0, fr);
 		
 		ArrayList<Double> column1 = Adapter.HashMapToArrayList(fr, this.verificationResult.get(currentElementIndex).values.get(keys[currentParamIndex]));

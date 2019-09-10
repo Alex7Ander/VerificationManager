@@ -192,6 +192,7 @@ public abstract class ToleranceParametrs implements Includable<Element>, dbStora
 		}
 		sqlQuery += ")";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
+		System.out.println("\t\tСоздана таблица с параметрами ");
 		
 		//Заполняем таблицу paramsTableName с результатами измерений
 		for (int i=0; i<this.countOfFreq; i++) {	
@@ -213,6 +214,8 @@ public abstract class ToleranceParametrs implements Includable<Element>, dbStora
 			sqlQuery += ")";
 					
 			DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
+			System.out.println("\t\tВнесены праметры для частоты " + freqs.get(i) + ": ");
+			System.out.println("\t\t" + sqlQuery + "");
 		}
 	}
 	

@@ -16,7 +16,7 @@ public class Adapter {
 	
 	public static double textToDouble(String text, double defValue) {
 		try {
-			text.replace(',', '.');
+			text = text.replace(',', '.');
 			double val = Double.parseDouble(text); 
 			return val;
 		}

@@ -109,12 +109,14 @@ public class Device implements dbStorable {
 		
 		sqlString = "INSERT INTO [Devices] (NameOfDevice, TypeOfDevice, SerialNumber, Owner, GosNumber, CountOfElements, ElementsTable) values ('"+name+"','"+type+"','"+serialNumber+"','"+owner+"','"+gosNumber+"','"+Integer.toString(this.countOfElements)+"','"+strElementsTable+"')";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlString);
+		System.out.println("Внесена запись о новом приборе в таблицу Devices");
 		//Создание таблицы со списком включенных элементов
 		sqlString = "CREATE TABLE ["+strElementsTable+"] (id INTEGER PRIMARY KEY AUTOINCREMENT, ElementType VARCHAR(256), ElementSerNumber VARCHAR(256), PoleCount VARCHAR(256), MeasUnit VARCHAR(256), ToleranceType VARCHAR(256), PeriodicParamTable VARCHAR(256), PrimaryParamTable VARCHAR(256), NominalIndex VARCHAR(10))";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlString);
+		System.out.println("Создана таблица со списком элементов данного устройства");
 		this.elementsTableName = strElementsTable;
 		for (int i=0; i < this.countOfElements; i++){
-			System.out.println("this.countOfElements = " + this.countOfElements);
+			System.out.println("Начато сохранение элемента №" + i + ": ");
 			//Сохранение в БД данных о составных элементах
 			this.includedElements.get(i).saveInDB(); 		
 		}
@@ -152,7 +154,7 @@ public class Device implements dbStorable {
 		this.countOfElements--;	
 	}
 	
-	public void createIniFile(String psiFilePAth) throws IOException {
+	public void createIniFile(String psiFilePath) throws IOException {
 		ArrayList<String> fileStrings = new ArrayList<String>();
 		fileStrings.add("Параметры поверки:\n");
 		fileStrings.add("1.Наименование типа средства измерения <" + this.name + ">\n");
@@ -168,9 +170,14 @@ public class Device implements dbStorable {
 				ruTextOfMeasUnit = "КСВН";
 			}
 			else {
-				ruTextOfMeasUnit = "модуль";
+				ruTextOfMeasUnit = "Модуль";
 			}
 			fileStrings.add("Измеряемая величина: " + ruTextOfMeasUnit + "\n");
+			String paramsStr = "S11";
+			if (this.includedElements.get(i).getPoleCount() == 4) {
+				paramsStr += ", S12, S21, S22";
+			}				
+			fileStrings.add("Параметры: " + paramsStr + "\n");
 			int currentCountOfFreq = this.includedElements.get(i).getNominal().getCountOfFreq();
 			for (int j=0; j<currentCountOfFreq; j++) {
 				double currentFreq = this.includedElements.get(i).getNominal().freqs.get(j);
@@ -184,7 +191,7 @@ public class Device implements dbStorable {
 			}
 		}
 		String coding = "ansi-1251";
-		FileManager.WriteFile(psiFilePAth, coding, fileStrings);
+		FileManager.WriteFile(psiFilePath, coding, fileStrings);
 	}
 	
 }

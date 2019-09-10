@@ -147,12 +147,19 @@ public class Element implements Includable<Device>, Verificatable, dbStorable{
 		// 3.1 Внесли запись об элементе
 		String sqlString = "INSERT INTO ["+strElementsTable+"] (ElementType, ElementSerNumber, PoleCount, MeasUnit, ToleranceType, PeriodicParamTable, PrimaryParamTable, NominalIndex) values ('"+type+"','"+serialNumber+"','"+poleCount+"','"+measUnit+"','"+toleranceType+"','"+periodicParamTable +"','"+primaryParamTable+"','"+Integer.toString(nominalIndex)+"')";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlString);
+		System.out.println("\tЭлемент зарегистрирован");
 		// 3.2 Создание таблицы [Список таблиц с результатами измерений для ...]
 		sqlString = "CREATE TABLE [Список таблиц с результатами измерений для " + (addStr + " " + this.type + " " + this.serialNumber) + "] (id INTEGER PRIMARY KEY AUTOINCREMENT, dateOfVerification VARCHAR(60), resultsTableName VARCHAR(512))";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlString);
+		System.out.println("\tСоздана таблица для списко проведенных измерений");
 		// 3.3 Сохранить критерии годности
+		System.out.println("\tНачато сохранение критериев годности:");
+		System.out.println("\t---------------первичной поверки-----------------------:");
 		this.primaryToleranceParams.saveInDB();	
-		this.periodicToleranceParams.saveInDB();	
+		System.out.println("\t---------------периодическойй поверки-----------------------:");
+		this.periodicToleranceParams.saveInDB();
+		
+		System.out.println("\tНачато сохранение номинала:");
 		// 3.4 Сохраняем номиналы
 		this.nominal.saveInDB();		
 	}

@@ -85,11 +85,11 @@
                   <Separator prefWidth="200.0" />
                   <Pane prefHeight="59.0" prefWidth="827.0">
                      <children>
-                        <RadioButton fx:id="resultsRB" layoutX="14.0" layoutY="6.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="236.0" styleClass="radiobutton" stylesheets="@../../bin/application/commonRadioButton.css" text="Результаты поверки" />
-                        <RadioButton fx:id="paramsRB" layoutX="14.0" layoutY="37.0" mnemonicParsing="false" styleClass="radiobutton" stylesheets="@../../bin/application/commonRadioButton.css" text="Критерии годности" />
-                        <Label layoutX="197.0" layoutY="7.0" stylesheets="@../../bin/application/commonLabel.css" text="Дата проведения поверки:" />
+                        <RadioButton fx:id="resultsRB" layoutX="14.0" layoutY="6.0" mnemonicParsing="false" onAction="#resultsRBClick" prefHeight="17.0" prefWidth="236.0" styleClass="radiobutton" stylesheets="@../../bin/application/commonRadioButton.css" text="Результаты поверки" />
+                        <RadioButton fx:id="paramsRB" layoutX="14.0" layoutY="37.0" mnemonicParsing="false" onAction="#paramsRBClick" styleClass="radiobutton" stylesheets="@../../bin/application/commonRadioButton.css" text="Критерии годности" />
+                        <Label fx:id="dateLabel" layoutX="197.0" layoutY="7.0" stylesheets="@../../bin/application/commonLabel.css" text="Дата проведения поверки:" />
                         <ComboBox fx:id="verificationDateComboBox" layoutX="359.0" layoutY="2.0" onAction="#verificationDataComboBoxClick" prefHeight="25.0" prefWidth="460.0" />
-                        <Label layoutX="197.0" layoutY="37.0" stylesheets="@../../bin/application/commonLabel.css" text="Измеряемая величина:" />
+                        <Label fx:id="measUnitLabel" layoutX="197.0" layoutY="37.0" stylesheets="@../../bin/application/commonLabel.css" text="Измеряемая величина:" />
                         <ComboBox fx:id="currentMeasUnitComboBox" layoutX="359.0" layoutY="33.0" prefHeight="25.0" prefWidth="460.0" />
                      </children>
                   </Pane>

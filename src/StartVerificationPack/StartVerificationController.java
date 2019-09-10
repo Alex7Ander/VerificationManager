@@ -44,14 +44,14 @@ public class StartVerificationController {
 	private double currentAtmPreasure;
 	private double currentAirHumidity;
 	
-	private double upTemperature = 25.0;
-	private double downTemperature = 20.0;
+	private double upTemperature = 24.0;
+	private double downTemperature = 22.0;
 	
-	private double upAtmPreasure = 800.0;
-	private double downAtmPreasure = 600.0;
+	private double upAtmPreasure = 1800.0;
+	private double downAtmPreasure = 450.0;
 	
-	private double upAirHumidity = 95.0;
-	private double downAirHumidity = 35.0;
+	private double upAirHumidity = 80.0;
+	private double downAirHumidity = 50.0;
 	
 	private String envStatusString;
 	
@@ -66,14 +66,17 @@ public class StartVerificationController {
 		verGroup = new ToggleGroup();
 		primaryVerRB.setToggleGroup(verGroup);
 		periodicVerRB.setToggleGroup(verGroup);
+		primaryVerRB.setSelected(true);
 		
 		viewGroup = new ToggleGroup();
 		goodViewRB.setToggleGroup(viewGroup);
 		badViewRB.setToggleGroup(viewGroup);
+		goodViewRB.setSelected(true);
 				
 		workGroup = new ToggleGroup();
 		goodWorkRB.setToggleGroup(workGroup);
 		badWorkRB.setToggleGroup(workGroup);
+		goodWorkRB.setSelected(true);
 	}
 
 	@FXML
@@ -92,7 +95,7 @@ public class StartVerificationController {
 		if (!chekEnvironment()) {
 			YesNoWindow ynWin = new YesNoWindow("Внимание", envStatusString + "\nЖелаете продолжить?");
 			int answer = ynWin.showAndWait();
-			if (answer == 0) {
+			if (answer == 1) {
 				return;
 			}
 		}

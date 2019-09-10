@@ -46,7 +46,7 @@
                   </HBox>
                   <HBox prefHeight="30.0" prefWidth="200.0">
                      <children>
-                        <Label prefHeight="16.0" prefWidth="140.0" stylesheets="@../application/commonLabel.css" text="Номер в гос реестре" />
+                        <Label prefHeight="16.0" prefWidth="140.0" stylesheets="@../application/commonLabel.css" text="Номер по ФИФ" />
                         <Separator orientation="VERTICAL" prefHeight="200.0" />
                         <TextField fx:id="gosNumberTextField" prefWidth="430.0" />
                      </children>

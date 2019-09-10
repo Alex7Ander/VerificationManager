@@ -5,7 +5,6 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 
-
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="566.0" prefWidth="375.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="StartVerificationPack.StartVerificationController">
    <children>
       <VBox layoutX="54.0" layoutY="-10.0" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
@@ -16,21 +15,21 @@
                <children>
                   <Label prefWidth="130.0" stylesheets="@../../bin/application/commonLabel.css" text="Температура, C: " />
                   <Separator orientation="VERTICAL" prefHeight="200.0" />
-                  <TextField fx:id="temperatureTextField" prefHeight="25.0" prefWidth="220.0" />
+                  <TextField fx:id="temperatureTextField" prefHeight="25.0" prefWidth="220.0" text="23" />
                </children>
             </HBox>
             <HBox prefHeight="35.0" prefWidth="200.0">
                <children>
                   <Label prefHeight="17.0" prefWidth="130.0" stylesheets="@../../bin/application/commonLabel.css" text="Влажность, %:" />
                   <Separator orientation="VERTICAL" prefHeight="200.0" />
-                  <TextField fx:id="airHumidityTextField" prefHeight="25.0" prefWidth="220.0" />
+                  <TextField fx:id="airHumidityTextField" prefHeight="25.0" prefWidth="220.0" text="55" />
                </children>
             </HBox>
             <HBox prefHeight="35.0" prefWidth="200.0">
                <children>
                   <Label prefHeight="17.0" prefWidth="130.0" stylesheets="@../../bin/application/commonLabel.css" text="Давление, мм.рт.ст.:" />
                   <Separator orientation="VERTICAL" prefHeight="200.0" />
-                  <TextField fx:id="atmPreasureTextField" prefHeight="25.0" prefWidth="220.0" />
+                  <TextField fx:id="atmPreasureTextField" prefHeight="25.0" prefWidth="220.0" text="756" />
                </children>
             </HBox>
             <Pane prefHeight="10.0" prefWidth="200.0">

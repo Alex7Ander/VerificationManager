@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import _tempHelpers.Adapter;
+
 public class ResultReaderManager {
 	private ArrayList<String> fileStrings;
 	private String filePath;
@@ -22,7 +24,7 @@ public class ResultReaderManager {
 	}
 	
 	private void findResult(int numberOfResult, ArrayList<String> resStrings) throws IOException{
-		String str;	
+		String str = "";	
 		//Если файл не был пуст, то обрабатываем прочитанные строки
 		int stringNumber = 0;
 		int currentResult = 0;
@@ -65,8 +67,12 @@ public class ResultReaderManager {
 			String[] line = res.get(i).split("\t");	
 			int column = 0;
 			for (String st: line) {
+				/*
 				String text = st.replace(',', '.');
 				tempArrays.get(column).add(Double.parseDouble(text));
+				*/
+				double cValue = Adapter.textToDouble(st, 0);
+				tempArrays.get(column).add(cValue);
 				column++;
 			}
 		}
