@@ -9,7 +9,9 @@ import java.util.Date;
 
 import AboutMessageForm.AboutMessageWindow;
 import DataBasePack.DataBaseManager;
+import FileManagePack.FileManager;
 import VerificationPack.MeasResult;
+import VerificationPack.VerificationProcedure;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -67,32 +69,52 @@ public class ProtocolCreateController {
 	@FXML
 	private Button createBtn;
 			
-	private ObservableList militaryRanks;
-	private ObservableList docTypes;
+	private ObservableList<String> militaryRanks;
+	private ObservableList<String> docTypes;
 	private String newProtocolName;
 	private String newDocumentName;
 	private ArrayList<MeasResult> protocoledResult;
-		
+	private VerificationProcedure verification;
+	
 	@FXML
-	private void initialize() {
+	private void initialize() throws IOException {
 		militaryRanks = FXCollections.observableArrayList();
+		try {
+			FileManager.ItemsToLines(new File(".").getAbsolutePath() + "//files//ranks.txt", militaryRanks);
+		}
+		catch(IOException ioExp) {
+			militaryRanks.add("Полковник");
+			militaryRanks.add("Подполковник");
+			militaryRanks.add("Майор");
+		}
+		this.militaryStatusComboBox.setItems(militaryRanks);
+		
 		docTypes = FXCollections.observableArrayList();	
+		this.reasonTextArea.setVisible(false);
+		this.decisionLabel.setVisible(false);
 		
 		siGroup = new ToggleGroup();
 		etalonRB.setToggleGroup(siGroup);
 		siRB.setToggleGroup(siGroup);
-		
+		siRB.setSelected(true);
 	}
 	
-	public void setDocTypes(String[] types) {
-		for (String str : types) docTypes.add(str);
-		docTypeComboBox.setItems(docTypes);
+	@FXML
+	private void docTypeComboBoxChange() {
+		if (!this.decisionLabel.isVisible()) {
+			this.decisionLabel.setVisible(true);
+		}
+		if (docTypeComboBox.getSelectionModel().getSelectedItem().toString().equals("Свидетельство о поверке")) {
+			this.decisionLabel.setText("признан пригодным к применению");
+			this.reasonTextArea.setVisible(false);
+		}
+		else {
+			this.decisionLabel.setText("признан не пригодным к применению по следующим причинам");
+			this.reasonTextArea.setVisible(true);
+		}
 	}
 	
-	public void setResults(ArrayList<MeasResult> results) {
-		this.protocoledResult = results;
-	}
-	
+	@SuppressWarnings("finally")
 	@FXML
 	private void createBtnClick() {
 		
@@ -116,7 +138,7 @@ public class ProtocolCreateController {
 		
 		//Запускаем поток создания протокола, если были проведены измерения
 		if (protocoledResult != null) {
-			ProtocolCreateThread crtThread = new ProtocolCreateThread("crtThread", newProtocolName, protocoledResult);
+			ProtocolCreateThread crtThread = new ProtocolCreateThread("crtThread", newProtocolName, protocoledResult, verification);
 			crtThread.start();
 			try {
 				crtThread.join();
@@ -127,11 +149,16 @@ public class ProtocolCreateController {
 		}
 		
 		//Запускаем поток создания документа (извещения о непригодности или свидетельства о поверке)
-		/*
-		while(!crtThread.isInterrupted()) {
+		DocumentCreateThread docThr = new DocumentCreateThread(verification);
+		docThr.start();
+		try {
+			docThr.join();
+		}
+		catch(InterruptedException iExp) {
 			
 		}
-		*/
+		
+		//Вносим запись в БД о созданных протоколе и документе
 		try {
 			makeRecordInDB();
 		}
@@ -143,8 +170,7 @@ public class ProtocolCreateController {
 			catch(IOException ioExp) {
 				//
 			}
-		}
-		
+		}		
 	}
 	
 	private void makeRecordInDB() throws SQLException {
@@ -160,6 +186,15 @@ public class ProtocolCreateController {
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
 	}
 	
+	public void setDocTypes(String[] types) {
+		for (String str : types) docTypes.add(str);
+		docTypeComboBox.setItems(docTypes);
+	}
+	
+	public void setResults(ArrayList<MeasResult> results) {
+		this.protocoledResult = results;
+	}
+	
 	private boolean checkDocType() {
 		if (this.docTypeComboBox.getSelectionModel().getSelectedIndex() < 0) {
 			return false;
@@ -168,4 +203,23 @@ public class ProtocolCreateController {
 			return true;
 		}
 	}
+	
+	public void setVerificationProcedure(VerificationProcedure verificationProc) {
+		this.verification = verificationProc;
+	}
+	
+	public String getWorkerName() {return this.workerNameTextField.getText();}
+	public String getBossName() {return this.bossNameTextFiled.getText();}
+	public String getBossStatus() {return this.militaryStatusComboBox.getSelectionModel().getSelectedItem().toString();}
+	public String getResultDecision() {
+		if (this.docTypeComboBox.getSelectionModel().getSelectedItem().toString().equals("Свидетельство о поверке")) {
+			return "годным";
+		}
+		else {
+			return "не годным";
+		}
+	}
+	public String getProtocolNumber() {return "";}
+	public String getDocumentNumber() {return this.docNumberTextField.getText();}
+	
 }

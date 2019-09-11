@@ -3,6 +3,7 @@ package StartVerificationPack;
 
 import java.io.IOException;
 
+import DevicePack.DeviceException;
 import ProtocolCreatePack.ProtocolCreateWindow;
 import VerificationForm.VerificationController;
 import VerificationForm.VerificationWindow;
@@ -90,7 +91,7 @@ public class StartVerificationController {
 	}
 	
 	@FXML
-	private void startBtnClick() throws IOException {
+	private void startBtnClick() throws Exception {
 		
 		if (!chekEnvironment()) {
 			YesNoWindow ynWin = new YesNoWindow("Внимание", envStatusString + "\nЖелаете продолжить?");
@@ -116,9 +117,8 @@ public class StartVerificationController {
 			YesNoWindow ynWin = new YesNoWindow("Отрицательный результат внешнего осмотра?", "Вы признали прибор негодным\n по результатам внешнеого осмотра?");
 			int answer = ynWin.showAndWait();
 			if (answer == 0) {
-				this.badViewRB.setSelected(true);
 				String[] docTypes = {"Извещение о непригодности"};
-				ProtocolCreateWindow.getProtocolCreateWindow(docTypes, null).show();
+				VerificationWindow.getVerificationWindow().getController().createProtocol(docTypes);
 				return;
 			}
 			else {
@@ -133,7 +133,7 @@ public class StartVerificationController {
 			if (answer == 0) {
 				this.badWorkRB.setSelected(true);
 				String[] docTypes = {"Извещение о непригодности"};
-				ProtocolCreateWindow.getProtocolCreateWindow(docTypes, null).show();
+				VerificationWindow.getVerificationWindow().getController().createProtocol(docTypes);
 				return;
 			}
 			else {

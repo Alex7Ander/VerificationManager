@@ -152,19 +152,23 @@ public class VerificationController implements InfoRequestable {
 		}
 	}
 	
-//Нажатеина кнопку создания протокола
+//Нажатие на кнопку создания протокола
 	@FXML
 	private void createProtocolBtnClick(ActionEvent event) throws IOException {
 		if (verificationResult.size() != 0) {
-			String[] docTypes = {"Свидетельство о поверке", "Извещение о непригодности"};			
-			ProtocolCreateWindow.getProtocolCreateWindow(docTypes, verificationResult).show();
+			String[] docTypes = {"Свидетельство о поверке", "Извещение о непригодности"};	
+			createProtocol(docTypes);
 		}
 		else {
 			AboutMessageWindow msgWin = new AboutMessageWindow("Ошибка","Процедура поверки еще не закончена");
 			msgWin.show();
 		}
 	}
-
+	public void createProtocol(String[] docTypes) throws IOException {
+		this.verification.setDeviceInformation(this.verificatedDevice);
+		ProtocolCreateWindow.getProtocolCreateWindow(docTypes, verificationResult, this.verification).show();
+	}
+	
 	@FXML
 	private void elementComboBoxChange() {
 		int elPoleCount = this.verificatedDevice.includedElements.get(currentElementIndex).getPoleCount();		

@@ -13,7 +13,7 @@
             <Pane prefHeight="30.0" prefWidth="200.0">
                <children>
                   <Label layoutX="14.0" layoutY="8.0" stylesheets="@../../bin/application/commonLabel.css" text="Тип документа:" />
-                  <ComboBox fx:id="docTypeComboBox" layoutX="119.0" layoutY="4.0" prefHeight="25.0" prefWidth="253.0" />
+                  <ComboBox fx:id="docTypeComboBox" layoutX="119.0" layoutY="4.0" onAction="#docTypeComboBoxChange" prefHeight="25.0" prefWidth="253.0" />
                </children>
             </Pane>
             <Pane prefHeight="30.0" prefWidth="200.0">

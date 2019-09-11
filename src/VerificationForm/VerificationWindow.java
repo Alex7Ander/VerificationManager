@@ -17,6 +17,10 @@ public class VerificationWindow extends guiWindow{
 		}
 		return instanceVerificationWindow;
 	}
+	
+	public VerificationController getController() {
+		return this.loader.getController();
+	}
 
 	
 }
