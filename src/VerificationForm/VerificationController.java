@@ -3,13 +3,13 @@ package VerificationForm;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.UnknownHostException;
+//import java.io.InputStream;
+//import java.net.ServerSocket;
+//import java.net.Socket;
+//import java.net.UnknownHostException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
+//import java.util.HashMap;
 
 import AboutMessageForm.AboutMessageWindow;
 import DevicePack.Device;
@@ -65,6 +65,7 @@ public class VerificationController implements InfoRequestable {
 	@FXML
 	private AnchorPane tablePane;
 	private StringGridFX resultTable;
+	/*
 	private ArrayList<String> tableHeads;
 	private ArrayList<String> modulColumn;
 	private ArrayList<String> modulErrorColumn;
@@ -72,7 +73,7 @@ public class VerificationController implements InfoRequestable {
 	private ArrayList<String> phaseColumn;
 	private ArrayList<String> phaseErrorColumn;
 	private ArrayList<String> phaseSolutColumn;
-	
+	*/
 //Процедура поверки
 	VerificationProcedure verification;
 //Результат поверки
@@ -91,14 +92,14 @@ public class VerificationController implements InfoRequestable {
 		listOfParametrs = FXCollections.observableArrayList();
 		
 		verificationResult = new ArrayList<MeasResult>();
-		
+		/*
 		tableHeads = new ArrayList<String>();
 		modulErrorColumn = new ArrayList<String>();
 		modulSolutColumn = new ArrayList<String>();
 		phaseColumn = new ArrayList<String>();
 		phaseErrorColumn = new ArrayList<String>();
 		phaseSolutColumn = new ArrayList<String>();
-		
+		*/
 		currentElementIndex = 0;
 		currentParamIndex = 0;
 		   		
@@ -168,9 +169,14 @@ public class VerificationController implements InfoRequestable {
 		this.verification.setDeviceInformation(this.verificatedDevice);
 		ProtocolCreateWindow.getProtocolCreateWindow(docTypes, verificationResult, this.verification).show();
 	}
-	
+//Изменить занчение в комбобоксе со списком элементов	
 	@FXML
 	private void elementComboBoxChange() {
+		
+		//Получим индекс отображаемого элемента
+		currentElementIndex = this.elementComboBox.getSelectionModel().getSelectedIndex();
+		
+		//Установим список параметрав в соответствии количеству полюсов у элемента
 		int elPoleCount = this.verificatedDevice.includedElements.get(currentElementIndex).getPoleCount();		
 		int countOfParams = 0;
 		if (elPoleCount == 2) countOfParams = 1;
@@ -191,17 +197,19 @@ public class VerificationController implements InfoRequestable {
 			listOfParametrs.add("S22");
 		}
 		this.parametrComboBox.setItems(listOfParametrs);
-		this.parametrComboBox.getSelectionModel().select(0);
-		
+		//Установим индекс отображаемого параметра в 0 
 		currentParamIndex = 0;
-		currentElementIndex = this.elementComboBox.getSelectionModel().getSelectedIndex();
-		fillTable();
+		//И программно выберем параметром под индексом 0
+		this.parametrComboBox.getSelectionModel().select(currentParamIndex);
+		//Это приведет к вызову функции parametrComboBoxChange()  //fillTable();
 	}
-	
+//Изменить значение в комбобоксе с параметрами	
 	@FXML
 	private void parametrComboBoxChange() {
-		currentParamIndex = this.parametrComboBox.getSelectionModel().getSelectedIndex(); 		
-		fillTable();
+		currentParamIndex = this.parametrComboBox.getSelectionModel().getSelectedIndex(); 
+		if (currentParamIndex != -1) {
+			fillTable();			
+		}
 	}
 	
 //---------------------------	

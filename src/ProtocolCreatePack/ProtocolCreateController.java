@@ -126,8 +126,7 @@ public class ProtocolCreateController {
 			finally {
 				return;
 			}
-		}
-		
+		}		
 		Date dt = protocoledResult.get(0).getDateOfMeas();
 		String strDt = new SimpleDateFormat("DD/mm/yy HH/mm/ss").format(dt);
 		String addStr = protocoledResult.get(0).getMyOwner().getMyOwner().getName() + " " +
@@ -156,7 +155,7 @@ public class ProtocolCreateController {
 		}
 		catch(InterruptedException iExp) {
 			
-		}
+		}	
 		
 		//Вносим запись в БД о созданных протоколе и документе
 		try {
