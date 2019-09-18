@@ -14,7 +14,7 @@ public class StartVerificationWindow  extends guiWindow {
 		ctrl.setWindow(this);
 	}
 		
-	public static StartVerificationWindow getVerificationWindow() throws IOException {
+	public static StartVerificationWindow getStartVerificationWindow() throws IOException {
 		if (instanceStartVerificationWindow == null) {
 			instanceStartVerificationWindow = new StartVerificationWindow();			
 		}

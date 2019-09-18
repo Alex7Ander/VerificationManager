@@ -1,6 +1,8 @@
-*.db
 /addition
 /Documents
 /measurment
-/Protocols
 /MessageSender
+/Protocols
+*.db
+*.exe
+*.jar

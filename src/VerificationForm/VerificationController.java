@@ -3,6 +3,10 @@ package VerificationForm;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
 //import java.io.InputStream;
 //import java.net.ServerSocket;
 //import java.net.Socket;
@@ -27,6 +31,7 @@ import _tempHelpers.Adapter;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -34,6 +39,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
 
 public class VerificationController implements InfoRequestable {
 	@FXML
@@ -65,26 +73,16 @@ public class VerificationController implements InfoRequestable {
 	@FXML
 	private AnchorPane tablePane;
 	private StringGridFX resultTable;
-	/*
-	private ArrayList<String> tableHeads;
-	private ArrayList<String> modulColumn;
-	private ArrayList<String> modulErrorColumn;
-	private ArrayList<String> modulSolutColumn;
-	private ArrayList<String> phaseColumn;
-	private ArrayList<String> phaseErrorColumn;
-	private ArrayList<String> phaseSolutColumn;
-	*/
+
 //Процедура поверки
 	VerificationProcedure verification;
 //Результат поверки
 	private ArrayList<MeasResult> verificationResult;	
 //Ссылка на поверяемое СИ
-	public Device verificatedDevice;
-		
+	public Device verificatedDevice;		
 	private int currentElementIndex;
 	private int currentParamIndex;
 	
-		
 	@FXML
 	private void initialize(){	
 		
@@ -92,14 +90,6 @@ public class VerificationController implements InfoRequestable {
 		listOfParametrs = FXCollections.observableArrayList();
 		
 		verificationResult = new ArrayList<MeasResult>();
-		/*
-		tableHeads = new ArrayList<String>();
-		modulErrorColumn = new ArrayList<String>();
-		modulSolutColumn = new ArrayList<String>();
-		phaseColumn = new ArrayList<String>();
-		phaseErrorColumn = new ArrayList<String>();
-		phaseSolutColumn = new ArrayList<String>();
-		*/
 		currentElementIndex = 0;
 		currentParamIndex = 0;
 		   		
@@ -123,7 +113,7 @@ public class VerificationController implements InfoRequestable {
 	@FXML
 	private void startBtnClick(ActionEvent event) throws IOException, InterruptedException {
 		if(verificatedDevice != null) {
-			StartVerificationWindow.getVerificationWindow().show();						
+			StartVerificationWindow.getStartVerificationWindow().show();						
 		}
 		else{
 			AboutMessageWindow msgWin = new AboutMessageWindow("Ошибка","Вы не выбрали средство измерения для поверки");
@@ -216,7 +206,7 @@ public class VerificationController implements InfoRequestable {
 	@FXML
 	private Button fileReadBtn;
 	@FXML
-	private void fileReadBtnClick() {
+	public void fileReadBtnClick() {
 		if (this.verification == null) {
 			return;
 		}
@@ -273,7 +263,7 @@ public class VerificationController implements InfoRequestable {
 		
 		//Получение информации об окружающей среде
 		verification = new VerificationProcedure();
-		verification.setPrimaryInformation((StartVerificationController)StartVerificationWindow.getVerificationWindow().getControllerClass());
+		verification.setPrimaryInformation((StartVerificationController)StartVerificationWindow.getStartVerificationWindow().getControllerClass());
 		
 		//Создание файла psi.ini
 		String psiFilePath = absPath + "\\measurment\\PSI.ini";
@@ -354,18 +344,55 @@ public class VerificationController implements InfoRequestable {
 	public void setDevice(Device device) {
 		verificatedDevice = device;
 	}
-	
+		
 	//Закрыть	
-		@FXML
-		private void closeBtnClick(ActionEvent event) {
-			try {
-				Stage stage = (Stage) closeBtn.getScene().getWindow();
-				stage.close();
-			}
-			catch(Exception exp){
-				//
-			}
+	@FXML
+	private void closeBtnClick(ActionEvent event) {
+		Stage stage = (Stage) closeBtn.getScene().getWindow();
+		stage.close();
+	}
+		
+	public void waitResults(){
+		ServerService wService = new ServerService();
+		wService.start();
+	}	
+/*	
+	static class WaitService extends Service<Integer>{
+		@Override
+		protected Task<Integer> createTask() {
+			return new Task<Integer>(){
+				@Override
+				public Integer call() throws IOException {
+					InetAddress addr = InetAddress.getLocalHost();
+					String strAddr = addr.getHostAddress();
+					ArrayList<String> ipList = new ArrayList<String>();
+					ipList.add(strAddr);
+					FileManager.ItemsToLines("/files/ip.txt", ipList);
+					
+					ServerSocket serverSocket = new ServerSocket(5051);
+					Socket socket = null;
+				    while(true){
+				    	socket = serverSocket.accept();
+				    	InputStream inStream = socket.getInputStream();
+				        byte[] line = new byte[1024];
+				        inStream.read(line);
+				        String msg = new String(line);
+				        msg = msg.trim();
+				        System.out.println("Message is: " + msg + ". It's length is: " + msg.length());
+				        if (msg.equals("ready")){
+				        	System.out.println("It was flag for stopping");
+				            break;
+				        }
+				        else{
+				        	System.out.println("It was not flag!");
+				        }
+				   }
+				   socket.close();
+				   serverSocket.close();
+				   return 0;
+				}	
+			};
 		}
-	
+	}*/
 	
 }

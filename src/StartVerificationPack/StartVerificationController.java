@@ -1,10 +1,5 @@
 package StartVerificationPack;
 
-
-import java.io.IOException;
-
-import DevicePack.DeviceException;
-import ProtocolCreatePack.ProtocolCreateWindow;
 import VerificationForm.VerificationController;
 import VerificationForm.VerificationWindow;
 import YesNoDialogPack.YesNoWindow;
@@ -144,6 +139,7 @@ public class StartVerificationController {
 		if(VerificationWindow.getVerificationWindow() != null) {
 			VerificationController vCtrl = (VerificationController)VerificationWindow.getVerificationWindow().getControllerClass();
 			vCtrl.StartVerification();
+			vCtrl.waitResults();
 			this.myWindow.close();
 		}
 	}

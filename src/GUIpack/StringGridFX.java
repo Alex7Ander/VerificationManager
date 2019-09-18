@@ -1,16 +1,16 @@
 package GUIpack;
 
 import java.util.ArrayList;
-import java.util.Collection;
+//import java.util.Collection;
 import java.util.Iterator;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Orientation;
+//import javafx.geometry.Orientation;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
-import javafx.scene.control.Separator;
+//import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
@@ -29,19 +29,18 @@ public class StringGridFX {
 	private ObservableList<Label> heads;
 	private ObservableList<ObservableList<TextField>> cells;
 	
-	private ArrayList<ArrayList<String>> cellsValues;
-	
+
 	private double height;
-	private double celHeight;
-	private double width;
+//	private double celHeight;
+//	private double width;
 	private double celWidth;
 	
 	public StringGridFX(int ColCount, int RowCount, double Width, double Height, ScrollPane ScrollContainer, Pane container) {
 		
 		celWidth = Width/ColCount - 1;
-		celHeight = 27;
+		//celHeight = 27;
 		height = 27 * RowCount + 5;
-		width = Width;
+		//width = Width;
 		
 		scrollContainer = ScrollContainer;
 		scrollContainer.setHbarPolicy(ScrollBarPolicy.AS_NEEDED);

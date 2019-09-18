@@ -101,8 +101,7 @@ public abstract class ToleranceParametrs implements Includable<Element>, dbStora
 		
 		sqlQuery = "SELECT freq FROM ["+paramTableName+"]";
 		DataBaseManager.getDB().sqlQueryDouble(sqlQuery, "freq", this.freqs);
-		this.countOfFreq = this.freqs.size();
-		
+		this.countOfFreq = this.freqs.size();		
 	}
 	
 
