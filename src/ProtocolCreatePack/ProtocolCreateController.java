@@ -14,16 +14,22 @@ import VerificationPack.MeasResult;
 import VerificationPack.VerificationProcedure;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.WorkerStateEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 
 public class ProtocolCreateController {
 
@@ -68,7 +74,20 @@ public class ProtocolCreateController {
 	
 	@FXML
 	private Button createBtn;
-			
+		
+	//------------------------------------
+	@FXML
+	private StackPane stackPane;
+	@FXML
+	private ProgressIndicator progress;
+	@FXML
+	private Label infoLabel;
+	@FXML
+	private VBox infoBox;
+	@FXML
+	private AnchorPane progressPane;	
+	//------------------------------------
+	
 	private ObservableList<String> militaryRanks;
 	private ObservableList<String> docTypes;
 	private String newProtocolName;
@@ -78,6 +97,10 @@ public class ProtocolCreateController {
 	
 	@FXML
 	private void initialize() throws IOException {
+		infoBox.toFront();
+		infoBox.setOpacity(1.0);
+		progressPane.setVisible(false);
+		
 		militaryRanks = FXCollections.observableArrayList();
 		try {
 			FileManager.ItemsToLines(new File(".").getAbsolutePath() + "//files//ranks.txt", militaryRanks);
@@ -128,34 +151,52 @@ public class ProtocolCreateController {
 			}
 		}		
 		Date dt = protocoledResult.get(0).getDateOfMeas();
-		String strDt = new SimpleDateFormat("DD/mm/yy HH/mm/ss").format(dt);
+		String strDt = new SimpleDateFormat("DD-mm-yy HH-mm-ss").format(dt);
 		String addStr = protocoledResult.get(0).getMyOwner().getMyOwner().getName() + " " +
 				   		protocoledResult.get(0).getMyOwner().getMyOwner().getType() + " " +
 				   		protocoledResult.get(0).getMyOwner().getMyOwner().getSerialNumber() + " от " + strDt;
-		newProtocolName = "Протокол поверки для " + addStr + ".xlsx";
-		newDocumentName = docTypeComboBox.getSelectionModel().getSelectedItem().toString() + " " + addStr + ".docx";
+		newProtocolName = "Протокол поверки для " + addStr + ".xls";
+		newDocumentName = docTypeComboBox.getSelectionModel().getSelectedItem().toString() + " " + addStr + ".doc";
+		
+		//Скрываем информационные поля и показываем прогресс индикатор
+		infoBox.toBack();
+		infoBox.setOpacity(0.1);
+		progressPane.setVisible(true);
 		
 		//Запускаем поток создания протокола, если были проведены измерения
 		if (protocoledResult != null) {
-			ProtocolCreateThread crtThread = new ProtocolCreateThread("crtThread", newProtocolName, protocoledResult, verification);
-			crtThread.start();
-			try {
-				crtThread.join();
-			}
-			catch(InterruptedException iExp) {
-				
-			}
+			ProtocolCreateService protocolService = new ProtocolCreateService(this.newProtocolName, protocoledResult, verification);
+			protocolService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+				@Override
+				public void handle(WorkerStateEvent arg0) {
+					infoBox.toFront();
+					infoBox.setOpacity(1.0);
+					progressPane.setVisible(false);
+				}				
+			});
+			protocolService.setOnFailed(new EventHandler<WorkerStateEvent>() {
+				@Override
+				public void handle(WorkerStateEvent event) {
+					infoBox.toFront();
+					infoBox.setOpacity(1.0);
+					progressPane.setVisible(false);  
+					AboutMessageWindow aboutWin;
+					try {
+						aboutWin = new AboutMessageWindow("Ошибка", "Произошла ошибка при создании протокола.\nПовторите попытку.");
+						aboutWin.show();
+					} catch (IOException ioExp) {
+						ioExp.printStackTrace();
+					}
+					finally {
+						return;
+					}					
+				}				
+			});
+			protocolService.start();
 		}
 		
 		//Запускаем поток создания документа (извещения о непригодности или свидетельства о поверке)
-		DocumentCreateThread docThr = new DocumentCreateThread(verification);
-		docThr.start();
-		try {
-			docThr.join();
-		}
-		catch(InterruptedException iExp) {
-			
-		}	
+		
 		
 		//Вносим запись в БД о созданных протоколе и документе
 		try {
@@ -167,7 +208,7 @@ public class ProtocolCreateController {
 				msgWin.show();
 			}
 			catch(IOException ioExp) {
-				//
+				ioExp.getStackTrace();
 			}
 		}		
 	}

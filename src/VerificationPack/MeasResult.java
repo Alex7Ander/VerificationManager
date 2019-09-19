@@ -19,13 +19,18 @@ import NewElementPack.NewElementController;
 import javafx.collections.ObservableList;
 
 public class MeasResult implements Includable<Element>, dbStorable{
-		
-	//protected String keys[] = {"m_S11", "p_S11", "m_S12", "p_S12", "m_S21", "p_S21", "m_S22", "p_S22"};
+
 	/*		String keys[] = {"m_S11", "sko_m_S11", "err_m_S11", "p_S11", "sko_p_S11", "err_m_S11", 
 	 						 "m_S12", "sko_m_S12", "err_m_S12", "p_S12", "sko_p_S12", "err_m_S12",
 	 						 "m_S21", "sko_m_S21", "err_m_S121", "p_S21", "sko_p_S21", "err_m_S21", 
 	 						 "m_S22", "sko_m_S22", "err_m_S22", "p_S22", "sko_p_S22", "err_m_S22",};
 	*/
+	
+	public String keys[] = {"m_S11", "sko_m_S11", "err_m_S11", "p_S11", "sko_p_S11", "err_p_S11", 
+			 "m_S12", "sko_m_S12", "err_m_S12", "p_S12", "sko_p_S12", "err_p_S12",
+			 "m_S21", "sko_m_S21", "err_m_S21", "p_S21", "sko_p_S21", "err_p_S21", 
+			 "m_S22", "sko_m_S22", "err_m_S22", "p_S22", "sko_p_S22", "err_p_S22"};
+	
 	protected int countOfFreq;
 	protected int countOfParams;
 	protected Date dateOfMeas;
@@ -106,29 +111,17 @@ public class MeasResult implements Includable<Element>, dbStorable{
 		}
 		
 		String resultsTableName =  results.get(0).get(1);
-				
-		//String keys[] = {"freq", "m_S11", "p_S11", "m_S12", "p_S12", "m_S21", "p_S21", "m_S22", "p_S22"};
 	
 		//Получим частоты
 		sqlQuery = "SELECT freq FROM ["+resultsTableName+"]";
 		DataBaseManager.getDB().sqlQueryDouble(sqlQuery, "freq", this.freqs);
 		this.countOfFreq = this.freqs.size();
 		
-		String keys[] = {"m_S11", "sko_m_S11", "err_m_S11", "p_S11", "sko_p_S11", "err_p_S11", 
+	 /*	String keys[] = {"m_S11", "sko_m_S11", "err_m_S11", "p_S11", "sko_p_S11", "err_p_S11", 
 				 "m_S12", "sko_m_S12", "err_m_S12", "p_S12", "sko_p_S12", "err_p_S12",
 				 "m_S21", "sko_m_S21", "err_m_S21", "p_S21", "sko_p_S21", "err_p_S21", 
 				 "m_S22", "sko_m_S22", "err_m_S22", "p_S22", "sko_p_S22", "err_p_S22"};
-		/*
-		int countOfKeys = 0;
-		if (this.myElement.getPoleCount() == 2) {
-			countOfKeys = 6;
-		}
-		else {
-			countOfKeys = 24;
-		}
-		fieldsNames.clear();
-		for (int i=0; i<countOfKeys; i++) fieldsNames.add(keys[i]);
-		*/
+	 */
 		//Получим значения параметров
 		for (String key : keys) {
 			try {
@@ -145,18 +138,7 @@ public class MeasResult implements Includable<Element>, dbStorable{
 			catch(Exception exp) {
 				continue;
 			}
-		}
-		/*
-		sqlQuery = "SELECT freq, ";
-		for (int i=0; i<countOfKeys; i++) {
-			sqlQuery += keys[i];
-			if (i != countOfKeys - 1) sqlQuery += ", ";
-		}
-		sqlQuery += " FROM ["+resultsTableName+"]";
-		DataBaseManager.getDB().sqlQueryMapOfDouble(sqlQuery, fieldsNames, this.values);
-		this.countOfParams = this.values.size();
-		*/
-		
+		}		
 	}
 		
 //Includable<Element>
@@ -167,12 +149,12 @@ public class MeasResult implements Includable<Element>, dbStorable{
 //dbStorable
 	@Override
 	public void saveInDB() throws SQLException {
-		//String keys[] = {"m_S11", "p_S11", "m_S12", "p_S12", "m_S21", "p_S21", "m_S22", "p_S22"};
 		
-		String keys[] = {"m_S11", "sko_m_S11", "err_m_S11", "p_S11", "sko_p_S11", "err_p_S11", 
+     /*String keys[] = {"m_S11", "sko_m_S11", "err_m_S11", "p_S11", "sko_p_S11", "err_p_S11", 
 				 "m_S12", "sko_m_S12", "err_m_S12", "p_S12", "sko_p_S12", "err_p_S12",
 				 "m_S21", "sko_m_S21", "err_m_S21", "p_S21", "sko_p_S21", "err_p_S21", 
 				 "m_S22", "sko_m_S22", "err_m_S22", "p_S22", "sko_p_S22", "err_p_S22"};
+     */
 		ArrayList<String> currentKeys = new ArrayList<String>();
 		//Перепишем все параметры, которые необходимо сохранить в список currentKeys
 		for (String k: keys) {

@@ -3,17 +3,8 @@ package VerificationForm;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-//import java.io.InputStream;
-//import java.net.ServerSocket;
-//import java.net.Socket;
-//import java.net.UnknownHostException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-//import java.util.HashMap;
 
 import AboutMessageForm.AboutMessageWindow;
 import DevicePack.Device;
@@ -31,7 +22,6 @@ import _tempHelpers.Adapter;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -39,9 +29,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import javafx.concurrent.Service;
-import javafx.concurrent.Task;
-import javafx.concurrent.WorkerStateEvent;
 
 public class VerificationController implements InfoRequestable {
 	@FXML
@@ -352,9 +339,18 @@ public class VerificationController implements InfoRequestable {
 		stage.close();
 	}
 		
-	public void waitResults(){
-		ServerService wService = new ServerService();
-		wService.start();
+	public void waitResults(){		
+		try {
+			StopStatus status = new StopStatus();		
+			ServerService wService = new ServerService(status);
+			wService.start();
+			status.waitMonitor();
+			if (status.getStopStatus() == true) {
+				fileReadBtnClick();
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}				
 	}	
 /*	
 	static class WaitService extends Service<Integer>{

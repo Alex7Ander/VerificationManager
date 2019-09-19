@@ -13,6 +13,13 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 
 public class ServerService extends Service<Integer> {
+	
+	private StopStatus status;
+	
+	public ServerService(StopStatus Status) {
+		this.status = Status;
+	}
+	
 	@Override
 	protected Task<Integer> createTask() {
 		return new Task<Integer>(){
@@ -33,9 +40,10 @@ public class ServerService extends Service<Integer> {
 			        inStream.read(line);
 			        String msg = new String(line);
 			        msg = msg.trim();
-			        System.out.println("Message is: " + msg + ". It's length is: " + msg.length());
 			        if (msg.equals("ready")){
 			        	System.out.println("It was flag for stopping");
+			        	status.setStopStatus();
+			        	//VerificationWindow.getVerificationWindow().getController().fileReadBtnClick();
 			            break;
 			        }
 			        else{
