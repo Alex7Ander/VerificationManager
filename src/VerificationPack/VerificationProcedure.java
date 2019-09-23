@@ -52,7 +52,7 @@ public class VerificationProcedure {
 	}
 	
 	public void setDeviceInformation(Device device) {
-		deviceMainInfo = device.getName() + device.getType();
+		deviceMainInfo = device.getName() + " " + device.getType();
 		deviceSerNumber = device.getSerialNumber();
 		elementsMainInfo = new ArrayList<String>();
 		for (Element elm : device.includedElements) {
