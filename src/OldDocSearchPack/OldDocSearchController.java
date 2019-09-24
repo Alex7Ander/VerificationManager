@@ -67,7 +67,7 @@ public class OldDocSearchController implements InfoRequestable {
 		gDocRB.setSelected(true);
 		gDocRB.setToggleGroup(docTypeGroup);
 		bDocBtn.setToggleGroup(docTypeGroup);
-		typeOfDoc = "Cвидетельство о поверке";
+		typeOfDoc = "Certificate";
 		
 		listOfVerifications = FXCollections.observableArrayList();
 		resultOfSearch = new ArrayList<ArrayList<String>>();
@@ -93,12 +93,12 @@ public class OldDocSearchController implements InfoRequestable {
 	
 	@FXML
 	private void gDocRBClick() {
-		typeOfDoc = "Cвидетельство о поверке";
+		 typeOfDoc = "Certificate";
 	}
 	
 	@FXML
 	private void bDocRBClick() {
-		typeOfDoc = "Извещение о непригодности";
+		typeOfDoc = "Notice";
 	}
 	
 	@FXML
@@ -110,12 +110,12 @@ public class OldDocSearchController implements InfoRequestable {
 	private void openBtnClick()  {
 		try {
 			int index = this.verificationListView.getSelectionModel().getSelectedIndex();
-			String pathOfDoc = resultOfSearch.get(index).get(1);
-			String pathOfProtocol = resultOfSearch.get(index).get(2);
+			String pathOfDoc = new File(".").getAbsolutePath() + resultOfSearch.get(index).get(1);
+			String pathOfProtocol = new File(".").getAbsolutePath() + resultOfSearch.get(index).get(2);
 			
-			File docFile =new File(pathOfDoc);
-			File protocolFile =new File(pathOfProtocol);
-			Desktop.getDesktop().open(docFile);
+			File docFile = new File(pathOfDoc);
+			File protocolFile = new File(pathOfProtocol);
+			//Desktop.getDesktop().open(docFile);
 			Desktop.getDesktop().open(protocolFile);
 		}
 		catch(IOException ioExp) {
@@ -129,8 +129,6 @@ public class OldDocSearchController implements InfoRequestable {
 		}
 	}
 	
-	
-
 //InfoRequestable
 	@Override
 	public void setDevice(DevicePack.Device device) {

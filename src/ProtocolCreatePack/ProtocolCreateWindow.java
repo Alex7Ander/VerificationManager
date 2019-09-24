@@ -29,5 +29,9 @@ public class ProtocolCreateWindow extends guiWindow{
 	public static void deleteProtocolCreateWindow() {
 		instanceProtocolCreateWindow = null;
 	}
+	
+	public static void closeInstanceWindow() {
+		instanceProtocolCreateWindow.close();
+	}
 
 }

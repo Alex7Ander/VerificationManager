@@ -1,5 +1,6 @@
 package ProtocolCreatePack;
 
+import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -9,7 +10,9 @@ import java.util.Date;
 
 import AboutMessageForm.AboutMessageWindow;
 import DataBasePack.DataBaseManager;
+import DevicePack.Device;
 import FileManagePack.FileManager;
+import VerificationForm.VerificationWindow;
 import VerificationPack.MeasResult;
 import VerificationPack.VerificationProcedure;
 import javafx.collections.FXCollections;
@@ -70,7 +73,7 @@ public class ProtocolCreateController {
 	private RadioButton siRB;
 	private ToggleGroup siGroup;
 	@FXML
-	private CheckBox printCheckBox;
+	private RadioButton printRB;
 	
 	@FXML
 	private Button createBtn;
@@ -103,7 +106,7 @@ public class ProtocolCreateController {
 		
 		militaryRanks = FXCollections.observableArrayList();
 		try {
-			FileManager.ItemsToLines(new File(".").getAbsolutePath() + "//files//ranks.txt", militaryRanks);
+			FileManager.LinesToItems(new File(".").getAbsolutePath() + "//files//ranks.txt", militaryRanks);
 		}
 		catch(IOException ioExp) {
 			militaryRanks.add("Полковник");
@@ -116,6 +119,11 @@ public class ProtocolCreateController {
 		this.reasonTextArea.setVisible(false);
 		this.decisionLabel.setVisible(false);
 		
+		Device device = VerificationWindow.getVerificationWindow().getController().verificatedDevice;
+		this.devNameLabel.setText(device.getName() + " " + device.getType());
+		this.devSerNLabel.setText(device.getSerialNumber());
+		this.devOwnerLabel.setText(device.getOwner());
+		
 		siGroup = new ToggleGroup();
 		etalonRB.setToggleGroup(siGroup);
 		siRB.setToggleGroup(siGroup);
@@ -127,7 +135,7 @@ public class ProtocolCreateController {
 		if (!this.decisionLabel.isVisible()) {
 			this.decisionLabel.setVisible(true);
 		}
-		if (docTypeComboBox.getSelectionModel().getSelectedItem().toString().equals("Свидетельство о поверке")) {
+		if (docTypeComboBox.getSelectionModel().getSelectedItem().toString().equals("Cвидетельство о поверке")) {
 			this.decisionLabel.setText("признан пригодным к применению");
 			this.reasonTextArea.setVisible(false);
 		}
@@ -156,61 +164,86 @@ public class ProtocolCreateController {
 				   		protocoledResult.get(0).getMyOwner().getMyOwner().getType() + " " +
 				   		protocoledResult.get(0).getMyOwner().getMyOwner().getSerialNumber() + " от " + strDt;
 		newProtocolName = "Протокол поверки для " + addStr + ".xls";
-		newDocumentName = docTypeComboBox.getSelectionModel().getSelectedItem().toString() + " " + addStr + ".doc";
-		
+		newDocumentName = docTypeComboBox.getSelectionModel().getSelectedItem().toString() + " " + addStr + ".doc";		
 		//Скрываем информационные поля и показываем прогресс индикатор
 		infoBox.toBack();
 		infoBox.setOpacity(0.1);
-		progressPane.setVisible(true);
-		
-		//Запускаем поток создания протокола, если были проведены измерения
-		if (protocoledResult != null) {
-			ProtocolCreateService protocolService = new ProtocolCreateService(this.newProtocolName, protocoledResult, verification);
-			protocolService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-				@Override
-				public void handle(WorkerStateEvent arg0) {
-					infoBox.toFront();
-					infoBox.setOpacity(1.0);
-					progressPane.setVisible(false);
-				}				
-			});
-			protocolService.setOnFailed(new EventHandler<WorkerStateEvent>() {
-				@Override
-				public void handle(WorkerStateEvent event) {
-					infoBox.toFront();
-					infoBox.setOpacity(1.0);
-					progressPane.setVisible(false);  
-					AboutMessageWindow aboutWin;
+		progressPane.setVisible(true);		
+		//Создаем документы
+		creteDocuments();	
+	}
+	
+	private void creteDocuments() {
+		//Создаем поток создания протокола
+		DocumetnsCreateService docService = new DocumetnsCreateService(this.newProtocolName, protocoledResult, verification);
+		//Устанавливаем действие при успешном завершении
+		docService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+			@Override
+			public void handle(WorkerStateEvent arg0) {
+				infoBox.toFront();
+				infoBox.setOpacity(1.0);
+				progressPane.setVisible(false);
+				AboutMessageWindow goodResMsg;
+				try {
+					//Вносим запись в БД о созданных протоколе и документе
 					try {
-						aboutWin = new AboutMessageWindow("Ошибка", "Произошла ошибка при создании протокола.\nПовторите попытку.");
-						aboutWin.show();
-					} catch (IOException ioExp) {
-						ioExp.printStackTrace();
+						makeRecordInDB();
 					}
-					finally {
-						return;
-					}					
-				}				
-			});
-			protocolService.start();
-		}
-		
-		//Запускаем поток создания документа (извещения о непригодности или свидетельства о поверке)
-		
-		
-		//Вносим запись в БД о созданных протоколе и документе
-		try {
-			makeRecordInDB();
-		}
-		catch(SQLException sqlExp) {
-			try {
-				AboutMessageWindow msgWin = new AboutMessageWindow("Ошибка", "Ошибка внесения данных о созданном протоколе в БД");
-				msgWin.show();
-			}
-			catch(IOException ioExp) {
-				ioExp.getStackTrace();
-			}
-		}		
+					catch(SQLException sqlExp) {
+						try {
+							AboutMessageWindow msgWin = new AboutMessageWindow("Ошибка", "Ошибка внесения данных о созданном протоколе в БД");
+							msgWin.show();
+						}
+						catch(IOException ioExp) {
+							ioExp.getStackTrace();
+						}
+					}
+					//Открываем созданный файл, если требуется
+					if (printRB.isSelected()) {
+						String path = new File(".").getAbsoluteFile() + "//Protocols//" + newProtocolName;
+						File protocol = new File(path);
+						try {
+							Desktop.getDesktop().open(protocol);
+						}
+						catch(IOException ioExp) {
+							ioExp.getStackTrace();
+						}			
+					}
+					//Показываем сообщение об успешном создании
+					String docType = docTypeComboBox.getSelectionModel().getSelectedItem().toString();
+					goodResMsg = new AboutMessageWindow("Успешно", "Протокол и " + docType + "\nуспешно созданы.");
+					goodResMsg.show();
+				} catch (IOException ioExp) {
+					ioExp.printStackTrace();
+				}
+				finally {
+					ProtocolCreateWindow.closeInstanceWindow();
+					ProtocolCreateWindow.deleteProtocolCreateWindow();
+				}
+			}				
+		});
+		//Устанавливаем действие при провале
+		docService.setOnFailed(new EventHandler<WorkerStateEvent>() {
+			@SuppressWarnings("finally")
+			@Override
+			public void handle(WorkerStateEvent event) {
+				infoBox.toFront();
+				infoBox.setOpacity(1.0);
+				progressPane.setVisible(false);  
+				AboutMessageWindow aboutWin;
+				try {
+					aboutWin = new AboutMessageWindow("Ошибка", "Произошла ошибка при создании протокола.\nПовторите попытку.");
+					aboutWin.show();
+				} catch (IOException ioExp) {
+					ioExp.printStackTrace();
+				}
+				finally {
+					return;
+				}					
+			}				
+		});
+		//Запускаем поток создания документов
+		docService.start();
 	}
 	
 	private void makeRecordInDB() throws SQLException {
@@ -218,9 +251,15 @@ public class ProtocolCreateController {
 		String devName = protocoledResult.get(0).getMyOwner().getMyOwner().getName();
 		String devType = protocoledResult.get(0).getMyOwner().getMyOwner().getType();
 		String devSerN = protocoledResult.get(0).getMyOwner().getMyOwner().getSerialNumber();
-		String pathToProtocol = new File(".").getAbsolutePath() + "//Protocols//" + newProtocolName;
-		String pathToDocument = new File(".").getAbsolutePath() + "//Protocols//" + newDocumentName;
+		String pathToProtocol = "//Protocols//" + newProtocolName;
+		String pathToDocument = "//Documents//" + newDocumentName;
 		String docT = docTypeComboBox.getSelectionModel().getSelectedItem().toString();
+		if (docT.equals("Cвидетельство о поверке")) {
+			docT = "Certificate";
+		}
+		else {
+			docT = "Notice";
+		}
 		String sqlQuery = "INSERT INTO Verifications (data, deviceName, deviceType, deviceSerNum, pathOfDoc, pathOfProtocol, typeOFDoc) VALUES "
 											  + "('"+date+"','"+devName+"','"+devType+"','"+devSerN+"','"+pathToDocument+"','"+pathToProtocol+"','"+docT+"')";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
@@ -252,14 +291,14 @@ public class ProtocolCreateController {
 	public String getBossName() {return this.bossNameTextFiled.getText();}
 	public String getBossStatus() {return this.militaryStatusComboBox.getSelectionModel().getSelectedItem().toString();}
 	public String getResultDecision() {
-		if (this.docTypeComboBox.getSelectionModel().getSelectedItem().toString().equals("Свидетельство о поверке")) {
+		if (this.docTypeComboBox.getSelectionModel().getSelectedItem().toString().equals("Cвидетельство о поверке")) {
 			return "годным";
 		}
 		else {
 			return "не годным";
 		}
 	}
-	public String getProtocolNumber() {return "";}
+	public String getProtocolNumber() {return this.docNumberTextField.getText();}
 	public String getDocumentNumber() {return this.docNumberTextField.getText();}
 	
 }

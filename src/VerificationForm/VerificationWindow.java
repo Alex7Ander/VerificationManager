@@ -2,6 +2,8 @@ package VerificationForm;
 
 import java.io.IOException;
 import GUIpack.guiWindow;
+import javafx.event.EventHandler;
+import javafx.stage.WindowEvent;
 
 public class VerificationWindow extends guiWindow{
 
@@ -9,6 +11,12 @@ public class VerificationWindow extends guiWindow{
 		
 	private VerificationWindow() throws IOException{
 		super("Поверка", "VerificationForm.fxml");
+		this.stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+			@Override
+			public void handle(WindowEvent event) {
+				instanceVerificationWindow = null;				
+			}			
+		});
 	}
 		
 	public static VerificationWindow getVerificationWindow() throws IOException {
@@ -22,5 +30,8 @@ public class VerificationWindow extends guiWindow{
 		return this.loader.getController();
 	}
 
+	public static void closeinstancewindow() {
+		instanceVerificationWindow.close();
+	}
 	
 }

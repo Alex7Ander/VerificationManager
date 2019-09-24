@@ -71,15 +71,12 @@ public class VerificationController implements InfoRequestable {
 	private int currentParamIndex;
 	
 	@FXML
-	private void initialize(){	
-		
+	private void initialize(){			
 		listOfElements = FXCollections.observableArrayList();
-		listOfParametrs = FXCollections.observableArrayList();
-		
+		listOfParametrs = FXCollections.observableArrayList();		
 		verificationResult = new ArrayList<MeasResult>();
 		currentElementIndex = 0;
-		currentParamIndex = 0;
-		   		
+		currentParamIndex = 0;		   		
 		ArrayList<String> heads = new ArrayList<String>();
 		heads.add("Частота, ГГц");	
 		heads.add("Измер. знач. модуля");	
@@ -134,7 +131,7 @@ public class VerificationController implements InfoRequestable {
 	@FXML
 	private void createProtocolBtnClick(ActionEvent event) throws IOException {
 		if (verificationResult.size() != 0) {
-			String[] docTypes = {"Свидетельство о поверке", "Извещение о непригодности"};	
+			String[] docTypes = {"Cвидетельство о поверке", "Извещение о непригодности"};	
 			createProtocol(docTypes);
 		}
 		else {

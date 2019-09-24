@@ -22,12 +22,11 @@ import VerificationPack.VerificationProcedure;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 
-public class ProtocolCreateService extends Service<Integer> {
+public class DocumetnsCreateService extends Service<Integer> {
 
 	private VerificationProcedure verification;
 	private ArrayList<MeasResult> protocoledResult;
 	private String protocolName;
-	private String pathFrom;
 	private String pathTo;
 	//Книга
 	private Workbook wb;
@@ -41,7 +40,7 @@ public class ProtocolCreateService extends Service<Integer> {
 	private CellStyle ordinaryCellStyle;
 	private CellStyle boldCellStyle;
 	
-	public ProtocolCreateService(String protocolFileName, ArrayList<MeasResult> result, VerificationProcedure verificationProc){
+	public DocumetnsCreateService(String protocolFileName, ArrayList<MeasResult> result, VerificationProcedure verificationProc){
 		this.verification = verificationProc;
 		this.protocoledResult = result;
 		this.protocolName = protocolFileName;
@@ -89,11 +88,10 @@ public class ProtocolCreateService extends Service<Integer> {
 			protected Integer call() throws Exception {
 				pathTo = new File(".").getAbsolutePath() + "\\Protocols\\" + protocolName;
 				try {
-					prepareSheet();
-					fillSheet();
-					topCellsMerging();
-					colScaling();
-					writeSheet();
+					if (protocoledResult != null) {
+						createProtocol();
+					}
+					createDocument();
 					return 0;
 				}
 				catch(IOException ioExp) {
@@ -102,6 +100,18 @@ public class ProtocolCreateService extends Service<Integer> {
 				}
 			}			
 		};
+	}
+	
+	private void createProtocol() throws IOException {
+		prepareSheet();
+		fillSheet();
+		topCellsMerging();
+		colScaling();
+		writeSheet();
+	}
+	
+	private void createDocument() throws IOException {
+		//
 	}
 	
 	private void prepareSheet() {	
