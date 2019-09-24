@@ -165,7 +165,7 @@ public class ProtocolCreateService extends Service<Integer> {
 			//Заполнение таблицы
 			String keys[] = {"m_S11", "err_m_S11", "p_S11", "err_m_S11", 
 					 		 "m_S12", "err_m_S12", "p_S12", "err_m_S12",
-					 		 "m_S21", "err_m_S121", "p_S21", "err_m_S21", 
+					 		 "m_S21", "err_m_S21", "p_S21", "err_m_S21", 
 					 		 "m_S22", "err_m_S22", "p_S22", "err_m_S22"};
 			
 			for (int j = 0; j < currentRes.getCountOfFreq(); j++) {
@@ -237,6 +237,7 @@ public class ProtocolCreateService extends Service<Integer> {
 			this.sh.addMergedRegion(new CellRangeAddress(i, i, 0, 7));
 		}
 	}
+	
 	private void rowMerging(int row, int from, int to) {
 		this.sh.addMergedRegion(new CellRangeAddress(row, row, from, to));
 	}

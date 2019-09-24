@@ -78,11 +78,15 @@ public class ResultReaderManager {
 		}
 		for (double val : tempArrays.get(0)) freqs.add(val);
 
-		String keys[] = {"m_S11", "sko_m_S11", "p_S11", "sko_p_S11", 
+	/*	String keys[] = {"m_S11", "sko_m_S11", "p_S11", "sko_p_S11", 
 						 "m_S12", "sko_m_S12", "p_S12", "sko_p_S12",
 						 "m_S21", "sko_m_S21", "p_S21", "sko_p_S21", 
 						 "m_S22", "sko_m_S22", "p_S22", "sko_p_S22"};
-		
+	*/	
+		String keys[] = {"m_S11", "err_m_S11", "p_S11", "err_p_S11", 
+			 	 		 "m_S12", "err_m_S12", "p_S12", "err_p_S12",
+			 	 		 "m_S21", "err_m_S21", "p_S21", "err_p_S21", 
+			 	 		 "m_S22", "err_m_S22", "p_S22", "err_p_S22"};
 		for (int i=1; i<countOfParams; i++) {
 			HashMap<Double, Double> oneFreqHM = new HashMap<Double, Double>();
 			for (int j=0; j<countOfFreqs; j++) {

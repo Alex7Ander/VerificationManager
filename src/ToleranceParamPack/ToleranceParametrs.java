@@ -28,6 +28,10 @@ public abstract class ToleranceParametrs implements Includable<Element>, dbStora
 	public int getCountOfFreq() {return this.countOfFreq;}
 	public String getTypeByTime() {return this.typeByTime;}
 	
+	//Абстрактный метод, который должен быть переопредел классими наследниками для определения пригодности 
+	//устройства по тому или иному способу
+	public abstract boolean checkResult(MeasResult result);
+		
 	//Конструктор для инициализации перед сохранением в БД
 	ToleranceParametrs(String TypeByTime, NewElementController elCtrl, Element ownerElement){
 		this.typeByTime = TypeByTime;		
@@ -164,11 +168,7 @@ public abstract class ToleranceParametrs implements Includable<Element>, dbStora
 			result.values.put("err_p_" + cKeys[j], errorsPhi);
 		}
 		
-	}
-//Абстрактный метод, который должен быть переопредел классими наследниками для определения пригодности 
-//устройства по тому или иному способу
-	public abstract boolean checkResult(MeasResult result);
-	
+	}	
 //Includable<Element>	
 	private Element myElement;
 	@Override
@@ -177,14 +177,14 @@ public abstract class ToleranceParametrs implements Includable<Element>, dbStora
 //dbStorable
 	@Override
 	public void saveInDB() throws SQLException {
-		String paramsTableName = "";
+		String paramsTableName = null;
 		if (this.typeByTime.equals("primary")) {
 			paramsTableName = this.myElement.getPrimaryParamTable();
 		}
 		else if (this.typeByTime.equals("periodic")) {
 			paramsTableName = this.myElement.getPeriodicParamTable();
 		}
-		String sqlQuery = "CREATE TABLE ["+paramsTableName+"] (id INTEGER PRIMARY KEY AUTOINCREMENT, freq VARCHAR(20), "; //m_s11_d REAL, m_s11_n REAL, m_s11_u REAL, p_s11_d REAL, p_s11_n REAL,  p_s11_u REAL)";
+		String sqlQuery = "CREATE TABLE ["+paramsTableName+"] (id INTEGER PRIMARY KEY AUTOINCREMENT, freq VARCHAR(20), ";
 		for (int i=0; i<this.countOfParams; i++) {
 			sqlQuery += (keys[i] + " VARCHAR(20)");
 			if (i != this.countOfParams - 1) sqlQuery += ", ";
@@ -238,8 +238,7 @@ public abstract class ToleranceParametrs implements Includable<Element>, dbStora
 	}
 	@Override
 	public void getData() {
-		// TODO Auto-generated method stub
-		
+		// TODO Auto-generated method stub		
 	}
 					
 }

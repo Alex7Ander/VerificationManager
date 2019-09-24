@@ -188,7 +188,61 @@ public class VerificationController implements InfoRequestable {
 			fillTable();			
 		}
 	}
-	
+//---------------------------	
+	public void StartVerification() throws IOException {
+			
+		String absPath = new File(".").getAbsolutePath();
+			
+		//Получение информации об окружающей среде
+		verification = new VerificationProcedure();
+		verification.setPrimaryInformation((StartVerificationController)StartVerificationWindow.getStartVerificationWindow().getControllerClass());
+			
+		//Создание файла psi.ini
+		String psiFilePath = absPath + "\\measurment\\PSI.ini";
+		verificatedDevice.createIniFile(psiFilePath);
+			
+		//Запуск программы measurment
+		File file =new File(absPath + "\\measurment\\Project1.exe");
+		Desktop.getDesktop().open(file);				
+	}
+		
+	private void fillTable() {
+		String keys[] = {"m_S11", "err_m_S11", "p_S11", "err_p_S11", 
+					 	 "m_S12", "err_m_S12", "p_S12", "err_p_S12",
+					 	 "m_S21", "err_m_S21", "p_S21", "err_p_S21", 
+					 	 "m_S22", "err_m_S22", "p_S22", "err_p_S22"};
+			
+		ArrayList<Double> fr = this.verificationResult.get(currentElementIndex).freqs;
+		int countOfFreq = fr.size();
+		if (this.resultTable.getRowCount() < countOfFreq) {
+			while (this.resultTable.getRowCount() != countOfFreq) 
+				this.resultTable.addRow();
+		}
+		else if (this.resultTable.getRowCount() > countOfFreq) {
+			while (this.resultTable.getRowCount() != countOfFreq) 
+				this.resultTable.deleteRow(this.resultTable.getRowCount());
+		}
+			  
+		this.resultTable.setColumnFromDouble(0, fr);
+			
+		ArrayList<Double> column1 = Adapter.HashMapToArrayList(fr, this.verificationResult.get(currentElementIndex).values.get(keys[currentParamIndex*4]));
+		this.resultTable.setColumnFromDouble(1, column1);
+			
+		ArrayList<Double> column2 = Adapter.HashMapToArrayList(fr, this.verificationResult.get(currentElementIndex).values.get(keys[1 + currentParamIndex*4]));
+		this.resultTable.setColumnFromDouble(2, column2);
+					
+		ArrayList<Double> column4 = Adapter.HashMapToArrayList(fr, this.verificationResult.get(currentElementIndex).values.get(keys[2 + currentParamIndex*4]));
+		this.resultTable.setColumnFromDouble(4, column4);
+		
+		ArrayList<Double> column5 = Adapter.HashMapToArrayList(fr, this.verificationResult.get(currentElementIndex).values.get(keys[3 + currentParamIndex*4]));
+		this.resultTable.setColumnFromDouble(5, column5);
+			
+		ArrayList<String> column3 = Adapter.HashMapToArrayList(fr, this.verificationResult.get(currentElementIndex).suitabilityDecision.get(keys[currentParamIndex])); 
+		this.resultTable.setColumn(3, column3);
+			
+		ArrayList<String> column6 = Adapter.HashMapToArrayList(fr, this.verificationResult.get(currentElementIndex).suitabilityDecision.get(keys[2 + currentParamIndex])); 
+		this.resultTable.setColumn(6, column6);
+	}	
 //---------------------------	
 	@FXML
 	private Button fileReadBtn;
@@ -205,29 +259,16 @@ public class VerificationController implements InfoRequestable {
 				String absPath = new File(".").getAbsolutePath();
 				String resFilePath = absPath + "\\measurment\\protocol.ini";
 
-				MeasResult rs = new MeasResult(resFilePath, i+1, this.verificatedDevice.includedElements.get(i));
-				
-				this.verificationResult.add(rs);
-				
+				MeasResult rs = new MeasResult(resFilePath, i+1, this.verificatedDevice.includedElements.get(i));				
+				this.verificationResult.add(rs);				
 				if (this.verification.getTypeByTime().equals("primary")) {
-					try {
-						this.verificatedDevice.includedElements.get(i).getPrimaryToleranceParams().measError(rs);
-					}
-					catch(SQLException exp) {
-						//
-					}
+					//Проверка результатво
 					this.verificatedDevice.includedElements.get(i).getPrimaryToleranceParams().checkResult(rs);
 				}
 				else {
-					try {
-						this.verificatedDevice.includedElements.get(i).getPeriodicToleranceParams().measError(rs);
-					}
-					catch(SQLException exp) {
-						//
-					}
+					//Проверка результатов
 					this.verificatedDevice.includedElements.get(i).getPeriodicToleranceParams().checkResult(rs);
-				}
-							
+				}							
 				//Заполним таблицу
 				fillTable();
 			}
@@ -242,64 +283,7 @@ public class VerificationController implements InfoRequestable {
 			}
 		}
 	}
-//---------------------------
-	
-	public void StartVerification() throws IOException {
-		
-		String absPath = new File(".").getAbsolutePath();
-		
-		//Получение информации об окружающей среде
-		verification = new VerificationProcedure();
-		verification.setPrimaryInformation((StartVerificationController)StartVerificationWindow.getStartVerificationWindow().getControllerClass());
-		
-		//Создание файла psi.ini
-		String psiFilePath = absPath + "\\measurment\\PSI.ini";
-		verificatedDevice.createIniFile(psiFilePath);
-		
-		//Запуск программы measurment
-		File file =new File(absPath + "\\measurment\\Project1.exe");
-		Desktop.getDesktop().open(file);
-		
-		//Запуск сервера, ожидающего ответа о завершении измерений
-		
-	}
-	
-	private void fillTable() {
-		String keys[] = {"m_S11", "err_m_S11", "p_S11", "err_p_S11", 
-				 		 "m_S12", "err_m_S12", "p_S12", "err_p_S12",
-				 		 "m_S21", "err_m_S21", "p_S21", "err_p_S21", 
-				 		 "m_S22", "err_m_S22", "p_S22", "err_p_S22"};
-		
-		ArrayList<Double> fr = this.verificationResult.get(currentElementIndex).freqs;
-		int countOfFreq = fr.size();
-		if (this.resultTable.getRowCount() < countOfFreq) {
-			while (this.resultTable.getRowCount() != countOfFreq) this.resultTable.addRow();
-		}
-		else if (this.resultTable.getRowCount() > countOfFreq) {
-			while (this.resultTable.getRowCount() != countOfFreq) this.resultTable.deleteRow(this.resultTable.getRowCount());
-		}
-		  
-		this.resultTable.setColumnFromDouble(0, fr);
-		
-		ArrayList<Double> column1 = Adapter.HashMapToArrayList(fr, this.verificationResult.get(currentElementIndex).values.get(keys[currentParamIndex]));
-		this.resultTable.setColumnFromDouble(1, column1);
-		
-		ArrayList<Double> column2 = Adapter.HashMapToArrayList(fr, this.verificationResult.get(currentElementIndex).values.get(keys[1 + currentParamIndex]));
-		this.resultTable.setColumnFromDouble(2, column2);
-				
-		ArrayList<Double> column4 = Adapter.HashMapToArrayList(fr, this.verificationResult.get(currentElementIndex).values.get(keys[2 + currentParamIndex]));
-		this.resultTable.setColumnFromDouble(4, column4);
-		
-		ArrayList<Double> column5 = Adapter.HashMapToArrayList(fr, this.verificationResult.get(currentElementIndex).values.get(keys[3 + currentParamIndex]));
-		this.resultTable.setColumnFromDouble(5, column5);
-		
-		ArrayList<String> column3 = Adapter.HashMapToArrayList(fr, this.verificationResult.get(currentElementIndex).suitabilityDecision.get(keys[currentParamIndex])); 
-		this.resultTable.setColumn(3, column3);
-		
-		ArrayList<String> column6 = Adapter.HashMapToArrayList(fr, this.verificationResult.get(currentElementIndex).suitabilityDecision.get(keys[2 + currentParamIndex])); 
-		this.resultTable.setColumn(6, column6);
-	}
-//---------------------------	
+//----------------------------------------	
 	@Override
 	public void representRequestedInfo() {
 		this.nameLabel.setText(this.verificatedDevice.getName());
@@ -352,43 +336,5 @@ public class VerificationController implements InfoRequestable {
 			e.printStackTrace();
 		}				
 	}	
-/*	
-	static class WaitService extends Service<Integer>{
-		@Override
-		protected Task<Integer> createTask() {
-			return new Task<Integer>(){
-				@Override
-				public Integer call() throws IOException {
-					InetAddress addr = InetAddress.getLocalHost();
-					String strAddr = addr.getHostAddress();
-					ArrayList<String> ipList = new ArrayList<String>();
-					ipList.add(strAddr);
-					FileManager.ItemsToLines("/files/ip.txt", ipList);
-					
-					ServerSocket serverSocket = new ServerSocket(5051);
-					Socket socket = null;
-				    while(true){
-				    	socket = serverSocket.accept();
-				    	InputStream inStream = socket.getInputStream();
-				        byte[] line = new byte[1024];
-				        inStream.read(line);
-				        String msg = new String(line);
-				        msg = msg.trim();
-				        System.out.println("Message is: " + msg + ". It's length is: " + msg.length());
-				        if (msg.equals("ready")){
-				        	System.out.println("It was flag for stopping");
-				            break;
-				        }
-				        else{
-				        	System.out.println("It was not flag!");
-				        }
-				   }
-				   socket.close();
-				   serverSocket.close();
-				   return 0;
-				}	
-			};
-		}
-	}*/
 	
 }

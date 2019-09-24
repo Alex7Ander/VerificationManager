@@ -30,11 +30,10 @@ public class UpDownTolerance extends ToleranceParametrs {
 		int countOfParams = result.getMyOwner().getPoleCount();
 		if (countOfParams == 2) countOfParams = 1;
 		String[] cKeys = {"S11", "S12", "S21", "S22"};
-		for (int i=0; i < countOfParams; i++) {
-			
+		
+		for (int i=0; i < countOfParams; i++) {			
 			HashMap<Double, String> decisionsG = new HashMap<Double, String>();
-			HashMap<Double, String> decisionsPhi = new HashMap<Double, String>();
-			
+			HashMap<Double, String> decisionsPhi = new HashMap<Double, String>();			
 			for (int j=0; j < currentCountOfFreq; j++) {
 				double cFreq = result.freqs.get(j);
 								
@@ -59,8 +58,7 @@ public class UpDownTolerance extends ToleranceParametrs {
 				else {
 					decisionsPhi.put(cFreq, "Годен");
 				}
-			}
-			
+			}			
 			result.suitabilityDecision.put(cKeys[i], decisionsG);
 			result.suitabilityDecision.put(cKeys[i], decisionsPhi);
 		}
