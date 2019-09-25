@@ -206,7 +206,7 @@ public class SearchDeviceController {
 		}
 		return filterString;
 	}
-	
+/*	
     private javafx.event.EventHandler<WindowEvent> closeEventHandler = new javafx.event.EventHandler<WindowEvent>() {
         @Override
         public void handle(WindowEvent event) {
@@ -217,5 +217,5 @@ public class SearchDeviceController {
     public javafx.event.EventHandler<WindowEvent> getCloseEventHandler(){
     	return closeEventHandler;
     }
-		
+*/		
 }

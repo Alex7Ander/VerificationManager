@@ -5,7 +5,8 @@ import java.io.IOException;
 import DevicePack.Device;
 import GUIpack.InfoRequestable;
 import GUIpack.guiWindow;
-import VerificationForm.VerificationWindow;
+import javafx.event.EventHandler;
+import javafx.stage.WindowEvent;
 
 public class SearchDeviceWindow extends guiWindow{
 	
@@ -16,7 +17,12 @@ public class SearchDeviceWindow extends guiWindow{
 		SearchDeviceController controller = (SearchDeviceController) loader.getController();
 		controller.setDevice(incomingDevice);
 		controller.setRequester(incomingRequester);
-		this.stage.setOnCloseRequest(controller.getCloseEventHandler());
+		this.stage.setOnCloseRequest( new EventHandler<WindowEvent>() {
+			@Override
+			public void handle(WindowEvent arg0) {
+				deleteWindow();				
+			}			
+		});
 	}
 		
 	public static SearchDeviceWindow getSearchDeviceWindow(Device incomingDevice, InfoRequestable incomingRequester) throws IOException {

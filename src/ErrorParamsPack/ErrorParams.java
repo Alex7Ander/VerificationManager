@@ -137,15 +137,8 @@ public class ErrorParams implements dbStorable  {
 	}
 	
 	@Override
-	public void editInfoInDB() throws SQLException {
+	public void editInfoInDB(HashMap<String, String> editingValues) throws SQLException {
 		// TODO Auto-generated method stub		
 	}
-
-	@Override
-	public void getData() {
-		// TODO Auto-generated method stub		
-	}
-	
-	
 
 }

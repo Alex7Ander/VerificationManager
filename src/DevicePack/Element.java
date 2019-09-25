@@ -45,13 +45,14 @@ public class Element implements Includable<Device>, Verificatable, dbStorable{
 		
 		this.myDevice = deviceOwner;
 		String elementTableName = myDevice.getElementsTableName();
-		String sqlQuery = "SELECT ElementType, ElementSerNumber, PoleCount, MeasUnit, ToleranceType, PeriodicParamTable, PrimaryParamTable, NominalIndex FROM [" + elementTableName + "] WHERE id='"+index+"'";
+		String sqlQuery = "SELECT ElementType, ElementSerNumber, PoleCount, MeasUnit, ToleranceType, VerificationsTable, PeriodicParamTable, PrimaryParamTable, NominalIndex FROM [" + elementTableName + "] WHERE id='"+index+"'";
 		ArrayList<String> fieldName = new ArrayList<String>();
 		fieldName.add("ElementType");
 		fieldName.add("ElementSerNumber");
 		fieldName.add("PoleCount");
 		fieldName.add("MeasUnit");
 		fieldName.add("ToleranceType");
+		fieldName.add("VerificationsTable");
 		fieldName.add("PeriodicParamTable");
 		fieldName.add("PrimaryParamTable");
 		fieldName.add("NominalIndex");
@@ -63,13 +64,11 @@ public class Element implements Includable<Device>, Verificatable, dbStorable{
 		this.serialNumber = arrayResults.get(0).get(1);
 		this.poleCount = Integer.parseInt(arrayResults.get(0).get(2));
 		this.measUnit = arrayResults.get(0).get(3);
-		this.toleranceType = arrayResults.get(0).get(4);		
-		this.periodicParamTable = arrayResults.get(0).get(5);
-		this.primaryParamTable = arrayResults.get(0).get(6);
-		this.nominalIndex = Integer.parseInt(arrayResults.get(0).get(7));
-		String addrStr = this.myDevice.getName() + " " + this.myDevice.getType() + " " +this.myDevice.getSerialNumber() + " "+
-				 this.type + " " + this.serialNumber;
-		this.listOfVerificationsTable = "Список таблиц с результатами измерений для " + addrStr;
+		this.toleranceType = arrayResults.get(0).get(4);
+		this.listOfVerificationsTable = arrayResults.get(0).get(5);
+		this.periodicParamTable = arrayResults.get(0).get(6);
+		this.primaryParamTable = arrayResults.get(0).get(7);
+		this.nominalIndex = Integer.parseInt(arrayResults.get(0).get(8));		
 		//Получим номиналы на элемент 
 		if (this.measUnit.equals("vswr")) {
 			this.nominal = new VSWR_Result(this, nominalIndex);
@@ -145,7 +144,7 @@ public class Element implements Includable<Device>, Verificatable, dbStorable{
 		String addStr = myDevice.getName() + " " + myDevice.getType() + " " + myDevice.getSerialNumber();
 		String strElementsTable = this.myDevice.getElementsTableName();
 		// 3.1 Внесли запись об элементе
-		String sqlString = "INSERT INTO ["+strElementsTable+"] (ElementType, ElementSerNumber, PoleCount, MeasUnit, ToleranceType, PeriodicParamTable, PrimaryParamTable, NominalIndex) values ('"+type+"','"+serialNumber+"','"+poleCount+"','"+measUnit+"','"+toleranceType+"','"+periodicParamTable +"','"+primaryParamTable+"','"+Integer.toString(nominalIndex)+"')";
+		String sqlString = "INSERT INTO ["+strElementsTable+"] (ElementType, ElementSerNumber, PoleCount, MeasUnit, ToleranceType, VerificationsTable, PeriodicParamTable, PrimaryParamTable, NominalIndex) values ('"+type+"','"+serialNumber+"','"+poleCount+"','"+measUnit+"','"+toleranceType+"','"+listOfVerificationsTable+"','"+periodicParamTable +"','"+primaryParamTable+"','"+Integer.toString(nominalIndex)+"')";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlString);
 		System.out.println("\tЭлемент зарегистрирован");
 		// 3.2 Создание таблицы [Список таблиц с результатами измерений для ...]
@@ -185,13 +184,22 @@ public class Element implements Includable<Device>, Verificatable, dbStorable{
 	}
 	
 	@Override
-	public void editInfoInDB() throws SQLException {
-		
-	}
-	
-	@Override
-	public void getData() {
-		
+	public void editInfoInDB(HashMap<String, String> editingValues) throws SQLException {
+		String tableName = this.myDevice.getElementsTableName();
+		String sqlQuery = "UPDATE " + tableName + " SET ";
+		int count = 1;
+		for (String str: editingValues.keySet()) {
+			sqlQuery += (str + "='"+editingValues.get(str)+"'");
+			if (count != editingValues.size()) {
+				sqlQuery += ", ";
+			} 
+			else {
+				sqlQuery += " ";
+			}
+			count++;
+		}
+		sqlQuery += "WHERE ElementType='"+this.type+"' AND ElementSerNumber='"+this.serialNumber+"'";
+		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);	
 	}
 //----------------------------------------	
 	@Override

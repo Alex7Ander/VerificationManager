@@ -1,9 +1,7 @@
 package DataBasePack;
 
 import java.sql.SQLException;
-
-import DevicePack.SavingException;
-import VerificationPack.MeasResult;
+import java.util.HashMap;
 
 public interface dbStorable {
 
@@ -11,6 +9,5 @@ public interface dbStorable {
 
 	void saveInDB() throws SQLException;
 	void deleteFromDB() throws SQLException;
-	void editInfoInDB() throws SQLException;
-	void getData();
+	void editInfoInDB(HashMap<String, String> editingValues) throws SQLException;
 }

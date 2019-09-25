@@ -41,7 +41,7 @@
                                        <children>
                                           <Label prefWidth="130.0" stylesheets="@../../bin/application/commonLabel.css" text="Наименование СИ:" />
                                           <Separator orientation="VERTICAL" prefHeight="200.0" />
-                                          <TextField fx:id="nameTextField" prefHeight="25.0" prefWidth="215.0" />
+                                          <ComboBox fx:id="nameComboBox" prefHeight="26.0" prefWidth="214.0" />
                                        </children>
                                     </HBox>
                                     <HBox prefHeight="30.0" prefWidth="200.0">
@@ -127,8 +127,10 @@
                               </ScrollPane>
                               <Pane prefHeight="58.0" prefWidth="823.0">
                                  <children>
-                                    <Button fx:id="addFreqBtn" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#addFreqBtnClick" prefHeight="37.0" prefWidth="153.0" stylesheets="@../../bin/application/commonButton.css" text="+ частота" />
-                                    <Button fx:id="deleteFreqBtn" layoutX="181.0" layoutY="16.0" mnemonicParsing="false" onAction="#deleteFreqBtnClick" prefHeight="37.0" prefWidth="153.0" stylesheets="@../../bin/application/commonButton.css" text="- частота" />
+                                    <Button fx:id="addFreqBtn" layoutX="14.0" layoutY="11.0" mnemonicParsing="false" onAction="#addFreqBtnClick" prefHeight="40.0" prefWidth="155.0" stylesheets="@../../bin/application/commonButton.css" text="+ частота" />
+                                    <Button fx:id="deleteFreqBtn" layoutX="181.0" layoutY="11.0" mnemonicParsing="false" onAction="#deleteFreqBtnClick" prefHeight="40.0" prefWidth="155.0" stylesheets="@../../bin/application/commonButton.css" text="- частота" />
+                                    <Button layoutX="346.0" layoutY="11.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="155.0" stylesheets="@../application/commonButton.css" text="Удалить" />
+                                    <Button layoutX="509.0" layoutY="11.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="155.0" stylesheets="@../application/commonButton.css" text="Сохранить" />
                                  </children>
                               </Pane>
                            </children>

@@ -28,6 +28,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
@@ -41,7 +42,7 @@ public class DBEditController implements InfoRequestable {
 
 	@Override
 	public void representRequestedInfo() {
-		this.nameTextField.setText(modDevice.getName());
+		this.nameComboBox.setValue(modDevice.getName());
 		this.typeTextFiel.setText(modDevice.getType());
 		this.ownerTextField.setText(modDevice.getOwner());
 		this.serNumTextField.setText(modDevice.getSerialNumber());
@@ -63,7 +64,8 @@ public class DBEditController implements InfoRequestable {
 	@FXML
 	private Button searchDeviceBtn;
 	@FXML
-	private TextField nameTextField;
+	private ComboBox<String> nameComboBox;
+	private ObservableList<String> devNamesList;
 	@FXML
 	private TextField typeTextFiel;
 	@FXML
@@ -98,6 +100,8 @@ public class DBEditController implements InfoRequestable {
 	@FXML
 	private AnchorPane paramsTablePane;
 	private StringGridFX paramsTable;
+	@FXML
+	private Pane paramsBtnPane;
 	//------------------------------
 	//Просмотр результатов измерений
 	@FXML
@@ -126,6 +130,8 @@ public class DBEditController implements InfoRequestable {
 	private Label measUnitLabel;
 	@FXML
 	private Label dateLabel;
+	@FXML
+	private Pane resBtnPane;
 	
 //---------------------------------------------	
 	private Device modDevice;  //Редактируемое средство измерения
@@ -136,28 +142,39 @@ public class DBEditController implements InfoRequestable {
 	
 //---------------------------------------------------------
 	@FXML
-	private void initialize() {
-		
+	private void initialize() {		
 		resultsTable = this.createResultsTable();
 		paramsTable = this.createParamsTable();
 		
 		elementsList = FXCollections.observableArrayList();
 		verificationSecondParametrList = FXCollections.observableArrayList();
 		measUnitsList = FXCollections.observableArrayList();
+		
+		devNamesList = FXCollections.observableArrayList();
+		try {
+			FileManager.LinesToItems(new File(".").getAbsolutePath() + "//files//sitypes.txt", devNamesList);
+		} catch (Exception exp) {
+			devNamesList.add("Рабочий эталон ККПиО");
+			devNamesList.add("Набор нагрузок волноводных");
+			devNamesList.add("Нагрузки волноводные согласованные");
+			devNamesList.add("Комплект поверочный");
+			devNamesList.add("Калибровочный и поверочный комплекты мер");
+			devNamesList.add("Нагрузки волноводные КЗ подвижные");
+		} 
+		nameComboBox.setItems(devNamesList);
+		
 		propertiesList = FXCollections.observableArrayList();
 		propertiesList.add("Критерий годности");
 		propertiesList.add("Результат измерения");
 		
 		this.verificationSecondParametrComboBox.setItems(this.verificationSecondParametrList);
-		this.currentMeasUnitComboBox.setItems(this.measUnitsList);
-				
+		this.currentMeasUnitComboBox.setItems(this.measUnitsList);				
 		this.currentMeasUnitComboBox.setItems(measUnitsList);
 		this.editedPropertyComboBox.setItems(propertiesList);
 	}
 //---------------------------------------------------------	
 	//Создание таблиц
 	private StringGridFX createParamsTable() {
-		String cMeasUnit = "";
 		ArrayList<String> tableHeads = new ArrayList<String>();
 		tableHeads.add("Частота, ГГц");
 		tableHeads.add("Модуль - нижний допуск");
@@ -171,17 +188,15 @@ public class DBEditController implements InfoRequestable {
 		ArrayList<String> tableHeads = new ArrayList<String>();
 		tableHeads.add("Частота, ГГц");
 		tableHeads.add("Изм. знач. модуля");
-		tableHeads.add("СКО");
 		tableHeads.add("Погрешность");
 		tableHeads.add("Изм. знач. фазы");
-		tableHeads.add("СКО");
 		tableHeads.add("Погрешность");
-		return new StringGridFX(7, 10, 800, 100, resultsScrollPane, resultsTablePane, tableHeads);
+		return new StringGridFX(5, 10, 800, 100, resultsScrollPane, resultsTablePane, tableHeads);
 	}
 //---------------------------------------------------------
 	//Очистка окна
 	private void clearGUI() {
-		this.nameTextField.setText("");
+		this.nameComboBox.setValue("");
 		this.typeTextFiel.setText("");
 		this.ownerTextField.setText("");
 		this.serNumTextField.setText("");
@@ -226,8 +241,7 @@ public class DBEditController implements InfoRequestable {
 			this.currentMeasUnitComboBox.setItems(measUnitsList);
 		}
 	}
-//---------------------------------------------------------	
-	
+//---------------------------------------------------------		
 	//Отображение результатов
 	private void showResult() throws SQLException {	
 		this.resultsTable.clear();
@@ -243,16 +257,15 @@ public class DBEditController implements InfoRequestable {
 			}				
 		}
 		this.resultsTable.setColumnFromDouble(0, this.currentResult.freqs);
-		String keys[] = {"m_S11", "sko_m_S11", "err_m_S11", "p_S11", "sko_p_S11", "err_p_S11", 
-				 "m_S12", "sko_m_S12", "err_m_S12", "p_S12", "sko_p_S12", "err_p_S12",
-				 "m_S21", "sko_m_S21", "err_m_S21", "p_S21", "sko_p_S21", "err_p_S21", 
-				 "m_S22", "sko_m_S22", "err_m_S22", "p_S22", "sko_p_S22", "err_p_S22"};
-		for (int i = 1; i < 7; i++) {
+		String keys[] = {"m_S11", "err_m_S11", "p_S11", "err_p_S11", 
+				 "m_S12", "err_m_S12", "p_S12", "err_p_S12",
+				 "m_S21", "err_m_S21", "p_S21", "err_p_S21", 
+				 "m_S22", "err_m_S22", "p_S22", "err_p_S22"};
+		for (int i = 1; i < 5; i++) {
 			int currentMeasUnitIndex = this.currentMeasUnitComboBox.getSelectionModel().getSelectedIndex();
-			String key = keys[i-1 + currentMeasUnitIndex*6];
+			String key = keys[i-1 + currentMeasUnitIndex * 4];
 			this.resultsTable.setColumnFromDouble(i, Adapter.HashMapToArrayList(this.currentResult.freqs, this.currentResult.values.get(key)));
-		}
-		
+		}		
 	}
 //---------------------------------------------------------
 
@@ -313,8 +326,32 @@ public class DBEditController implements InfoRequestable {
 	}
 	
 	@FXML
-	private void saveDeviceModificationBtnClick() {
-		
+	private void saveDeviceModificationBtnClick(){
+		HashMap<String, String> editingValues = new HashMap<String, String>();
+		editingValues.put("NameOfDevice", this.nameComboBox.getSelectionModel().getSelectedItem().toString()); 
+		editingValues.put("TypeOfDevice", this.typeTextFiel.getText());
+		editingValues.put("SerialNumber", this.serNumTextField.getText());
+		editingValues.put("Owner", this.ownerTextField.getText());
+		editingValues.put("GosNumber", this.gosNumTextField.getText());
+		try {
+			this.modDevice.editInfoInDB(editingValues);
+			try {
+				AboutMessageWindow aboutWin = new AboutMessageWindow("Успешно", "Изменения сохранены");
+				aboutWin.show();
+			}
+			catch(IOException ioExp) {
+				ioExp.getStackTrace();
+			}
+		}
+		catch(SQLException sqlExp) {
+			try {
+				AboutMessageWindow aboutWin = new AboutMessageWindow("Ошибка", "Не удалось сохранить изменения");
+				aboutWin.show();
+			}
+			catch(IOException ioExp) {
+				ioExp.getStackTrace();
+			}
+		}
 	}
 	
 	@FXML
@@ -370,8 +407,7 @@ public class DBEditController implements InfoRequestable {
 			for (int i = 0; i < verifications.size(); i++) {
 				verificationSecondParametrList.add(verifications.get(i).get(1));
 			}						
-			this.verificationSecondParametrComboBox.setItems(verificationSecondParametrList);
-			
+			this.verificationSecondParametrComboBox.setItems(verificationSecondParametrList);			
 			//Установим измеряемые велечины
 			setMeasUnits();
 		}
@@ -385,12 +421,10 @@ public class DBEditController implements InfoRequestable {
 	private void currentMeasUnitComboBoxClick() throws SQLException {
 		int index = this.editedPropertyComboBox.getSelectionModel().getSelectedIndex();
 		if(index == 0) {
-			if (this.currentResult!= null) {
-				showParams();
-			}			
+			showParams();			
 		}
 		else if (index == 1) {
-			showResult();
+			if (this.currentResult != null) showResult();
 		}
 	}
 	
@@ -401,8 +435,7 @@ public class DBEditController implements InfoRequestable {
 			int resIndex = Integer.parseInt(this.verifications.get(
 					this.verificationSecondParametrComboBox.getSelectionModel().getSelectedIndex()).get(0));
 			this.currentMeasUnitComboBox.setValue(measUnitsList.get(0));
-			this.currentResult = new MeasResult(this.modDevice.includedElements.get(currentElementIndex), resIndex);
-			
+			this.currentResult = new MeasResult(this.modDevice.includedElements.get(currentElementIndex), resIndex);			
 			if(index == 0) {
 				showParams();
 			}	

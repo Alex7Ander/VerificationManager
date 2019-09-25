@@ -3,6 +3,7 @@ package DevicePack;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import DataBasePack.DataBaseManager;
 import DataBasePack.dbStorable;
@@ -83,9 +84,7 @@ public class Device implements dbStorable {
 	
 	public boolean isExist() {
 		String sqlString = null;
-		String addStr = name + " " + type + " " + serialNumber;
-		String strElementsTable = "Элементы для " + addStr;
-		sqlString = "SELECT COUNT(*) FROM Devices WHERE TypeOfDevice='"+this.type+"' AND NameOfDevice='"+ this.name +"' AND SerialNumber='" + this.serialNumber + "'";
+		sqlString = "SELECT COUNT(*) FROM Devices WHERE TypeOfDevice='" + this.type + "' AND NameOfDevice='" + this.name + "' AND SerialNumber='" + this.serialNumber + "'";
 		int isExist = 0;
 		try {
 			isExist = DataBaseManager.getDB().sqlQueryCount(sqlString);
@@ -111,7 +110,7 @@ public class Device implements dbStorable {
 		DataBaseManager.getDB().sqlQueryUpdate(sqlString);
 		System.out.println("Внесена запись о новом приборе в таблицу Devices");
 		//Создание таблицы со списком включенных элементов
-		sqlString = "CREATE TABLE ["+strElementsTable+"] (id INTEGER PRIMARY KEY AUTOINCREMENT, ElementType VARCHAR(256), ElementSerNumber VARCHAR(256), PoleCount VARCHAR(256), MeasUnit VARCHAR(256), ToleranceType VARCHAR(256), PeriodicParamTable VARCHAR(256), PrimaryParamTable VARCHAR(256), NominalIndex VARCHAR(10))";
+		sqlString = "CREATE TABLE ["+strElementsTable+"] (id INTEGER PRIMARY KEY AUTOINCREMENT, ElementType VARCHAR(256), ElementSerNumber VARCHAR(256), PoleCount VARCHAR(256), MeasUnit VARCHAR(256), ToleranceType VARCHAR(256), VerificationsTable VARCHAR(256), PeriodicParamTable VARCHAR(256), PrimaryParamTable VARCHAR(256), NominalIndex VARCHAR(10))";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlString);
 		System.out.println("Создана таблица со списком элементов данного устройства");
 		this.elementsTableName = strElementsTable;
@@ -135,15 +134,23 @@ public class Device implements dbStorable {
 	}
 	
 	@Override
-	public void editInfoInDB() throws SQLException {
-		// TODO Auto-generated method stub
+	public void editInfoInDB(HashMap<String, String> editingValues) throws SQLException {
+		String sqlQuery = "UPDATE Devices SET ";
+		int count = 1;
+		for (String str: editingValues.keySet()) {
+			sqlQuery += (str + "='"+editingValues.get(str)+"'");
+			if (count != editingValues.size()) {
+				sqlQuery += ", ";
+			} 
+			else {
+				sqlQuery += " ";
+			}
+			count++;
+		}
+		sqlQuery += "WHERE NameOfDevice='"+this.name+"' AND TypeOfDevice='"+this.type+"' AND SerialNumber='"+this.serialNumber+"'";
+		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);		
 	}
-	
-	@Override
-	public void getData() {
-		// TODO Auto-generated method stub		
-	}
-	
+		
 	public void addElement(Element element) {
 		this.includedElements.add(element);
 		this.countOfElements = this.includedElements.size();	

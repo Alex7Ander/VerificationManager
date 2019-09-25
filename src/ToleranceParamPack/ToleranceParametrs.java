@@ -81,7 +81,7 @@ public abstract class ToleranceParametrs implements Includable<Element>, dbStora
 			paramTableName = ownerElement.getPeriodicParamTable(); 
 		}
 		
-		ArrayList<ArrayList<String>> results = new ArrayList<ArrayList<String>>();
+		//ArrayList<ArrayList<String>> results = new ArrayList<ArrayList<String>>();
 		ArrayList<String> fieldsNames = new ArrayList<String>();
 		fieldsNames.add("freq");
 		
@@ -108,7 +108,6 @@ public abstract class ToleranceParametrs implements Includable<Element>, dbStora
 		this.countOfFreq = this.freqs.size();		
 	}
 	
-
 	public void measError(MeasResult result) throws SQLException {
 		ErrorParams er = new ErrorParams();
 		String tract = "";
@@ -232,12 +231,7 @@ public abstract class ToleranceParametrs implements Includable<Element>, dbStora
 	}
 	
 	@Override
-	public void editInfoInDB() throws SQLException {
-		// TODO Auto-generated method stub
-		
-	}
-	@Override
-	public void getData() {
+	public void editInfoInDB(HashMap<String, String> editingValues) throws SQLException {
 		// TODO Auto-generated method stub		
 	}
 					

@@ -19,17 +19,11 @@ import NewElementPack.NewElementController;
 import javafx.collections.ObservableList;
 
 public class MeasResult implements Includable<Element>, dbStorable{
-
-	/*		String keys[] = {"m_S11", "sko_m_S11", "err_m_S11", "p_S11", "sko_p_S11", "err_m_S11", 
-	 						 "m_S12", "sko_m_S12", "err_m_S12", "p_S12", "sko_p_S12", "err_m_S12",
-	 						 "m_S21", "sko_m_S21", "err_m_S121", "p_S21", "sko_p_S21", "err_m_S21", 
-	 						 "m_S22", "sko_m_S22", "err_m_S22", "p_S22", "sko_p_S22", "err_m_S22",};
-	*/
 	
-	public String keys[] = {"m_S11", "sko_m_S11", "err_m_S11", "p_S11", "sko_p_S11", "err_p_S11", 
-			 "m_S12", "sko_m_S12", "err_m_S12", "p_S12", "sko_p_S12", "err_p_S12",
-			 "m_S21", "sko_m_S21", "err_m_S21", "p_S21", "sko_p_S21", "err_p_S21", 
-			 "m_S22", "sko_m_S22", "err_m_S22", "p_S22", "sko_p_S22", "err_p_S22"};
+	public String keys[] = {"m_S11", "err_m_S11", "p_S11", "err_p_S11", 
+			 "m_S12", "err_m_S12", "p_S12", "err_p_S12",
+			 "m_S21", "err_m_S21", "p_S21", "err_p_S21", 
+			 "m_S22", "err_m_S22", "p_S22", "err_p_S22"};
 	
 	protected int countOfFreq;
 	protected int countOfParams;
@@ -116,12 +110,7 @@ public class MeasResult implements Includable<Element>, dbStorable{
 		sqlQuery = "SELECT freq FROM ["+resultsTableName+"]";
 		DataBaseManager.getDB().sqlQueryDouble(sqlQuery, "freq", this.freqs);
 		this.countOfFreq = this.freqs.size();
-		
-	 /*	String keys[] = {"m_S11", "sko_m_S11", "err_m_S11", "p_S11", "sko_p_S11", "err_p_S11", 
-				 "m_S12", "sko_m_S12", "err_m_S12", "p_S12", "sko_p_S12", "err_p_S12",
-				 "m_S21", "sko_m_S21", "err_m_S21", "p_S21", "sko_p_S21", "err_p_S21", 
-				 "m_S22", "sko_m_S22", "err_m_S22", "p_S22", "sko_p_S22", "err_p_S22"};
-	 */
+
 		//Получим значения параметров
 		for (String key : keys) {
 			try {
@@ -149,12 +138,6 @@ public class MeasResult implements Includable<Element>, dbStorable{
 //dbStorable
 	@Override
 	public void saveInDB() throws SQLException {
-		
-     /*String keys[] = {"m_S11", "sko_m_S11", "err_m_S11", "p_S11", "sko_p_S11", "err_p_S11", 
-				 "m_S12", "sko_m_S12", "err_m_S12", "p_S12", "sko_p_S12", "err_p_S12",
-				 "m_S21", "sko_m_S21", "err_m_S21", "p_S21", "sko_p_S21", "err_p_S21", 
-				 "m_S22", "sko_m_S22", "err_m_S22", "p_S22", "sko_p_S22", "err_p_S22"};
-     */
 		ArrayList<String> currentKeys = new ArrayList<String>();
 		//Перепишем все параметры, которые необходимо сохранить в список currentKeys
 		for (String k: keys) {
@@ -167,11 +150,9 @@ public class MeasResult implements Includable<Element>, dbStorable{
 			catch(Exception exp) {
 				
 			}
-		}
-						
+		}						
 		DateFormat df = new SimpleDateFormat(datePattern);
-		String dateOfVerification = df.format(this.dateOfMeas);
-		
+		String dateOfVerification = df.format(this.dateOfMeas);		
 		String listOfVerificationsTable = this.myElement.getListOfVerificationsTable();
 		String resultsTableName = "Результат поверки " + 
 				this.myElement.getMyOwner().getName() + " " + this.myElement.getMyOwner().getType() + " " + this.myElement.getMyOwner().getSerialNumber() + " " + this.myElement.getType() + " " + this.myElement.getSerialNumber() +
@@ -184,27 +165,21 @@ public class MeasResult implements Includable<Element>, dbStorable{
 			if (i != currentKeys.size() - 1) sqlQuery += ", ";
 		}
 		sqlQuery += ")";
-		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
-		
+		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);		
 		//Заполняем таблицу resultsTableName с результатами измерений
-		for (int i=0; i<this.countOfFreq; i++) {	
-			
-			sqlQuery = "INSERT INTO [" + resultsTableName + "] (freq, ";
-			
+		for (int i=0; i<this.countOfFreq; i++) {				
+			sqlQuery = "INSERT INTO [" + resultsTableName + "] (freq, ";			
 			for (int j = 0; j < currentKeys.size(); j++) {
 				sqlQuery += (currentKeys.get(j));
 				if (j != currentKeys.size() - 1) sqlQuery += ", ";
 			}
 			
-			sqlQuery += ") values ('"+freqs.get(i)+"', ";
-			
+			sqlQuery += ") values ('"+freqs.get(i)+"', ";			
 			for (int j = 0; j < currentKeys.size(); j++) {
 				sqlQuery += ("'"+values.get(currentKeys.get(j)).get(freqs.get(i)).toString()+"'");
 				if (j != currentKeys.size() - 1) sqlQuery += ", ";
-			}
-			
-			sqlQuery += ")";
-			
+			}			
+			sqlQuery += ")";			
 			DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
 		}
 	}
@@ -223,16 +198,8 @@ public class MeasResult implements Includable<Element>, dbStorable{
 	}
 	
 	@Override
-	public void editInfoInDB() throws SQLException {
-		// TODO Auto-generated method stub
-		
+	public void editInfoInDB(HashMap<String, String> editingValues) throws SQLException {
+		// TODO Auto-generated method stub		
 	}
-	
-	@Override
-	public void getData() {
-		// TODO Auto-generated method stub
-		
-	}
-	
 	
 }

@@ -4,7 +4,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import DataBasePack.DataBaseManager;
 import DevicePack.Element;
 import NewElementPack.NewElementController;
 import VerificationPack.MeasResult;
