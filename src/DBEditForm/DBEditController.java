@@ -102,6 +102,10 @@ public class DBEditController implements InfoRequestable {
 	private StringGridFX paramsTable;
 	@FXML
 	private Pane paramsBtnPane;
+	@FXML
+	private Button deleteParamsBtn;
+	@FXML
+	private Button saveParamsModBtn;
 	//------------------------------
 	//Просмотр результатов измерений
 	@FXML
@@ -171,6 +175,8 @@ public class DBEditController implements InfoRequestable {
 		this.currentMeasUnitComboBox.setItems(this.measUnitsList);				
 		this.currentMeasUnitComboBox.setItems(measUnitsList);
 		this.editedPropertyComboBox.setItems(propertiesList);
+		
+		this.resBtnPane.setVisible(false);
 	}
 //---------------------------------------------------------	
 	//Создание таблиц
@@ -313,18 +319,18 @@ public class DBEditController implements InfoRequestable {
 		measUnitsList.clear();
 		measUnitsList.add("Первичная поверка");
 		measUnitsList.add("Периодическая поверка");
-	}
-	
+	}	
 	@FXML
 	private void passBtnClick() {
 		
-	}
-	
+	}	
 	@FXML
 	private void errorParamsBtnClick() throws IOException {
 		ErrorParamsWindow.getErrorParamsWindow().show();
-	}
+	}	
 	
+//---Работа с устройством---
+//Сохранение изменений в устройство
 	@FXML
 	private void saveDeviceModificationBtnClick(){
 		HashMap<String, String> editingValues = new HashMap<String, String>();
@@ -353,22 +359,7 @@ public class DBEditController implements InfoRequestable {
 			}
 		}
 	}
-	
-	@FXML
-	private void saveResModificationBtn() {
-		
-	}
-	
-	@FXML
-	private void searchDeviceBtnClick() {
-		try {
-			SearchDeviceWindow.getSearchDeviceWindow(modDevice, this).show();
-		}
-		catch(IOException exp) {
-			//
-		}
-	}
-		
+//Удаление устройства
 	@FXML
 	private void deleteDeviceBtnClick() throws IOException, SQLException {
 		modDevice.deleteFromDB();
@@ -385,6 +376,30 @@ public class DBEditController implements InfoRequestable {
 			msgWin.show();
 		}
 	}
+	
+//--- Работа с результатами измерений ---
+//Сохранение изменений результатво измерения
+	@FXML
+	private void saveResModificationBtn() {
+		
+	}
+//--- Работа с параметрами поверки ---
+//Сохранение изменений параметров пригодности для поверки
+	@FXML
+	private void saveParamsModificationBtn() {
+		
+	}
+//Поиск
+	@FXML
+	private void searchDeviceBtnClick() {
+		try {
+			SearchDeviceWindow.getSearchDeviceWindow(modDevice, this).show();
+		}
+		catch(IOException exp) {
+			//
+		}
+	}
+
 		
 	@FXML
 	private void deletResBtnClick() throws IOException {
@@ -395,8 +410,7 @@ public class DBEditController implements InfoRequestable {
 			AboutMessageWindow msgWin = new AboutMessageWindow("Ошибка", "Ошибка доступа к БД\nпри удалении результатов измерения");
 			msgWin.show();	
 		}
-	}
-			
+	}			
 	@FXML
 	private void elementsListViewClick() throws IOException {
 		currentElementIndex = elementsListView.getSelectionModel().getSelectedIndex();
@@ -415,8 +429,7 @@ public class DBEditController implements InfoRequestable {
 			AboutMessageWindow msgWin = new AboutMessageWindow("Ошибка", "Ошибка доступа к БД\nпри получении списка проведенных поверок");
 			msgWin.show();
 		}		
-	}
-		
+	}		
 	@FXML
 	private void currentMeasUnitComboBoxClick() throws SQLException {
 		int index = this.editedPropertyComboBox.getSelectionModel().getSelectedIndex();
@@ -426,8 +439,7 @@ public class DBEditController implements InfoRequestable {
 		else if (index == 1) {
 			if (this.currentResult != null) showResult();
 		}
-	}
-	
+	}	
 	@FXML
 	private void verificationSecondParametrComboBoxClick() throws IOException {
 		try {
@@ -447,27 +459,29 @@ public class DBEditController implements InfoRequestable {
 			AboutMessageWindow msgWin = new AboutMessageWindow("Ошибка", "Ошибка доступа к БД\nпри получении результатов измерения");
 			msgWin.show();
 		}
-	}
-		
+	}		
 	@FXML
 	private void editedPropertyComboBoxChange() {
 		int index = this.editedPropertyComboBox.getSelectionModel().getSelectedIndex();
 		switch(index) {
-			case 0:
+			case 0: //отображение параметров
 				dateLabel.setText("Тип поверки");
 				this.verificationSecondParametrList.clear();
 				this.verificationSecondParametrList.add("Первичная");
 				this.verificationSecondParametrList.add("Периодическая");
 				this.paramsBox.toFront();
+				this.paramsBtnPane.setVisible(true);
+				this.resBtnPane.setVisible(false);
 				break;
-			case 1:
+			case 1: //отображение результатво
 				dateLabel.setText("Дата проведения поверки:");
 				this.verificationSecondParametrList.clear();
 				this.resultBox.toFront();
+				this.paramsBtnPane.setVisible(false);
+				this.resBtnPane.setVisible(true);
 				break;
 		}
 	}
-
 	@FXML
 	private void addFreqBtnClick() {
 		this.paramsTable.addRow();
@@ -476,4 +490,5 @@ public class DBEditController implements InfoRequestable {
 	private void deleteFreqBtnClick() {
 		this.paramsTable.deleteRow(this.paramsTable.getRowCount());
 	}
+	
 }

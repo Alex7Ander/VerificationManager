@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.image.*?>
-<?import javafx.scene.control.*?>
-<?import java.lang.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="666.0" prefWidth="1209.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="NewElementPack.NewElementController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="666.0" prefWidth="1209.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="NewElementPack.NewElementController">
    <children>
       <HBox prefHeight="549.0" prefWidth="1024.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
          <children>
@@ -24,7 +31,7 @@
                         <Separator orientation="VERTICAL" prefHeight="200.0" />
                         <Button fx:id="freqTablesBtn" mnemonicParsing="false" onAction="#freqTablesBtnClick" prefHeight="26.0" prefWidth="115.0" stylesheets="@../application/commonButton.css" text="Сетка" />
                         <Separator orientation="VERTICAL" prefHeight="200.0" />
-                        <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="254.0" stylesheets="@../../bin/application/commonButton.css" text="Дублировать S11 на S22" />
+                        <Button fx:id="cloneS11ToS22Btn" mnemonicParsing="false" onAction="#cloneS11ToS22BtnClick" prefHeight="25.0" prefWidth="254.0" stylesheets="@../../bin/application/commonButton.css" text="Дублировать S11 на S22" />
                      </children>
                   </HBox>
                   <AnchorPane prefHeight="28.0" prefWidth="721.0">
@@ -121,8 +128,8 @@
                     <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
-                              <RadioButton fx:id="upDownToleranceRB" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#upDownToleranceRBClick" text="Верхний/нижний предел" />
-                              <RadioButton fx:id="percentToleranceRB" layoutX="14.0" layoutY="52.0" mnemonicParsing="false" onAction="#percentToleranceRBClick" text="\\% от номинала" />
+                              <RadioButton fx:id="upDownToleranceRB" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" text="Верхний/нижний предел" />
+                              <RadioButton fx:id="percentToleranceRB" layoutX="14.0" layoutY="52.0" mnemonicParsing="false" text="\\% от номинала" />
                            </children>
                         </AnchorPane>
                     </content>

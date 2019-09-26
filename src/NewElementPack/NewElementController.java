@@ -11,7 +11,6 @@ import _tempHelpers.Randomizer;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -21,7 +20,6 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.AnchorPane;
-import javafx.stage.WindowEvent;
 
 public class NewElementController {
 
@@ -165,7 +163,7 @@ public class NewElementController {
 		
 		//Частоты в виде double
 		freqs = new ArrayList<Double>();
-		
+		//Частоты в виде строк для заполнения таблиц
 		strFreqs = new ArrayList<String>();
 		m_s = new HashMap<String, ArrayList<String>>();
 		p_s = new HashMap<String, ArrayList<String>>();
@@ -186,19 +184,19 @@ public class NewElementController {
 		
 		listOfParams = FXCollections.observableArrayList();
 		twoPoleTypesList = FXCollections.observableArrayList();
-		fourPoleTypesList = FXCollections.observableArrayList();		
-		twoPoleTypesList.add("Нагрузка согласованная");
-		twoPoleTypesList.add("Нагрузка рассогласованная");
-		twoPoleTypesList.add("Нагрузка короткозамкнутая");
-		twoPoleTypesList.add("Нагрузка холостоходная");
-		twoPoleTypesList.add("Нагрузка подвижная согласованная");
-		twoPoleTypesList.add("Нагрузка подвижная рассогласованная");
-		fourPoleTypesList.add("Отрезок линии");
-		fourPoleTypesList.add("Вентиль");
-		fourPoleTypesList.add("Аттенюатор");
-		twoPoleTypesList.add("Преобразователь мощности");
-		elemTypesComboBox.setItems(twoPoleTypesList);
-		elemTypesComboBox.setValue("Нагрузка согласованная");		
+		fourPoleTypesList = FXCollections.observableArrayList();
+		try {
+			FileManager.LinesToItems(new File(".").getAbsolutePath() + "//files//twoPoleTypes.txt", twoPoleTypesList);
+		} catch (Exception exp) {
+			twoPoleTypesList.add("Двухполюсник");			
+		}
+		try {
+			FileManager.LinesToItems(new File(".").getAbsolutePath() + "//files//fourPoleTypes.txt", fourPoleTypesList);
+		} catch (Exception exp) {
+			fourPoleTypesList.add("Четырехполюсник");
+		}	
+		this.elemTypesComboBox.setItems(twoPoleTypesList);
+		elemTypesComboBox.setValue(twoPoleTypesList.get(0));
 		
 		poleCountGroup = new ToggleGroup();
 		this.twoPoleRB.setSelected(true);
@@ -297,7 +295,7 @@ public class NewElementController {
 		paramsComboBox.setItems(listOfParams);
 		paramsComboBox.setValue(listOfParams.get(0));
 		elemTypesComboBox.setItems(twoPoleTypesList);
-		elemTypesComboBox.setValue("Нагрузка согласованная");
+		elemTypesComboBox.setValue(twoPoleTypesList.get(0));
 	}
 	
 	@FXML 
@@ -307,17 +305,7 @@ public class NewElementController {
 		paramsComboBox.setItems(listOfParams);
 		paramsComboBox.setValue(listOfParams.get(0));
 		elemTypesComboBox.setItems(fourPoleTypesList);
-		elemTypesComboBox.setValue("Отрезок линии");
-	}
-	
-	@FXML
-	private void upDownToleranceRBClick() {
-		
-	}
-	
-	@FXML
-	private void percentToleranceRBClick() {
-		
+		elemTypesComboBox.setValue(fourPoleTypesList.get(0));
 	}
 	
 	@FXML
@@ -370,10 +358,10 @@ public class NewElementController {
 		myWindow.close();
 	}
 	
-	@SuppressWarnings("unlikely-arg-type")
 	@FXML
 	private void cloneS11ToS22BtnClick() {	
 		try {
+			//Внесем все наши мапы в один список, что бы не обращаться к ним по отдельности
 			ArrayList<HashMap<String, ArrayList<String>>> hashMaps = new ArrayList<HashMap<String, ArrayList<String>>>();
 			hashMaps.add(m_s);
 			hashMaps.add(p_s);
@@ -381,14 +369,14 @@ public class NewElementController {
 			hashMaps.add(u_m_s);
 			hashMaps.add(d_p_s);
 			hashMaps.add(u_p_s);
-			for (@SuppressWarnings("unused") HashMap<String, ArrayList<String>> hashMap : hashMaps) {
-				hashMaps.remove("primary_S22");
-				ArrayList<String> cloneHMPrim = m_s.get("primary_S11");
-				m_s.put("primary_S22", cloneHMPrim);
+			for (HashMap<String, ArrayList<String>> hashMap : hashMaps) {
+				hashMap.remove("primary_S22");
+				ArrayList<String> cloneHMPrim = hashMap.get("primary_S11");
+				hashMap.put("primary_S22", cloneHMPrim);
 			
-				hashMaps.remove("periodic_S22");
-				ArrayList<String> cloneHMPeriod = m_s.get("periodic_S11");
-				m_s.put("periodic_S22", cloneHMPeriod);
+				hashMap.remove("periodic_S22");
+				ArrayList<String> cloneHMPeriod = hashMap.get("periodic_S11");
+				hashMap.put("periodic_S22", cloneHMPeriod);
 			}
 		}
 		catch(Exception exp) {
@@ -622,7 +610,81 @@ public class NewElementController {
 		return returnedvalue;
 	}
 	
-//Действие по закрытию окна
+//Действия по закрытию окна
+	public void remeberTables() {
+		try {
+    		int showIndex = paramIndex + timeIndex;		
+    		refreshTable(savingIndex, showIndex);
+    		savingIndex = showIndex;
+    		
+    		freqs.clear();
+    		for (int i=0; i<paramsTable.getRowCount(); i++) {
+    			try {
+    				double val = Double.parseDouble(paramsTable.getCellValue(0, i));
+    				freqs.add(val);
+    			}
+    			catch(NumberFormatException nfExp) {
+    				freqs.add(0.0);
+    			}
+    		}
+    	}
+    	catch(Exception exp) {
+    		//
+    	}
+	}
+	public boolean checkfreqTable() {
+		boolean result = true;
+		for (int i = 0; i < this.strFreqs.size(); i++) {		
+			try {
+				double value = Double.parseDouble(this.strFreqs.get(i));
+				if (value <=0) {
+					result = false;
+					break;
+				}
+			} catch(Exception exp) {
+				result = false;
+				break;
+			}			
+		}	
+		return result;
+	}
+	public int checkInfo() {
+		int result = 0;
+		ArrayList<HashMap<String, ArrayList<String>>> maps = new ArrayList<HashMap<String, ArrayList<String>>>();
+		maps.add(m_s);
+		maps.add(p_s);
+		maps.add(d_m_s);
+		maps.add(u_m_s);
+		maps.add(d_p_s);
+		maps.add(u_p_s);
+		
+		String[] currentKeys;
+		if (this.twoPoleRB.isSelected()) {
+			currentKeys = new String[2];
+			currentKeys[0] = this.keys[0];
+			currentKeys[1] = this.keys[4];
+		}
+		else {
+			currentKeys = this.keys;
+		}
+		
+		for (int cMap = 0; cMap < maps.size(); cMap++) { //Для каждой мапы со значениями
+			for (String key: currentKeys) {				 //Для каждого S параметра и как первичной, так и периодической поверко
+				for (int i = 0; i < maps.get(cMap).get(key).size(); i++) {
+					String strValue = maps.get(cMap).get(key).get(i);
+					try {
+						@SuppressWarnings("unused")
+						double value = Double.parseDouble(strValue);
+					} catch(NumberFormatException nfExp) {
+						result++;
+					}
+				}
+			}
+		}
+		return result;		
+	}
+//--------------------------------------------------------------------------------------------------	
+/*	
 	private EventHandler<WindowEvent> closeEventHandler = new EventHandler<WindowEvent>() {
         @Override
         public void handle(WindowEvent event) {
@@ -651,4 +713,5 @@ public class NewElementController {
     public javafx.event.EventHandler<WindowEvent> getCloseEventHandler(){
     	return closeEventHandler;
     }
+*/
 }
