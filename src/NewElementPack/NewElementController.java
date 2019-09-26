@@ -684,34 +684,4 @@ public class NewElementController {
 		return result;		
 	}
 //--------------------------------------------------------------------------------------------------	
-/*	
-	private EventHandler<WindowEvent> closeEventHandler = new EventHandler<WindowEvent>() {
-        @Override
-        public void handle(WindowEvent event) {
-        	try {
-        		int showIndex = paramIndex + timeIndex;		
-        		refreshTable(savingIndex, showIndex);
-        		savingIndex = showIndex;
-        		
-        		freqs.clear();
-        		for (int i=0; i<paramsTable.getRowCount(); i++) {
-        			try {
-        				double val = Double.parseDouble(paramsTable.getCellValue(0, i));
-        				freqs.add(val);
-        			}
-        			catch(NumberFormatException nfExp) {
-        				freqs.add(0.0);
-        			}
-        		}
-        	}
-        	catch(Exception exp) {
-        		//
-        	}
-        }
-    };
-
-    public javafx.event.EventHandler<WindowEvent> getCloseEventHandler(){
-    	return closeEventHandler;
-    }
-*/
 }

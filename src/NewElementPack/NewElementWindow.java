@@ -22,26 +22,25 @@ public class NewElementWindow extends guiWindow {
 					if (answer == 0) {
 						event.consume();
 					}
-					else {
-						//Проверим прочие параметры
-						int errorsCount = ctrl.checkInfo();
-						if (errorsCount != 0) {
-							try {
-								YesNoWindow qWin2 = new YesNoWindow("Некорректное значение параметров", Integer.toString(errorsCount) + " значений введенных вами параметров некорректны.\n"
-										+ "Это может привести к неправльному определению\nпригодности поверяемго прибора.\nЖелаете продолжить редактирование?");
-								int answerParams = qWin2.showAndWait();
-								if (answerParams == 0) {
-									event.consume();
-								}
-							} catch(IOException ioExp) {
-								ioExp.getStackTrace();
-							}
-						}			
+				} catch(IOException ioExp) {
+					ioExp.getStackTrace();
+				}
+			}	
+			
+			//Проверим прочие параметры
+			int errorsCount = ctrl.checkInfo();
+			if (errorsCount != 0) {
+				try {
+					YesNoWindow qWin2 = new YesNoWindow("Некорректное значение параметров", Integer.toString(errorsCount) + " значений введенных вами параметров некорректны.\n"
+							+ "Это может привести к неправльному определению\nпригодности поверяемго прибора.\nЖелаете продолжить редактирование?");
+					int answerParams = qWin2.showAndWait();
+					if (answerParams == 0) {
+						event.consume();
 					}
 				} catch(IOException ioExp) {
 					ioExp.getStackTrace();
 				}
-			}			
+			}
 		});
 	}	
 	public void setTitle(String newTitle) {
