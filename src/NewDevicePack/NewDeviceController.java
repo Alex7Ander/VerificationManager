@@ -9,9 +9,11 @@ import AddNewDeviceNameForm.AddNewDeviceNameWindow;
 import DataBasePack.DataBaseManager;
 import DevicePack.Device;
 import DevicePack.Element;
+import Exceptions.NoOwnerException;
+import Exceptions.SavingException;
 import FileManagePack.FileManager;
-import NewElementPack.NewElementController;
 import NewElementPack.NewElementWindow;
+import YesNoDialogPack.YesNoWindow;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -49,6 +51,11 @@ public class NewDeviceController  {
 	@FXML
 	private VBox elementsButtonBox;
 	
+	//Сохраняемыый прибор
+	private Device newDevice;
+	//Составные элементы данного прибора
+	private ArrayList<Element> elements;
+	
 	public ArrayList<NewElementWindow> elementsWindow;
 	public ArrayList<Button> elementsButton;
 	
@@ -60,6 +67,7 @@ public class NewDeviceController  {
 		listOfNames = FXCollections.observableArrayList();
 		elementsButton = new ArrayList<Button>();
 		elementsWindow = new ArrayList<NewElementWindow>();
+		elements = new ArrayList<Element>();
 		setItemsOfNames();
 	}
 	
@@ -72,11 +80,16 @@ public class NewDeviceController  {
 		elementsWindow.clear();
 		try {			
 			countOfElements = Integer.parseInt(countOfElementsTextField.getText());
-			for (int i=0; i<countOfElements; i++) {
+			for (int i = 0; i < countOfElements; i++) {
+				//Создаем элемент и инициализируем его нулем
+				Element elm = null;
+				elements.add(elm);
+								
 				final int index = i;
 				String item = Integer.toString(i+1);		
-				
-				NewElementWindow elementWin = new NewElementWindow();
+				//Cоздаем окно, которе будет принимать информацию для элемента
+				//Передаем в это окно этот самый элемент
+				NewElementWindow elementWin = new NewElementWindow(elm);
 				elementWin.setTitle(item);
 				elementsWindow.add(elementWin);	
 				
@@ -110,50 +123,77 @@ public class NewDeviceController  {
 			return;
 		}
 		
-		if (tName != null) {
-			String tType = this.typeTextField.getText();
-			String tSerN = this.serialNumberTextField.getText();
-			String tOwner = this.ownerTextField.getText();
-			String tGosN = this.gosNumberTextField.getText();
-			Device newDevice = null;
+		String tType = this.typeTextField.getText();
+		String tSerN = this.serialNumberTextField.getText();
+		String tOwner = this.ownerTextField.getText();
+		String tGosN = this.gosNumberTextField.getText();
 			
-			if (tName.length()==0 || tType.length()==0 || tSerN.length()==0){
-				AboutMessageWindow errorMessage = new AboutMessageWindow("Ошибка", "Заполнены не все обходимые поля");
-				errorMessage.show();
+		//Если критически важные для сохранения поля пусты, то прерываем процедуру
+		if (tName.length()==0 || tType.length()==0 || tSerN.length()==0){
+			AboutMessageWindow errorMessage = new AboutMessageWindow("Ошибка", "Заполнены не все обходимые поля");
+			errorMessage.show();
+			return;
+		}
+		if (tOwner.length() == 0) tOwner = "-"; //Не критически важные заполняем условно прочерком
+		if (tGosN.length() == 0) tGosN = "-";
+			
+		//Создали новое устройство
+		newDevice = new Device(tName, tType, tSerN, tOwner, tGosN);			
+		//Проверим, не существует ли аналогичное в БД
+		if (newDevice.isExist()) {
+			AboutMessageWindow errorMessage = new AboutMessageWindow("Ошибка", "Прибор данного типа с таким серийным номером уже существует!");
+			errorMessage.show();
+			return;
+		}
+		
+		//Проверим, все ли элементы проинициализированны
+		int notInitializedElementsCount = 0;
+		for (Element cElm : this.elements) {
+			if (cElm == null) {
+				notInitializedElementsCount++;
 			}
-			else{
-				if (tOwner.length() == 0) tOwner = "-";
-				if (tGosN.length() == 0) tGosN = "-";
-				newDevice = new Device(tName, tType, tSerN, tOwner, tGosN);
-				if (!(newDevice.isExist())) {
-					//Создаем элементы
-					for (int i=0; i<elementsWindow.size(); i++) {
-						NewElementWindow elementWin = elementsWindow.get(i);
-						NewElementController ctrl = (NewElementController) elementWin.getControllerClass();						
-						Element el = new Element(ctrl, newDevice);
-						newDevice.addElement(el);
-					}
-					try{
-						DataBaseManager.getDB().BeginTransaction();
-						newDevice.saveInDB();
-						DataBaseManager.getDB().Commit();
-						AboutMessageWindow sucsessMessage = new AboutMessageWindow("Успешно", "Успешное сохранение");
-						sucsessMessage.show();
-						Stage stage = (Stage) saveBtn.getScene().getWindow();
-						stage.close();
-						NewDeviceWindow.deleteNewDeviceWindow();
-					}
-					catch(SQLException sqlExp){
-						DataBaseManager.getDB().RollBack();
-						AboutMessageWindow errorMessage = new AboutMessageWindow("Ошибка", "Ошибка: " + sqlExp.getMessage());
-						errorMessage.show();
-					}
-				}
-				else {
-					AboutMessageWindow errorMessage = new AboutMessageWindow("Ошибка", "Прибор данного типа с таким серийным номером уже существует!");
-					errorMessage.show();
-				}
+		}
+		if (notInitializedElementsCount != 0) {
+			int answer = 0;
+			try {
+				YesNoWindow qWin = new YesNoWindow("","Вы проиницилизировали не все компоненты создаваемого СИ.\nЕсли Вы желаете сохранить только проинициализированные, то нажмите - \"Да\"."
+						+ "Если желаее продолжить редактирование, то нажмите - \"Нет\".");
+				answer = qWin.showAndWait();
 			}
+			catch(IOException ioExp) {
+				ioExp.getStackTrace();
+			}
+			if (answer != 0) {
+				return;
+			}
+		}
+
+		for (Element cElm : this.elements) {
+			if (cElm != null) {
+				newDevice.addElement(cElm);
+			}
+		}
+		
+		//и наконец, пробуем сохранить все в БД
+		try{
+			DataBaseManager.getDB().BeginTransaction();
+			newDevice.saveInDB();
+			DataBaseManager.getDB().Commit();
+			AboutMessageWindow sucsessMessage = new AboutMessageWindow("Успешно", "Успешное сохранение");
+			sucsessMessage.show();
+			Stage stage = (Stage) saveBtn.getScene().getWindow();
+			stage.close();
+			NewDeviceWindow.deleteNewDeviceWindow();
+		}
+		catch(SQLException sqlExp){
+			DataBaseManager.getDB().RollBack();
+			AboutMessageWindow errorMessage = new AboutMessageWindow("Ошибка", "Ошибка: " + sqlExp.getMessage());
+			errorMessage.show();
+		}
+		catch(SavingException noExp) {
+			DataBaseManager.getDB().RollBack();
+			AboutMessageWindow errorMessage = new AboutMessageWindow("Ошибка", "Ошибка: " + noExp.getMessage());
+			errorMessage.show();
 		}
 	}
 	

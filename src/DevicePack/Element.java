@@ -6,6 +6,7 @@ import java.util.HashMap;
 
 import DataBasePack.DataBaseManager;
 import DataBasePack.dbStorable;
+import Exceptions.NoOwnerException;
 import NewElementPack.NewElementController;
 import ToleranceParamPack.PercentTolerance;
 import ToleranceParamPack.ToleranceParametrs;
@@ -13,14 +14,16 @@ import ToleranceParamPack.UpDownTolerance;
 import VerificationPack.Gamma_Result;
 import VerificationPack.MeasResult;
 import VerificationPack.VSWR_Result;
-import VerificationPack.Verificatable;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 
-public class Element implements Includable<Device>, Verificatable, dbStorable{
+public class Element implements Includable<Device>, dbStorable{
 
 	public Element() {
 		
+	}
+	
+	@Override
+	public void onAdding(Device Owner) {
+		this.myDevice = Owner;		
 	}
 	
 	private String type;
@@ -89,10 +92,8 @@ public class Element implements Includable<Device>, Verificatable, dbStorable{
 	
 	//Конструктор, инициализирующий объект информацией из Графического интерфейса для последующего сохранения в БД
 	//Вызывается при инициализации устройства перед сохранением нового устройства в БД 
-	public Element(NewElementController elCtrl, Device device) {
-		
-		this.myDevice = device;
-		
+	//передаем в качестве парамерами ссылку на контроллер окна, из которого надо взять информацию
+	public Element(NewElementController elCtrl) {			
 		this.type = elCtrl.getType();
 		this.serialNumber = elCtrl.getSerNum();
 		this.poleCount = elCtrl.getPoleCount();
@@ -140,7 +141,10 @@ public class Element implements Includable<Device>, Verificatable, dbStorable{
 	
 //dbStorable		
 	@Override
-	public void saveInDB() throws SQLException {
+	public void saveInDB() throws SQLException, NoOwnerException {
+		if (this.myDevice == null) {
+			throw new NoOwnerException(this);
+		}
 		String addStr = myDevice.getName() + " " + myDevice.getType() + " " + myDevice.getSerialNumber();
 		String strElementsTable = this.myDevice.getElementsTableName();
 		// 3.1 Внесли запись об элементе
@@ -201,18 +205,9 @@ public class Element implements Includable<Device>, Verificatable, dbStorable{
 		sqlQuery += "WHERE ElementType='"+this.type+"' AND ElementSerNumber='"+this.serialNumber+"'";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);	
 	}
-//----------------------------------------	
-	@Override
-	public boolean isSuitable(MeasResult result, HashMap<Double, Double> report) {
-		boolean resultOfVerification = false;
-		//
-		return resultOfVerification;
-	}
 	
-	public ArrayList<ArrayList<String>> getListOfVerifications() throws SQLException {
-		
+	public ArrayList<ArrayList<String>> getListOfVerifications() throws SQLException {		
 		String addStr = myDevice.getName() + " " + myDevice.getType() + " " + myDevice.getSerialNumber();	
-		String strElementsTable = this.myDevice.getElementsTableName();
 		String measurementsOfTableName = "Список таблиц с результатами измерений для " + addStr + " " + this.type + " " + this.serialNumber;
 		String sqlString = "SELECT id, dateOfVerification, resultsTableName FROM ["+measurementsOfTableName+"]";
 		

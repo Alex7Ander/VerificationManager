@@ -1,17 +1,20 @@
 package NewElementPack;
 
 import java.io.IOException;
+
+import DevicePack.Element;
 import GUIpack.guiWindow;
 import YesNoDialogPack.YesNoWindow;
 
 public class NewElementWindow extends guiWindow {
 
-	public NewElementWindow() throws IOException {		
+	public NewElementWindow(Element elm) throws IOException {		
 		super("", "NewElementForm.fxml");
 		NewElementController ctrl = (NewElementController) loader.getController();
-		//stage.setOnCloseRequest(ctrl.getCloseEventHandler());
 		ctrl.setWindow(this);
+		ctrl.setElement(elm);
 		
+		//Установим действия по проверке введенных параметров перед закрытием
 		this.stage.setOnCloseRequest( event->{
 			ctrl.remeberTables();
 			//Проверим частоты
@@ -40,7 +43,9 @@ public class NewElementWindow extends guiWindow {
 				} catch(IOException ioExp) {
 					ioExp.getStackTrace();
 				}
-			}
+			}			
+			//если пользователя все удовлетворяет, то в этом случае записываем внесенные данные в характеристики элемента
+			ctrl.initializeElement();
 		});
 	}	
 	public void setTitle(String newTitle) {

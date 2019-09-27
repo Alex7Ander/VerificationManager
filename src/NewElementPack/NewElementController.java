@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import DevicePack.Element;
 import FileManagePack.FileManager;
 import FreqTablesPack.FreqTablesWindow;
 import GUIpack.StringGridFX;
@@ -114,6 +116,11 @@ public class NewElementController {
 	private ToggleGroup toleranceTypeGroup;
 	private ToggleGroup verificationTypeGroup;
 		
+	//представляемый элемент
+	@SuppressWarnings("unused")
+	private Element currentElement;
+	public void setElement(Element Elm) { this.currentElement = Elm;}
+	
 	ObservableList<String> listOfParams;
 	private int currentCountOfParams;
 	private String currentTypeOfParams;
@@ -445,7 +452,10 @@ public class NewElementController {
 			this.paramsTable.setColumn(6, u_p_s.get(keys[showIndex]));
 		}
 	}
-		
+//Метод инициализирующий элемент
+	public void initializeElement() {
+		this.currentElement = new Element(this);
+	}
 //Методы для получения информации об элементе
 	public String getType() {return elemTypesComboBox.getSelectionModel().getSelectedItem().toString();}
 	public String getSerNum() {return serNumberTextField.getText();}

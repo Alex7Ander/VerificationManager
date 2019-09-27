@@ -7,8 +7,8 @@ import java.util.HashMap;
 
 import DataBasePack.DataBaseManager;
 import DataBasePack.dbStorable;
+import Exceptions.SavingException;
 import FileManagePack.FileManager;
-import VerificationPack.MeasResult;
 
 public class Device implements dbStorable {
 	
@@ -50,7 +50,6 @@ public class Device implements dbStorable {
 		fieldName.add("CountOfElements");
 		fieldName.add("ElementsTable");
 		
-		ArrayList<Element> includedElements = new ArrayList<Element>();
 		ArrayList<ArrayList<String>> arrayResults = new ArrayList<ArrayList<String>>();	
 				
 		DataBaseManager.getDB().sqlQueryString(sqlQuery, fieldName, arrayResults);
@@ -101,7 +100,7 @@ public class Device implements dbStorable {
 	}
 //dbStorable	
 	@Override
-	public void saveInDB() throws SQLException{
+	public void saveInDB() throws SQLException, SavingException{
 		String sqlString = null;
 		String addStr = name + " " + type + " " + serialNumber;
 		String strElementsTable = "Ёлементы дл€ " + addStr;
@@ -153,6 +152,7 @@ public class Device implements dbStorable {
 		
 	public void addElement(Element element) {
 		this.includedElements.add(element);
+		element.onAdding(this);
 		this.countOfElements = this.includedElements.size();	
 	}
 	
