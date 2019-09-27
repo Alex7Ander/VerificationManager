@@ -99,15 +99,15 @@ public class NewDeviceController  {
 	}	
 	
 	@FXML
-	public void saveBtnClick(ActionEvent event) throws IOException {
-		
+	public void saveBtnClick(ActionEvent event) throws IOException {		
 		String tName = null;
 		try{
 			tName = this.namesComboBox.getValue().toString();		
 		}
-		catch(Exception exp) {
+		catch(NullPointerException npExp) {
 			AboutMessageWindow errorMessage = new AboutMessageWindow("Ошибка", "Не указано наименование типа создаваемого СИ!");
 			errorMessage.show();
+			return;
 		}
 		
 		if (tName != null) {
@@ -158,16 +158,14 @@ public class NewDeviceController  {
 	}
 	
 	@FXML
-	public void addNameBtnClick(ActionEvent event) {
-		
+	public void addNameBtnClick(ActionEvent event) {		
 		try {
 			//SearchDeviceWindow.getSearchDeviceWindow(verificatedDevice, this).show();
 			AddNewDeviceNameWindow.getNewDeviceWindow(this).show();
 		}
 		catch(IOException ioExp) {
 			//
-		}
-		
+		}		
 	}
 	
 	public void setItemsOfNames() {

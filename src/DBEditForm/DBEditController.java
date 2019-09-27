@@ -17,14 +17,17 @@ import GUIpack.StringGridFX;
 import SearchDevicePack.SearchDeviceWindow;
 import ToleranceParamPack.ToleranceParametrs;
 import VerificationPack.MeasResult;
+import YesNoDialogPack.YesNoWindow;
 import _tempHelpers.Adapter;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
@@ -33,28 +36,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 public class DBEditController implements InfoRequestable {
-
-//InfoRequestable
-	@Override
-	public void setDevice(Device device) {
-		modDevice = device;	
-	}
-
-	@Override
-	public void representRequestedInfo() {
-		this.nameComboBox.setValue(modDevice.getName());
-		this.typeTextFiel.setText(modDevice.getType());
-		this.ownerTextField.setText(modDevice.getOwner());
-		this.serNumTextField.setText(modDevice.getSerialNumber());
-		this.gosNumTextField.setText(modDevice.getGosNumber());	
-		
-		this.elementsList.clear();
-		for (Element elm : this.modDevice.includedElements) {
-			String item = elm.getType() + " №" + elm.getSerialNumber();
-			this.elementsList.add(item);
-		}
-		this.elementsListView.setItems(elementsList);		
-	}
 	
 //Левая часть окна
 	@FXML
@@ -80,6 +61,7 @@ public class DBEditController implements InfoRequestable {
 	private Button deleteDeviceBtn;
 	@FXML
 	private ListView<String> elementsListView;
+	private ContextMenu elemtnsListViewContextMenu;
 	private ObservableList<String> elementsList;
 //---------------------------------------------
 
@@ -177,6 +159,55 @@ public class DBEditController implements InfoRequestable {
 		this.editedPropertyComboBox.setItems(propertiesList);
 		
 		this.resBtnPane.setVisible(false);
+		
+		elemtnsListViewContextMenu = new ContextMenu();
+		MenuItem deleteItem = new MenuItem("Удалить");
+		MenuItem editItem = new MenuItem("Редактировать");
+		elemtnsListViewContextMenu.getItems().addAll(deleteItem, editItem);
+		
+		deleteItem.setOnAction(event->{
+			try {
+				YesNoWindow qWin = new YesNoWindow("Удалить?", "Удалить выбранный элемент:\n" + 
+								this.elementsListView.getSelectionModel().getSelectedItem().toString());
+				int answer = qWin.showAndWait();
+				if (answer == 0) {
+					deleteElement(this.elementsListView.getSelectionModel().getSelectedIndex());
+				}	
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		});
+		
+		editItem.setOnAction(event->{
+			//
+		});
+		
+		this.elementsListView.setOnContextMenuRequested(event->{
+			double x = event.getScreenX();
+			double y = event.getScreenY();
+			elemtnsListViewContextMenu.show(this.elementsListView, x, y);
+		});
+	}
+//InfoRequestable
+	@Override
+	public void setDevice(Device device) {
+		modDevice = device;	
+	}
+
+	@Override
+	public void representRequestedInfo() {
+		this.nameComboBox.setValue(modDevice.getName());
+		this.typeTextFiel.setText(modDevice.getType());
+		this.ownerTextField.setText(modDevice.getOwner());
+		this.serNumTextField.setText(modDevice.getSerialNumber());
+		this.gosNumTextField.setText(modDevice.getGosNumber());	
+			
+		this.elementsList.clear();
+		for (Element elm : this.modDevice.includedElements) {
+			String item = elm.getType() + " №" + elm.getSerialNumber();
+			this.elementsList.add(item);
+		}
+		this.elementsListView.setItems(elementsList);		
 	}
 //---------------------------------------------------------	
 	//Создание таблиц
@@ -213,8 +244,7 @@ public class DBEditController implements InfoRequestable {
 		this.verificationSecondParametrList.clear();
 		this.verificationSecondParametrComboBox.setItems(verificationSecondParametrList);
 	}
-//---------------------------------------------------------
-	
+//---------------------------------------------------------	
 	//Установка необходимых информационных лейблов с единицами измерений
 	private void setMeasUnits() {	
 		Element cElm = this.modDevice.includedElements.get(currentElementIndex);
@@ -359,10 +389,9 @@ public class DBEditController implements InfoRequestable {
 			}
 		}
 	}
-//Удаление устройства
-	@FXML
-	private void deleteDeviceBtnClick() throws IOException, SQLException {
-		modDevice.deleteFromDB();
+//----------------------УДАЛЕНИЯ---------------------------
+//-----------------Удаление устройства---------------------	
+	private void deleteDevice() throws IOException {
 		try {
 			DataBaseManager.getDB().BeginTransaction();
 			modDevice.deleteFromDB();
@@ -376,7 +405,28 @@ public class DBEditController implements InfoRequestable {
 			msgWin.show();
 		}
 	}
-	
+//---------------------------------------------------------
+//--------------------Удаление элемента--------------------
+	private void deleteElement(int index) throws IOException {
+		if (index > 0) return;
+		try {
+			DataBaseManager.getDB().BeginTransaction();
+			this.modDevice.includedElements.get(index).deleteFromDB();
+			DataBaseManager.getDB().Commit();
+			this.elementsList.remove(index);
+		}
+		catch(SQLException sqlExp) {
+			DataBaseManager.getDB().RollBack();
+			AboutMessageWindow msgWin = new AboutMessageWindow("Ошибка", "Ошибка доступа к БД\nпри попытке удаления");
+			msgWin.show();
+		}
+	}	
+//---------------------------------------------------------
+//---------------------------------------------------------
+	@FXML
+	private void deleteDeviceBtnClick() throws IOException {
+		deleteDevice();
+	}	
 //--- Работа с результатами измерений ---
 //Сохранение изменений результатво измерения
 	@FXML
