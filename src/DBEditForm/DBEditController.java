@@ -14,6 +14,7 @@ import ErrorParamsPack.ErrorParamsWindow;
 import FileManagePack.FileManager;
 import GUIpack.InfoRequestable;
 import GUIpack.StringGridFX;
+import NewElementPack.NewElementWindow;
 import SearchDevicePack.SearchDeviceWindow;
 import ToleranceParamPack.ToleranceParametrs;
 import VerificationPack.MeasResult;
@@ -179,7 +180,14 @@ public class DBEditController implements InfoRequestable {
 		});
 		
 		editItem.setOnAction(event->{
-			//
+			int index = this.elementsListView.getSelectionModel().getSelectedIndex();
+			Element elm = this.modDevice.includedElements.get(index);
+			try {
+				NewElementWindow elementWin = new NewElementWindow(elm);
+				elementWin.show();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		});
 		
 		this.elementsListView.setOnContextMenuRequested(event->{

@@ -23,7 +23,12 @@ public class Element implements Includable<Device>, dbStorable{
 	
 	@Override
 	public void onAdding(Device Owner) {
-		this.myDevice = Owner;		
+		this.myDevice = Owner;	
+		String addrStr = this.myDevice.getName() + " " + this.myDevice.getType() + " " +this.myDevice.getSerialNumber() + " "+
+				 this.type + " " + this.serialNumber;
+		this.periodicParamTable = "Критерии периодической поверки для " + addrStr;
+		this.primaryParamTable = "Критерии первичной поверки для " + addrStr;
+		this.listOfVerificationsTable = "Список таблиц с результатами измерений для " + addrStr;
 	}
 	
 	private String type;
@@ -117,11 +122,15 @@ public class Element implements Includable<Device>, dbStorable{
 			this.periodicToleranceParams = new UpDownTolerance("periodic", elCtrl, this);
 		}
 		
-		String addrStr = this.myDevice.getName() + " " + this.myDevice.getType() + " " +this.myDevice.getSerialNumber() + " "+
-						 this.type + " " + this.serialNumber;
-		this.periodicParamTable = "Критерии периодической поверки для " + addrStr;
-		this.primaryParamTable = "Критерии первичной поверки для " + addrStr;
-		this.listOfVerificationsTable = "Список таблиц с результатами измерений для " + addrStr;
+		/*
+		if (this.myDevice != null) {
+			String addrStr = this.myDevice.getName() + " " + this.myDevice.getType() + " " +this.myDevice.getSerialNumber() + " "+
+					 this.type + " " + this.serialNumber;
+			this.periodicParamTable = "Критерии периодической поверки для " + addrStr;
+			this.primaryParamTable = "Критерии первичной поверки для " + addrStr;
+			this.listOfVerificationsTable = "Список таблиц с результатами измерений для " + addrStr;
+		}
+		*/
 	}
 
 	//getters

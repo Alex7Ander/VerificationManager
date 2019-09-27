@@ -115,12 +115,23 @@ public class NewElementController {
 	private ToggleGroup measUnitGroup;
 	private ToggleGroup toleranceTypeGroup;
 	private ToggleGroup verificationTypeGroup;
-		
-	//представляемый элемент
-	@SuppressWarnings("unused")
+
+//************************************************	
+	//представляемый элемент	
 	private Element currentElement;
-	public void setElement(Element Elm) { this.currentElement = Elm;}
-	
+	public void setElement(Element Elm) { 
+		this.currentElement = Elm;
+		if (this.currentElement != null) {
+			showElementInfo();
+		}
+	}
+	//Метод инициализирующий элемент
+	public void initializeElement() {
+		this.currentElement = new Element(this);
+	}
+	public Element getElement() {return this.currentElement;}
+//************************************************	
+		
 	ObservableList<String> listOfParams;
 	private int currentCountOfParams;
 	private String currentTypeOfParams;
@@ -452,10 +463,6 @@ public class NewElementController {
 			this.paramsTable.setColumn(6, u_p_s.get(keys[showIndex]));
 		}
 	}
-//Метод инициализирующий элемент
-	public void initializeElement() {
-		this.currentElement = new Element(this);
-	}
 //Методы для получения информации об элементе
 	public String getType() {return elemTypesComboBox.getSelectionModel().getSelectedItem().toString();}
 	public String getSerNum() {return serNumberTextField.getText();}
@@ -620,7 +627,7 @@ public class NewElementController {
 		return returnedvalue;
 	}
 	
-//Действия по закрытию окна
+//Действия по закрытию окна		
 	public void remeberTables() {
 		try {
     		int showIndex = paramIndex + timeIndex;		
@@ -693,5 +700,10 @@ public class NewElementController {
 		}
 		return result;		
 	}
-//--------------------------------------------------------------------------------------------------	
+//--------------------------------------------------------------------------------------------------
+	
+	private void showElementInfo() {
+		this.elemTypesComboBox.setValue(this.currentElement.getType());
+		this.serNumberTextField.setText(this.currentElement.getSerialNumber());
+	}
 }

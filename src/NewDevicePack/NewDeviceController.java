@@ -9,9 +9,9 @@ import AddNewDeviceNameForm.AddNewDeviceNameWindow;
 import DataBasePack.DataBaseManager;
 import DevicePack.Device;
 import DevicePack.Element;
-import Exceptions.NoOwnerException;
 import Exceptions.SavingException;
 import FileManagePack.FileManager;
+import NewElementPack.NewElementController;
 import NewElementPack.NewElementWindow;
 import YesNoDialogPack.YesNoWindow;
 import javafx.collections.FXCollections;
@@ -54,7 +54,7 @@ public class NewDeviceController  {
 	//Сохраняемыый прибор
 	private Device newDevice;
 	//Составные элементы данного прибора
-	private ArrayList<Element> elements;
+	//private ArrayList<Element> elements;
 	
 	public ArrayList<NewElementWindow> elementsWindow;
 	public ArrayList<Button> elementsButton;
@@ -67,7 +67,7 @@ public class NewDeviceController  {
 		listOfNames = FXCollections.observableArrayList();
 		elementsButton = new ArrayList<Button>();
 		elementsWindow = new ArrayList<NewElementWindow>();
-		elements = new ArrayList<Element>();
+		//elements = new ArrayList<Element>();
 		setItemsOfNames();
 	}
 	
@@ -80,15 +80,12 @@ public class NewDeviceController  {
 		elementsWindow.clear();
 		try {			
 			countOfElements = Integer.parseInt(countOfElementsTextField.getText());
-			for (int i = 0; i < countOfElements; i++) {
-				//Создаем элемент и инициализируем его нулем
-				Element elm = null;
-				elements.add(elm);
-								
+			for (int i = 0; i < countOfElements; i++) {								
 				final int index = i;
 				String item = Integer.toString(i+1);		
 				//Cоздаем окно, которе будет принимать информацию для элемента
 				//Передаем в это окно этот самый элемент
+				Element elm = null;
 				NewElementWindow elementWin = new NewElementWindow(elm);
 				elementWin.setTitle(item);
 				elementsWindow.add(elementWin);	
@@ -148,16 +145,24 @@ public class NewDeviceController  {
 		
 		//Проверим, все ли элементы проинициализированны
 		int notInitializedElementsCount = 0;
-		for (Element cElm : this.elements) {
-			if (cElm == null) {
-				notInitializedElementsCount++;
+		//this.elements.clear();
+		for (int i=0; i<this.elementsWindow.size(); i++) {			
+			NewElementController ctrl = (NewElementController)this.elementsWindow.get(i).getControllerClass();
+			Element elm = ctrl.getElement();
+			if (elm == null) {
+				notInitializedElementsCount ++;
 			}
+			else {
+				newDevice.addElement(elm);
+			}			
 		}
 		if (notInitializedElementsCount != 0) {
 			int answer = 0;
 			try {
-				YesNoWindow qWin = new YesNoWindow("","Вы проиницилизировали не все компоненты создаваемого СИ.\nЕсли Вы желаете сохранить только проинициализированные, то нажмите - \"Да\"."
-						+ "Если желаее продолжить редактирование, то нажмите - \"Нет\".");
+				YesNoWindow qWin = new YesNoWindow("Не полная инициализация","Вы проиницилизировали не все компоненты создаваемого СИ.\nЕсли Вы желаете сохранить только проинициализированные,"
+						+ "\nто нажмите - \"Да\"."
+						+ "Если желаее продолжить редактирование, "
+						+ "\nто нажмите - \"Нет\".");
 				answer = qWin.showAndWait();
 			}
 			catch(IOException ioExp) {
@@ -167,13 +172,6 @@ public class NewDeviceController  {
 				return;
 			}
 		}
-
-		for (Element cElm : this.elements) {
-			if (cElm != null) {
-				newDevice.addElement(cElm);
-			}
-		}
-		
 		//и наконец, пробуем сохранить все в БД
 		try{
 			DataBaseManager.getDB().BeginTransaction();

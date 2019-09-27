@@ -15,7 +15,7 @@ public class NewElementWindow extends guiWindow {
 		ctrl.setElement(elm);
 		
 		//Установим действия по проверке введенных параметров перед закрытием
-		this.stage.setOnCloseRequest( event->{
+		this.stage.setOnCloseRequest( event -> {
 			ctrl.remeberTables();
 			//Проверим частоты
 			if (!ctrl.checkfreqTable()) {
@@ -23,7 +23,7 @@ public class NewElementWindow extends guiWindow {
 					YesNoWindow qWin = new YesNoWindow("Некорректное значение частоты", "Одно из введенных вами значений частоты некорректно.\nЖелаете продолжить редактирование?");
 					int answer = qWin.showAndWait();
 					if (answer == 0) {
-						event.consume();
+						//event.consume();
 					}
 				} catch(IOException ioExp) {
 					ioExp.getStackTrace();
@@ -38,7 +38,7 @@ public class NewElementWindow extends guiWindow {
 							+ "Это может привести к неправльному определению\nпригодности поверяемго прибора.\nЖелаете продолжить редактирование?");
 					int answerParams = qWin2.showAndWait();
 					if (answerParams == 0) {
-						event.consume();
+					//	event.consume();
 					}
 				} catch(IOException ioExp) {
 					ioExp.getStackTrace();
