@@ -200,7 +200,6 @@ public class NewDeviceController  {
 	@FXML
 	public void addNameBtnClick(ActionEvent event) {		
 		try {
-			//SearchDeviceWindow.getSearchDeviceWindow(verificatedDevice, this).show();
 			AddNewDeviceNameWindow.getNewDeviceWindow(this).show();
 		}
 		catch(IOException ioExp) {

@@ -172,6 +172,10 @@ public abstract class ToleranceParametrs implements Includable<Element>, dbStora
 	private Element myElement;
 	@Override
 	public Element getMyOwner() {return myElement;}
+	@Override
+	public void onAdding(Element Owner) {
+		this.myElement = Owner;		
+	}
 	
 //dbStorable
 	@Override

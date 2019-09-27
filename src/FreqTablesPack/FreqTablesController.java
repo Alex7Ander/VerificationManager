@@ -14,7 +14,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.stage.Stage;
 
-public class FreqTablesController implements Includable<NewElementController> {
+public class FreqTablesController {
 
 	@FXML
 	private Button continueBtn;	
@@ -58,9 +58,17 @@ public class FreqTablesController implements Includable<NewElementController> {
 	    stage.close();
 	    FreqTablesWindow.deleteFreqTablesWindow();
 	}
-
+/*
 	@Override
 	public NewElementController getMyOwner() {
 		return myOwner;
 	}
+*/
+/* implements Includable<NewElementController>
+	@Override
+	public void onAdding(NewElementController Owner) {
+		// TODO Auto-generated method stub
+		
+	}
+*/
 }

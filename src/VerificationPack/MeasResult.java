@@ -134,7 +134,10 @@ public class MeasResult implements Includable<Element>, dbStorable{
 	protected Element myElement;
 	@Override
 	public Element getMyOwner() {return myElement;}
-	
+	@Override
+	public void onAdding(Element Owner) {
+		this.myElement = Owner;	
+	}
 //dbStorable
 	@Override
 	public void saveInDB() throws SQLException {

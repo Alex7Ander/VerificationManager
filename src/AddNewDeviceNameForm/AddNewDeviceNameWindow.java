@@ -8,14 +8,14 @@ import NewDevicePack.NewDeviceController;
 
 public class AddNewDeviceNameWindow extends guiWindow implements Includable<NewDeviceController> {
 
-	private NewDeviceController myOwner;
+	private NewDeviceController myNewDeviceController;
 	private AddNewDeviceNameController myController;
 	
 	private static AddNewDeviceNameWindow instanceNewDeviceNameWindow;
 	
 	protected AddNewDeviceNameWindow(NewDeviceController winOwnerController) throws IOException {
 		super("Добавление нового наименования типа СИ", "AddNewDeviceNameForm.fxml");
-		this.myOwner = winOwnerController;
+		this.myNewDeviceController = winOwnerController;
 		myController = (AddNewDeviceNameController) loader.getController();
 		myController.setMyWindow(this);
 	}
@@ -26,10 +26,15 @@ public class AddNewDeviceNameWindow extends guiWindow implements Includable<NewD
 		}
 		return instanceNewDeviceNameWindow;
 	}
-
+	
 	@Override
 	public NewDeviceController getMyOwner() {
-		return myOwner;
+		return myNewDeviceController;
 	}
 
+	@Override
+	public void onAdding(NewDeviceController Owner) {
+		myNewDeviceController = Owner;		
+	}
+	
 }
