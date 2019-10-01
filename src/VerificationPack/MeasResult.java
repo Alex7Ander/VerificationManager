@@ -160,6 +160,7 @@ public class MeasResult implements Includable<Element>, dbStorable{
 		String resultsTableName = "Результат поверки " + 
 				this.myElement.getMyOwner().getName() + " " + this.myElement.getMyOwner().getType() + " " + this.myElement.getMyOwner().getSerialNumber() + " " + this.myElement.getType() + " " + this.myElement.getSerialNumber() +
 				" проведенной " + dateOfVerification;
+	//
 		String sqlQuery = "INSERT INTO [" + listOfVerificationsTable + "] (dateOfVerification, resultsTableName) values ('"+ dateOfVerification +"','"+ resultsTableName +"')";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
 		sqlQuery = "CREATE TABLE [" + resultsTableName + "] (id INTEGER PRIMARY KEY AUTOINCREMENT, freq VARCHAR(20), ";
@@ -189,9 +190,11 @@ public class MeasResult implements Includable<Element>, dbStorable{
 	
 	@Override
 	public void deleteFromDB() throws SQLException {
-		String dateOfVerification = this.dateOfMeas.toString();
+		DateFormat df = new SimpleDateFormat(datePattern);
+		String when = df.format(this.dateOfMeas);
 		String listOfVerificationsTable = this.myElement.getListOfVerificationsTable();
-		String resultsTableName = "Results of verification " + listOfVerificationsTable.substring(listOfVerificationsTable.indexOf("Measurements of ")) + " at " + dateOfVerification;
+		String what = this.myElement.getMyOwner().getName() + " " + this.myElement.getMyOwner().getType() + " " + this.myElement.getMyOwner().getSerialNumber() + " " + this.myElement.getType() + " " + this.myElement.getSerialNumber();
+		String resultsTableName = "Результат поверки " + what + " проведенной " + when;
 		
 		String sqlQuery = "DELETE FROM ["+listOfVerificationsTable+"] WHERE resultsTableName='"+resultsTableName+"'";	
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);

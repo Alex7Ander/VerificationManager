@@ -197,7 +197,7 @@ public abstract class ToleranceParametrs implements Includable<Element>, dbStora
 		System.out.println("\t\tСоздана таблица с параметрами ");
 		
 		//Заполняем таблицу paramsTableName с результатами измерений
-		for (int i=0; i<this.countOfFreq; i++) {	
+		for (int i = 0; i < this.countOfFreq; i++) {	
 					
 			sqlQuery = "INSERT INTO [" + paramsTableName + "] (freq, ";
 					

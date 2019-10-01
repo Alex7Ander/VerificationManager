@@ -84,9 +84,7 @@ public class NewDeviceController  {
 				final int index = i;
 				String item = Integer.toString(i+1);		
 				//Cоздаем окно, которе будет принимать информацию для элемента
-				//Передаем в это окно этот самый элемент
-				Element elm = null;
-				NewElementWindow elementWin = new NewElementWindow(elm);
+				NewElementWindow elementWin = new NewElementWindow();
 				elementWin.setTitle(item);
 				elementsWindow.add(elementWin);	
 				
@@ -145,7 +143,6 @@ public class NewDeviceController  {
 		
 		//Проверим, все ли элементы проинициализированны
 		int notInitializedElementsCount = 0;
-		//this.elements.clear();
 		for (int i=0; i<this.elementsWindow.size(); i++) {			
 			NewElementController ctrl = (NewElementController)this.elementsWindow.get(i).getControllerClass();
 			Element elm = ctrl.getElement();

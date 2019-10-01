@@ -9,6 +9,12 @@ import DevicePack.Element;
 import FileManagePack.FileManager;
 import FreqTablesPack.FreqTablesWindow;
 import GUIpack.StringGridFX;
+import ToleranceParamPack.PercentTolerance;
+import ToleranceParamPack.ToleranceParametrs;
+import ToleranceParamPack.UpDownTolerance;
+import VerificationPack.Gamma_Result;
+import VerificationPack.MeasResult;
+import VerificationPack.VSWR_Result;
 import _tempHelpers.Randomizer;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -159,8 +165,7 @@ public class NewElementController {
 	}
 	
 	@FXML
-	private void initialize() {	
-		
+	private void initialize() {			
 		this.fillTableRand.setVisible(false);
 		this.agreeBtn.setVisible(false);
 		//Создаем таблицу
@@ -586,33 +591,28 @@ public class NewElementController {
 			tolParamsValues.put("d_m_S12", d_m_S12);
 			tolParamsValues.put("u_m_S12", u_m_S12);
 			tolParamsValues.put("d_p_S12", d_p_S12);
-			tolParamsValues.put("u_p_S12", u_p_S12);
-			
+			tolParamsValues.put("u_p_S12", u_p_S12);			
 			tolParamsValues.put("d_m_S21", d_m_S21);
 			tolParamsValues.put("u_m_S21", u_m_S21);
 			tolParamsValues.put("d_p_S21", d_p_S21);
-			tolParamsValues.put("u_p_S21", u_p_S21);
-			
+			tolParamsValues.put("u_p_S21", u_p_S21);			
 			tolParamsValues.put("d_m_S22", d_m_S22);
 			tolParamsValues.put("u_m_S22", u_m_S22);
 			tolParamsValues.put("d_p_S22", d_p_S22);
 			tolParamsValues.put("u_p_S22", u_p_S22);
-		}
-		
+		}		
 		return tolParamsValues;
 	}
 	
 	public int checkInputedValues() {
-		int returnedvalue = 0;
-		
+		int returnedvalue = 0;		
 		ArrayList<HashMap<String, ArrayList<String>>> hashMaps = new ArrayList<HashMap<String, ArrayList<String>>>();
 		hashMaps.add(d_m_s);
 		hashMaps.add(m_s);
 		hashMaps.add(u_m_s);
 		hashMaps.add(d_p_s);
 		hashMaps.add(p_s);
-		hashMaps.add(u_p_s);
-		
+		hashMaps.add(u_p_s);		
 		for (int i=0; i<hashMaps.size(); i++) {			
 			for (String key : keys) {
 				for (int j=0; j<this.strFreqs.size(); j++) {
@@ -632,8 +632,7 @@ public class NewElementController {
 		try {
     		int showIndex = paramIndex + timeIndex;		
     		refreshTable(savingIndex, showIndex);
-    		savingIndex = showIndex;
-    		
+    		savingIndex = showIndex;   		
     		freqs.clear();
     		for (int i=0; i<paramsTable.getRowCount(); i++) {
     			try {
@@ -700,10 +699,141 @@ public class NewElementController {
 		}
 		return result;		
 	}
-//--------------------------------------------------------------------------------------------------
-	
+//--------------------------------------------------------------------------------------------------	
 	private void showElementInfo() {
 		this.elemTypesComboBox.setValue(this.currentElement.getType());
 		this.serNumberTextField.setText(this.currentElement.getSerialNumber());
+		
+		if (this.currentElement.getPoleCount() == 4) {
+			this.fourPoleRB.setSelected(true);
+			this.fourPoleRBClick(null);
+		}
+		else {
+			this.twoPoleRB.setSelected(true);
+			this.twoPoleRBClick(null);
+		}
+		
+		this.paramsTable.clear();	
+		for (String key : keys) {
+			m_s.get(key).clear();
+		}
+
+		Double fr[] = new Double[this.currentElement.getNominal().freqs.size()];
+		this.currentElement.getNominal().freqs.toArray(fr);
+		for (Double freq : fr) {
+			this.freqs.add(freq);
+			strFreqs.add(freq.toString());
+			m_s.get("primary_S11").add(this.currentElement.getNominal().values.get("m_S11").get(freq).toString());
+			m_s.get("periodic_S11").add(this.currentElement.getNominal().values.get("m_S11").get(freq).toString());
+			p_s.get("primary_S11").add(this.currentElement.getNominal().values.get("p_S11").get(freq).toString());
+			p_s.get("periodic_S11").add(this.currentElement.getNominal().values.get("p_S11").get(freq).toString());
+			
+			d_m_s.get("primary_S11").add(this.currentElement.getPrimaryToleranceParams().values.get("d_m_S11").get(freq).toString());
+			d_m_s.get("periodic_S11").add(this.currentElement.getPeriodicToleranceParams().values.get("d_m_S11").get(freq).toString());
+			u_m_s.get("primary_S11").add(this.currentElement.getPrimaryToleranceParams().values.get("u_m_S11").get(freq).toString());
+			u_m_s.get("periodic_S11").add(this.currentElement.getPeriodicToleranceParams().values.get("u_m_S11").get(freq).toString());
+			
+			d_p_s.get("primary_S11").add(this.currentElement.getPrimaryToleranceParams().values.get("d_p_S11").get(freq).toString());
+			d_p_s.get("periodic_S11").add(this.currentElement.getPeriodicToleranceParams().values.get("d_p_S11").get(freq).toString());
+			u_p_s.get("primary_S11").add(this.currentElement.getPrimaryToleranceParams().values.get("u_p_S11").get(freq).toString());
+			u_p_s.get("periodic_S11").add(this.currentElement.getPeriodicToleranceParams().values.get("u_p_S11").get(freq).toString());
+			
+			if (this.currentElement.getPoleCount() == 4) {
+				m_s.get("primary_S12").add(this.currentElement.getNominal().values.get("m_S12").get(freq).toString());
+				m_s.get("periodic_S12").add(this.currentElement.getNominal().values.get("m_S12").get(freq).toString());
+				p_s.get("primary_S12").add(this.currentElement.getNominal().values.get("p_S12").get(freq).toString());
+				p_s.get("periodic_S12").add(this.currentElement.getNominal().values.get("p_S12").get(freq).toString());
+				
+				d_m_s.get("primary_S12").add(this.currentElement.getPrimaryToleranceParams().values.get("d_m_S12").get(freq).toString());
+				d_m_s.get("periodic_S12").add(this.currentElement.getPeriodicToleranceParams().values.get("d_m_S12").get(freq).toString());
+				u_m_s.get("primary_S12").add(this.currentElement.getPrimaryToleranceParams().values.get("u_m_S12").get(freq).toString());
+				u_m_s.get("periodic_S12").add(this.currentElement.getPeriodicToleranceParams().values.get("u_m_S12").get(freq).toString());
+				
+				d_p_s.get("primary_S12").add(this.currentElement.getPrimaryToleranceParams().values.get("d_p_S12").get(freq).toString());
+				d_p_s.get("periodic_S12").add(this.currentElement.getPeriodicToleranceParams().values.get("d_p_S12").get(freq).toString());
+				u_p_s.get("primary_S12").add(this.currentElement.getPrimaryToleranceParams().values.get("u_p_S12").get(freq).toString());
+				u_p_s.get("periodic_S12").add(this.currentElement.getPeriodicToleranceParams().values.get("u_p_S12").get(freq).toString());
+				//--------------------------------------------------------------------------------------------------------------------------
+				m_s.get("primary_S21").add(this.currentElement.getNominal().values.get("m_S21").get(freq).toString());
+				m_s.get("periodic_S21").add(this.currentElement.getNominal().values.get("m_S21").get(freq).toString());
+				p_s.get("primary_S21").add(this.currentElement.getNominal().values.get("p_S21").get(freq).toString());
+				p_s.get("periodic_S21").add(this.currentElement.getNominal().values.get("p_S21").get(freq).toString());
+				
+				d_m_s.get("primary_S21").add(this.currentElement.getPrimaryToleranceParams().values.get("d_m_S21").get(freq).toString());
+				d_m_s.get("periodic_S21").add(this.currentElement.getPeriodicToleranceParams().values.get("d_m_S21").get(freq).toString());
+				u_m_s.get("primary_S21").add(this.currentElement.getPrimaryToleranceParams().values.get("u_m_S21").get(freq).toString());
+				u_m_s.get("periodic_S21").add(this.currentElement.getPeriodicToleranceParams().values.get("u_m_S21").get(freq).toString());
+				
+				d_p_s.get("primary_S21").add(this.currentElement.getPrimaryToleranceParams().values.get("d_p_S21").get(freq).toString());
+				d_p_s.get("periodic_S21").add(this.currentElement.getPeriodicToleranceParams().values.get("d_p_S21").get(freq).toString());
+				u_p_s.get("primary_S21").add(this.currentElement.getPrimaryToleranceParams().values.get("u_p_S21").get(freq).toString());
+				u_p_s.get("periodic_S21").add(this.currentElement.getPeriodicToleranceParams().values.get("u_p_S21").get(freq).toString());
+				//--------------------------------------------------------------------------------------------------------------------------
+				m_s.get("primary_S22").add(this.currentElement.getNominal().values.get("m_S22").get(freq).toString());
+				m_s.get("periodic_S22").add(this.currentElement.getNominal().values.get("m_S22").get(freq).toString());
+				p_s.get("primary_S22").add(this.currentElement.getNominal().values.get("p_S22").get(freq).toString());
+				p_s.get("periodic_S22").add(this.currentElement.getNominal().values.get("p_S22").get(freq).toString());
+				
+				d_m_s.get("primary_S22").add(this.currentElement.getPrimaryToleranceParams().values.get("d_m_S22").get(freq).toString());
+				d_m_s.get("periodic_S22").add(this.currentElement.getPeriodicToleranceParams().values.get("d_m_S22").get(freq).toString());
+				u_m_s.get("primary_S22").add(this.currentElement.getPrimaryToleranceParams().values.get("u_m_S22").get(freq).toString());
+				u_m_s.get("periodic_S22").add(this.currentElement.getPeriodicToleranceParams().values.get("u_m_S22").get(freq).toString());
+				
+				d_p_s.get("primary_S22").add(this.currentElement.getPrimaryToleranceParams().values.get("d_p_S22").get(freq).toString());
+				d_p_s.get("periodic_S22").add(this.currentElement.getPeriodicToleranceParams().values.get("d_p_S22").get(freq).toString());
+				u_p_s.get("primary_S22").add(this.currentElement.getPrimaryToleranceParams().values.get("u_p_S22").get(freq).toString());
+				u_p_s.get("periodic_S22").add(this.currentElement.getPeriodicToleranceParams().values.get("u_p_S22").get(freq).toString());
+			}
+			int freqCount = this.currentElement.getNominal().freqs.size();
+			if (freqCount > this.paramsTable.getRowCount()) {
+				while(freqCount != this.paramsTable.getRowCount()) 
+					this.paramsTable.addRow();
+			}
+			else if (freqCount < this.paramsTable.getRowCount()) {
+				while(freqCount != this.paramsTable.getRowCount()) 
+					this.paramsTable.deleteRow(this.paramsTable.getRowCount());
+			}
+			this.paramsTable.setColumn(0, strFreqs);			
+			this.paramsTable.setColumn(1, d_m_s.get(keys[this.savingIndex]));
+			this.paramsTable.setColumn(2, m_s.get(keys[this.savingIndex]));
+			this.paramsTable.setColumn(3, u_m_s.get(keys[this.savingIndex]));
+			this.paramsTable.setColumn(4, d_p_s.get(keys[this.savingIndex]));
+			this.paramsTable.setColumn(5, p_s.get(keys[this.savingIndex]));
+			this.paramsTable.setColumn(6, u_p_s.get(keys[this.savingIndex]));
+		}
 	}
+	
+	public ToleranceParametrs getPrimaryTP() {
+		if (this.percentToleranceRB.isSelected()) {
+			PercentTolerance ptp = new PercentTolerance("primary", this, this.currentElement);
+			return ptp;
+		}
+		else {
+			UpDownTolerance udt = new UpDownTolerance("primary", this, this.currentElement);
+			return udt;
+		}
+	}
+	
+	public ToleranceParametrs getPeriodicTP() {
+		if (this.percentToleranceRB.isSelected()) {
+			PercentTolerance ptp = new PercentTolerance("periodic", this, this.currentElement);
+			return ptp;
+		}
+		else {
+			UpDownTolerance udt = new UpDownTolerance("periodic", this, this.currentElement);
+			return udt;
+		}
+	}
+	
+	public MeasResult getNominals() {
+		if (this.gammaRB.isSelected()) {
+			Gamma_Result gr = new Gamma_Result(this, this.currentElement);
+			return gr;
+		}
+		else{
+			VSWR_Result vr = new VSWR_Result(this, this.currentElement);
+			return vr;
+		}
+	}
+	
 }

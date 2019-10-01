@@ -106,8 +106,8 @@
                      <content>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="0.0" prefWidth="309.0">
                            <children>
-                              <RadioButton fx:id="twoPoleRB" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#twoPoleRBClick" text="2-х полюсник" />
-                              <RadioButton fx:id="fourPoleRB" layoutX="14.0" layoutY="50.0" mnemonicParsing="false" onAction="#fourPoleRBClick" text="4-х полюсник" />
+                              <RadioButton fx:id="twoPoleRB" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#twoPoleRBClick" text="2-х полюсник" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="5.0" />
+                              <RadioButton fx:id="fourPoleRB" layoutX="14.0" layoutY="50.0" mnemonicParsing="false" onAction="#fourPoleRBClick" text="4-х полюсник" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="40.0" />
                            </children>
                         </AnchorPane>
                      </content>
@@ -117,8 +117,8 @@
                     <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="80.0" prefWidth="200.0">
                            <children>
-                              <RadioButton fx:id="vswrRB" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#vswrRBClick" prefHeight="17.0" prefWidth="290.0" text="КСВН / фаза" />
-                              <RadioButton fx:id="gammaRB" layoutX="14.0" layoutY="48.0" mnemonicParsing="false" onAction="#gammaClick" prefHeight="17.0" prefWidth="292.0" text="|Г| / фаза" />
+                              <RadioButton fx:id="vswrRB" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#vswrRBClick" prefHeight="17.0" prefWidth="290.0" text="КСВН / фаза" AnchorPane.topAnchor="5.0" />
+                              <RadioButton fx:id="gammaRB" layoutX="14.0" layoutY="48.0" mnemonicParsing="false" onAction="#gammaClick" prefHeight="17.0" prefWidth="292.0" text="|Г| / фаза" AnchorPane.topAnchor="40.0" />
                            </children>
                         </AnchorPane>
                     </content>
@@ -128,25 +128,25 @@
                     <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
-                              <RadioButton fx:id="upDownToleranceRB" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" text="Верхний/нижний предел" />
-                              <RadioButton fx:id="percentToleranceRB" layoutX="14.0" layoutY="52.0" mnemonicParsing="false" text="\\% от номинала" />
+                              <RadioButton fx:id="upDownToleranceRB" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" text="Верхний/нижний предел" AnchorPane.topAnchor="5.0" />
+                              <RadioButton fx:id="percentToleranceRB" layoutX="14.0" layoutY="52.0" mnemonicParsing="false" text="\\% от номинала" AnchorPane.topAnchor="40.0" />
                            </children>
                         </AnchorPane>
                     </content>
                   </TitledPane>
                   <Separator prefHeight="10.0" prefWidth="311.0" />
-                  <TitledPane animated="false" prefHeight="100.0" prefWidth="249.0" style="-fx-font-family: Arial Narrow; -fx-font-size: 14; -fx-font-weight: bold;" text="Тип поверки" underline="true">
+                  <TitledPane animated="false" prefHeight="110.0" prefWidth="249.0" style="-fx-font-family: Arial Narrow; -fx-font-size: 14; -fx-font-weight: bold;" text="Тип поверки" underline="true">
                     <content>
-                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="74.0" prefWidth="224.0">
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="88.0" prefWidth="301.0">
                            <children>
-                              <RadioButton fx:id="primaryVerificationRB" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#primaryRBClick" prefHeight="17.0" prefWidth="232.0" text="Первичная" />
-                              <RadioButton fx:id="periodicVerificationRB" layoutX="14.0" layoutY="43.0" mnemonicParsing="false" onAction="#periodicRBClick" prefHeight="17.0" prefWidth="231.0" text="Периодическая" />
+                              <RadioButton fx:id="primaryVerificationRB" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#primaryRBClick" prefHeight="17.0" prefWidth="232.0" text="Первичная" AnchorPane.topAnchor="5.0" />
+                              <RadioButton fx:id="periodicVerificationRB" layoutX="14.0" layoutY="43.0" mnemonicParsing="false" onAction="#periodicRBClick" prefHeight="17.0" prefWidth="231.0" text="Периодическая" AnchorPane.topAnchor="40.0" />
                            </children>
                         </AnchorPane>
                     </content>
                   </TitledPane>
                   <Separator prefHeight="10.0" prefWidth="311.0" />
-                  <Button fx:id="agreeBtn" mnemonicParsing="false" onAction="#agreeBtnClick" prefHeight="19.0" prefWidth="311.0" stylesheets="@../application/commonButton.css" text="Подтвердить" />
+                  <Button fx:id="agreeBtn" mnemonicParsing="false" onAction="#agreeBtnClick" prefHeight="36.0" prefWidth="303.0" stylesheets="@../application/commonButton.css" text="Подтвердить" />
                   <Pane prefHeight="5.0" prefWidth="311.0" />
                   <Button fx:id="fillTableRand" mnemonicParsing="false" onAction="#fillTableRandClick" prefHeight="13.0" prefWidth="311.0" text="Заполнить таблицу" />
                </children>

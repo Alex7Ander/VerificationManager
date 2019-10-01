@@ -3,7 +3,6 @@ package DevicePack;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-
 import DataBasePack.DataBaseManager;
 import DataBasePack.dbStorable;
 import Exceptions.NoOwnerException;
@@ -40,6 +39,7 @@ public class Element implements Includable<Device>, dbStorable{
 	
 	private String periodicParamTable;
 	private String primaryParamTable;
+	private String nominalTable;
 	private String listOfVerificationsTable;
 	
 	private Device myDevice; 		//Устройство, которому принадлежит элемент
@@ -121,16 +121,6 @@ public class Element implements Includable<Device>, dbStorable{
 			this.primaryToleranceParams = new UpDownTolerance("primary", elCtrl, this);
 			this.periodicToleranceParams = new UpDownTolerance("periodic", elCtrl, this);
 		}
-		
-		/*
-		if (this.myDevice != null) {
-			String addrStr = this.myDevice.getName() + " " + this.myDevice.getType() + " " +this.myDevice.getSerialNumber() + " "+
-					 this.type + " " + this.serialNumber;
-			this.periodicParamTable = "Критерии периодической поверки для " + addrStr;
-			this.primaryParamTable = "Критерии первичной поверки для " + addrStr;
-			this.listOfVerificationsTable = "Список таблиц с результатами измерений для " + addrStr;
-		}
-		*/
 	}
 
 	//getters
@@ -141,6 +131,7 @@ public class Element implements Includable<Device>, dbStorable{
 	public String getToleranceType() {return this.toleranceType;}
 	public String getPeriodicParamTable() {return periodicParamTable;}
 	public String getPrimaryParamTable() {return primaryParamTable;}
+	public String getNominaltable() {return nominalTable;}
 	public String getListOfVerificationsTable() {return listOfVerificationsTable;}
 	public MeasResult getNominal() {return nominal;}
 	public ToleranceParametrs getPrimaryToleranceParams() {return primaryToleranceParams;}	// 
@@ -163,26 +154,24 @@ public class Element implements Includable<Device>, dbStorable{
 		// 3.2 Создание таблицы [Список таблиц с результатами измерений для ...]
 		sqlString = "CREATE TABLE [Список таблиц с результатами измерений для " + (addStr + " " + this.type + " " + this.serialNumber) + "] (id INTEGER PRIMARY KEY AUTOINCREMENT, dateOfVerification VARCHAR(60), resultsTableName VARCHAR(512))";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlString);
-		System.out.println("\tСоздана таблица для списко проведенных измерений");
+		System.out.println("\tСоздана таблица для списков проведенных измерений");
 		// 3.3 Сохранить критерии годности
 		System.out.println("\tНачато сохранение критериев годности:");
 		System.out.println("\t---------------первичной поверки-----------------------:");
 		this.primaryToleranceParams.saveInDB();	
 		System.out.println("\t---------------периодическойй поверки-----------------------:");
-		this.periodicToleranceParams.saveInDB();
-		
+		this.periodicToleranceParams.saveInDB();		
 		System.out.println("\tНачато сохранение номинала:");
 		// 3.4 Сохраняем номиналы
-		this.nominal.saveInDB();		
+		this.nominal.saveInDB();	
+		System.out.println("\tПроцедура сохранения завершена");
 	}
 	
 	@Override
-	public void deleteFromDB() throws SQLException {
-		
+	public void deleteFromDB() throws SQLException {		
 		String addStr = myDevice.getName() + " " + myDevice.getType() + " " + myDevice.getSerialNumber();	
 		String strElementsTable = this.myDevice.getElementsTableName();
-		String measurementsOfTableName = "Список таблиц с результатами измерений для " + addStr + " " + this.type + " " + this.serialNumber;
-		
+		String measurementsOfTableName = "Список таблиц с результатами измерений для " + addStr + " " + this.type + " " + this.serialNumber;		
 		//Удалить номинал
 		this.nominal.deleteFromDB();
 		//Удалить критерии годности
@@ -231,4 +220,15 @@ public class Element implements Includable<Device>, dbStorable{
 		return arrayResults;
 	}
 
+	public void rewriteParams(ToleranceParametrs newPrimaryparams,
+							  ToleranceParametrs newPeriodicalParams,
+							  MeasResult newNominals) throws SQLException{
+		this.primaryToleranceParams.deleteFromDB();
+		this.periodicToleranceParams.deleteFromDB();
+		this.nominal.deleteFromDB();
+		
+		newPrimaryparams.saveInDB();
+		newPeriodicalParams.saveInDB();
+		newNominals.saveInDB();
+	}
 }
