@@ -267,7 +267,7 @@ public class VerificationController implements InfoRequestable {
 					this.verificatedDevice.includedElements.get(i).getPeriodicToleranceParams().checkResult(rs);
 				}							
 				//Заполним таблицу
-				fillTable();
+				//fillTable();
 			}
 		}
 		catch(IOException ioExp) {

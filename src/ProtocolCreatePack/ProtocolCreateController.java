@@ -21,7 +21,6 @@ import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
@@ -159,7 +158,7 @@ public class ProtocolCreateController {
 			}
 		}		
 		Date dt = protocoledResult.get(0).getDateOfMeas();
-		String strDt = new SimpleDateFormat("DD-mm-yy HH-mm-ss").format(dt);
+		String strDt = new SimpleDateFormat("dd-MM-yyyy HH-mm-ss").format(dt);
 		String addStr = protocoledResult.get(0).getMyOwner().getMyOwner().getName() + " " +
 				   		protocoledResult.get(0).getMyOwner().getMyOwner().getType() + " " +
 				   		protocoledResult.get(0).getMyOwner().getMyOwner().getSerialNumber() + " от " + strDt;
@@ -168,7 +167,8 @@ public class ProtocolCreateController {
 		//Скрываем информационные поля и показываем прогресс индикатор
 		infoBox.toBack();
 		infoBox.setOpacity(0.1);
-		progressPane.setVisible(true);		
+		progressPane.setVisible(true);	
+		this.verification.setFinallyInformation(this);
 		//Создаем документы
 		creteDocuments();	
 	}
@@ -289,7 +289,15 @@ public class ProtocolCreateController {
 	
 	public String getWorkerName() {return this.workerNameTextField.getText();}
 	public String getBossName() {return this.bossNameTextFiled.getText();}
-	public String getBossStatus() {return this.militaryStatusComboBox.getSelectionModel().getSelectedItem().toString();}
+	public String getBossStatus() {
+		String status = null;
+		try {
+			status = this.militaryStatusComboBox.getSelectionModel().getSelectedItem().toString();
+		} catch (NullPointerException npExp) {
+			status = "Генерал-завхоз";
+		}
+		return status;
+	}
 	public String getResultDecision() {
 		if (this.docTypeComboBox.getSelectionModel().getSelectedItem().toString().equals("Cвидетельство о поверке")) {
 			return "годным";
@@ -300,5 +308,28 @@ public class ProtocolCreateController {
 	}
 	public String getProtocolNumber() {return this.docNumberTextField.getText();}
 	public String getDocumentNumber() {return this.docNumberTextField.getText();}
-	
+	public String getEtalonString() { 
+		if (this.etalonRB.isSelected()) {
+			return "Эталон";
+		} else {
+			return "Средство измерения ";
+		}
+	}
+	public String getDocType() { return this.docTypeComboBox.getSelectionModel().getSelectedItem().toString();}
+	public String getDateOfCreation() {		
+		Date dt = new Date();
+		String strDate = new SimpleDateFormat("dd-mm-yyyy").format(dt);
+		return strDate;
+	}
+	public String getFinishDate() {
+		Date dt = new Date();
+		long t = dt.getTime();
+		long oneYear = 365*24*60*60*1000; 
+		t += oneYear;
+		Date dtFinish = new Date(t);
+		return dtFinish.toString();
+	}
+	public String getMilitryBaseName() {
+		return this.militaryBaseName.getText();
+	}
 }

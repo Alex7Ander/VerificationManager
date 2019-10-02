@@ -353,6 +353,7 @@ public class DBEditController implements InfoRequestable {
 		
 	}
 //---------------------------------------------------------
+	@SuppressWarnings("unused")
 	private void setParamsTypes() {
 		measUnitsList.clear();
 		measUnitsList.add("Первичная поверка");

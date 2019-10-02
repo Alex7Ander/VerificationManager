@@ -2,7 +2,6 @@ package DBEditForm;
 
 import java.io.IOException;
 import GUIpack.guiWindow;
-import VerificationForm.VerificationWindow;
 
 public class DBEditWindow extends guiWindow {
 

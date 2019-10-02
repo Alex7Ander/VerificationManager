@@ -1,7 +1,9 @@
 package ProtocolCreatePack;
 
+import java.awt.Desktop;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -27,7 +29,8 @@ public class DocumetnsCreateService extends Service<Integer> {
 	private VerificationProcedure verification;
 	private ArrayList<MeasResult> protocoledResult;
 	private String protocolName;
-	private String pathTo;
+	private String protoPathTo;
+	private String docPathTo;
 	//Книга
 	private Workbook wb;
 	//лист
@@ -86,11 +89,12 @@ public class DocumetnsCreateService extends Service<Integer> {
 		return new Task<Integer>() {
 			@Override
 			protected Integer call() throws Exception {
-				pathTo = new File(".").getAbsolutePath() + "\\Protocols\\" + protocolName;
-				try {
+				protoPathTo = new File(".").getAbsolutePath() + "\\Protocols\\" + protocolName;
+				docPathTo = new File(".").getAbsolutePath() + "";
+				try {					
 					if (protocoledResult != null) {
 						createProtocol();
-					}
+					}	
 					createDocument();
 					return 0;
 				}
@@ -111,7 +115,34 @@ public class DocumetnsCreateService extends Service<Integer> {
 	}
 	
 	private void createDocument() throws IOException {
-		//
+		FileWriter writer = new FileWriter("proto.txt");
+		try {
+			Integer t = 0;
+			if (this.verification.getDocType().equals("Свидетельство о поверке")) {
+				t = 1;
+			} 
+			writer.write(this.protocolName + "\n");								//1
+			writer.write(t.toString() + "\n");				//2
+			writer.write(this.verification.getTypeByTime() + "\n");				//3
+			writer.write(this.verification.getMilitaryBasename() + "\n");		//4
+			writer.write(this.verification.getDocumentNumber() + "\n");			//5
+			writer.write(this.verification.getDeviceInfo() + "\n");				//6
+			writer.write(this.verification.getEtalonString() + "\n");			//7
+			writer.write(this.verification.getDeviceSerNumber() + "\n");		//8
+			writer.write(this.verification.getDeviceOwner() + "\n");			//9
+			writer.write(this.verification.getWorkerName() + "\n");				//10
+			writer.write(this.verification.getBossStatus() + " " + this.verification.getBossName() + "\n");		//11
+			writer.write(this.verification.getDecision() + "\n");				//12
+			writer.write(this.verification.getDateOfCreation() + "\n");			//13
+			writer.write(this.verification.getFinishDate() + "\n");				//14
+		} catch (IOException ioExp) {
+			ioExp.getStackTrace();
+		} finally {
+			writer.close();
+		}	
+		String absPath = new File(".").getAbsolutePath();
+		File file = new File(absPath + "\\Project2.exe");
+		Desktop.getDesktop().open(file);
 	}
 	
 	private void prepareSheet() {	
@@ -254,7 +285,7 @@ public class DocumetnsCreateService extends Service<Integer> {
 	
 	private void writeSheet() throws IOException {		
 		//Запись в файл
-		FileOutputStream fout = new FileOutputStream(pathTo);
+		FileOutputStream fout = new FileOutputStream(protoPathTo);
 		wb.write(fout);
 		fout.close();
 	}

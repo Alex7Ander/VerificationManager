@@ -43,7 +43,7 @@ public class ServerService extends Service<Integer> {
 			        if (msg.equals("ready")){
 			        	System.out.println("It was flag for stopping");
 			        	status.setStopStatus();
-			        	//VerificationWindow.getVerificationWindow().getController().fileReadBtnClick();
+			        	VerificationWindow.getVerificationWindow().getController().fileReadBtnClick();
 			            break;
 			        }
 			        else{
