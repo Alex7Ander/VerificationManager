@@ -4,8 +4,10 @@ import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 import AboutMessageForm.AboutMessageWindow;
@@ -318,16 +320,22 @@ public class ProtocolCreateController {
 	public String getDocType() { return this.docTypeComboBox.getSelectionModel().getSelectedItem().toString();}
 	public String getDateOfCreation() {		
 		Date dt = new Date();
-		String strDate = new SimpleDateFormat("dd-mm-yyyy").format(dt);
+		String strDate = new SimpleDateFormat("dd-MM-yyyy").format(dt);
 		return strDate;
 	}
 	public String getFinishDate() {
 		Date dt = new Date();
-		long t = dt.getTime();
-		long oneYear = 365*24*60*60*1000; 
-		t += oneYear;
-		Date dtFinish = new Date(t);
-		return dtFinish.toString();
+		String sdt = new SimpleDateFormat("dd-MM-yyyy").format(dt);
+		Calendar calend = Calendar.getInstance();
+		try {
+			calend.setTime(new SimpleDateFormat("dd-MM-yyyy").parse(sdt));
+		} catch (ParseException pExp) {
+			pExp.getStackTrace();
+			calend.setTime(new Date());
+		}		
+		calend.add(Calendar.YEAR, 1);
+		String strDate = new SimpleDateFormat("dd-MM-yyyy").format(calend.getTime());		
+		return strDate;
 	}
 	public String getMilitryBaseName() {
 		return this.militaryBaseName.getText();

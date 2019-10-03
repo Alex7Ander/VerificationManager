@@ -117,13 +117,15 @@ public class DocumetnsCreateService extends Service<Integer> {
 	private void createDocument() throws IOException {
 		FileWriter writer = new FileWriter("proto.txt");
 		try {
-			Integer t = 0;
-			if (this.verification.getDocType().equals("Свидетельство о поверке")) {
-				t = 1;
-			} 
-			writer.write(this.protocolName + "\n");								//1
-			writer.write(t.toString() + "\n");				//2
-			writer.write(this.verification.getTypeByTime() + "\n");				//3
+			String docName = this.verification.getDocType() + " для " + this.verification.getDeviceInfo() + " №" + this.verification.getDeviceSerNumber() +
+					" проведенной " + this.verification.getDateOfCreation();			
+			writer.write(docName + "\n");										//1
+			writer.write(this.verification.getDocType() + "\n");				//2
+			if (this.verification.getTypeByTime().equals("primary")) {
+				writer.write("первичной \n");									//3
+			} else {
+				writer.write("периодической \n");								//3
+			}			
 			writer.write(this.verification.getMilitaryBasename() + "\n");		//4
 			writer.write(this.verification.getDocumentNumber() + "\n");			//5
 			writer.write(this.verification.getDeviceInfo() + "\n");				//6
@@ -140,8 +142,15 @@ public class DocumetnsCreateService extends Service<Integer> {
 		} finally {
 			writer.close();
 		}	
-		String absPath = new File(".").getAbsolutePath();
-		File file = new File(absPath + "\\Project2.exe");
+		String absPath = new File(".").getAbsolutePath();		
+		String scriptPath = null;
+		String doc = this.verification.getDocType();
+		if (doc.equals("Cвидетельство о поверке")) {
+			scriptPath = absPath + "\\cert.exe";
+		} else {
+			scriptPath = absPath + "\\notif.exe";
+		}
+		File file = new File(scriptPath);
 		Desktop.getDesktop().open(file);
 	}
 	
@@ -160,8 +169,7 @@ public class DocumetnsCreateService extends Service<Integer> {
 	
 	private void fillSheet() {
 		setCellValue(0, 0, "Протокол поверки № " + this.verification.getProtocolNumber(), headCellStyle);
-		setCellValue(1, 0, "к свидетельству о поверке (извещению о непригодности) № " + this.verification.getDocumentNumber(), headCellStyle);
-		
+		setCellValue(1, 0, "к свидетельству о поверке (извещению о непригодности) № " + this.verification.getDocumentNumber(), headCellStyle);		
 		setCellValue(2, 0, "Средство измерений: " + this.verification.getDeviceInfo(), ordinaryCellStyle);
 		setCellValue(4, 0, "Заводской номер (номера): " + this.verification.getDeviceSerNumber(), ordinaryCellStyle);
 		setCellValue(6, 0, "Поверка проведена при следующих значениях влияющих факторов:", boldCellStyle);
@@ -179,8 +187,7 @@ public class DocumetnsCreateService extends Service<Integer> {
 		setCellValue(16, 0, "2. Опробование: ", boldCellStyle);
 		setCellValue(17, 0, "Аппаратура работоспособна.", ordinaryCellStyle);
 		setCellValue(18, 0, "3. Метрологические характеристики: ", boldCellStyle);
-	
-		
+			
 		int dRow = 19;
 		int countOfRes = protocoledResult.size();
 		for (int i = 0; i < countOfRes; i++) {
