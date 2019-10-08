@@ -32,15 +32,11 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 public class DBEditController implements InfoRequestable {
 	
 //Левая часть окна
-	@FXML
-	private Button passBtn;	
 	@FXML
 	private Button errorParamsBtn;	
 	@FXML
@@ -68,13 +64,8 @@ public class DBEditController implements InfoRequestable {
 
 //Правая часть окна
 	//Шапка
-	@FXML
-	private ComboBox<String> editedPropertyComboBox;
-	private ObservableList<String> propertiesList;
-	@FXML
-	private StackPane propertiesStack;
 	//---------------------------------
-	//Редактирование параметров годности
+/*	//Редактирование параметров годности
 	@FXML
 	private VBox paramsBox;
 	//Таблица для параметров
@@ -88,21 +79,17 @@ public class DBEditController implements InfoRequestable {
 	@FXML
 	private Button deleteParamsBtn;
 	@FXML
-	private Button saveParamsModBtn;
+	private Button saveParamsModBtn;*/
 	//------------------------------
 	//Просмотр результатов измерений
 	@FXML
 	private VBox resultBox;
 	@FXML
-	private ComboBox<String> verificationSecondParametrComboBox;
-	private ObservableList<String> verificationSecondParametrList;
+	private ComboBox<String> verificationDateComboBox;
+	private ObservableList<String> verificationDateList;	
 	@FXML
 	private ComboBox<String> currentMeasUnitComboBox;
-	private ObservableList<String> measUnitsList;
-	@FXML
-	private Button addFreqBtn;
-	@FXML
-	private Button deleteFreqBtn;
+	private ObservableList<String> measUnitsList;	
 	//таблица для результатов
 	@FXML
 	private ScrollPane resultsScrollPane;
@@ -112,13 +99,9 @@ public class DBEditController implements InfoRequestable {
 	@FXML
 	private Button deletResBtn;
 	@FXML
-	private Button saveResModificationBtn;
-	@FXML
 	private Label measUnitLabel;
 	@FXML
 	private Label dateLabel;
-	@FXML
-	private Pane resBtnPane;
 	
 //---------------------------------------------	
 	private Device modDevice;  //Редактируемое средство измерения
@@ -130,11 +113,9 @@ public class DBEditController implements InfoRequestable {
 //---------------------------------------------------------
 	@FXML
 	private void initialize() {		
-		resultsTable = this.createResultsTable();
-		paramsTable = this.createParamsTable();
-		
+		resultsTable = this.createResultsTable();		
 		elementsList = FXCollections.observableArrayList();
-		verificationSecondParametrList = FXCollections.observableArrayList();
+		verificationDateList = FXCollections.observableArrayList();
 		measUnitsList = FXCollections.observableArrayList();
 		
 		devNamesList = FXCollections.observableArrayList();
@@ -150,16 +131,14 @@ public class DBEditController implements InfoRequestable {
 		} 
 		nameComboBox.setItems(devNamesList);
 		
-		propertiesList = FXCollections.observableArrayList();
-		propertiesList.add("Критерий годности");
-		propertiesList.add("Результат измерения");
+		//propertiesList = FXCollections.observableArrayList();
+		//propertiesList.add("Критерий годности");
+		//propertiesList.add("Результат измерения");
 		
-		this.verificationSecondParametrComboBox.setItems(this.verificationSecondParametrList);
-		this.currentMeasUnitComboBox.setItems(this.measUnitsList);				
+		this.verificationDateComboBox.setItems(this.verificationDateList);
+		//this.currentMeasUnitComboBox.setItems(this.measUnitsList);				
 		this.currentMeasUnitComboBox.setItems(measUnitsList);
-		this.editedPropertyComboBox.setItems(propertiesList);
-		
-		this.resBtnPane.setVisible(false);
+		//this.editedPropertyComboBox.setItems(propertiesList);
 		
 		elemtnsListViewContextMenu = new ContextMenu();
 		MenuItem deleteItem = new MenuItem("Удалить");
@@ -218,7 +197,7 @@ public class DBEditController implements InfoRequestable {
 		this.elementsListView.setItems(elementsList);		
 	}
 //---------------------------------------------------------	
-	//Создание таблиц
+/*	//Создание таблиц
 	private StringGridFX createParamsTable() {
 		ArrayList<String> tableHeads = new ArrayList<String>();
 		tableHeads.add("Частота, ГГц");
@@ -228,7 +207,7 @@ public class DBEditController implements InfoRequestable {
 		tableHeads.add("Фаза - верхний допуск");
 		return new StringGridFX(5, 10, 800, 100, paramsScrollPane, paramsTablePane, tableHeads);
 	}
-	
+*/	
 	private StringGridFX createResultsTable() {
 		ArrayList<String> tableHeads = new ArrayList<String>();
 		tableHeads.add("Частота, ГГц");
@@ -249,42 +228,10 @@ public class DBEditController implements InfoRequestable {
 		
 		this.elementsList.clear();
 		this.elementsListView.setItems(elementsList);
-		this.verificationSecondParametrList.clear();
-		this.verificationSecondParametrComboBox.setItems(verificationSecondParametrList);
+		this.verificationDateList.clear();
+		this.verificationDateComboBox.setItems(verificationDateList);
 	}
 //---------------------------------------------------------	
-	//Установка необходимых информационных лейблов с единицами измерений
-	private void setMeasUnits() {	
-		Element cElm = this.modDevice.includedElements.get(currentElementIndex);
-		try {
-			ArrayList<String> items = new ArrayList<String>();
-			String path = new File(".").getAbsolutePath();
-			if (cElm.getMeasUnit().equals("vswr")) {
-				path += "\\files\\vswr.txt";			
-			}
-			else {
-				path += "\\files\\gamma.txt";
-			}
-			FileManager.LinesToItems(path, items);
-			
-			measUnitsList.clear();
-			measUnitsList.add(items.get(0));			
-			if (cElm.getPoleCount() == 4) {
-				measUnitsList.add(items.get(1));
-				measUnitsList.add(items.get(2));
-				measUnitsList.add(items.get(3));
-			}	
-		}
-		catch(Exception Exp) {
-			measUnitsList.add("S11");			
-			if (cElm.getPoleCount() == 4) {
-				measUnitsList.add("S12");
-				measUnitsList.add("S21");
-				measUnitsList.add("S22");
-			}	
-			this.currentMeasUnitComboBox.setItems(measUnitsList);
-		}
-	}
 //---------------------------------------------------------		
 	//Отображение результатов
 	private void showResult() throws SQLException {	
@@ -312,57 +259,6 @@ public class DBEditController implements InfoRequestable {
 		}		
 	}
 //---------------------------------------------------------
-
-	//Отображение параметров пригодности
-	private void showParams() throws SQLException {
-		if (this.modDevice == null) {
-			return;
-		}
-				
-		String keys[] = {"d_m_S11", "u_m_S11", "d_p_S11", "u_p_S11",  
-				   "d_m_S12", "u_m_S12", "d_p_S12", "u_p_S12",
-				   "d_m_S21", "u_m_S21", "d_p_S21", "u_p_S21",
-				   "d_m_S22", "u_m_S22", "d_p_S22", "u_p_S22"};
-		
-		this.paramsTable.clear();
-		if (this.verificationSecondParametrComboBox.getSelectionModel().getSelectedIndex()==0) {
-			currentParams = this.modDevice.includedElements.get(currentElementIndex).getPrimaryToleranceParams();
-		}
-		else {
-			currentParams = this.modDevice.includedElements.get(currentElementIndex).getPeriodicToleranceParams();
-		}	
-			
-		int necessaryRowCount = currentParams.getCountOfFreq();
-		if (this.paramsTable.getRowCount() < necessaryRowCount) {
-			while(this.paramsTable.getRowCount() < necessaryRowCount) {
-				this.paramsTable.addRow();
-			}
-		}
-		else if (this.paramsTable.getRowCount() > necessaryRowCount) {
-			while(this.paramsTable.getRowCount() > necessaryRowCount) {
-				this.paramsTable.deleteRow(this.paramsTable.getRowCount());
-			}				
-		}
-		this.paramsTable.setColumnFromDouble(0, currentParams.freqs);
-		int dParam = this.currentMeasUnitComboBox.getSelectionModel().getSelectedIndex();
-		for (int i=0; i<4; i++) {
-			String key = keys[i  +dParam];
-			HashMap<Double, Double> hMap = currentParams.values.get(key);
-			this.paramsTable.setColumnFromDouble(i+1, Adapter.HashMapToArrayList(currentParams.freqs, hMap));
-		}
-		
-	}
-//---------------------------------------------------------
-	@SuppressWarnings("unused")
-	private void setParamsTypes() {
-		measUnitsList.clear();
-		measUnitsList.add("Первичная поверка");
-		measUnitsList.add("Периодическая поверка");
-	}	
-	@FXML
-	private void passBtnClick() {
-		
-	}	
 	@FXML
 	private void errorParamsBtnClick() throws IOException {
 		ErrorParamsWindow.getErrorParamsWindow().show();
@@ -437,17 +333,7 @@ public class DBEditController implements InfoRequestable {
 		deleteDevice();
 	}	
 //--- Работа с результатами измерений ---
-//Сохранение изменений результатво измерения
-	@FXML
-	private void saveResModificationBtn() {
-		
-	}
-//--- Работа с параметрами поверки ---
-//Сохранение изменений параметров пригодности для поверки
-	@FXML
-	private void saveParamsModificationBtn() {
-		
-	}
+
 //Поиск
 	@FXML
 	private void searchDeviceBtnClick() {
@@ -458,7 +344,6 @@ public class DBEditController implements InfoRequestable {
 			//
 		}
 	}
-
 		
 	@FXML
 	private void deletResBtnClick() throws IOException {
@@ -469,85 +354,70 @@ public class DBEditController implements InfoRequestable {
 			AboutMessageWindow msgWin = new AboutMessageWindow("Ошибка", "Ошибка доступа к БД\nпри удалении результатов измерения");
 			msgWin.show();	
 		}
-	}			
+	}	
+	
 	@FXML
 	private void elementsListViewClick() throws IOException {
 		currentElementIndex = elementsListView.getSelectionModel().getSelectedIndex();
 		Element cElm = this.modDevice.includedElements.get(currentElementIndex);
 		try {
 			verifications = cElm.getListOfVerifications();
-			this.verificationSecondParametrList.clear();
+			this.verificationDateList.clear();
 			for (int i = 0; i < verifications.size(); i++) {
-				verificationSecondParametrList.add(verifications.get(i).get(1));
+				verificationDateList.add(verifications.get(i).get(1));
 			}						
-			this.verificationSecondParametrComboBox.setItems(verificationSecondParametrList);			
-			//Установим измеряемые велечины
-			setMeasUnits();
+			this.verificationDateComboBox.setItems(verificationDateList);			
 		}
 		catch(SQLException exp) {
 			AboutMessageWindow msgWin = new AboutMessageWindow("Ошибка", "Ошибка доступа к БД\nпри получении списка проведенных поверок");
 			msgWin.show();
 		}		
-	}		
-	@FXML
-	private void currentMeasUnitComboBoxClick() throws SQLException {
-		int index = this.editedPropertyComboBox.getSelectionModel().getSelectedIndex();
-		if(index == 0) {
-			showParams();			
-		}
-		else if (index == 1) {
-			if (this.currentResult != null) showResult();
-		}
 	}	
+		
 	@FXML
-	private void verificationSecondParametrComboBoxClick() throws IOException {
+	private void verificationDateComboBoxClick() throws IOException {
+		Element cElm = this.modDevice.includedElements.get(currentElementIndex);
 		try {
-			int index = this.editedPropertyComboBox.getSelectionModel().getSelectedIndex();
-			int resIndex = Integer.parseInt(this.verifications.get(
-					this.verificationSecondParametrComboBox.getSelectionModel().getSelectedIndex()).get(0));
-			this.currentMeasUnitComboBox.setValue(measUnitsList.get(0));
-			this.currentResult = new MeasResult(this.modDevice.includedElements.get(currentElementIndex), resIndex);			
-			if(index == 0) {
-				showParams();
-			}	
-			else if (index == 1) {
-				showResult();
+			ArrayList<String> items = new ArrayList<String>();
+			String path = new File(".").getAbsolutePath();
+			if (cElm.getMeasUnit().equals("vswr")) {
+				path += "\\files\\vswr.txt";			
 			}
+			else {
+				path += "\\files\\gamma.txt";
+			}
+			FileManager.LinesToItems(path, items);
+			
+			measUnitsList.clear();
+			measUnitsList.add(items.get(0));			
+			if (cElm.getPoleCount() == 4) {
+				measUnitsList.add(items.get(1));
+				measUnitsList.add(items.get(2));
+				measUnitsList.add(items.get(3));
+			}	
+		}
+		catch(Exception Exp) {
+			measUnitsList.add("S11");			
+			if (cElm.getPoleCount() == 4) {
+				measUnitsList.add("S12");
+				measUnitsList.add("S21");
+				measUnitsList.add("S22");
+			}	
+			this.currentMeasUnitComboBox.setItems(measUnitsList);
+		}
+	}		
+	
+	@FXML
+	private void currentMeasUnitComboBoxClick() throws IOException {
+		try {
+			int resIndex = Integer.parseInt(this.verifications.get(
+					this.verificationDateComboBox.getSelectionModel().getSelectedIndex()).get(0));
+			this.currentResult = new MeasResult(this.modDevice.includedElements.get(currentElementIndex), resIndex);
+			showResult();
 		}
 		catch(SQLException sqlExp) {
 			AboutMessageWindow msgWin = new AboutMessageWindow("Ошибка", "Ошибка доступа к БД\nпри получении результатов измерения");
 			msgWin.show();
 		}
-	}		
-	@FXML
-	private void editedPropertyComboBoxChange() {
-		int index = this.editedPropertyComboBox.getSelectionModel().getSelectedIndex();
-		switch(index) {
-			case 0: //отображение параметров
-				dateLabel.setText("Тип поверки");
-				this.verificationSecondParametrList.clear();
-				this.verificationSecondParametrList.add("Первичная");
-				this.verificationSecondParametrList.add("Периодическая");
-				this.paramsBox.toFront();
-				this.paramsBtnPane.setVisible(true);
-				this.resBtnPane.setVisible(false);
-				break;
-			case 1: //отображение результатво
-				dateLabel.setText("Дата проведения поверки:");
-				this.verificationSecondParametrList.clear();
-				this.resultBox.toFront();
-				this.paramsBtnPane.setVisible(false);
-				this.resBtnPane.setVisible(true);
-				break;
-		}
 	}
-	@FXML
-	private void addFreqBtnClick() {
-		this.paramsTable.addRow();
-	}
-	@FXML
-	private void deleteFreqBtnClick() {
-		this.paramsTable.deleteRow(this.paramsTable.getRowCount());
-	}
-	
 }

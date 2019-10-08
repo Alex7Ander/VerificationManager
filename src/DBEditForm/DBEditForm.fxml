@@ -11,7 +11,6 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
-<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="725.0" prefWidth="1223.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="DBEditForm.DBEditController">
@@ -22,8 +21,7 @@
                <children>
                   <Pane prefHeight="40.0" prefWidth="374.0">
                      <children>
-                        <Button fx:id="passBtn" layoutX="14.0" layoutY="7.0" maxWidth="185.0" mnemonicParsing="false" onAction="#passBtnClick" prefHeight="26.0" prefWidth="170.0" stylesheets="@../../bin/application/commonButton.css" text="Пароль" />
-                        <Button fx:id="errorParamsBtn" layoutX="195.0" layoutY="7.0" mnemonicParsing="false" onAction="#errorParamsBtnClick" prefHeight="26.0" prefWidth="170.0" stylesheets="@../../bin/application/commonButton.css" text="Параметры погрешности" />
+                        <Button fx:id="errorParamsBtn" layoutX="13.0" layoutY="7.0" mnemonicParsing="false" onAction="#errorParamsBtnClick" prefHeight="26.0" prefWidth="352.0" stylesheets="@../../bin/application/commonButton.css" text="Параметры погрешности" />
                      </children>
                   </Pane>
                   <Pane prefHeight="40.0" prefWidth="200.0">
@@ -84,7 +82,7 @@
                   </TitledPane>
                   <Label stylesheets="@../../bin/application/commonLabel.css" text="Составные элементы данного СИ:" />
                   <Separator prefWidth="200.0" />
-                  <ListView fx:id="elementsListView" onMouseClicked="#elementsListViewClick" prefHeight="305.0" prefWidth="374.0" />
+                  <ListView fx:id="elementsListView" onEditStart="#elementsListViewClick" onMouseClicked="#elementsListViewClick" prefHeight="305.0" prefWidth="374.0" />
                </children>
             </VBox>
             <Separator orientation="VERTICAL" prefHeight="200.0" />
@@ -92,51 +90,23 @@
                <children>
                   <AnchorPane prefHeight="110.0" prefWidth="823.0">
                      <children>
-                        <Label prefHeight="37.0" prefWidth="159.0" stylesheets="@../../bin/application/commonLabel.css" text="Редактируемое свойство:" />
-                        <ComboBox fx:id="editedPropertyComboBox" layoutX="172.0" layoutY="6.0" onAction="#editedPropertyComboBoxChange" prefHeight="25.0" prefWidth="649.0" />
-                        <Label fx:id="dateLabel" layoutX="398.0" layoutY="47.0" stylesheets="@../../bin/application/commonLabel.css" text="Дата проведения поверки:" />
-                        <ComboBox fx:id="verificationSecondParametrComboBox" layoutX="555.0" layoutY="42.0" onAction="#verificationSecondParametrComboBoxClick" prefHeight="25.0" prefWidth="268.0" />
+                        <Label fx:id="dateLabel" layoutY="14.0" stylesheets="@../../bin/application/commonLabel.css" text="Дата проведения поверки:" />
+                        <ComboBox fx:id="verificationDateComboBox" layoutX="162.0" layoutY="10.0" onAction="#verificationDateComboBoxClick" prefHeight="25.0" prefWidth="268.0" />
                         <Label fx:id="measUnitLabel" layoutY="47.0" stylesheets="@../../bin/application/commonLabel.css" text="Измеряемая величина:" />
-                        <ComboBox fx:id="currentMeasUnitComboBox" layoutX="173.0" layoutY="43.0" onAction="#currentMeasUnitComboBoxClick" prefHeight="25.0" prefWidth="218.0" />
+                        <ComboBox fx:id="currentMeasUnitComboBox" layoutX="162.0" layoutY="43.0" prefHeight="25.0" prefWidth="268.0" />
+                        <Button fx:id="deletResBtn" layoutX="442.0" layoutY="9.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="374.0" stylesheets="@../../bin/application/commonButton.css" text="Удалить" />
                      </children>
                   </AnchorPane>
                   <Separator prefHeight="12.0" prefWidth="823.0" />
-                  <StackPane fx:id="propertiesStack" prefHeight="652.0" prefWidth="823.0">
+                  <VBox fx:id="resultBox" prefHeight="705.0" prefWidth="827.0">
                      <children>
-                        <VBox fx:id="resultBox" prefHeight="705.0" prefWidth="827.0">
-                           <children>
-                              <ScrollPane fx:id="resultsScrollPane" prefHeight="567.0" prefWidth="827.0">
-                                 <content>
-                                    <AnchorPane fx:id="resultsTablePane" minHeight="0.0" minWidth="0.0" prefHeight="501.0" prefWidth="800.0" />
-                                 </content>
-                              </ScrollPane>
-                              <Pane fx:id="resBtnPane" prefHeight="61.0" prefWidth="823.0">
-                                 <children>
-                                    <Button fx:id="deletResBtn" layoutX="14.0" layoutY="11.0" mnemonicParsing="false" onAction="#deletResBtnClick" prefHeight="40.0" prefWidth="155.0" stylesheets="@../../bin/application/commonButton.css" text="Удалить" />
-                                    <Button fx:id="saveResModificationBtn" layoutX="180.0" layoutY="11.0" mnemonicParsing="false" onAction="#saveResModificationBtn" opacity="0.0" prefHeight="40.0" prefWidth="155.0" stylesheets="@../../bin/application/commonButton.css" text="Сохранить изменения" />
-                                 </children>
-                              </Pane>
-                           </children>
-                        </VBox>
-                        <VBox fx:id="paramsBox" prefHeight="616.0" prefWidth="823.0">
-                           <children>
-                              <ScrollPane fx:id="paramsScrollPane" prefHeight="564.0" prefWidth="823.0">
-                                <content>
-                                  <AnchorPane fx:id="paramsTablePane" minHeight="0.0" minWidth="0.0" prefHeight="560.0" prefWidth="817.0" />
-                                </content>
-                              </ScrollPane>
-                              <Pane fx:id="paramsBtnPane" prefHeight="58.0" prefWidth="823.0">
-                                 <children>
-                                    <Button fx:id="addFreqBtn" layoutX="14.0" layoutY="11.0" mnemonicParsing="false" onAction="#addFreqBtnClick" prefHeight="40.0" prefWidth="155.0" stylesheets="@../../bin/application/commonButton.css" text="+ частота" />
-                                    <Button fx:id="deleteFreqBtn" layoutX="181.0" layoutY="11.0" mnemonicParsing="false" onAction="#deleteFreqBtnClick" prefHeight="40.0" prefWidth="155.0" stylesheets="@../../bin/application/commonButton.css" text="- частота" />
-                                    <Button fx:id="deleteParamsBtn" layoutX="346.0" layoutY="11.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="155.0" stylesheets="@../application/commonButton.css" text="Удалить" />
-                                    <Button fx:id="saveParamsModBtn" layoutX="509.0" layoutY="11.0" mnemonicParsing="false" onAction="#saveParamsModificationBtn" prefHeight="40.0" prefWidth="155.0" stylesheets="@../application/commonButton.css" text="Сохранить" />
-                                 </children>
-                              </Pane>
-                           </children>
-                        </VBox>
+                        <ScrollPane fx:id="resultsScrollPane" prefHeight="621.0" prefWidth="823.0">
+                           <content>
+                              <AnchorPane fx:id="resultsTablePane" minHeight="0.0" minWidth="0.0" prefHeight="501.0" prefWidth="800.0" />
+                           </content>
+                        </ScrollPane>
                      </children>
-                  </StackPane>
+                  </VBox>
                </children>
             </VBox>
          </children>

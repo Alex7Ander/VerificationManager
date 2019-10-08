@@ -1,5 +1,10 @@
 package StartVerificationPack;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+
+import FileManagePack.FileManager;
 import VerificationForm.VerificationController;
 import VerificationForm.VerificationWindow;
 import YesNoDialogPack.YesNoWindow;
@@ -139,43 +144,52 @@ public class StartVerificationController {
 		if(VerificationWindow.getVerificationWindow() != null) {
 			VerificationController vCtrl = (VerificationController)VerificationWindow.getVerificationWindow().getControllerClass();
 			vCtrl.StartVerification();
-			vCtrl.waitResults();
+			boolean wait = false;
+			try {
+				ArrayList<String> array = new ArrayList<String>();
+				FileManager.LinesToItems(new File(".").getAbsolutePath() +  "//files//startserver.txt", array);
+				if (array.get(0).equals("true")) {
+					wait = true;
+				}
+			} catch (IOException ioExp) {
+				ioExp.getStackTrace();
+			}
+			if (wait) {vCtrl.waitResults();}
 			this.myWindow.close();
 		}
 	}
 	
 	private boolean chekEnvironment() {
-		boolean environmetnStatus = true;
-		envStatusString = "ѕараметры окружающей среды вне допуска:\n";
-		
+		boolean environmentStatus = true;
+		envStatusString = "ѕараметры окружающей среды вне допуска:\n";		
 		try {
 			currentTemparature = Double.parseDouble(this.temperatureTextField.getText());
 			currentAtmPreasure = Double.parseDouble(this.atmPreasureTextField.getText());
 			currentAirHumidity = Double.parseDouble(this.airHumidityTextField.getText());
 			
 			if (currentTemparature > upTemperature || currentTemparature < downTemperature) {
-				environmetnStatus = false;
+				environmentStatus = false;
 				if (currentTemparature > upTemperature) envStatusString += "температура выше нормы\n";
 				else envStatusString += "температура ниже нормы\n";
 			}
 			
 			if (currentAtmPreasure > upAtmPreasure || currentAtmPreasure < downAtmPreasure) {
-				environmetnStatus = false;
+				environmentStatus = false;
 				if (currentAtmPreasure > upAtmPreasure) envStatusString += "атмосферное давление выше нормы\n";
 				else envStatusString += "атмосферное давление ниже нормы\n";
 			}
 			
 			if (currentAirHumidity > upAirHumidity || currentAirHumidity < downAirHumidity) {
-				environmetnStatus = false;
+				environmentStatus = false;
 				if (currentAirHumidity > upAirHumidity) envStatusString += "влажность выше нормы\n";
 				else envStatusString += "влажность ниже нормы\n";
 			}
 		}
 		catch(NumberFormatException nfExp) {
-			environmetnStatus = false;
+			environmentStatus = false;
 			envStatusString = "¬веденные ¬ами значени€ параметров\nокружающей среды не €вл€ютс€ действительными числами.";
 		}				
-		return environmetnStatus;
+		return environmentStatus;
 	}
 	
 	private boolean checkVerType() {
