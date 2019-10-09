@@ -15,7 +15,6 @@ import ToleranceParamPack.UpDownTolerance;
 import VerificationPack.Gamma_Result;
 import VerificationPack.MeasResult;
 import VerificationPack.VSWR_Result;
-import _tempHelpers.Randomizer;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -31,16 +30,6 @@ import javafx.scene.layout.AnchorPane;
 
 public class NewElementController {
 
-	Randomizer randManager = new Randomizer();
-	@FXML
-	private Button fillTableRand;
-	@FXML
-	private void fillTableRandClick() {
-		Randomizer.fillStringGrid(this.paramsTable, 1);
-	}
-		
-	@FXML
-	private Button agreeBtn; 
 	@FXML
 	private Button addFreqBtn;
 	@FXML
@@ -99,6 +88,10 @@ public class NewElementController {
 	private RadioButton percentToleranceRB;	
 	@FXML
 	private RadioButton upDownToleranceRB;
+	@FXML
+	private RadioButton percentPhaseToleranceRB;
+	@FXML
+	private RadioButton upDownPhaseToleranceRB;
 	
 	@FXML
 	private ComboBox<String> paramsComboBox;
@@ -121,7 +114,7 @@ public class NewElementController {
 	private ToggleGroup measUnitGroup;
 	private ToggleGroup toleranceTypeGroup;
 	private ToggleGroup verificationTypeGroup;
-
+	private ToggleGroup phaseTolearnceTypeGroup;
 //************************************************	
 	//представляемый элемент	
 	private Element currentElement;
@@ -158,16 +151,14 @@ public class NewElementController {
 	private HashMap<String, ArrayList<String>> u_m_s;	//верхний предел модуля	
 	private HashMap<String, ArrayList<String>> d_p_s;	//нижний предел фазы
 	private HashMap<String, ArrayList<String>> u_p_s;	//верхний предел фазы
-		
+/*		
 	private NewElementWindow myWindow;	
 	public void setWindow(NewElementWindow window) {
 		myWindow = window;
 	}
-	
+*/	
 	@FXML
 	private void initialize() {			
-		this.fillTableRand.setVisible(false);
-		this.agreeBtn.setVisible(false);
 		//Создаем таблицу
 		int initialfreqCount = 10;
 		ArrayList<String> paramTableHeads = new ArrayList<String>();
@@ -241,11 +232,16 @@ public class NewElementController {
 		this.primaryVerificationRB.setToggleGroup(verificationTypeGroup);
 		this.periodicVerificationRB.setToggleGroup(verificationTypeGroup);
 		
+		phaseTolearnceTypeGroup = new ToggleGroup();
+		this.upDownPhaseToleranceRB.setSelected(true);
+		this.upDownPhaseToleranceRB.setToggleGroup(phaseTolearnceTypeGroup);
+		this.percentPhaseToleranceRB.setToggleGroup(phaseTolearnceTypeGroup);
+		
 		currentCountOfParams = 1;
 		currentTypeOfParams = "vswr";		
 		setParams(currentTypeOfParams, currentCountOfParams);
 		this.paramsComboBox.setItems(listOfParams);
-		this.paramsComboBox.setValue(listOfParams.get(0));
+		this.paramsComboBox.setValue(listOfParams.get(0));		
 	}
 	
 	@FXML
@@ -375,12 +371,7 @@ public class NewElementController {
 	private void freqTablesBtnClick() throws IOException {
 		FreqTablesWindow.getFreqTablesWindow(this).show();
 	}
-	
-	@FXML 
-	private void agreeBtnClick(ActionEvent event) throws IOException {
-		myWindow.close();
-	}
-	
+
 	@FXML
 	private void cloneS11ToS22BtnClick() {	
 		try {

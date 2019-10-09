@@ -149,9 +149,8 @@ public class MeasResult implements Includable<Element>, dbStorable{
 				if (size > 0) {
 					currentKeys.add(k);
 				}
-			}
-			catch(Exception exp) {
-				
+			} catch(Exception exp) {
+				//
 			}
 		}						
 		DateFormat df = new SimpleDateFormat(datePattern);
@@ -160,7 +159,7 @@ public class MeasResult implements Includable<Element>, dbStorable{
 		String resultsTableName = "Результат поверки " + 
 				this.myElement.getMyOwner().getName() + " " + this.myElement.getMyOwner().getType() + " " + this.myElement.getMyOwner().getSerialNumber() + " " + this.myElement.getType() + " " + this.myElement.getSerialNumber() +
 				" проведенной " + dateOfVerification;
-	//
+		//
 		String sqlQuery = "INSERT INTO [" + listOfVerificationsTable + "] (dateOfVerification, resultsTableName) values ('"+ dateOfVerification +"','"+ resultsTableName +"')";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
 		sqlQuery = "CREATE TABLE [" + resultsTableName + "] (id INTEGER PRIMARY KEY AUTOINCREMENT, freq VARCHAR(20), ";

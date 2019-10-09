@@ -48,7 +48,7 @@ public class Element implements Includable<Device>, dbStorable{
 	private ToleranceParametrs periodicToleranceParams;
 	
 	//Конструктор, инициализирующий объект информацией из БД
-	//Вызывается при инициализации устройства перед поверкой
+	//Вызывается при инициализации устройства перед поверкой или редактированием
 	public Element(Device deviceOwner, int index) throws SQLException{
 		
 		this.myDevice = deviceOwner;
@@ -76,7 +76,15 @@ public class Element implements Includable<Device>, dbStorable{
 		this.listOfVerificationsTable = arrayResults.get(0).get(5);
 		this.periodicParamTable = arrayResults.get(0).get(6);
 		this.primaryParamTable = arrayResults.get(0).get(7);
-		this.nominalIndex = Integer.parseInt(arrayResults.get(0).get(8));		
+		this.nominalIndex = Integer.parseInt(arrayResults.get(0).get(8));	
+		
+		arrayResults.clear();
+		fieldName.clear();
+		fieldName.add("resultsTableName");
+		sqlQuery = "SELECT resultsTableName FROM ["+ this.listOfVerificationsTable +"] WHERE id = "+Integer.toString(this.nominalIndex)+"";
+		DataBaseManager.getDB().sqlQueryString(sqlQuery, fieldName, arrayResults);
+		this.nominalTable = arrayResults.get(0).get(0);
+		
 		//Получим номиналы на элемент 
 		if (this.measUnit.equals("vswr")) {
 			this.nominal = new VSWR_Result(this, nominalIndex);
@@ -147,7 +155,7 @@ public class Element implements Includable<Device>, dbStorable{
 		}
 		String addStr = myDevice.getName() + " " + myDevice.getType() + " " + myDevice.getSerialNumber();
 		String strElementsTable = this.myDevice.getElementsTableName();
-		// 3.1 Внесли запись об элементе
+		// 3.1 Внесли запись об элементе в таблицу Devices
 		String sqlString = "INSERT INTO ["+strElementsTable+"] (ElementType, ElementSerNumber, PoleCount, MeasUnit, ToleranceType, VerificationsTable, PeriodicParamTable, PrimaryParamTable, NominalIndex) values ('"+type+"','"+serialNumber+"','"+poleCount+"','"+measUnit+"','"+toleranceType+"','"+listOfVerificationsTable+"','"+periodicParamTable +"','"+primaryParamTable+"','"+Integer.toString(nominalIndex)+"')";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlString);
 		System.out.println("\tЭлемент зарегистрирован");
