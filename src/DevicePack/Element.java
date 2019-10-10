@@ -8,8 +8,8 @@ import DataBasePack.dbStorable;
 import Exceptions.NoOwnerException;
 import NewElementPack.NewElementController;
 import ToleranceParamPack.PercentTolerance;
-import ToleranceParamPack.ToleranceParametrs;
 import ToleranceParamPack.UpDownTolerance;
+import ToleranceParamPack.Parametrspack.ToleranceParametrs;
 import VerificationPack.Gamma_Result;
 import VerificationPack.MeasResult;
 import VerificationPack.VSWR_Result;
@@ -44,8 +44,10 @@ public class Element implements Includable<Device>, dbStorable{
 	
 	private Device myDevice; 		//Устройство, которому принадлежит элемент
 	private MeasResult nominal;		//Номиналы значений
-	private ToleranceParametrs primaryToleranceParams;	// 
-	private ToleranceParametrs periodicToleranceParams;
+	private ToleranceParametrs primaryModuleToleranceParams;	// 
+	private ToleranceParametrs periodicModuleToleranceParams;
+	private ToleranceParametrs primaryPhaseToleranceParams;
+	private ToleranceParametrs periodicPhaseToleranceParams;
 	
 	//Конструктор, инициализирующий объект информацией из БД
 	//Вызывается при инициализации устройства перед поверкой или редактированием
@@ -93,6 +95,7 @@ public class Element implements Includable<Device>, dbStorable{
 			this.nominal = new Gamma_Result(this, nominalIndex);
 		}		 
 		//Получим критерии годности на элемент
+		/*
 		if (toleranceType.equals("percent")) {
 			this.periodicToleranceParams = new PercentTolerance("periodic", this);
 			this.primaryToleranceParams = new PercentTolerance("primary", this);
@@ -101,6 +104,7 @@ public class Element implements Includable<Device>, dbStorable{
 			this.periodicToleranceParams = new UpDownTolerance("periodic", this);
 			this.primaryToleranceParams = new UpDownTolerance("primary", this);
 		}
+		*/
 	}
 	
 	//Конструктор, инициализирующий объект информацией из Графического интерфейса для последующего сохранения в БД
@@ -122,8 +126,8 @@ public class Element implements Includable<Device>, dbStorable{
 		}
 		
 		if (this.toleranceType.equals("percent")) {
-			this.primaryToleranceParams = new PercentTolerance("primary", elCtrl, this);
-			this.periodicToleranceParams = new PercentTolerance("periodic", elCtrl, this);
+			this.primaryModuleToleranceParams = new ToleranceParametrs("primary", elCtrl, this, "m_");
+			this.primaryPhaseToleranceParams = new ToleranceParametrs("periodic", elCtrl, this, "p_");
 		}
 		else {
 			this.primaryToleranceParams = new UpDownTolerance("primary", elCtrl, this);

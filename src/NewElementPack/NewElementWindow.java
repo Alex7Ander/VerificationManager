@@ -14,7 +14,6 @@ public class NewElementWindow extends guiWindow {
 	public NewElementWindow() throws IOException {
 		super("", "NewElementForm.fxml");
 		NewElementController ctrl = (NewElementController) loader.getController();
-		//ctrl.setWindow(this);
 		//Установим действия по проверке введенных параметров перед закрытием
 		this.stage.setOnCloseRequest( event -> {
 			ctrl.remeberTables();
@@ -36,7 +35,6 @@ public class NewElementWindow extends guiWindow {
 	public NewElementWindow(Element elm) throws IOException {		
 		super(elm.getType(), "NewElementForm.fxml");
 		NewElementController ctrl = (NewElementController) loader.getController();
-		//ctrl.setWindow(this);
 		ctrl.setElement(elm);
 				
 		this.stage.setOnCloseRequest( event -> {

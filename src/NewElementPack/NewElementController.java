@@ -10,8 +10,11 @@ import FileManagePack.FileManager;
 import FreqTablesPack.FreqTablesWindow;
 import GUIpack.StringGridFX;
 import ToleranceParamPack.PercentTolerance;
-import ToleranceParamPack.ToleranceParametrs;
 import ToleranceParamPack.UpDownTolerance;
+import ToleranceParamPack.Parametrspack.ToleranceParametrs;
+import ToleranceParamPack.StrategyPack.StrategyOfSuitability;
+import ToleranceParamPack.StrategyPack.percentStrategy;
+import ToleranceParamPack.StrategyPack.upDownStrategy;
 import VerificationPack.Gamma_Result;
 import VerificationPack.MeasResult;
 import VerificationPack.VSWR_Result;
@@ -115,6 +118,26 @@ public class NewElementController {
 	private ToggleGroup toleranceTypeGroup;
 	private ToggleGroup verificationTypeGroup;
 	private ToggleGroup phaseTolearnceTypeGroup;
+	
+	//—тратегии определени€ годности
+	private StrategyOfSuitability moduleStrategy;
+	private StrategyOfSuitability phaseStrategy;
+	@FXML
+	private void phasePercentRBClick() {
+		phaseStrategy = new percentStrategy();
+	}
+	@FXML
+	private void phaseUpDownRBClick() {
+		phaseStrategy = new upDownStrategy();
+	}
+	@FXML
+	private void modulePercentRBClick() {
+		moduleStrategy = new percentStrategy();
+	}
+	@FXML
+	private void moduleUpDownRBClick() {
+		moduleStrategy = new upDownStrategy();
+	}
 //************************************************	
 	//представл€емый элемент	
 	private Element currentElement;
@@ -151,12 +174,7 @@ public class NewElementController {
 	private HashMap<String, ArrayList<String>> u_m_s;	//верхний предел модул€	
 	private HashMap<String, ArrayList<String>> d_p_s;	//нижний предел фазы
 	private HashMap<String, ArrayList<String>> u_p_s;	//верхний предел фазы
-/*		
-	private NewElementWindow myWindow;	
-	public void setWindow(NewElementWindow window) {
-		myWindow = window;
-	}
-*/	
+
 	@FXML
 	private void initialize() {			
 		//—оздаем таблицу
@@ -793,29 +811,7 @@ public class NewElementController {
 			this.paramsTable.setColumn(6, u_p_s.get(keys[this.savingIndex]));
 		}
 	}
-	
-	public ToleranceParametrs getPrimaryTP() {
-		if (this.percentToleranceRB.isSelected()) {
-			PercentTolerance ptp = new PercentTolerance("primary", this, this.currentElement);
-			return ptp;
-		}
-		else {
-			UpDownTolerance udt = new UpDownTolerance("primary", this, this.currentElement);
-			return udt;
-		}
-	}
-	
-	public ToleranceParametrs getPeriodicTP() {
-		if (this.percentToleranceRB.isSelected()) {
-			PercentTolerance ptp = new PercentTolerance("periodic", this, this.currentElement);
-			return ptp;
-		}
-		else {
-			UpDownTolerance udt = new UpDownTolerance("periodic", this, this.currentElement);
-			return udt;
-		}
-	}
-	
+		
 	public MeasResult getNominals() {
 		if (this.gammaRB.isSelected()) {
 			Gamma_Result gr = new Gamma_Result(this, this.currentElement);

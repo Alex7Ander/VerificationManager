@@ -128,8 +128,8 @@
                     <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
-                              <RadioButton fx:id="upDownToleranceRB" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" text="Верхний/нижний предел" AnchorPane.topAnchor="5.0" />
-                              <RadioButton fx:id="percentToleranceRB" layoutX="14.0" layoutY="52.0" mnemonicParsing="false" text="\% от номинала" AnchorPane.topAnchor="40.0" />
+                              <RadioButton fx:id="upDownToleranceRB" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#moduleUpDownRBClick" text="Верхний/нижний предел" AnchorPane.topAnchor="5.0" />
+                              <RadioButton fx:id="percentToleranceRB" layoutX="14.0" layoutY="52.0" mnemonicParsing="false" onAction="#modulePercentRBClick" text="\% от номинала" AnchorPane.topAnchor="40.0" />
                            </children>
                         </AnchorPane>
                     </content>
@@ -139,8 +139,8 @@
                     <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
-                              <RadioButton fx:id="upDownPhaseToleranceRB" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" text="Верхний/нижний предел" />
-                              <RadioButton fx:id="percentPhaseToleranceRB" layoutX="14.0" layoutY="53.0" mnemonicParsing="false" text="\% от номинала" />
+                              <RadioButton fx:id="upDownPhaseToleranceRB" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#phaseUpDownRBClick" text="Верхний/нижний предел" />
+                              <RadioButton fx:id="percentPhaseToleranceRB" layoutX="14.0" layoutY="53.0" mnemonicParsing="false" onAction="#phasePercentRBClick" text="\% от номинала" />
                            </children>
                         </AnchorPane>
                     </content>

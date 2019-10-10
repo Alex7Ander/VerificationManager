@@ -40,7 +40,7 @@ public class MeasResult implements Includable<Element>, dbStorable{
 	//Измеренные значения 
 	public HashMap<String, HashMap<Double, Double>> values;
 	//Решения о пригодности
-	public HashMap<String, HashMap<Double, String>> suitabilityDecision;
+	public HashMap<String, HashMap<Double, String>> suitabilityDecision;  //<Ключ к параметру(S11, S12, S21, S22) <Частота, Решение о годности>>
 	//Списко частот (может использоваться списком ключей для 2-го HashMap)
 	public ArrayList<Double> freqs;
 	

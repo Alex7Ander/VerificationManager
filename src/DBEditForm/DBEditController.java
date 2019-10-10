@@ -16,7 +16,7 @@ import GUIpack.InfoRequestable;
 import GUIpack.StringGridFX;
 import NewElementPack.NewElementWindow;
 import SearchDevicePack.SearchDeviceWindow;
-import ToleranceParamPack.ToleranceParametrs;
+import ToleranceParamPack.Parametrspack.ToleranceParametrs;
 import VerificationPack.MeasResult;
 import YesNoDialogPack.YesNoWindow;
 import _tempHelpers.Adapter;
