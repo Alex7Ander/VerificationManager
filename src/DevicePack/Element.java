@@ -7,9 +7,9 @@ import DataBasePack.DataBaseManager;
 import DataBasePack.dbStorable;
 import Exceptions.NoOwnerException;
 import NewElementPack.NewElementController;
-import ToleranceParamPack.PercentTolerance;
-import ToleranceParamPack.UpDownTolerance;
 import ToleranceParamPack.Parametrspack.ToleranceParametrs;
+import ToleranceParamPack.StrategyPack.percentStrategy;
+import ToleranceParamPack.StrategyPack.upDownStrategy;
 import VerificationPack.Gamma_Result;
 import VerificationPack.MeasResult;
 import VerificationPack.VSWR_Result;
@@ -25,8 +25,10 @@ public class Element implements Includable<Device>, dbStorable{
 		this.myDevice = Owner;	
 		String addrStr = this.myDevice.getName() + " " + this.myDevice.getType() + " " +this.myDevice.getSerialNumber() + " "+
 				 this.type + " " + this.serialNumber;
-		this.periodicParamTable = "Критерии периодической поверки для " + addrStr;
-		this.primaryParamTable = "Критерии первичной поверки для " + addrStr;
+		this.periodicModuleParamTable = "Критерии годности Модуля периодической поверки для " + addrStr;
+		this.primaryModuleParamTable = "Критерии первичной поверки для " + addrStr;
+		this.periodicPhaseParamTable = "Критерии годности Фазы периодической поверки для " + addrStr;
+		this.primaryPhaseParamTable = "Критерии годности Фазы первичной поверки " + addrStr;		
 		this.listOfVerificationsTable = "Список таблиц с результатами измерений для " + addrStr;
 	}
 	
@@ -34,13 +36,27 @@ public class Element implements Includable<Device>, dbStorable{
 	private String serialNumber;
 	private int poleCount;
 	private String measUnit;
-	private String toleranceType;
 	private int nominalIndex;
 	
-	private String periodicParamTable;
-	private String primaryParamTable;
+	//Маркеры типов критериев годнсоти
+	private String moduleToleranceType;
+	private String phaseToleranceType;
+	public String getModuleToleranceType() {return this.moduleToleranceType;}
+	public String getPhaseToleranceType() {return this.phaseToleranceType;}
+	
+	//Названия таблиц для критериев годности, номиналов и списка проведенных поверок
+	private String periodicModuleParamTable;
+	private String primaryModuleParamTable;
+	private String periodicPhaseParamTable;
+	private String primaryPhaseParamTable;	
 	private String nominalTable;
 	private String listOfVerificationsTable;
+	public String getPeriodicModuleParamTable() {return this.periodicModuleParamTable;}
+	public String getPrimaryModuleParamTable() {return this.primaryModuleParamTable;}
+	public String getPeriodicPhaseParamTable() {return this.periodicPhaseParamTable;}
+	public String getPrimaryPhaseParamTable() {return this.primaryPhaseParamTable;}	
+	public String getNominalTable() {return this.nominalTable;}
+	public String getListOfVerificationsTable() {return this.listOfVerificationsTable;}
 	
 	private Device myDevice; 		//Устройство, которому принадлежит элемент
 	private MeasResult nominal;		//Номиналы значений
@@ -51,35 +67,37 @@ public class Element implements Includable<Device>, dbStorable{
 	
 	//Конструктор, инициализирующий объект информацией из БД
 	//Вызывается при инициализации устройства перед поверкой или редактированием
-	public Element(Device deviceOwner, int index) throws SQLException{
-		
+	public Element(Device deviceOwner, int index) throws SQLException{		
 		this.myDevice = deviceOwner;
 		String elementTableName = myDevice.getElementsTableName();
-		String sqlQuery = "SELECT ElementType, ElementSerNumber, PoleCount, MeasUnit, ToleranceType, VerificationsTable, PeriodicParamTable, PrimaryParamTable, NominalIndex FROM [" + elementTableName + "] WHERE id='"+index+"'";
+		String sqlQuery = "SELECT ElementType, ElementSerNumber, PoleCount, MeasUnit, ModuleToleranceType, PhaseToleranceType, VerificationsTable, vv NominalIndex FROM [" + elementTableName + "] WHERE id='"+index+"'";
 		ArrayList<String> fieldName = new ArrayList<String>();
-		fieldName.add("ElementType");
-		fieldName.add("ElementSerNumber");
-		fieldName.add("PoleCount");
-		fieldName.add("MeasUnit");
-		fieldName.add("ToleranceType");
-		fieldName.add("VerificationsTable");
-		fieldName.add("PeriodicParamTable");
-		fieldName.add("PrimaryParamTable");
-		fieldName.add("NominalIndex");
+		fieldName.add("ElementType");				//0
+		fieldName.add("ElementSerNumber");			//1
+		fieldName.add("PoleCount");					//2
+		fieldName.add("MeasUnit");					//3
+		fieldName.add("ModuleToleranceType");		//4
+		fieldName.add("PhaseToleranceType");		//5
+		fieldName.add("VerificationsTable");		//6		
+		fieldName.add("PrimaryModuleParamTable");	//7
+		fieldName.add("PeriodicModuleParamTable");	//8
+		fieldName.add("PrimaryPhaseParamTable");	//9
+		fieldName.add("PeriodicPhaseParamTable");	//10		
+		fieldName.add("NominalIndex");				//11
 		ArrayList<ArrayList<String>> arrayResults = new ArrayList<ArrayList<String>>();
-		DataBaseManager.getDB().sqlQueryString(sqlQuery, fieldName, arrayResults);
-		
-		
+		DataBaseManager.getDB().sqlQueryString(sqlQuery, fieldName, arrayResults);				
 		this.type = arrayResults.get(0).get(0);
 		this.serialNumber = arrayResults.get(0).get(1);
 		this.poleCount = Integer.parseInt(arrayResults.get(0).get(2));
 		this.measUnit = arrayResults.get(0).get(3);
-		this.toleranceType = arrayResults.get(0).get(4);
-		this.listOfVerificationsTable = arrayResults.get(0).get(5);
-		this.periodicParamTable = arrayResults.get(0).get(6);
-		this.primaryParamTable = arrayResults.get(0).get(7);
-		this.nominalIndex = Integer.parseInt(arrayResults.get(0).get(8));	
-		
+		this.moduleToleranceType = arrayResults.get(0).get(4);
+		this.phaseToleranceType = arrayResults.get(0).get(5);		
+		this.listOfVerificationsTable = arrayResults.get(0).get(6);
+		this.primaryModuleParamTable = arrayResults.get(0).get(7);
+		this.periodicModuleParamTable = arrayResults.get(0).get(8);
+		this.primaryPhaseParamTable = arrayResults.get(0).get(9);
+		this.periodicPhaseParamTable = arrayResults.get(0).get(10);
+		this.nominalIndex = Integer.parseInt(arrayResults.get(0).get(11));			
 		arrayResults.clear();
 		fieldName.clear();
 		fieldName.add("resultsTableName");
@@ -95,6 +113,10 @@ public class Element implements Includable<Device>, dbStorable{
 			this.nominal = new Gamma_Result(this, nominalIndex);
 		}		 
 		//Получим критерии годности на элемент
+		this.primaryModuleToleranceParams = new ToleranceParametrs("primary", this, "m_");
+		this.periodicModuleToleranceParams = new ToleranceParametrs("periodic", this, "m_");
+		this.primaryPhaseToleranceParams = new ToleranceParametrs("primary", this, "p_");
+		this.periodicPhaseToleranceParams = new ToleranceParametrs("periodic", this, "p_");
 		/*
 		if (toleranceType.equals("percent")) {
 			this.periodicToleranceParams = new PercentTolerance("periodic", this);
@@ -115,7 +137,8 @@ public class Element implements Includable<Device>, dbStorable{
 		this.serialNumber = elCtrl.getSerNum();
 		this.poleCount = elCtrl.getPoleCount();
 		this.measUnit = elCtrl.getMeasUnit();
-		this.toleranceType = elCtrl.getToleranceType();
+		this.moduleToleranceType = elCtrl.getModuleToleranceType();
+		this.phaseToleranceType = elCtrl.getPhaseToleranceType();
 		this.nominalIndex = 1;
 		
 		if (this.measUnit.equals("vswr")) {
@@ -125,13 +148,25 @@ public class Element implements Includable<Device>, dbStorable{
 			this.nominal = new Gamma_Result(elCtrl, this);
 		}
 		
-		if (this.toleranceType.equals("percent")) {
-			this.primaryModuleToleranceParams = new ToleranceParametrs("primary", elCtrl, this, "m_");
-			this.primaryPhaseToleranceParams = new ToleranceParametrs("periodic", elCtrl, this, "p_");
+		this.primaryModuleToleranceParams = new ToleranceParametrs("primary", elCtrl, this, "m_");
+		this.primaryPhaseToleranceParams = new ToleranceParametrs("primary", elCtrl, this, "p_");		
+		this.periodicModuleToleranceParams = new ToleranceParametrs("periodic", elCtrl, this, "m_");
+		this.periodicPhaseToleranceParams = new ToleranceParametrs("periodic", elCtrl, this, "p_");		
+		percentStrategy percentStr = new percentStrategy();
+		upDownStrategy udStr = new upDownStrategy();
+		if (this.moduleToleranceType.equals("updown")) {
+			primaryModuleToleranceParams.setStratege(udStr);
+			periodicModuleToleranceParams.setStratege(udStr);
+		} else {			
+			primaryModuleToleranceParams.setStratege(percentStr);
+			periodicModuleToleranceParams.setStratege(percentStr);
 		}
-		else {
-			this.primaryToleranceParams = new UpDownTolerance("primary", elCtrl, this);
-			this.periodicToleranceParams = new UpDownTolerance("periodic", elCtrl, this);
+		if (this.phaseToleranceType.equals("updown")) {
+			primaryPhaseToleranceParams.setStratege(udStr);
+			periodicPhaseToleranceParams.setStratege(udStr);
+		} else {
+			primaryPhaseToleranceParams.setStratege(percentStr);
+			periodicPhaseToleranceParams.setStratege(percentStr);
 		}
 	}
 
@@ -140,14 +175,12 @@ public class Element implements Includable<Device>, dbStorable{
 	public String getSerialNumber() {return this.serialNumber;}
 	public int getPoleCount() {return this.poleCount;}
 	public String getMeasUnit() {return this.measUnit;}
-	public String getToleranceType() {return this.toleranceType;}
-	public String getPeriodicParamTable() {return periodicParamTable;}
-	public String getPrimaryParamTable() {return primaryParamTable;}
 	public String getNominaltable() {return nominalTable;}
-	public String getListOfVerificationsTable() {return listOfVerificationsTable;}
 	public MeasResult getNominal() {return nominal;}
-	public ToleranceParametrs getPrimaryToleranceParams() {return primaryToleranceParams;}	// 
-	public ToleranceParametrs getPeriodicToleranceParams() {return periodicToleranceParams;}
+	public ToleranceParametrs getPrimaryModuleToleranceParams() {return primaryModuleToleranceParams;}	// 
+	public ToleranceParametrs getPeriodicModuleToleranceParams() {return periodicModuleToleranceParams;}
+	public ToleranceParametrs getPrimaryPhaseToleranceParams() {return primaryPhaseToleranceParams;}	// 
+	public ToleranceParametrs getPeriodicPhaseToleranceParams() {return periodicPhaseToleranceParams;}
 	@Override
 	public Device getMyOwner() {return this.myDevice;}
 	
@@ -160,7 +193,8 @@ public class Element implements Includable<Device>, dbStorable{
 		String addStr = myDevice.getName() + " " + myDevice.getType() + " " + myDevice.getSerialNumber();
 		String strElementsTable = this.myDevice.getElementsTableName();
 		// 3.1 Внесли запись об элементе в таблицу Devices
-		String sqlString = "INSERT INTO ["+strElementsTable+"] (ElementType, ElementSerNumber, PoleCount, MeasUnit, ToleranceType, VerificationsTable, PeriodicParamTable, PrimaryParamTable, NominalIndex) values ('"+type+"','"+serialNumber+"','"+poleCount+"','"+measUnit+"','"+toleranceType+"','"+listOfVerificationsTable+"','"+periodicParamTable +"','"+primaryParamTable+"','"+Integer.toString(nominalIndex)+"')";
+		String sqlString = "INSERT INTO ["+strElementsTable+"] (ElementType, ElementSerNumber, PoleCount, MeasUnit, ModuleToleranceType, PhaseToleranceType, VerificationsTable, PrimaryModuleParamTable, PeriodicModuleParamTable, PrimaryPhaseParamTable, PeriodicPhaseParamTable, NominalIndex) values "
+				+ "('"+type+"','"+serialNumber+"','"+poleCount+"','"+measUnit+"','"+this.moduleToleranceType+"','"+this.phaseToleranceType+"','"+listOfVerificationsTable+"','" + this.primaryModuleParamTable + "','"+this.periodicModuleParamTable+"','"+this.primaryPhaseParamTable+"','"+this.periodicPhaseParamTable+"','"+Integer.toString(nominalIndex)+"')";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlString);
 		System.out.println("\tЭлемент зарегистрирован");
 		// 3.2 Создание таблицы [Список таблиц с результатами измерений для ...]
@@ -170,9 +204,11 @@ public class Element implements Includable<Device>, dbStorable{
 		// 3.3 Сохранить критерии годности
 		System.out.println("\tНачато сохранение критериев годности:");
 		System.out.println("\t---------------первичной поверки-----------------------:");
-		this.primaryToleranceParams.saveInDB();	
+		this.primaryModuleToleranceParams.saveInDB();	
+		this.primaryPhaseToleranceParams.saveInDB();
 		System.out.println("\t---------------периодическойй поверки-----------------------:");
-		this.periodicToleranceParams.saveInDB();		
+		this.periodicModuleToleranceParams.saveInDB();	
+		this.periodicPhaseToleranceParams.saveInDB();
 		System.out.println("\tНачато сохранение номинала:");
 		// 3.4 Сохраняем номиналы
 		this.nominal.saveInDB();	
@@ -187,8 +223,10 @@ public class Element implements Includable<Device>, dbStorable{
 		//Удалить номинал
 		this.nominal.deleteFromDB();
 		//Удалить критерии годности
-		this.periodicToleranceParams.deleteFromDB();
-		this.primaryToleranceParams.deleteFromDB();		
+		this.primaryModuleToleranceParams.deleteFromDB();
+		this.primaryPhaseToleranceParams.deleteFromDB();
+		this.periodicModuleToleranceParams.deleteFromDB();
+		this.periodicPhaseToleranceParams.deleteFromDB();
 		//Удалить таблицу Measurements of 		
 		String sqlString = "DROP TABLE ["+measurementsOfTableName+"]";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlString);
@@ -232,15 +270,18 @@ public class Element implements Includable<Device>, dbStorable{
 		return arrayResults;
 	}
 
-	public void rewriteParams(ToleranceParametrs newPrimaryparams,
-							  ToleranceParametrs newPeriodicalParams,
-							  MeasResult newNominals) throws SQLException{
-		this.primaryToleranceParams.deleteFromDB();
-		this.periodicToleranceParams.deleteFromDB();
+	public void rewriteParams(ToleranceParametrs newModulePrimaryParams, ToleranceParametrs newModulePeriodicParams,
+							  ToleranceParametrs newPhasePrimaryParams, ToleranceParametrs newPhasePeriodicparams, MeasResult newNominals) throws SQLException{
+		this.primaryModuleToleranceParams.deleteFromDB();
+		this.primaryPhaseToleranceParams.deleteFromDB();
+		this.periodicModuleToleranceParams.deleteFromDB();
+		this.periodicPhaseToleranceParams.deleteFromDB();
 		this.nominal.deleteFromDB();
 		
-		newPrimaryparams.saveInDB();
-		newPeriodicalParams.saveInDB();
+		newModulePrimaryParams.saveInDB();
+		newModulePeriodicParams.saveInDB();
+		newPhasePrimaryParams.saveInDB();
+		newPhasePeriodicparams.saveInDB();
 		newNominals.saveInDB();
 	}
 }

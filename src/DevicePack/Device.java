@@ -109,7 +109,7 @@ public class Device implements dbStorable {
 		DataBaseManager.getDB().sqlQueryUpdate(sqlString);
 		System.out.println("Внесена запись о новом приборе в таблицу Devices");
 		//Создание таблицы со списком включенных элементов
-		sqlString = "CREATE TABLE ["+strElementsTable+"] (id INTEGER PRIMARY KEY AUTOINCREMENT, ElementType VARCHAR(256), ElementSerNumber VARCHAR(256), PoleCount VARCHAR(256), MeasUnit VARCHAR(256), ToleranceType VARCHAR(256), VerificationsTable VARCHAR(256), PeriodicParamTable VARCHAR(256), PrimaryParamTable VARCHAR(256), NominalIndex VARCHAR(10))";
+		sqlString = "CREATE TABLE ["+strElementsTable+"] (id INTEGER PRIMARY KEY AUTOINCREMENT, ElementType VARCHAR(256), ElementSerNumber VARCHAR(256), PoleCount VARCHAR(256), MeasUnit VARCHAR(256), ModuleToleranceType VARCHAR(256), PhaseToleranceType VARCHAR(256), VerificationsTable VARCHAR(256), PrimaryModuleParamTable VARCHAR(256), PeriodicModuleParamTable VARCHAR(256), PrimaryPhaseParamTable VARCHAR(256), PeriodicPhaseParamTable VARCHAR(256), NominalIndex VARCHAR(10))";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlString);
 		System.out.println("Создана таблица со списком элементов данного устройства");
 		this.elementsTableName = strElementsTable;

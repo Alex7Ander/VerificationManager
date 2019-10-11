@@ -489,11 +489,15 @@ public class NewElementController {
 		else return "gamma"; 
 	}
 	
-	public String getToleranceType() {
+	public String getModuleToleranceType() {
 		if (this.upDownToleranceRB.isSelected()) return "updown";
 		else return "percent";
 	}
-
+	public String getPhaseToleranceType() {
+		if (this.upDownPhaseToleranceRB.isSelected()) return "updown";
+		else return "percent";
+	}
+	
 	public ArrayList<Double> getFreqsValues(){
 		return freqs;
 	}	
