@@ -7,7 +7,7 @@ import DataBasePack.DataBaseManager;
 import DataBasePack.dbStorable;
 import Exceptions.NoOwnerException;
 import NewElementPack.NewElementController;
-import ToleranceParamPack.Parametrspack.ToleranceParametrs;
+import ToleranceParamPack.ParametrsPack.ToleranceParametrs;
 import ToleranceParamPack.StrategyPack.percentStrategy;
 import ToleranceParamPack.StrategyPack.upDownStrategy;
 import VerificationPack.Gamma_Result;
@@ -116,7 +116,7 @@ public class Element implements Includable<Device>, dbStorable{
 		this.primaryModuleToleranceParams = new ToleranceParametrs("primary", this, "m_");
 		this.periodicModuleToleranceParams = new ToleranceParametrs("periodic", this, "m_");
 		this.primaryPhaseToleranceParams = new ToleranceParametrs("primary", this, "p_");
-		this.periodicPhaseToleranceParams = new ToleranceParametrs("periodic", this, "p_");
+		this.periodicPhaseToleranceParams = new ToleranceParametrs("periodic", this, "p_");    
 		/*
 		if (toleranceType.equals("percent")) {
 			this.periodicToleranceParams = new PercentTolerance("periodic", this);

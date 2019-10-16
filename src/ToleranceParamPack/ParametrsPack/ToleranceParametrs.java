@@ -1,4 +1,4 @@
-package ToleranceParamPack.Parametrspack;
+package ToleranceParamPack.ParametrsPack;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -9,50 +9,88 @@ import DataBasePack.dbStorable;
 import DevicePack.Element;
 import DevicePack.Includable;
 import ErrorParamsPack.ErrorParams;
+import Exceptions.SavingException;
 import NewElementPack.NewElementController;
 import ToleranceParamPack.StrategyPack.StrategyOfSuitability;
 import VerificationPack.MeasResult;
 
 public class ToleranceParametrs implements Includable<Element>, dbStorable {
-	protected String keys[];/* = {"d_m_S11", "u_m_S11", "d_p_S11", "u_p_S11",  
-							   "d_m_S12", "u_m_S12", "d_p_S12", "u_p_S12",
-							   "d_m_S21", "u_m_S21", "d_p_S21", "u_p_S21",
-							   "d_m_S22", "u_m_S22", "d_p_S22", "u_p_S22"};*/
+		 
+	 public HashMap<String, HashMap<Double, Double>> values; //Значения критериев годности <имя параметра, <частота, параметр>>
+	 public ArrayList<Double> freqs;						 //Частоты
 	
-	private String unitPrefix;
+	 private String tableName;
+	 public String getTableName(){
+		 return this.tableName;
+	 }
+
+	 public TimeType timeType;
+	 public MeasUnitPart measUnitPart;
+
+	 ToleranceParametrs(){
+
+	     tableName = "Критерии годности " + this.timeType.getTableNamePart() + " поверки для " + this.measUnitPart.getTableNamePart() + " S параметров";
+	 }
+
+	 public void setTableName(){
+		 tableName = "Критерии годности " + this.timeType.getTableNamePart() + " поверки для " + this.measUnitPart.getTableNamePart() + " S параметров";
+	 }
+		
+//Конструкторы
+	//Конструктор для инициализации перед сохранением в БД
+	public ToleranceParametrs(Element ownerElement, NewElementController elCtrl){		
+		this.myElement = ownerElement;
+		this.freqs = elCtrl.getFreqsValues();
+		this.values = elCtrl.getToleranceParamsValues("");
+	}
+//Методы, выполняющие работу с БД (унаследованны от dbStorable)		    
+	 @Override
+	 public void saveInDB() throws SQLException, SavingException {
+		 // TODO Auto-generated method stub				
+	 }
 	
-	protected int countOfParams;
-	protected int countOfFreq;
-	protected String typeByTime;
-	public HashMap<String, HashMap<Double, Double>> values;
-	public ArrayList<Double> freqs;
+	 @Override
+	 public void deleteFromDB() throws SQLException {
+		 // TODO Auto-generated method stub
+	 }
 	
-	public String getUnitPrefix() {return this.unitPrefix;}
-	public int getCountOfParams() {return this.countOfParams;}
-	public int getCountOfFreq() {return this.countOfFreq;}
-	public String getTypeByTime() {return this.typeByTime;}
+	 @Override
+	 public void editInfoInDB(HashMap<String, String> editingValues) throws SQLException {
+		 // TODO Auto-generated method stub
+	 }
+
+//Методы, определяющие принадлежность данного критерия годности к конкретному элементу (унаследованы от Includable<Element>)
+	 private Element myElement; //Сам элемент
+	 @Override
+	 public Element getMyOwner() {
+		 // TODO Auto-generated method stub
+		 return null;
+	 }
 	
-	//Стратегия определения годности прибора
+	 @Override
+	 public void onAdding(Element Owner) {
+		 // TODO Auto-generated method stub				
+	 }
+	 
+	 //Стратегия определения годности прибора
 	private StrategyOfSuitability strategy;
 	public void setStratege(StrategyOfSuitability anyStrategy) {
 		this.strategy = anyStrategy;
 	}
-	//Абстрактный метод, который должен быть переопредел классими наследниками для определения пригодности 
-	//устройства по тому или иному способу
 	public boolean checkResult(MeasResult result) {
 		return this.strategy.checkResult(result, this);		
 	}
-		
-	//Конструктор для инициализации перед сохранением в БД
-	public ToleranceParametrs(String TypeByTime, NewElementController elCtrl, Element ownerElement, String UnitPrefix){
-		this.typeByTime = TypeByTime;		
-		this.myElement = ownerElement;
-		this.freqs = elCtrl.getFreqsValues();
-		this.countOfFreq = this.freqs.size();
-		this.values = elCtrl.getToleranceParamsValues(TypeByTime);
-		this.countOfParams = this.values.size();
-		this.unitPrefix = UnitPrefix;
-	}
+	/*
+	protected String keys[] = {"d_m_S11", "u_m_S11", "d_p_S11", "u_p_S11",  
+							   "d_m_S12", "u_m_S12", "d_p_S12", "u_p_S12",
+							   "d_m_S21", "u_m_S21", "d_p_S21", "u_p_S21",
+							   "d_m_S22", "u_m_S22", "d_p_S22", "u_p_S22"};		
+	protected int countOfParams;
+	protected int countOfFreq;
+	public int getCountOfParams() {return this.countOfParams;}
+	public int getCountOfFreq() {return this.countOfFreq;}		
+	
+
 	
 	//Еще 1 вариант конструктора для сохранения в БД
 	public ToleranceParametrs(Element ParamsOwnerElement, ArrayList<Double> Freqs, ArrayList<ArrayList<Double>> Parametrs, String TypeByTime, String UnitPrefix){
@@ -93,8 +131,7 @@ public class ToleranceParametrs implements Includable<Element>, dbStorable {
 		}
 		else {
 			paramTableName = ownerElement.getPeriodicParamTable(); 
-		}
-		
+		}		
 		ArrayList<String> fieldsNames = new ArrayList<String>();
 		fieldsNames.add("freq");
 		
@@ -191,5 +228,5 @@ public class ToleranceParametrs implements Includable<Element>, dbStorable {
 	public void editInfoInDB(HashMap<String, String> editingValues) throws SQLException {
 		// TODO Auto-generated method stub		
 	}
-					
+	*/			
 }

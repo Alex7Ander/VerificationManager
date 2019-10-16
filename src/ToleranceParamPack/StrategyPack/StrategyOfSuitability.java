@@ -1,6 +1,6 @@
 package ToleranceParamPack.StrategyPack;
 
-import ToleranceParamPack.Parametrspack.ToleranceParametrs;
+import ToleranceParamPack.ParametrsPack.ToleranceParametrs;
 import VerificationPack.MeasResult;
 
 public interface StrategyOfSuitability {

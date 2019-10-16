@@ -2,7 +2,7 @@ package ToleranceParamPack.StrategyPack;
 
 import java.util.HashMap;
 
-import ToleranceParamPack.Parametrspack.ToleranceParametrs;
+import ToleranceParamPack.ParametrsPack.ToleranceParametrs;
 import VerificationPack.MeasResult;
 
 public class upDownStrategy implements StrategyOfSuitability {

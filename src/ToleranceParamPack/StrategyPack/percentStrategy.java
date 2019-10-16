@@ -2,7 +2,7 @@ package ToleranceParamPack.StrategyPack;
 
 import java.util.HashMap;
 
-import ToleranceParamPack.Parametrspack.ToleranceParametrs;
+import ToleranceParamPack.ParametrsPack.ToleranceParametrs;
 import VerificationPack.MeasResult;
 
 public class percentStrategy implements StrategyOfSuitability {
@@ -18,7 +18,7 @@ public class percentStrategy implements StrategyOfSuitability {
 			HashMap<Double, String> decisions = new HashMap<Double, String>();			
 			for (int j=0; j < currentCountOfFreq; j++) {
 				double cFreq = result.freqs.get(j);	
-				String k1 = tolerance.getUnitPrefix() + cKeys[i];
+				String k1 = tolerance.measUnitPart + cKeys[i];
 				double res = result.values.get(k1).get(cFreq);
 				double down = tolerance.values.get("d_" + k1).get(cFreq) * res / 100;
 				double up = tolerance.values.get("u_" + k1).get(cFreq) * res / 100;; 
