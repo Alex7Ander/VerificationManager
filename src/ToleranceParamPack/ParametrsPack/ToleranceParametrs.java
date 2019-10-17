@@ -15,9 +15,9 @@ import ToleranceParamPack.StrategyPack.StrategyOfSuitability;
 import VerificationPack.MeasResult;
 
 public class ToleranceParametrs implements Includable<Element>, dbStorable {
-		 
-	 public HashMap<String, HashMap<Double, Double>> values; //Значения критериев годности <имя параметра, <частота, параметр>>
-	 public ArrayList<Double> freqs;						 //Частоты
+	 protected String keys[] = 	{"S11", "S12", "S21", "S22"}; 
+	 public HashMap<String, HashMap<Double, Double>> values; //Р—РЅР°С‡РµРЅРёСЏ РєСЂРёС‚РµСЂРёРµРІ РіРѕРґРЅРѕСЃС‚Рё
+	 public ArrayList<Double> freqs;						 //Р§Р°СЃС‚РѕС‚С‹
 	
 	 private String tableName;
 	 public String getTableName(){
@@ -27,31 +27,89 @@ public class ToleranceParametrs implements Includable<Element>, dbStorable {
 	 public TimeType timeType;
 	 public MeasUnitPart measUnitPart;
 
-	 ToleranceParametrs(){
-
-	     tableName = "Критерии годности " + this.timeType.getTableNamePart() + " поверки для " + this.measUnitPart.getTableNamePart() + " S параметров";
-	 }
-
 	 public void setTableName(){
-		 tableName = "Критерии годности " + this.timeType.getTableNamePart() + " поверки для " + this.measUnitPart.getTableNamePart() + " S параметров";
+		 tableName = "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ " + this.timeType.getTableNamePart() + " пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ " + this.measUnitPart.getTableNamePart() + " S пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ";
 	 }
 		
-//Конструкторы
-	//Конструктор для инициализации перед сохранением в БД
-	public ToleranceParametrs(Element ownerElement, NewElementController elCtrl){		
+//РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
+	 ToleranceParametrs(){
+		this.values = new HashMap<String, HashMap<Double, Double>>();
+		this.freqs = new ArrayList<Double>();
+	 }
+	//РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РґР»СЏ РїРѕР»СѓС‡РµРЅРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ РёР· GUI
+	public ToleranceParametrs(TimeType currentTimeType, MeasUnitPart currentUnitPart, NewElementController elCtrl, Element ownerElement){		
+		this();
 		this.myElement = ownerElement;
+		this.timeType = currentTimeType;
+		this.measUnitPart = currentUnitPart;
 		this.freqs = elCtrl.getFreqsValues();
 		this.values = elCtrl.getToleranceParamsValues("");
+		this.tableName = "РљСЂРёС‚РµСЂРёРё РіРѕРґРЅРѕСЃС‚Рё " + this.timeType.getTableNamePart() + " РїРѕРІРµСЂРєРё РґР»СЏ " + this.measUnitPart.getTableNamePart() + " S РїР°СЂР°РјРµС‚СЂРѕРІ";
 	}
-//Методы, выполняющие работу с БД (унаследованны от dbStorable)		    
+	//РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РґР»СЏ РїРѕР»СѓС‡РµРЅРёСЏ РґР°РЅРЅС‹С… РёР· Р‘Р”
+	public ToleranceParametrs(TimeType currentTimeType, MeasUnitPart currentUnitPart, Element ownerElement) throws SQLException {
+		this();		
+		this.myElement = ownerElement;
+		this.timeType = currentTimeType;
+		this.measUnitPart = currentUnitPart;		
+		this.tableName = "РљСЂРёС‚РµСЂРёРё РіРѕРґРЅРѕСЃС‚Рё " + this.timeType.getTableNamePart() + " РїРѕРІРµСЂРєРё РґР»СЏ " + this.measUnitPart.getTableNamePart() + " S РїР°СЂР°РјРµС‚СЂРѕРІ";		
+		
+		ArrayList<String> fieldsNames = new ArrayList<String>();
+		fieldsNames.add("freq");
+		for (int i = 0; i < this.myElement.getSParamsCout(); i++) {
+			fieldsNames.add("DOWN_" + this.measUnitPart + "_" + this.keys[i]);
+			fieldsNames.add("UP_" + this.measUnitPart + "_" + this.keys[i]);
+		}
+		
+		String sqlQuery = "SELECT ";
+		for (int i = 0; i < this.myElement.getSParamsCout(); i++) {
+			sqlQuery += fieldsNames.get(i);
+			if (i != this.myElement.getSParamsCout() - 1) sqlQuery += ", ";
+		}
+		sqlQuery += " FROM [" + this.tableName +"]";
+		DataBaseManager.getDB().sqlQueryMapOfDouble(sqlQuery, fieldsNames, this.values);
+		
+		sqlQuery = "SELECT freq FROM [" + this.tableName + "]";
+		DataBaseManager.getDB().sqlQueryDouble(sqlQuery, "freq", this.freqs);		
+	}
+ 
+//пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ dbStorable)		    
 	 @Override
 	 public void saveInDB() throws SQLException, SavingException {
-		 // TODO Auto-generated method stub				
+		String sqlQuery = "CREATE TABLE [" + this.tableName + "] (id INTEGER PRIMARY KEY AUTOINCREMENT, freq VARCHAR(20), ";
+		for (int i = 0; i < this.myElement.getSParamsCout(); i++) {
+			sqlQuery += ("DOWN_" + this.measUnitPart + "_" + this.keys[i] + " VARCHAR(20)");
+			sqlQuery += ("UP_" + this.measUnitPart + "_" + this.keys[i] + " VARCHAR(20)");
+			if (i != this.myElement.getSParamsCout()) sqlQuery += ", ";
+		}
+		sqlQuery += ")";
+		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
+		System.out.println("\t\tпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ ");
+			
+		//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ paramsTableName пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+		for (int i = 0; i < this.freqs.size(); i++) {			
+			sqlQuery = "INSERT INTO [" + this.tableName + "] (freq, ";						
+			for (int j = 0; j < this.values.size(); j++) {
+				sqlQuery += (keys[j]);
+				if (j != this.values.size()) sqlQuery += ", ";
+			}
+			sqlQuery += ") values ('"+freqs.get(i)+"', ";		
+			for (int j = 0; j < this.values.size(); j++) {
+				sqlQuery += ("'"+values.get(this.timeType + "_" + keys[j]).get(freqs.get(i)).toString()+"'");
+				if (j != this.values.size()) sqlQuery += ", ";
+			}				
+			sqlQuery += ")";						
+			DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
+			System.out.println("\t\tпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ " + freqs.get(i) + ": ");
+			System.out.println("\t\t" + sqlQuery + "");
+		}			
 	 }
 	
 	 @Override
 	 public void deleteFromDB() throws SQLException {
-		 // TODO Auto-generated method stub
+		String sqlQuery = "DROP TABLE [" + this.tableName + "]";
+		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
+		//Р”РѕР±Р°РІРёС‚СЊ РєРѕРґ РїРѕ СѓРґР°Р»РµРЅРёСЋ Р·Р°РїРёСЃРё С‚Р°Р±Р»РёС†С‹ РІ С‚Р°Р±Р»РёС†Рµ СЌР»РµРјРµРЅС‚Р° Рѕ С‚Р°Р±Р»РёС†Рµ РґР°РЅРЅРѕРіРѕ РєСЂРёС‚РµСЂРёСЏ (РЅСѓ РІС‹ РїРѕРЅСЏР»Рё)
 	 }
 	
 	 @Override
@@ -59,174 +117,24 @@ public class ToleranceParametrs implements Includable<Element>, dbStorable {
 		 // TODO Auto-generated method stub
 	 }
 
-//Методы, определяющие принадлежность данного критерия годности к конкретному элементу (унаследованы от Includable<Element>)
-	 private Element myElement; //Сам элемент
+//пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ Includable<Element>)
+	 private Element myElement; //пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	 @Override
 	 public Element getMyOwner() {
-		 // TODO Auto-generated method stub
-		 return null;
+		 return myElement;
 	 }
 	
 	 @Override
 	 public void onAdding(Element Owner) {
-		 // TODO Auto-generated method stub				
+		 this.myElement = Owner;				
 	 }
 	 
-	 //Стратегия определения годности прибора
+	//РЎС‚СЂР°С‚РµРіРёСЏ РѕРїСЂРµРґРµР»РµРЅРёСЏ РїСЂРёРіРѕРґРЅРѕСЃС‚Рё СЌР»РµРјРµРЅС‚Р°
 	private StrategyOfSuitability strategy;
 	public void setStratege(StrategyOfSuitability anyStrategy) {
 		this.strategy = anyStrategy;
 	}
 	public boolean checkResult(MeasResult result) {
 		return this.strategy.checkResult(result, this);		
-	}
-	/*
-	protected String keys[] = {"d_m_S11", "u_m_S11", "d_p_S11", "u_p_S11",  
-							   "d_m_S12", "u_m_S12", "d_p_S12", "u_p_S12",
-							   "d_m_S21", "u_m_S21", "d_p_S21", "u_p_S21",
-							   "d_m_S22", "u_m_S22", "d_p_S22", "u_p_S22"};		
-	protected int countOfParams;
-	protected int countOfFreq;
-	public int getCountOfParams() {return this.countOfParams;}
-	public int getCountOfFreq() {return this.countOfFreq;}		
-	
-
-	
-	//Еще 1 вариант конструктора для сохранения в БД
-	public ToleranceParametrs(Element ParamsOwnerElement, ArrayList<Double> Freqs, ArrayList<ArrayList<Double>> Parametrs, String TypeByTime, String UnitPrefix){
-		this.unitPrefix = UnitPrefix;
-		this.myElement = ParamsOwnerElement;
-		this.countOfParams = Parametrs.size();
-		this.countOfFreq = Freqs.size();
-		this.typeByTime = TypeByTime;
-		values = new HashMap<String, HashMap<Double, Double>>();
-		freqs = new ArrayList<Double>();
-		
-		for (Double currentFr : Freqs) {
-			this.freqs.add(currentFr);
-		}
-		
-		for (int i=0; i < countOfParams; i++) {
-			HashMap<Double, Double> tVals = new HashMap<Double, Double>();
-			for (int j=0; j < countOfFreq; j++) {
-				tVals.put(Freqs.get(j), Parametrs.get(i).get(j));
-			}
-			values.put(keys[i], tVals);
-		}
-	}
-	
-	//Конструктор для получения данных из БД
-	public ToleranceParametrs(String TypeByTime, Element ownerElement, String UnitPrefix) throws SQLException {
-		
-		this.unitPrefix = UnitPrefix;
-		this.values = new HashMap<String, HashMap<Double, Double>>();
-		this.freqs = new ArrayList<Double>();
-		
-		this.myElement = ownerElement;
-		this.typeByTime = TypeByTime;
-		
-		String paramTableName = "";
-		if (TypeByTime.equals("primary")) {
-			paramTableName = ownerElement.getPrimaryParamTable();
-		}
-		else {
-			paramTableName = ownerElement.getPeriodicParamTable(); 
-		}		
-		ArrayList<String> fieldsNames = new ArrayList<String>();
-		fieldsNames.add("freq");
-		
-		int countOfKeys = 0;
-		if (this.myElement.getPoleCount() == 2) {
-			countOfKeys = 5;
-		}
-		else {
-			countOfKeys = 17;
-		}
-		for (int i=0; i<countOfKeys-1; i++) fieldsNames.add(keys[i]);
-		
-		String sqlQuery = "SELECT ";
-		for (int i=0; i<countOfKeys; i++) {
-			sqlQuery += fieldsNames.get(i);
-			if (i != countOfKeys - 1) sqlQuery += ", ";
-		}
-		sqlQuery += " FROM ["+paramTableName+"]";
-		DataBaseManager.getDB().sqlQueryMapOfDouble(sqlQuery, fieldsNames, this.values);
-		this.countOfParams = this.values.size();
-		
-		sqlQuery = "SELECT freq FROM ["+paramTableName+"]";
-		DataBaseManager.getDB().sqlQueryDouble(sqlQuery, "freq", this.freqs);
-		this.countOfFreq = this.freqs.size();		
-	}
-	
-//Includable<Element>	
-	private Element myElement;
-	@Override
-	public Element getMyOwner() {return myElement;}
-	@Override
-	public void onAdding(Element Owner) {
-		this.myElement = Owner;		
-	}
-	
-//dbStorable
-	@Override
-	public void saveInDB() throws SQLException {
-		String paramsTableName = null;
-		if (this.typeByTime.equals("primary")) {
-			paramsTableName = this.myElement.getPrimaryParamTable();
-		}
-		else if (this.typeByTime.equals("periodic")) {
-			paramsTableName = this.myElement.getPeriodicParamTable();
-		}
-		String sqlQuery = "CREATE TABLE ["+paramsTableName+"] (id INTEGER PRIMARY KEY AUTOINCREMENT, freq VARCHAR(20), ";
-		for (int i=0; i<this.countOfParams; i++) {
-			sqlQuery += (keys[i] + " VARCHAR(20)");
-			if (i != this.countOfParams - 1) sqlQuery += ", ";
-		}
-		sqlQuery += ")";
-		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
-		System.out.println("\t\tСоздана таблица с параметрами ");
-		
-		//Заполняем таблицу paramsTableName с результатами измерений
-		for (int i = 0; i < this.countOfFreq; i++) {	
-					
-			sqlQuery = "INSERT INTO [" + paramsTableName + "] (freq, ";
-					
-			for (int j=0; j<this.countOfParams; j++) {
-				sqlQuery += (keys[j]);
-				if (j != this.countOfParams - 1) sqlQuery += ", ";
-			}
-					
-			sqlQuery += ") values ('"+freqs.get(i)+"', ";
-					
-			for (int j = 0; j < this.countOfParams; j++) {
-				sqlQuery += ("'"+values.get(keys[j]).get(freqs.get(i)).toString()+"'");
-				if (j != this.countOfParams - 1) sqlQuery += ", ";
-			}
-					
-			sqlQuery += ")";
-					
-			DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
-			System.out.println("\t\tВнесены праметры для частоты " + freqs.get(i) + ": ");
-			System.out.println("\t\t" + sqlQuery + "");
-		}
-	}
-	
-	@Override
-	public void deleteFromDB() throws SQLException {
-		String paramsTableName = "";
-		if (this.typeByTime.equals("primary")) {
-			paramsTableName = this.myElement.getPrimaryParamTable();
-		}
-		else if (this.typeByTime.equals("periodic")) {
-			paramsTableName = this.myElement.getPeriodicParamTable();
-		}
-		String sqlQuery = "DROP TABLE ["+paramsTableName+"]";
-		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
-	}
-	
-	@Override
-	public void editInfoInDB(HashMap<String, String> editingValues) throws SQLException {
-		// TODO Auto-generated method stub		
-	}
-	*/			
+	}			
 }
