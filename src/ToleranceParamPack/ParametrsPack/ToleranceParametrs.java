@@ -16,8 +16,8 @@ import VerificationPack.MeasResult;
 
 public class ToleranceParametrs implements Includable<Element>, dbStorable {
 	 protected String keys[] = 	{"S11", "S12", "S21", "S22"}; 
-	 public HashMap<String, HashMap<Double, Double>> values; //Р—РЅР°С‡РµРЅРёСЏ РєСЂРёС‚РµСЂРёРµРІ РіРѕРґРЅРѕСЃС‚Рё
-	 public ArrayList<Double> freqs;						 //Р§Р°СЃС‚РѕС‚С‹
+	 public HashMap<String, HashMap<Double, Double>> values; 
+	 public ArrayList<Double> freqs;						 
 	
 	 private String tableName;
 	 public String getTableName(){
@@ -28,15 +28,15 @@ public class ToleranceParametrs implements Includable<Element>, dbStorable {
 	 public MeasUnitPart measUnitPart;
 
 	 public void setTableName(){
-		 tableName = "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ " + this.timeType.getTableNamePart() + " пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ " + this.measUnitPart.getTableNamePart() + " S пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ";
+		 tableName = "Параметры допуска " + this.timeType.getTableNamePart() + " поверки для " + this.measUnitPart.getTableNamePart() + " S параметров";
 	 }
 		
-//РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
+//Constructors
 	 ToleranceParametrs(){
 		this.values = new HashMap<String, HashMap<Double, Double>>();
 		this.freqs = new ArrayList<Double>();
 	 }
-	//РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РґР»СЏ РїРѕР»СѓС‡РµРЅРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ РёР· GUI
+	//GUI
 	public ToleranceParametrs(TimeType currentTimeType, MeasUnitPart currentUnitPart, NewElementController elCtrl, Element ownerElement){		
 		this();
 		this.myElement = ownerElement;
@@ -44,15 +44,15 @@ public class ToleranceParametrs implements Includable<Element>, dbStorable {
 		this.measUnitPart = currentUnitPart;
 		this.freqs = elCtrl.getFreqsValues();
 		this.values = elCtrl.getToleranceParamsValues("");
-		this.tableName = "РљСЂРёС‚РµСЂРёРё РіРѕРґРЅРѕСЃС‚Рё " + this.timeType.getTableNamePart() + " РїРѕРІРµСЂРєРё РґР»СЏ " + this.measUnitPart.getTableNamePart() + " S РїР°СЂР°РјРµС‚СЂРѕРІ";
+		this.tableName = "Параметры допуска " + this.timeType.getTableNamePart() + " поверки для " + this.measUnitPart.getTableNamePart() + " S параметров";
 	}
-	//РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РґР»СЏ РїРѕР»СѓС‡РµРЅРёСЏ РґР°РЅРЅС‹С… РёР· Р‘Р”
+	//DataBase
 	public ToleranceParametrs(TimeType currentTimeType, MeasUnitPart currentUnitPart, Element ownerElement) throws SQLException {
 		this();		
 		this.myElement = ownerElement;
 		this.timeType = currentTimeType;
 		this.measUnitPart = currentUnitPart;		
-		this.tableName = "РљСЂРёС‚РµСЂРёРё РіРѕРґРЅРѕСЃС‚Рё " + this.timeType.getTableNamePart() + " РїРѕРІРµСЂРєРё РґР»СЏ " + this.measUnitPart.getTableNamePart() + " S РїР°СЂР°РјРµС‚СЂРѕРІ";		
+		this.tableName = "Параметры допуска " + this.timeType.getTableNamePart() + " поверки для " + this.measUnitPart.getTableNamePart() + " S параметров";		
 		
 		ArrayList<String> fieldsNames = new ArrayList<String>();
 		fieldsNames.add("freq");
@@ -73,7 +73,7 @@ public class ToleranceParametrs implements Includable<Element>, dbStorable {
 		DataBaseManager.getDB().sqlQueryDouble(sqlQuery, "freq", this.freqs);		
 	}
  
-//пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ dbStorable)		    
+//interface dbStorable		    
 	 @Override
 	 public void saveInDB() throws SQLException, SavingException {
 		String sqlQuery = "CREATE TABLE [" + this.tableName + "] (id INTEGER PRIMARY KEY AUTOINCREMENT, freq VARCHAR(20), ";
@@ -83,10 +83,7 @@ public class ToleranceParametrs implements Includable<Element>, dbStorable {
 			if (i != this.myElement.getSParamsCout()) sqlQuery += ", ";
 		}
 		sqlQuery += ")";
-		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
-		System.out.println("\t\tпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ ");
-			
-		//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ paramsTableName пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);			
 		for (int i = 0; i < this.freqs.size(); i++) {			
 			sqlQuery = "INSERT INTO [" + this.tableName + "] (freq, ";						
 			for (int j = 0; j < this.values.size(); j++) {
@@ -100,8 +97,6 @@ public class ToleranceParametrs implements Includable<Element>, dbStorable {
 			}				
 			sqlQuery += ")";						
 			DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
-			System.out.println("\t\tпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ " + freqs.get(i) + ": ");
-			System.out.println("\t\t" + sqlQuery + "");
 		}			
 	 }
 	

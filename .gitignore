@@ -6,4 +6,7 @@
 *.db
 *.exe
 *.jar
+*.doc
+*.docx
+*.xls
 /bin/

@@ -22,8 +22,8 @@ public class Element implements Includable<Device>, dbStorable{
 		
 	}
 	
-	private Device myDevice; 		//����������, �������� ����������� �������
-	private MeasResult nominal;		//�������� ��������
+	private Device myDevice; 		
+	private MeasResult nominal;		
 	private ToleranceParametrs primaryModuleToleranceParams;	// 
 	private ToleranceParametrs periodicModuleToleranceParams;
 	private ToleranceParametrs primaryPhaseToleranceParams;
@@ -114,8 +114,7 @@ public class Element implements Includable<Device>, dbStorable{
 		this.primaryPhaseParamTable = "�������� �������� ���� ��������� ������� " + addrStr;		
 		this.listOfVerificationsTable = "������ ������ � ������������ ��������� ��� " + addrStr;
 	}
-	//�����������, ���������������� ������ ����������� �� ��
-	//���������� ��� ������������� ���������� ����� �������� ��� ���������������
+	
 	public Element(Device deviceOwner, int index) throws SQLException{		
 		this.myDevice = deviceOwner;
 		String elementTableName = myDevice.getElementsTableName();
@@ -154,18 +153,18 @@ public class Element implements Includable<Device>, dbStorable{
 		DataBaseManager.getDB().sqlQueryString(sqlQuery, fieldName, arrayResults);
 		this.nominalTable = arrayResults.get(0).get(0);
 		
-		//������� �������� �� ������� 
+		 
 		if (this.measUnit.equals("vswr")) {
 			this.nominal = new VSWR_Result(this, nominalIndex);
 		}
 		else {
 			this.nominal = new Gamma_Result(this, nominalIndex);
 		}		 
-		//������� �������� �������� �� �������
+		/*
 		this.primaryModuleToleranceParams = new ToleranceParametrs("primary", this, "m_");
 		this.periodicModuleToleranceParams = new ToleranceParametrs("periodic", this, "m_");
 		this.primaryPhaseToleranceParams = new ToleranceParametrs("primary", this, "p_");
-		this.periodicPhaseToleranceParams = new ToleranceParametrs("periodic", this, "p_");    
+		this.periodicPhaseToleranceParams = new ToleranceParametrs("periodic", this, "p_");   */ 
 		/*
 		if (toleranceType.equals("percent")) {
 			this.periodicToleranceParams = new PercentTolerance("periodic", this);
@@ -178,9 +177,6 @@ public class Element implements Includable<Device>, dbStorable{
 		*/
 	}
 	
-	//�����������, ���������������� ������ ����������� �� ������������ ���������� ��� ������������ ���������� � ��
-	//���������� ��� ������������� ���������� ����� ����������� ������ ���������� � �� 
-	//�������� � �������� ���������� ������ �� ���������� ����, �� �������� ���� ����� ����������
 	public Element(NewElementController elCtrl) {			
 		this.type = elCtrl.getType();
 		this.serialNumber = elCtrl.getSerNum();
@@ -220,7 +216,7 @@ public class Element implements Includable<Device>, dbStorable{
 	
 //dbStorable		
 	@Override
-	public void saveInDB() throws SQLException, NoOwnerException {
+	public void saveInDB() throws SQLException, NoOwnerException {/*
 		if (this.myDevice == null) {
 			throw new NoOwnerException(this);
 		}
@@ -246,7 +242,7 @@ public class Element implements Includable<Device>, dbStorable{
 		System.out.println("\t������ ���������� ��������:");
 		// 3.4 ��������� ��������
 		this.nominal.saveInDB();	
-		System.out.println("\t��������� ���������� ���������");
+		System.out.println("\t��������� ���������� ���������");*/
 	}
 	
 	@Override
@@ -304,6 +300,7 @@ public class Element implements Includable<Device>, dbStorable{
 		return arrayResults;
 	}
 
+	public void rewriteParams() throws SQLException {}
 	public void rewriteParams(ToleranceParametrs newModulePrimaryParams, ToleranceParametrs newModulePeriodicParams,
 							  ToleranceParametrs newPhasePrimaryParams, ToleranceParametrs newPhasePeriodicparams, MeasResult newNominals) throws SQLException{
 		this.primaryModuleToleranceParams.deleteFromDB();
@@ -311,11 +308,11 @@ public class Element implements Includable<Device>, dbStorable{
 		this.periodicModuleToleranceParams.deleteFromDB();
 		this.periodicPhaseToleranceParams.deleteFromDB();
 		this.nominal.deleteFromDB();
-		
+		/*
 		newModulePrimaryParams.saveInDB();
 		newModulePeriodicParams.saveInDB();
 		newPhasePrimaryParams.saveInDB();
 		newPhasePeriodicparams.saveInDB();
-		newNominals.saveInDB();
+		newNominals.saveInDB();*/
 	}
 }

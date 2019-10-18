@@ -2,7 +2,6 @@ package NewElementPack;
 
 import java.io.IOException;
 import java.sql.SQLException;
-
 import AboutMessageForm.AboutMessageWindow;
 import DataBasePack.DataBaseManager;
 import DevicePack.Element;
@@ -55,7 +54,8 @@ public class NewElementWindow extends guiWindow {
 				else {
 					try {
 						DataBaseManager.getDB().BeginTransaction();
-						ctrl.getElement().rewriteParams(ctrl.getPrimaryTP(), ctrl.getPeriodicTP(), ctrl.getNominals());
+						//ctrl.getElement().rewriteParams(ctrl.getPrimaryTP(), ctrl.getPeriodicTP(), ctrl.getNominals());
+						ctrl.getElement().rewriteParams();
 						DataBaseManager.getDB().Commit();
 						try {
 							AboutMessageWindow errorMsg = new AboutMessageWindow("Успешно", "Изменения успешно сохранены");

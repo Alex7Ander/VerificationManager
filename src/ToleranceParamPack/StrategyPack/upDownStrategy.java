@@ -13,14 +13,14 @@ public class upDownStrategy implements StrategyOfSuitability {
 		int currentCountOfFreq = result.getCountOfFreq();
 		int countOfParams = result.getMyOwner().getPoleCount();
 		if (countOfParams == 2) countOfParams = 1;
-		String[] cKeys = {"S11", "S12", "S21", "S22"};
+		String[] keys = {"S11", "S12", "S21", "S22"};
 		
 		for (int i=0; i < countOfParams; i++) {			
 			HashMap<Double, String> decisions = new HashMap<Double, String>();	
 			
 			for (int j=0; j < currentCountOfFreq; j++) {
 				double cFreq = result.freqs.get(j);	
-				String k1 = tolerance.getUnitPrefix() + cKeys[i];
+				String k1 = tolerance.measUnitPart + "_" + keys[i];
 				double res = result.values.get(k1).get(cFreq);
 				double down = tolerance.values.get("d_" + k1).get(cFreq);
 				double up = tolerance.values.get("u_" + k1).get(cFreq); 				
@@ -32,7 +32,7 @@ public class upDownStrategy implements StrategyOfSuitability {
 					decisions.put(cFreq, "Годен");
 				}
 			}			
-			result.suitabilityDecision.put(tolerance.getUnitPrefix() + cKeys[i], decisions);
+			result.suitabilityDecision.put(tolerance.measUnitPart + "_" + keys[i], decisions);
 		}
 		return resultOfCheck;
 	}

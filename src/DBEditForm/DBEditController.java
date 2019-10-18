@@ -13,7 +13,9 @@ import DevicePack.Element;
 import ErrorParamsPack.ErrorParamsWindow;
 import FileManagePack.FileManager;
 import GUIpack.InfoRequestable;
-import GUIpack.StringGridFX;
+import GUIpack.StringGridFXPack.ResultsStringGridFX;
+import GUIpack.StringGridFXPack.StringGridFX;
+import GUIpack.StringGridFXPack.StringGridPosition;
 import NewElementPack.NewElementWindow;
 import SearchDevicePack.SearchDeviceWindow;
 import ToleranceParamPack.ParametrsPack.ToleranceParametrs;
@@ -112,8 +114,9 @@ public class DBEditController implements InfoRequestable {
 	
 //---------------------------------------------------------
 	@FXML
-	private void initialize() {		
-		resultsTable = this.createResultsTable();		
+	private void initialize() {				
+		StringGridPosition position = new StringGridPosition(800, 100, resultsScrollPane, resultsTablePane); 
+		resultsTable = new ResultsStringGridFX(position);		
 		elementsList = FXCollections.observableArrayList();
 		verificationDateList = FXCollections.observableArrayList();
 		measUnitsList = FXCollections.observableArrayList();
@@ -209,13 +212,8 @@ public class DBEditController implements InfoRequestable {
 	}
 */	
 	private StringGridFX createResultsTable() {
-		ArrayList<String> tableHeads = new ArrayList<String>();
-		tableHeads.add("Частота, ГГц");
-		tableHeads.add("Изм. знач. модуля");
-		tableHeads.add("Погрешность");
-		tableHeads.add("Изм. знач. фазы");
-		tableHeads.add("Погрешность");
-		return new StringGridFX(5, 10, 800, 100, resultsScrollPane, resultsTablePane, tableHeads);
+		StringGridPosition position = new StringGridPosition(800, 100, resultsScrollPane, resultsTablePane); //5, 10, 800, 100, resultsScrollPane, resultsTablePane, tableHeads
+		return new ResultsStringGridFX(position);
 	}
 //---------------------------------------------------------
 	//Очистка окна

@@ -8,7 +8,9 @@ import java.util.HashMap;
 import DevicePack.Element;
 import FileManagePack.FileManager;
 import FreqTablesPack.FreqTablesWindow;
-import GUIpack.StringGridFX;
+import GUIpack.StringGridFXPack.NewElementStringGridFX;
+import GUIpack.StringGridFXPack.StringGridFX;
+import GUIpack.StringGridFXPack.StringGridPosition;
 import ToleranceParamPack.ParametrsPack.ToleranceParametrs;
 import ToleranceParamPack.StrategyPack.StrategyOfSuitability;
 import ToleranceParamPack.StrategyPack.percentStrategy;
@@ -109,7 +111,7 @@ public class NewElementController {
 	@FXML
 	private AnchorPane tablePane;
 	
-	private StringGridFX paramsTable;
+	private NewElementStringGridFX paramsTable;
 	
 	private ToggleGroup poleCountGroup;
 	private ToggleGroup measUnitGroup;
@@ -173,6 +175,12 @@ public class NewElementController {
 	private HashMap<String, ArrayList<String>> d_p_s;	//нижний предел фазы
 	private HashMap<String, ArrayList<String>> u_p_s;	//верхний предел фазы
 
+	private MeasResult nominal;
+	private ToleranceParametrs primaryModuleTP;
+	private ToleranceParametrs primaryPhaseTP;
+	private ToleranceParametrs periodicModuleTP;
+	private ToleranceParametrs periodicPhaseTP;
+	
 	@FXML
 	private void initialize() {			
 		//Создаем таблицу
@@ -184,9 +192,10 @@ public class NewElementController {
 		paramTableHeads.add("Верхний допуск");
 		paramTableHeads.add("Нижний допуск");
 		paramTableHeads.add("Номинал");
-		paramTableHeads.add("Верхний допуск");
-		paramsTable = new StringGridFX(7, initialfreqCount, 850, 100, scrollPane, tablePane, paramTableHeads);
-		
+		paramTableHeads.add("Верхний допуск");		
+		StringGridPosition paramsTablePosition = new StringGridPosition(850, 100, scrollPane, tablePane);		
+		paramsTable = new NewElementStringGridFX(paramsTablePosition);
+				
 		timeIndex = 0;
 		paramIndex = 0;
 		savingIndex = 0;
@@ -711,7 +720,7 @@ public class NewElementController {
 		return result;		
 	}
 //--------------------------------------------------------------------------------------------------	
-	private void showElementInfo() {
+	private void showElementInfo() {/*
 		this.elemTypesComboBox.setValue(this.currentElement.getType());
 		this.serNumberTextField.setText(this.currentElement.getSerialNumber());
 		
@@ -739,10 +748,10 @@ public class NewElementController {
 			p_s.get("primary_S11").add(this.currentElement.getNominal().values.get("p_S11").get(freq).toString());
 			p_s.get("periodic_S11").add(this.currentElement.getNominal().values.get("p_S11").get(freq).toString());
 			
-			d_m_s.get("primary_S11").add(this.currentElement.getPrimaryToleranceParams().values.get("d_m_S11").get(freq).toString());
-			d_m_s.get("periodic_S11").add(this.currentElement.getPeriodicToleranceParams().values.get("d_m_S11").get(freq).toString());
+			d_m_s.get("primary_S11").add(this.currentElement.getPrimaryModuleToleranceParams().values.get("d_m_S11").get(freq).toString());
+			d_m_s.get("periodic_S11").add(this.currentElement.getPeriodicModuleToleranceParams().values.get("d_m_S11").get(freq).toString());
 			u_m_s.get("primary_S11").add(this.currentElement.getPrimaryToleranceParams().values.get("u_m_S11").get(freq).toString());
-			u_m_s.get("periodic_S11").add(this.currentElement.getPeriodicToleranceParams().values.get("u_m_S11").get(freq).toString());
+			u_m_s.get("periodic_S11").add(this.currentElement.getPeriodicModuleToleranceParams().values.get("u_m_S11").get(freq).toString());
 			
 			d_p_s.get("primary_S11").add(this.currentElement.getPrimaryToleranceParams().values.get("d_p_S11").get(freq).toString());
 			d_p_s.get("periodic_S11").add(this.currentElement.getPeriodicToleranceParams().values.get("d_p_S11").get(freq).toString());
@@ -811,7 +820,7 @@ public class NewElementController {
 			this.paramsTable.setColumn(4, d_p_s.get(keys[this.savingIndex]));
 			this.paramsTable.setColumn(5, p_s.get(keys[this.savingIndex]));
 			this.paramsTable.setColumn(6, u_p_s.get(keys[this.savingIndex]));
-		}
+		}*/
 	}
 		
 	public MeasResult getNominals() {
@@ -823,6 +832,14 @@ public class NewElementController {
 			VSWR_Result vr = new VSWR_Result(this, this.currentElement);
 			return vr;
 		}
+	}
+	public ToleranceParametrs getPrimaryTP() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	public ToleranceParametrs getPeriodicTP() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }

@@ -5,13 +5,13 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-
 import AboutMessageForm.AboutMessageWindow;
 import DevicePack.Device;
 import DevicePack.Element;
 import FileManagePack.FileManager;
 import GUIpack.InfoRequestable;
-import GUIpack.StringGridFX;
+import GUIpack.StringGridFXPack.StringGridPosition;
+import GUIpack.StringGridFXPack.VerificationStringGridFX;
 import ProtocolCreatePack.ProtocolCreateWindow;
 import SearchDevicePack.SearchDeviceWindow;
 import StartVerificationPack.StartVerificationController;
@@ -59,7 +59,7 @@ public class VerificationController implements InfoRequestable {
 	private ScrollPane scrollPane;
 	@FXML
 	private AnchorPane tablePane;
-	private StringGridFX resultTable;
+	private VerificationStringGridFX resultTable;
 
 //Процедура поверки
 	VerificationProcedure verification;
@@ -77,15 +77,8 @@ public class VerificationController implements InfoRequestable {
 		verificationResult = new ArrayList<MeasResult>();
 		currentElementIndex = 0;
 		currentParamIndex = 0;		   		
-		ArrayList<String> heads = new ArrayList<String>();
-		heads.add("Частота, ГГц");	
-		heads.add("Измер. знач. модуля");	
-		heads.add("Погрешность");	
-		heads.add("Годен/не годен");	
-		heads.add("Измер. знач. фазы");	
-		heads.add("Погрешность");	
-		heads.add("Годен/не годен");	
-		resultTable = new StringGridFX(7, 10, 1110, 100, scrollPane, tablePane, heads);		 
+		StringGridPosition position = new StringGridPosition(1110, 100, scrollPane, tablePane);
+		resultTable = new VerificationStringGridFX( position);		 
 	}
 	
 	@FXML
@@ -260,11 +253,11 @@ public class VerificationController implements InfoRequestable {
 				this.verificationResult.add(rs);				
 				if (this.verification.getTypeByTime().equals("primary")) {
 					//Проверка результатво
-					this.verificatedDevice.includedElements.get(i).getPrimaryToleranceParams().checkResult(rs);
+					//this.verificatedDevice.includedElements.get(i).getPrimaryToleranceParams().checkResult(rs);
 				}
 				else {
 					//Проверка результатов
-					this.verificatedDevice.includedElements.get(i).getPeriodicToleranceParams().checkResult(rs);
+					//this.verificatedDevice.includedElements.get(i).getPeriodicToleranceParams().checkResult(rs);
 				}							
 				//Заполним таблицу
 				//fillTable();

@@ -2,7 +2,7 @@ package _tempHelpers;
 
 import java.util.Random;
 
-import GUIpack.StringGridFX;
+import GUIpack.StringGridFXPack.StringGridFX;
 
 public class Randomizer {
 	
