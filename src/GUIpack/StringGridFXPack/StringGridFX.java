@@ -16,10 +16,10 @@ public class StringGridFX {
 	private int rowCount;
 	private VBox vBox;
 	
-	private ObservableList<HBox> lines;	
-	private ObservableList<Label> heads;
-	private ObservableList<ObservableList<TextField>> cells;
-	private StringGridPosition myPosition;
+	protected ObservableList<HBox> lines;	
+	protected ObservableList<Label> heads;
+	protected ObservableList<ObservableList<TextField>> cells;
+	protected StringGridPosition myPosition;
 
 	private double height;
 	private double celWidth;
@@ -44,7 +44,7 @@ public class StringGridFX {
 			hLabel.setPrefWidth(celWidth-1);
 			hLabel.setStyle("-fx-text-fill: black;" + 
 						    "-fx-font-family: Arial Narrow;" + 
-							"-fx-font-size: 14;");		//-fx-font-weight: bold;	
+							"-fx-font-size: 14;");			
 			heads.add(hLabel);
 		}
 		headLine.getChildren().addAll(heads);
@@ -198,14 +198,22 @@ public class StringGridFX {
 	}
 	
 	public void setColumn(int index, ArrayList<String> columnValues) {
-		for (int i=0; i<columnValues.size(); i++) { // было for (int i=0; i<this.rowCount; i++)
-			this.cells.get(i).get(index).setText(columnValues.get(i));
+		for (int i=0; i<columnValues.size(); i++) { 
+			try {
+				this.cells.get(i).get(index).setText(columnValues.get(i));
+			} catch(Exception exp) {
+				break;
+			} 
 		}
 	}
 	
 	public void setColumnFromDouble(int index, ArrayList<Double> columnValues) {
 		for (int i=0; i < this.rowCount; i++) {
-			this.cells.get(i).get(index).setText(columnValues.get(i).toString());
+			try {
+				this.cells.get(i).get(index).setText(columnValues.get(i).toString());
+			} catch(Exception exp) {
+				break;
+			}
 		}
 	}
 	

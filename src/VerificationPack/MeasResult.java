@@ -78,22 +78,17 @@ public class MeasResult implements Includable<Element>, dbStorable{
 	}
 	
 	//Получение результатов из БД
-	public MeasResult(Element ownerElement, int index) throws SQLException {
-		
+	public MeasResult(Element ownerElement, int index) throws SQLException {		
 		this.values = new HashMap<String, HashMap<Double, Double>>();
-		this.freqs = new ArrayList<Double>();
-				
-		this.myElement = ownerElement;
-		
+		this.freqs = new ArrayList<Double>();				
+		this.myElement = ownerElement;		
 		ArrayList<ArrayList<String>> results = new ArrayList<ArrayList<String>>();
-		ArrayList<String> fieldsNames = new ArrayList<String>();
-		
+		ArrayList<String> fieldsNames = new ArrayList<String>();		
 		String listOfVerificationsTable = this.myElement.getListOfVerificationsTable();
 		String sqlQuery = "SELECT dateOfVerification, resultsTableName  FROM ["+listOfVerificationsTable+"] WHERE id='"+index+"'";
 		fieldsNames.add("dateOfVerification");
 		fieldsNames.add("resultsTableName");
-		DataBaseManager.getDB().sqlQueryString(sqlQuery, fieldsNames, results);
-		
+		DataBaseManager.getDB().sqlQueryString(sqlQuery, fieldsNames, results);		
 		//Дата
 		DateFormat df = new SimpleDateFormat(datePattern);
 		String strDate = results.get(0).get(0);
@@ -102,15 +97,12 @@ public class MeasResult implements Includable<Element>, dbStorable{
 		}
 		catch(ParseException pExp) {
 			this.dateOfMeas = Calendar.getInstance().getTime();
-		}
-		
-		String resultsTableName =  results.get(0).get(1);
-	
+		}		
+		String resultsTableName =  results.get(0).get(1);	
 		//Получим частоты
 		sqlQuery = "SELECT freq FROM ["+resultsTableName+"]";
 		DataBaseManager.getDB().sqlQueryDouble(sqlQuery, "freq", this.freqs);
 		this.countOfFreq = this.freqs.size();
-
 		//Получим значения параметров
 		for (String key : keys) {
 			try {
@@ -133,7 +125,9 @@ public class MeasResult implements Includable<Element>, dbStorable{
 //Includable<Element>
 	protected Element myElement;
 	@Override
-	public Element getMyOwner() {return myElement;}
+	public Element getMyOwner() {
+		return myElement;
+	}
 	@Override
 	public void onAdding(Element Owner) {
 		this.myElement = Owner;	
@@ -159,7 +153,6 @@ public class MeasResult implements Includable<Element>, dbStorable{
 		String resultsTableName = "Результат поверки " + 
 				this.myElement.getMyOwner().getName() + " " + this.myElement.getMyOwner().getType() + " " + this.myElement.getMyOwner().getSerialNumber() + " " + this.myElement.getType() + " " + this.myElement.getSerialNumber() +
 				" проведенной " + dateOfVerification;
-		//
 		String sqlQuery = "INSERT INTO [" + listOfVerificationsTable + "] (dateOfVerification, resultsTableName) values ('"+ dateOfVerification +"','"+ resultsTableName +"')";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
 		sqlQuery = "CREATE TABLE [" + resultsTableName + "] (id INTEGER PRIMARY KEY AUTOINCREMENT, freq VARCHAR(20), ";

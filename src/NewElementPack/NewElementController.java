@@ -183,16 +183,7 @@ public class NewElementController {
 	
 	@FXML
 	private void initialize() {			
-		//Создаем таблицу
-		int initialfreqCount = 10;
-		ArrayList<String> paramTableHeads = new ArrayList<String>();
-		paramTableHeads.add("Частота, ГГц");
-		paramTableHeads.add("Нижний допуск");
-		paramTableHeads.add("Номинал");
-		paramTableHeads.add("Верхний допуск");
-		paramTableHeads.add("Нижний допуск");
-		paramTableHeads.add("Номинал");
-		paramTableHeads.add("Верхний допуск");		
+		//Создаем таблицу		
 		StringGridPosition paramsTablePosition = new StringGridPosition(850, 100, scrollPane, tablePane);		
 		paramsTable = new NewElementStringGridFX(paramsTablePosition);
 				
