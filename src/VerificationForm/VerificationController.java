@@ -215,22 +215,22 @@ public class VerificationController implements InfoRequestable {
 			  
 		this.resultTable.setColumnFromDouble(0, fr);
 			
-		ArrayList<Double> column1 = Adapter.HashMapToArrayList(fr, this.verificationResult.get(currentElementIndex).values.get(keys[currentParamIndex*4]));
+		ArrayList<Double> column1 = Adapter.HashMapToArrayList(this.verificationResult.get(currentElementIndex).values.get(keys[currentParamIndex*4]));
 		this.resultTable.setColumnFromDouble(1, column1);
 			
-		ArrayList<Double> column2 = Adapter.HashMapToArrayList(fr, this.verificationResult.get(currentElementIndex).values.get(keys[1 + currentParamIndex*4]));
+		ArrayList<Double> column2 = Adapter.HashMapToArrayList(this.verificationResult.get(currentElementIndex).values.get(keys[1 + currentParamIndex*4]));
 		this.resultTable.setColumnFromDouble(2, column2);
 					
-		ArrayList<Double> column4 = Adapter.HashMapToArrayList(fr, this.verificationResult.get(currentElementIndex).values.get(keys[2 + currentParamIndex*4]));
+		ArrayList<Double> column4 = Adapter.HashMapToArrayList(this.verificationResult.get(currentElementIndex).values.get(keys[2 + currentParamIndex*4]));
 		this.resultTable.setColumnFromDouble(4, column4);
 		
-		ArrayList<Double> column5 = Adapter.HashMapToArrayList(fr, this.verificationResult.get(currentElementIndex).values.get(keys[3 + currentParamIndex*4]));
+		ArrayList<Double> column5 = Adapter.HashMapToArrayList(this.verificationResult.get(currentElementIndex).values.get(keys[3 + currentParamIndex*4]));
 		this.resultTable.setColumnFromDouble(5, column5);
 			
-		ArrayList<String> column3 = Adapter.HashMapToArrayList(fr, this.verificationResult.get(currentElementIndex).suitabilityDecision.get(keys[currentParamIndex])); 
+		ArrayList<String> column3 = Adapter.HashMapToArrayList(this.verificationResult.get(currentElementIndex).suitabilityDecision.get(keys[currentParamIndex])); 
 		this.resultTable.setColumn(3, column3);
 			
-		ArrayList<String> column6 = Adapter.HashMapToArrayList(fr, this.verificationResult.get(currentElementIndex).suitabilityDecision.get(keys[2 + currentParamIndex])); 
+		ArrayList<String> column6 = Adapter.HashMapToArrayList(this.verificationResult.get(currentElementIndex).suitabilityDecision.get(keys[2 + currentParamIndex])); 
 		this.resultTable.setColumn(6, column6);
 	}	
 //---------------------------	

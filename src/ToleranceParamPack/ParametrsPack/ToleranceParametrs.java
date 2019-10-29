@@ -8,7 +8,6 @@ import DataBasePack.DataBaseManager;
 import DataBasePack.dbStorable;
 import DevicePack.Element;
 import DevicePack.Includable;
-import ErrorParamsPack.ErrorParams;
 import Exceptions.SavingException;
 import NewElementPack.NewElementController;
 import ToleranceParamPack.StrategyPack.StrategyOfSuitability;
@@ -36,17 +35,23 @@ public class ToleranceParametrs implements Includable<Element>, dbStorable {
 		this.values = new HashMap<String, HashMap<Double, Double>>();
 		this.freqs = new ArrayList<Double>();
 	 }
-	//GUI
+/*	 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!	 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!	 
+*/	 
+//GUI
 	public ToleranceParametrs(TimeType currentTimeType, MeasUnitPart currentUnitPart, NewElementController elCtrl, Element ownerElement){		
 		this();
 		this.myElement = ownerElement;
 		this.timeType = currentTimeType;
 		this.measUnitPart = currentUnitPart;
-		this.freqs = elCtrl.getFreqsValues();
-		this.values = elCtrl.getToleranceParamsValues("");
 		this.tableName = "Параметры допуска " + this.timeType.getTableNamePart() + " поверки для " + this.measUnitPart.getTableNamePart() + " S параметров";
+		//Получим параметры
+		this.freqs = elCtrl.getFreqsValues();
+		this.values = elCtrl.getToleranceParamsValues(this.timeType, this.measUnitPart);
 	}
-	//DataBase
+//DataBase
 	public ToleranceParametrs(TimeType currentTimeType, MeasUnitPart currentUnitPart, Element ownerElement) throws SQLException {
 		this();		
 		this.myElement = ownerElement;

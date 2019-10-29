@@ -2,6 +2,8 @@ package _tempHelpers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Adapter {
 	
@@ -14,11 +16,10 @@ public class Adapter {
 		return listS;
 	}
 	
-	public static <T1, T2, T3> ArrayList<T3> HashMapToArrayList(ArrayList<T1> keys, HashMap<T2, T3> hashMap){
-		int l = hashMap.size();
-		ArrayList<T3> arrayList = new ArrayList<T3>();
-		for (int i=0; i<l; i++) {
-			arrayList.add(hashMap.get(keys.get(i)));
+	public static <T1, T2> ArrayList<T2> HashMapToArrayList(HashMap<T1, T2> hashMap){
+		ArrayList<T2> arrayList = new ArrayList<T2>();		
+		for (T1 key : hashMap.keySet()) {
+			arrayList.add(hashMap.get(key));
 		}
 		return arrayList;
 	}

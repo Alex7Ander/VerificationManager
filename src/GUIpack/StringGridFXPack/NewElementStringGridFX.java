@@ -1,42 +1,17 @@
 package GUIpack.StringGridFXPack;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 
 import ToleranceParamPack.ParametrsPack.MeasUnitPart;
+import ToleranceParamPack.ParametrsPack.S_Parametr;
 import ToleranceParamPack.ParametrsPack.TimeType;
-import ToleranceParamPack.ParametrsPack.ToleranceParametrs;
-import VerificationPack.MeasResult;
 import _tempHelpers.Adapter;
 
 public class NewElementStringGridFX extends StringGridFX {
-
-	private static ArrayList<String> tableHeads;
-	private MeasResult nominal;
-	private ToleranceParametrs primaryModuleTP;
-	private ToleranceParametrs primaryPhaseTP;
-	private ToleranceParametrs periodicModuleTP;
-	private ToleranceParametrs periodicPhaseTP;
 	
-	public MeasResult getNominal() {
-		return this.nominal;
-	}
-	public ToleranceParametrs getPrimaryModuleTP() {
-		return this.primaryModuleTP;
-	}
-	public ToleranceParametrs getPrimaryPhaseTP() {
-		return this.primaryPhaseTP;
-	}
-	public ToleranceParametrs getPeriodicModuleTP() {
-		return this.periodicModuleTP;
-	}
-	public ToleranceParametrs getPeriodicPhaseTP() {
-		return this.periodicPhaseTP;
-	}
-	
-	private String[] keyIndex = new String[]{
-		"FREQ", "DOWN_MODULE", "MODULE", "UP_MODULE", "DOWN_PHASE", "PHASE", "UP_PHASE"
-	};
-	
+	private static ArrayList<String> tableHeads;	
 	static {
 		tableHeads = new ArrayList<String>();
 		tableHeads.add("Частота, ГГц");
@@ -47,46 +22,59 @@ public class NewElementStringGridFX extends StringGridFX {
 		tableHeads.add("Номинал");
 		tableHeads.add("Верхний допуск");
 	}
-		
+	
+	public HashMap<String, HashMap<Double, Double>> values;	
+	
 	public NewElementStringGridFX(StringGridPosition position) {
 		super(7, 10, position, tableHeads);
-	}
-
-	private void setAllValues(String sParam, TimeType anyTimeTipe) {
-		//this.cells.get("СТОЛБЕЦ").get("СТРОКА")
-		int freqCount = this.nominal.freqs.size();
-		if (freqCount > this.getRowCount()) {
-			while(freqCount != this.getRowCount()) {
-				this.addRow();
+		values = new HashMap<String, HashMap<Double, Double>>();
+		for (int i = 0; i < S_Parametr.values().length; i++) {
+			for (int j = 0; j < MeasUnitPart.values().length; j++) {
+				for (int k = 0; k < TimeType.values().length; k++) {
+					String key = TimeType.values()[k] + "_" +
+								 MeasUnitPart.values()[j] + "_" +
+								 S_Parametr.values()[i];
+					values.put(key, new HashMap<Double, Double>());
+				}
 			}
-		} else if (freqCount < this.getRowCount()) {
-			while(freqCount != this.getRowCount()) {
-				this.deleteRow(this.getRowCount());
-			}
-		}
-		
-		ToleranceParametrs currentModuleTP = null;
-		ToleranceParametrs currentPhaseTP = null;
-		if (anyTimeTipe == TimeType.PRIMARY) {
-			currentModuleTP = this.primaryModuleTP;
-			currentPhaseTP = this.primaryPhaseTP;
-		} else {
-			currentModuleTP = this.periodicModuleTP;
-			currentPhaseTP = this.periodicPhaseTP;
-		}
-		
-		for (int i = 0; i < freqCount; i++) {
-			Double curFreq = this.nominal.freqs.get(i);
-			//Из номинала			
-			this.cells.get(0).get(i).setText(curFreq.toString()); //частоты
-			this.cells.get(2).get(i).setText(this.nominal.values.get(MeasUnitPart.MODULE + "_" + sParam).get(curFreq).toString());
-			this.cells.get(5).get(i).setText(this.nominal.values.get(MeasUnitPart.PHASE + "_" + sParam).get(curFreq).toString());
-			//			
-			this.cells.get(1).get(i).setText(currentModuleTP.values.get("DOWN_" + MeasUnitPart.MODULE + "_" + sParam).get(curFreq).toString());			
-			this.cells.get(3).get(i).setText(currentModuleTP.values.get("UP_" + MeasUnitPart.PHASE + "_" + sParam).get(curFreq).toString());
-			this.cells.get(4).get(i).setText(currentPhaseTP.values.get("DOWN_" + MeasUnitPart.MODULE + "_" + sParam).get(curFreq).toString());			
-			this.cells.get(6).get(i).setText(currentPhaseTP.values.get("UP_" + MeasUnitPart.PHASE + "_" + sParam).get(curFreq).toString());
 		}
 	}
 	
+	public HashMap<Double, Double> getColumnByKey(String key){
+		return values.get(key);		
+	}
+
+	public void setParams(TimeType type, S_Parametr Sxx) {
+			String key = type + "_" + "UP" + "_" + MeasUnitPart.MODULE + "_" + Sxx;
+			ArrayList<Double> columnValues = Adapter.HashMapToArrayList(this.values.get(key));
+			this.setColumnFromDouble(1, columnValues);
+			
+			key = type + "_" + MeasUnitPart.MODULE + "_" + Sxx;
+			columnValues = Adapter.HashMapToArrayList(this.values.get(key));
+			this.setColumnFromDouble(2, columnValues);
+			
+			key = type + "_" + "DOWN" + "_" + MeasUnitPart.MODULE + "_" + Sxx;
+			columnValues = Adapter.HashMapToArrayList(this.values.get(key));
+			this.setColumnFromDouble(3, columnValues);
+			
+			key = type + "_" + "UP" + "_" + MeasUnitPart.PHASE + "_" + Sxx;
+			columnValues = Adapter.HashMapToArrayList(this.values.get(key));
+			this.setColumnFromDouble(4, columnValues);
+			
+			key = type + "_" + MeasUnitPart.PHASE + "_" + Sxx;
+			columnValues = Adapter.HashMapToArrayList(this.values.get(key));
+			this.setColumnFromDouble(5, columnValues);
+			
+			key = type + "_" + "DOWN" + "_" + MeasUnitPart.PHASE + "_" + Sxx;
+			columnValues = Adapter.HashMapToArrayList(this.values.get(key));
+			this.setColumnFromDouble(6, columnValues);
+			
+			columnValues.clear();
+			HashSet<Double> fr = (HashSet<Double>)this.values.get(key).keySet();
+			for (Double d : fr) {
+				columnValues.add(d);
+			}
+			this.setColumnFromDouble(0, columnValues);
+	}
+
 }
