@@ -168,8 +168,7 @@ public class NewElementController {
 	int savingIndex;
 	String[] keys = {"primary_S11", "primary_S12", "primary_S21", "primary_S22", 
 					 "periodic_S11", "periodic_S12", "periodic_S21", "periodic_S22"};
-	
-	
+		
 	private TimeType currentTimeType;
 	private S_Parametr currentS;
 	private ArrayList<Double> freqs;
@@ -193,16 +192,12 @@ public class NewElementController {
 	private void initialize() {			
 		//Создаем таблицу		
 		StringGridPosition paramsTablePosition = new StringGridPosition(850, 100, scrollPane, tablePane);		
-		paramsTable = new NewElementStringGridFX(paramsTablePosition);
-				
-		timeIndex = 0;
-		paramIndex = 0;
-		savingIndex = 0;
-		
+		paramsTable = new NewElementStringGridFX(paramsTablePosition);			
+		this.currentS = S_Parametr.S11;
+		this.currentTimeType = TimeType.PRIMARY;
 		//Частоты и параметры
 		freqs = new ArrayList<Double>();
-		tableValues = new HashMap<String, HashMap<Double, Double>>();
-		
+		tableValues = new HashMap<String, HashMap<Double, Double>>();		
 		//Частоты в виде строк для заполнения таблиц
 		strFreqs = new ArrayList<String>();
 		m_s = new HashMap<String, ArrayList<String>>();
@@ -356,6 +351,7 @@ public class NewElementController {
 	@FXML
 	private void primaryRBClick() {
 		this.currentTimeType = TimeType.PRIMARY;
+		this.paramsTable.setParams(this.currentTimeType, this.currentS);
 		/*
 		if (primaryVerificationRB.isSelected()){
 			timeIndex -= 4;
@@ -369,6 +365,7 @@ public class NewElementController {
 	@FXML
 	private void periodicRBClick() {
 		this.currentTimeType = TimeType.PERIODIC;
+		this.paramsTable.setParams(this.currentTimeType, this.currentS);
 		/*
 		if (periodicVerificationRB.isSelected()) {
 			timeIndex += 4;
@@ -396,6 +393,7 @@ public class NewElementController {
 				this.currentS = S_Parametr.S22;
 				break;
 		}
+		this.paramsTable.setParams(this.currentTimeType, this.currentS);
 		/*
 		int showIndex = paramIndex + timeIndex;		
 		refreshTable(savingIndex, showIndex);
@@ -497,7 +495,7 @@ public class NewElementController {
 		//Записать новые
 		for (int i=0; i<this.currentCountOfParams; i++) {//для всех S параметров данного элемента
 			for (int j=0; j<MeasUnitPart.values().length; j++) {//а так же как для модуля, так и для фазы
-				String key = this.currentTimeType + "_" + MeasUnitPart.values()[j] + "_" + S_Parametr.values()[i];
+				String key = this.currentTimeType + "_" + MeasUnitPart.values()[j] + "_" + S_Parametr.values()[i]; 
 			}
 		}
 		//Переписать таблицу на значения лругого типа

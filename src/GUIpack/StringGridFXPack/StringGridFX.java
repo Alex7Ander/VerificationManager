@@ -2,11 +2,15 @@ package GUIpack.StringGridFXPack;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
@@ -15,10 +19,10 @@ public class StringGridFX {
 	private int colCount;
 	private int rowCount;
 	private VBox vBox;
-	
+
 	protected ObservableList<HBox> lines;	
 	protected ObservableList<Label> heads;
-	protected ObservableList<ObservableList<TextField>> cells;
+	protected ObservableList<ObservableList<CellTextField>> cells;
 	protected StringGridPosition myPosition;
 
 	private double height;
@@ -52,15 +56,25 @@ public class StringGridFX {
 		
 		for (int i=0; i<RowCount; i++) {
 			HBox line = new HBox();
-			ObservableList<TextField> cellsOfCurrentLine = FXCollections.observableArrayList();
-			for (int j=0; j<ColCount; j++) {				
-				TextField cell = new TextField();
+			ObservableList<CellTextField> cellsOfCurrentLine = FXCollections.observableArrayList();
+			for (int j=0; j<ColCount; j++) {	
+				CellTextField cell = new CellTextField(i, j);
 				cell.setPrefWidth(celWidth-1);
 				cell.setStyle("-fx-background-radius:0; "
 							+ "-fx-border-color:black; "
 							+ "-fx-border-width:1;"
 							+ "-fx-font-family: Arial Narrow;"
 							+ "-fx-font-size: 12;");
+				cell.setOnKeyPressed(new EventHandler<KeyEvent>(){
+			        @Override
+			        public void handle(KeyEvent key){
+			            if (key.getCode().equals(KeyCode.ENTER)){
+			            	final int _i = cell.getRowIndex() + 1;
+			            	final int _j = cell.getColIndex();
+			            	cells.get(_i).get(_j).requestFocus();
+			            }
+			        }
+			    });
 				cellsOfCurrentLine.add(cell);
 			}
 			if (i == 0) this.colCount = cellsOfCurrentLine.size();
@@ -99,15 +113,25 @@ public class StringGridFX {
 	
 	public void addRow() {
 		HBox line = new HBox();
-		ObservableList<TextField> cellsOfCurrentLine = FXCollections.observableArrayList();
+		ObservableList<CellTextField> cellsOfCurrentLine = FXCollections.observableArrayList();
 		for (int j=0; j<this.colCount; j++) {				
-			TextField cell = new TextField();
+			CellTextField cell = new CellTextField(cells.size(), j);
 			cell.setPrefWidth(celWidth-1);
 			cell.setStyle("-fx-background-radius:0; "
 						+ "-fx-border-color:black; "
 						+ "-fx-border-width:1;"
 						+ "-fx-font-family: Arial Narrow;"
 						+ "-fx-font-size: 12;");
+			cell.setOnKeyPressed(new EventHandler<KeyEvent>(){
+		        @Override
+		        public void handle(KeyEvent key){
+		            if (key.getCode().equals(KeyCode.ENTER)){
+		            	final int _i = cell.getRowIndex() + 1;
+		            	final int _j = cell.getColIndex();
+		            	cells.get(_i).get(_j).requestFocus();
+		            }
+		        }
+		    });
 			cellsOfCurrentLine.add(cell);
 		}
 		cells.add(cellsOfCurrentLine);
@@ -115,7 +139,6 @@ public class StringGridFX {
 		lines.add(line);
 		vBox.getChildren().add(line);
 		this.rowCount++;
-		
 		height = 27 * this.rowCount + 20;
 		myPosition.getAnchorContainer().setPrefHeight(height);
 	}
@@ -123,7 +146,7 @@ public class StringGridFX {
 	public void deleteRow(int index) {
 		if (index > 0) {	
 			vBox.getChildren().remove(index);
-			Iterator<ObservableList<TextField>> cellsIt = cells.iterator();
+			Iterator<ObservableList<CellTextField>> cellsIt = cells.iterator();
 			int i = 0;
 			while(i < index) {
 				if (cellsIt.hasNext()) {
