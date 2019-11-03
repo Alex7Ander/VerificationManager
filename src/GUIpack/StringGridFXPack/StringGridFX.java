@@ -8,7 +8,6 @@ import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
-import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;

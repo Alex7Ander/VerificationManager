@@ -11,9 +11,10 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="666.0" prefWidth="1209.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="NewElementPack.NewElementController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="666.0" prefWidth="1209.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="NewElementPack.NewElementController">
    <children>
       <HBox prefHeight="549.0" prefWidth="1024.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
          <children>
@@ -87,11 +88,20 @@
                         </VBox>
                      </children>
                   </HBox>
-                  <ScrollPane fx:id="scrollPane" prefHeight="514.0" prefWidth="869.0">
-                     <content>
-                        <AnchorPane fx:id="tablePane" prefHeight="399.0" prefWidth="852.0" />
-                     </content>
-                  </ScrollPane>
+                  <StackPane fx:id="tablesStack" prefHeight="517.0" prefWidth="873.0">
+                     <children>
+                        <ScrollPane fx:id="primaryScrollPane" prefHeight="514.0" prefWidth="869.0">
+                           <content>
+                              <AnchorPane fx:id="primaryTablePane" prefHeight="515.0" prefWidth="871.0" />
+                           </content>
+                        </ScrollPane>
+                        <ScrollPane fx:id="periodicScrollPane" prefHeight="514.0" prefWidth="869.0">
+                           <content>
+                              <AnchorPane fx:id="periodicTablePane" prefHeight="513.0" prefWidth="871.0" />
+                           </content>
+                        </ScrollPane>
+                     </children>
+                  </StackPane>
                </children>
             </VBox>
             <Separator orientation="VERTICAL" prefHeight="549.0" prefWidth="15.0" />
