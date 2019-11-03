@@ -15,6 +15,7 @@ public class NewElementWindow extends guiWindow {
 		NewElementController ctrl = (NewElementController) loader.getController();
 		//Установим действия по проверке введенных параметров перед закрытием
 		this.stage.setOnCloseRequest( event -> {
+			/*
 			ctrl.remeberTables();
 			int checkParamsResult = checkParams(); // 0 - норма, закрываем окно; 1 - приостанавливаем
 			if (checkParamsResult == 1) {
@@ -27,16 +28,16 @@ public class NewElementWindow extends guiWindow {
 				} catch (NumberFormatException nfExp) {
 					//
 				}				
-			}
+			}*/
 		});
 	}
 	
 	public NewElementWindow(Element elm) throws IOException {		
 		super(elm.getType(), "NewElementForm.fxml");
 		NewElementController ctrl = (NewElementController) loader.getController();
-		ctrl.setElement(elm);
-				
+		ctrl.setElement(elm);		
 		this.stage.setOnCloseRequest( event -> {
+			/*
 			ctrl.remeberTables();
 			int answer = 1;
 			try {
@@ -73,8 +74,8 @@ public class NewElementWindow extends guiWindow {
 						}											
 					}				
 				}				
-			}
-		});			
+			}*/	
+		});		
 	}	
 
 	private int checkParams() {

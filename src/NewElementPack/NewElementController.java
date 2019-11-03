@@ -349,8 +349,9 @@ public class NewElementController {
 	@FXML
 	private void twoPoleRBClick(ActionEvent event) {
 		currentCountOfParams = 1;
+		//paramsComboBox.setItems(null);		
 		setParams(currentTypeOfParams, currentCountOfParams);
-		paramsComboBox.setItems(listOfParams);
+		//paramsComboBox.setItems(listOfParams);
 		paramsComboBox.setValue(listOfParams.get(0));
 		elemTypesComboBox.setItems(twoPoleTypesList);
 		elemTypesComboBox.setValue(twoPoleTypesList.get(0));
@@ -360,7 +361,7 @@ public class NewElementController {
 	private void fourPoleRBClick(ActionEvent event) {
 		currentCountOfParams = 4;
 		setParams(currentTypeOfParams, currentCountOfParams);
-		paramsComboBox.setItems(listOfParams);
+		//paramsComboBox.setItems(listOfParams);
 		paramsComboBox.setValue(listOfParams.get(0));
 		elemTypesComboBox.setItems(fourPoleTypesList);
 		elemTypesComboBox.setValue(fourPoleTypesList.get(0));
@@ -388,9 +389,11 @@ public class NewElementController {
 				
 	@FXML
 	private void paramsComboBoxClick() {		
-		paramIndex = this.paramsComboBox.getSelectionModel().getSelectedIndex();
-		currentS = S_Parametr.values()[paramIndex];
-		visibleParamsTable.changeSParametr(currentS);
+	    paramIndex = this.paramsComboBox.getSelectionModel().getSelectedIndex();
+	    if (paramIndex >= 0) {
+			currentS = S_Parametr.values()[paramIndex];
+			visibleParamsTable.changeSParametr(currentS);	    	
+	    }
 	}
 	
 	@FXML 

@@ -169,6 +169,12 @@ public class StringGridFX {
 		}
 	}
 	
+	public void clearColumn(int columnIndex) {
+		for (int i=0; i<this.rowCount; i++) {
+			this.cells.get(i).get(columnIndex).setText("");
+		}
+	}
+	
 	public String getHead(int index) {
 		try {			
 			return this.heads.get(index).getText();
@@ -215,7 +221,11 @@ public class StringGridFX {
 	public void getColumnToDouble(int index, ArrayList<Double> columnValues) throws NumberFormatException {
 		columnValues.clear();
 		for (int i = 0; i < this.rowCount; i++) {
-			columnValues.add(Double.parseDouble(this.cells.get(i).get(index).getText()));
+			try {
+				columnValues.add(Double.parseDouble(this.cells.get(i).get(index).getText()));
+			} catch (NumberFormatException fExp) {
+				columnValues.add((double) 0);
+			}			
 		}		
 	}
 	

@@ -36,6 +36,7 @@ public class NewElementStringGridFX extends StringGridFX {
 		myTimeType = timeType;
 		currentS = S_Parametr.S11;
 		values = new HashMap<String, ArrayList<Double>>();
+		values.put("FREQS", new ArrayList<Double>());
 		for (int i = 0; i < S_Parametr.values().length; i++) {
 			for (int j = 0; j < MeasUnitPart.values().length; j++) {
 				String key = "DOWN_" + MeasUnitPart.values()[j] + "_" + S_Parametr.values()[i];
@@ -65,14 +66,17 @@ public class NewElementStringGridFX extends StringGridFX {
 	}
 	
 	public void changeSParametr(S_Parametr parametr) {
-		//Teke data
+		this.getColumnToDouble(0, values.get("FREQS"));
 		this.getColumnToDouble(1, values.get("DOWN_" + MeasUnitPart.MODULE + "_" + currentS));
 		this.getColumnToDouble(2, values.get(MeasUnitPart.MODULE + "_" + currentS));
 		this.getColumnToDouble(3, values.get("UP_" + MeasUnitPart.MODULE + "_" + currentS));		
 		this.getColumnToDouble(4, values.get("DOWN_" + MeasUnitPart.PHASE + "_" + currentS));
 		this.getColumnToDouble(5, values.get(MeasUnitPart.PHASE + "_" + currentS));
 		this.getColumnToDouble(6, values.get("UP_" + MeasUnitPart.PHASE + "_" + currentS));
+		//Clear table
+		this.clear();
 		//Set new values
+		this.setColumnFromDouble(0, values.get("FREQS"));
 		this.setColumnFromDouble(1, values.get("DOWN_" + MeasUnitPart.MODULE + "_" + parametr));
 		this.setColumnFromDouble(2, values.get(MeasUnitPart.MODULE + "_" + parametr));
 		this.setColumnFromDouble(3, values.get("UP_" + MeasUnitPart.MODULE + "_" + parametr));		
@@ -124,4 +128,10 @@ public class NewElementStringGridFX extends StringGridFX {
 			this.setColumnFromDouble(0, columnValues);*/
 	}
 	
+	public HashMap<Double, Double> getUpModule(){
+		
+		HashMap<Double, Double> upModule = new HashMap<Double, Double>();
+		
+		return upModule;
+	}
 }
