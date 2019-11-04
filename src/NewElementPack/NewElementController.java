@@ -420,9 +420,9 @@ public class NewElementController {
 			for (int i = 0; i < MeasUnitPart.values().length; i++) {
 				String key1 = prefix + MeasUnitPart.values()[i] + "_" + S_Parametr.S11;
 				String key2 = prefix + MeasUnitPart.values()[i] + "_" + S_Parametr.S22;
-				ArrayList<Double> valuesArray = this.primaryParamsTable.values.get(key1);
+				ArrayList<String> valuesArray = this.primaryParamsTable.values.get(key1);
 				this.primaryParamsTable.values.get(key2).clear();
-				for (Double val : valuesArray) {
+				for (String val : valuesArray) {
 					this.primaryParamsTable.values.get(key2).add(val);				
 				}
 			}
@@ -495,7 +495,7 @@ public class NewElementController {
 		}
 		*/
 	}
-//Методы для получения информации об элементе
+//Methods for getting information about element
 	public String getType() {return elemTypesComboBox.getSelectionModel().getSelectedItem().toString();}
 	public String getSerNum() {return serNumberTextField.getText();}
 	public int getPoleCount() {
@@ -515,158 +515,41 @@ public class NewElementController {
 		if (this.upDownPhaseToleranceRB.isSelected()) return "updown";
 		else return "percent";
 	}
-	
-	
+
+//Method for getting collections of parametrs	
+	public ArrayList<Double> getFreqsValues(){
+		return this.primaryParamsTable.getFreqs();
+	}
 	
 	public HashMap<String, HashMap<Double, Double>> getNominalValues(){
-		
-		/*
-		HashMap<String, HashMap<Double, Double>> nominalValues = new HashMap<String, HashMap<Double, Double>>();
-				
-		HashMap<Double, Double> m_S11 = new HashMap<Double, Double>();
-		HashMap<Double, Double> p_S11 = new HashMap<Double, Double>();
-		
-		HashMap<Double, Double> m_S12 = new HashMap<Double, Double>();
-		HashMap<Double, Double> p_S12 = new HashMap<Double, Double>();
-		
-		HashMap<Double, Double> m_S21 = new HashMap<Double, Double>();
-		HashMap<Double, Double> p_S21 = new HashMap<Double, Double>();
-		
-		HashMap<Double, Double> m_S22 = new HashMap<Double, Double>();
-		HashMap<Double, Double> p_S22 = new HashMap<Double, Double>();
-	
-		for (int j = 0; j < freqs.size(); j++) {
-			m_S11.put(this.freqs.get(j), Double.parseDouble(this.m_s.get("primary_S11").get(j)));
-			p_S11.put(this.freqs.get(j), Double.parseDouble(this.p_s.get("primary_S11").get(j)));
-			
-			if (this.getPoleCount() == 4) {
-				m_S12.put(this.freqs.get(j), Double.parseDouble(this.m_s.get("primary_S12").get(j)));
-				p_S12.put(this.freqs.get(j), Double.parseDouble(this.p_s.get("primary_S12").get(j)));
-			
-				m_S21.put(this.freqs.get(j), Double.parseDouble(this.m_s.get("primary_S21").get(j)));
-				p_S21.put(this.freqs.get(j), Double.parseDouble(this.p_s.get("primary_S21").get(j)));
-			
-				m_S22.put(this.freqs.get(j), Double.parseDouble(this.m_s.get("primary_S22").get(j)));
-				p_S22.put(this.freqs.get(j), Double.parseDouble(this.p_s.get("primary_S22").get(j)));
-			}
-		}		
-		
-		nominalValues.put("m_S11", m_S11);
-		nominalValues.put("p_S11", p_S11);
-		
-		if (this.getPoleCount() == 4) {
-			nominalValues.put("m_S12", m_S12);
-			nominalValues.put("p_S12", m_S12);
-			nominalValues.put("m_S21", m_S21);
-			nominalValues.put("p_S21", m_S21);
-			nominalValues.put("m_S22", m_S22);
-			nominalValues.put("p_S22", m_S22);
+		HashMap<String, HashMap<Double, Double>> nominals = new HashMap<String, HashMap<Double, Double>>();
+		for (int i = 0; i < currentCountOfParams; i++) {
+			String key = MeasUnitPart.MODULE + "_" + S_Parametr.values()[i];
+			nominals.put(key, this.primaryParamsTable.getParametr(key));
 		}
-				
-		return nominalValues;
-		*/
-		return null;
+		return nominals;
 	}
-	
-	public ArrayList<Double> getFreqsValues(){
-		return null;
-	}
-	
+		
 	public HashMap<String, HashMap<Double, Double>> getToleranceParamsValues(TimeType timeType, MeasUnitPart unit){
-		/*
-		HashMap<String, HashMap<Double, Double>> values = new HashMap<String, HashMap<Double, Double>>();
-		for (int i=0; i<currentCountOfParams; i++) {
-			String key = timeType + "_" + unit + "_" + S_Parametr.values()[i];
-			HashMap<Double, Double> hm = new HashMap<Double, Double>();
-			hm = this.tableValues.get(key);
-			values.put(key, hm);
+		HashMap<String, HashMap<Double, Double>> params = new HashMap<String, HashMap<Double, Double>>();
+		NewElementStringGridFX currentTable = null;
+		if (timeType.equals(TimeType.PERIODIC)) {
+			currentTable = this.periodicParamsTable;
+		} else if (timeType.equals(TimeType.PRIMARY)) {
+			currentTable = this.primaryParamsTable;
 		}
-		*/
-		
-		
-	/*	String[] S = new String[] {"S11", "S12", "S21", "S22"};
-		String addStr = timeType + "_" + unit;
-		ArrayList<String> paramsNames = new ArrayList<String>();
-		int paramsCount = 0;
-		if (this.currentElement.getPoleCount() == 2) {
-			paramsCount = 1; 
-		} else {
-			paramsCount = 4;
+		else {
+			return null;
 		}
-		
-		for (int i = 0; i < paramsCount; i++) {
-			tolParamsValues.put("DOWN_" + addStr + "_" + S[i], this.paramsTable.getValues("DOWN_" + addStr + "_" + S[i]));
-			tolParamsValues.put("UP_" + addStr + "_")
+		for (int i = 0; i < currentCountOfParams; i++) {
+			String key = "DOWN_" + "_" + unit + "_" + S_Parametr.values()[i];
+			params.put(key, currentTable.getParametr(key));
+			key = "UP_" + "_" + unit + "_" + S_Parametr.values()[i];
+			params.put(key, currentTable.getParametr(key));
 		}
-				
-		this.paramsTable.
-		
-		HashMap<Double, Double> d_m_S11 = new HashMap<Double, Double>();
-		HashMap<Double, Double> u_m_S11 = new HashMap<Double, Double>();
-		HashMap<Double, Double> d_p_S11 = new HashMap<Double, Double>();
-		HashMap<Double, Double> u_p_S11 = new HashMap<Double, Double>();
-		
-		HashMap<Double, Double> d_m_S12 = new HashMap<Double, Double>();
-		HashMap<Double, Double> u_m_S12 = new HashMap<Double, Double>();
-		HashMap<Double, Double> d_p_S12 = new HashMap<Double, Double>();
-		HashMap<Double, Double> u_p_S12 = new HashMap<Double, Double>();
-		
-		HashMap<Double, Double> d_m_S21 = new HashMap<Double, Double>();
-		HashMap<Double, Double> u_m_S21 = new HashMap<Double, Double>();
-		HashMap<Double, Double> d_p_S21 = new HashMap<Double, Double>();
-		HashMap<Double, Double> u_p_S21 = new HashMap<Double, Double>();
-		
-		HashMap<Double, Double> d_m_S22 = new HashMap<Double, Double>();
-		HashMap<Double, Double> u_m_S22 = new HashMap<Double, Double>();
-		HashMap<Double, Double> d_p_S22 = new HashMap<Double, Double>();
-		HashMap<Double, Double> u_p_S22 = new HashMap<Double, Double>();
-		
-		for (int j = 0; j < freqs.size(); j++) {
-			d_m_S11.put(this.freqs.get(j), Double.parseDouble(this.d_m_s.get(timeType + "_S11").get(j)));
-			u_m_S11.put(this.freqs.get(j), Double.parseDouble(this.u_m_s.get(timeType + "_S11").get(j)));
-			d_p_S11.put(this.freqs.get(j), Double.parseDouble(this.d_p_s.get(timeType + "_S11").get(j)));
-			u_p_S11.put(this.freqs.get(j), Double.parseDouble(this.u_p_s.get(timeType + "_S11").get(j)));
-				
-			if (this.getPoleCount() == 4) {
-				d_m_S12.put(this.freqs.get(j), Double.parseDouble(this.d_m_s.get(TypeByTime+"_S11").get(j)));
-				u_m_S12.put(this.freqs.get(j), Double.parseDouble(this.u_m_s.get(TypeByTime+"_S11").get(j)));
-				d_p_S12.put(this.freqs.get(j), Double.parseDouble(this.d_p_s.get(TypeByTime+"_S11").get(j)));
-				u_p_S12.put(this.freqs.get(j), Double.parseDouble(this.u_p_s.get(TypeByTime+"_S11").get(j)));
-					
-				d_m_S21.put(this.freqs.get(j), Double.parseDouble(this.d_m_s.get(TypeByTime+"_S11").get(j)));
-				u_m_S21.put(this.freqs.get(j), Double.parseDouble(this.u_m_s.get(TypeByTime+"_S11").get(j)));
-				d_p_S21.put(this.freqs.get(j), Double.parseDouble(this.d_p_s.get(TypeByTime+"_S11").get(j)));
-				u_p_S21.put(this.freqs.get(j), Double.parseDouble(this.u_p_s.get(TypeByTime+"_S11").get(j)));
-					
-				d_m_S22.put(this.freqs.get(j), Double.parseDouble(this.d_m_s.get(TypeByTime+"_S11").get(j)));
-				u_m_S22.put(this.freqs.get(j), Double.parseDouble(this.u_m_s.get(TypeByTime+"_S11").get(j)));
-				d_p_S22.put(this.freqs.get(j), Double.parseDouble(this.d_p_s.get(TypeByTime+"_S11").get(j)));
-				u_p_S22.put(this.freqs.get(j), Double.parseDouble(this.u_p_s.get(TypeByTime+"_S11").get(j)));
-			}
-		}		
-		
-		tolParamsValues.put("d_m_S11", d_m_S11);
-		tolParamsValues.put("u_m_S11", u_m_S11);
-		tolParamsValues.put("d_p_S11", d_p_S11);
-		tolParamsValues.put("u_p_S11", u_p_S11);
-		
-		if (this.getPoleCount() == 4) {
-			tolParamsValues.put("d_m_S12", d_m_S12);
-			tolParamsValues.put("u_m_S12", u_m_S12);
-			tolParamsValues.put("d_p_S12", d_p_S12);
-			tolParamsValues.put("u_p_S12", u_p_S12);			
-			tolParamsValues.put("d_m_S21", d_m_S21);
-			tolParamsValues.put("u_m_S21", u_m_S21);
-			tolParamsValues.put("d_p_S21", d_p_S21);
-			tolParamsValues.put("u_p_S21", u_p_S21);			
-			tolParamsValues.put("d_m_S22", d_m_S22);
-			tolParamsValues.put("u_m_S22", u_m_S22);
-			tolParamsValues.put("d_p_S22", d_p_S22);
-			tolParamsValues.put("u_p_S22", u_p_S22);
-		}		*/
-		return null;
+		return params;
 	}
-	
+//-------------------------------------------------------------------------------------------------------------------------	
 	public int checkInputedValues() {
 		/*
 		int returnedvalue = 0;		

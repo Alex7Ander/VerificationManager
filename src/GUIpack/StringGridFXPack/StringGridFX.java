@@ -218,12 +218,12 @@ public class StringGridFX {
 		}
 	}
 	
-	public void getColumnToDouble(int index, ArrayList<Double> columnValues) throws NumberFormatException {
+	public void getColumnToDouble(int index, ArrayList<Double> columnValues) {
 		columnValues.clear();
 		for (int i = 0; i < this.rowCount; i++) {
 			try {
 				columnValues.add(Double.parseDouble(this.cells.get(i).get(index).getText()));
-			} catch (NumberFormatException fExp) {
+			} catch (NumberFormatException nfExp) {
 				columnValues.add((double) 0);
 			}			
 		}		

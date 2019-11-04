@@ -49,6 +49,12 @@ public class ToleranceParametrs implements Includable<Element>, dbStorable {
 		this.tableName = "Параметры допуска " + this.timeType.getTableNamePart() + " поверки для " + this.measUnitPart.getTableNamePart() + " S параметров";
 		//Получим параметры
 		this.freqs = elCtrl.getFreqsValues();
+		for (int i = 0; i < this.myElement.getSParamsCout(); i++) {
+			String parametr = "DOWN_" + this.timeType + "_" + this.measUnitPart
+			HashMap<Double, Double> paramValues =
+			this.values.put(parametr, paramValues);
+			parametr = "DOWN_" + this.timeType + "_" + this.measUnitPart
+		}
 		this.values = elCtrl.getToleranceParamsValues(this.timeType, this.measUnitPart);
 	}
 //DataBase

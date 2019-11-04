@@ -19,7 +19,7 @@ public class NewElementStringGridFX extends StringGridFX {
 		return currentS;
 	}
 
-	public HashMap<String, ArrayList<Double>> values;
+	public HashMap<String, ArrayList<String>> values;
 	private static ArrayList<String> tableHeads;	
 	static {
 		tableHeads = new ArrayList<String>();
@@ -35,16 +35,16 @@ public class NewElementStringGridFX extends StringGridFX {
 		super(7, 10, position, tableHeads);
 		myTimeType = timeType;
 		currentS = S_Parametr.S11;
-		values = new HashMap<String, ArrayList<Double>>();
-		values.put("FREQS", new ArrayList<Double>());
+		values = new HashMap<String, ArrayList<String>>();
+		values.put("FREQS", new ArrayList<String>());
 		for (int i = 0; i < S_Parametr.values().length; i++) {
 			for (int j = 0; j < MeasUnitPart.values().length; j++) {
 				String key = "DOWN_" + MeasUnitPart.values()[j] + "_" + S_Parametr.values()[i];
-				values.put(key, new ArrayList<Double>());
+				values.put(key, new ArrayList<String>());
 				key = MeasUnitPart.values()[j] + "_" + S_Parametr.values()[i];
-				values.put(key, new ArrayList<Double>());
+				values.put(key, new ArrayList<String>());
 				key = "UP_" + MeasUnitPart.values()[j] + "_" + S_Parametr.values()[i];
-				values.put(key, new ArrayList<Double>());
+				values.put(key, new ArrayList<String>());
 			}
 		}		
 		for (ObservableList<CellTextField> line: this.cells) {
@@ -66,30 +66,57 @@ public class NewElementStringGridFX extends StringGridFX {
 	}
 	
 	public void changeSParametr(S_Parametr parametr) {
-		this.getColumnToDouble(0, values.get("FREQS"));
-		this.getColumnToDouble(1, values.get("DOWN_" + MeasUnitPart.MODULE + "_" + currentS));
-		this.getColumnToDouble(2, values.get(MeasUnitPart.MODULE + "_" + currentS));
-		this.getColumnToDouble(3, values.get("UP_" + MeasUnitPart.MODULE + "_" + currentS));		
-		this.getColumnToDouble(4, values.get("DOWN_" + MeasUnitPart.PHASE + "_" + currentS));
-		this.getColumnToDouble(5, values.get(MeasUnitPart.PHASE + "_" + currentS));
-		this.getColumnToDouble(6, values.get("UP_" + MeasUnitPart.PHASE + "_" + currentS));
+		//Get values
+		this.getColumn(0, values.get("FREQS"));
+		this.getColumn(1, values.get("DOWN_" + MeasUnitPart.MODULE + "_" + currentS));
+		this.getColumn(2, values.get(MeasUnitPart.MODULE + "_" + currentS));
+		this.getColumn(3, values.get("UP_" + MeasUnitPart.MODULE + "_" + currentS));		
+		this.getColumn(4, values.get("DOWN_" + MeasUnitPart.PHASE + "_" + currentS));
+		this.getColumn(5, values.get(MeasUnitPart.PHASE + "_" + currentS));
+		this.getColumn(6, values.get("UP_" + MeasUnitPart.PHASE + "_" + currentS));
 		//Clear table
 		this.clear();
 		//Set new values
-		this.setColumnFromDouble(0, values.get("FREQS"));
-		this.setColumnFromDouble(1, values.get("DOWN_" + MeasUnitPart.MODULE + "_" + parametr));
-		this.setColumnFromDouble(2, values.get(MeasUnitPart.MODULE + "_" + parametr));
-		this.setColumnFromDouble(3, values.get("UP_" + MeasUnitPart.MODULE + "_" + parametr));		
-		this.setColumnFromDouble(4, values.get("DOWN_" + MeasUnitPart.PHASE + "_" + parametr));
-		this.setColumnFromDouble(5, values.get(MeasUnitPart.PHASE + "_" + parametr));
-		this.setColumnFromDouble(6, values.get("UP_" + MeasUnitPart.PHASE + "_" + parametr));		
+		this.setColumn(0, values.get("FREQS"));
+		this.setColumn(1, values.get("DOWN_" + MeasUnitPart.MODULE + "_" + parametr));
+		this.setColumn(2, values.get(MeasUnitPart.MODULE + "_" + parametr));
+		this.setColumn(3, values.get("UP_" + MeasUnitPart.MODULE + "_" + parametr));		
+		this.setColumn(4, values.get("DOWN_" + MeasUnitPart.PHASE + "_" + parametr));
+		this.setColumn(5, values.get(MeasUnitPart.PHASE + "_" + parametr));
+		this.setColumn(6, values.get("UP_" + MeasUnitPart.PHASE + "_" + parametr));		
 		currentS = parametr;
 	}
 	
 	public HashMap<Double, Double> getColumnByKey(String key){		
 		return null; //values.get(key);		
 	}
-
+	
+	public ArrayList<Double> getFreqs(){
+		ArrayList<Double> freqs = new ArrayList<Double>();
+		for (String strFreq : this.values.get("FREQS")) {
+			try {
+				double freq = Double.parseDouble(strFreq);
+				freqs.add(freq);
+			} catch (NumberFormatException nfExp) {
+				
+			}
+		}
+		return freqs;
+	}
+	public HashMap<Double, Double> getParametr(String paramName){		
+		HashMap<Double, Double> parametr = new HashMap<Double, Double>();
+		for (int i=0; i < this.values.get("FREQS").size(); i++) {
+			try {
+				double freq = Double.parseDouble(this.values.get("FREQS").get(i));
+				double currentValue = Double.parseDouble(this.values.get(paramName).get(i));
+				parametr.put(freq, currentValue);
+			} catch (NumberFormatException nfExp) {
+				//
+			}			
+		}
+		return parametr;
+	}
+	
 	public void setParams(TimeType type, S_Parametr Sxx) {
 		// 1. Сохранить текущее состояние
 
@@ -126,12 +153,5 @@ public class NewElementStringGridFX extends StringGridFX {
 				columnValues.add(d);
 			}
 			this.setColumnFromDouble(0, columnValues);*/
-	}
-	
-	public HashMap<Double, Double> getUpModule(){
-		
-		HashMap<Double, Double> upModule = new HashMap<Double, Double>();
-		
-		return upModule;
 	}
 }
