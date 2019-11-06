@@ -1,7 +1,6 @@
 package GUIpack.StringGridFXPack;
 
 import java.util.ArrayList;
-
 import VerificationPack.MeasResult;
 
 public class ResultsStringGridFX extends StringGridFX {

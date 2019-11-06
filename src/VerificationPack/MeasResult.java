@@ -47,7 +47,8 @@ public class MeasResult implements Includable<Element>, dbStorable{
 	
 	protected  ObservableList<String> paramsNames;
 	
-	//Получение результатов из файла
+//Constructors
+//FILE
 	public MeasResult(String fileWithResults, int resultNumber, Element ownerElement) throws IOException{
 		
 		this.myElement = ownerElement;
@@ -63,9 +64,8 @@ public class MeasResult implements Includable<Element>, dbStorable{
 		this.dateOfMeas = Calendar.getInstance().getTime();
 	}
 	
-	//Получение результатов из GUI
-	public MeasResult(NewElementController elCtrl, Element ownerElement){
-		
+//GUI
+	public MeasResult(NewElementController elCtrl, Element ownerElement){		
 		this.myElement = ownerElement;	
 		freqs = new ArrayList<Double>();
 		values = new HashMap<String, HashMap<Double, Double>>();
@@ -76,9 +76,8 @@ public class MeasResult implements Includable<Element>, dbStorable{
 		this.countOfParams = values.size();
 		this.countOfFreq = freqs.size();
 		this.dateOfMeas = Calendar.getInstance().getTime();
-	}
-	
-	//Получение результатов из БД
+	}	
+//BD
 	public MeasResult(Element ownerElement, int index) throws SQLException {		
 		this.values = new HashMap<String, HashMap<Double, Double>>();
 		this.freqs = new ArrayList<Double>();				

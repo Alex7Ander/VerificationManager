@@ -15,20 +15,39 @@ public class NewElementWindow extends guiWindow {
 		NewElementController ctrl = (NewElementController) loader.getController();
 		//Установим действия по проверке введенных параметров перед закрытием
 		this.stage.setOnCloseRequest( event -> {
+			ctrl.saveValues();
 			/*
-			ctrl.remeberTables();
-			int checkParamsResult = checkParams(); // 0 - норма, закрываем окно; 1 - приостанавливаем
-			if (checkParamsResult == 1) {
-				event.consume();
+			if (!ctrl.checkPrimaryTable()) {
+				try {
+					YesNoWindow  qWin = new YesNoWindow("Внимание", "Вы не полностью заполнили таблицу\nс параметрами первичной поверки.\nЖелаете продолжить редактирование?");
+					int answer = qWin.showAndWait();
+					if (answer == 1) {	
+						return;
+					}
+					else{
+						event.consume();
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 			else {
-				//если пользователя все удовлетворяет, то в этом случае записываем внесенные данные в характеристики элемента
-				try {
-					ctrl.initializeElement();
-				} catch (NumberFormatException nfExp) {
-					//
-				}				
-			}*/
+				if (!ctrl.checkPeriodicTable()) {
+					try {
+						YesNoWindow  qWin = new YesNoWindow("Внимание", "Вы не полностью заполнили таблицу\nс параметрами периодической поверки.\nЖелаете продолжить редактирование?");
+						int answer = qWin.showAndWait();
+						if (answer == 1) {
+							return;
+						}
+						else{
+							event.consume();
+						}
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+			*/
 		});
 	}
 	
@@ -77,7 +96,7 @@ public class NewElementWindow extends guiWindow {
 			}*/	
 		});		
 	}	
-
+/*
 	private int checkParams() {
 		NewElementController ctrl = (NewElementController) loader.getController();
 		//Проверим частоты
@@ -116,7 +135,7 @@ public class NewElementWindow extends guiWindow {
 		}
 		return 0;
 	}
-	
+*/	
 	public void setTitle(String newTitle) {
 		title = newTitle;
 	}

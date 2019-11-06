@@ -9,7 +9,6 @@ import DevicePack.Element;
 import FileManagePack.FileManager;
 import FreqTablesPack.FreqTablesWindow;
 import GUIpack.StringGridFXPack.NewElementStringGridFX;
-import GUIpack.StringGridFXPack.StringGridFX;
 import GUIpack.StringGridFXPack.StringGridPosition;
 import ToleranceParamPack.ParametrsPack.MeasUnitPart;
 import ToleranceParamPack.ParametrsPack.S_Parametr;
@@ -163,7 +162,9 @@ public class NewElementController {
 	public void initializeElement() {
 		this.currentElement = new Element(this);
 	}
-	public Element getElement() {return this.currentElement;}
+	public Element getElement() {
+		return this.currentElement;
+	}
 //************************************************	
 		
 	ObservableList<String> listOfParams;
@@ -177,27 +178,7 @@ public class NewElementController {
 	int savingIndex;
 	String[] keys = {"primary_S11", "primary_S12", "primary_S21", "primary_S22", 
 					 "periodic_S11", "periodic_S12", "periodic_S21", "periodic_S22"};
-		
-	private TimeType currentTimeType;
 	private S_Parametr currentS;
-	
-	/*
-	private ArrayList<Double> freqs;
-	HashMap<String, HashMap<Double, Double>> tableValues;
-	private ArrayList<String> strFreqs;
-	private HashMap<String, ArrayList<String>> m_s;
-	private HashMap<String, ArrayList<String>> p_s;	
-	private HashMap<String, ArrayList<String>> d_m_s; 	//нижний предел модул€
-	private HashMap<String, ArrayList<String>> u_m_s;	//верхний предел модул€	
-	private HashMap<String, ArrayList<String>> d_p_s;	//нижний предел фазы
-	private HashMap<String, ArrayList<String>> u_p_s;	//верхний предел фазы
-	*/
-	
-	private MeasResult nominal;
-	private ToleranceParametrs primaryModuleTP;
-	private ToleranceParametrs primaryPhaseTP;
-	private ToleranceParametrs periodicModuleTP;
-	private ToleranceParametrs periodicPhaseTP;
 	
 	@FXML
 	private void initialize() {			
@@ -210,31 +191,6 @@ public class NewElementController {
 		this.periodicScrollPane.toBack();
 		
 		this.currentS = S_Parametr.S11;
-		this.currentTimeType = TimeType.PRIMARY;
-		//„астоты и параметры
-		/*
-		freqs = new ArrayList<Double>();
-		tableValues = new HashMap<String, HashMap<Double, Double>>();
-		
-		//„астоты в виде строк дл€ заполнени€ таблиц
-		strFreqs = new ArrayList<String>();
-		m_s = new HashMap<String, ArrayList<String>>();
-		p_s = new HashMap<String, ArrayList<String>>();
-		d_m_s = new HashMap<String, ArrayList<String>>();		
-		u_m_s = new HashMap<String, ArrayList<String>>();
-		d_p_s = new HashMap<String, ArrayList<String>>();		
-		u_p_s = new HashMap<String, ArrayList<String>>();
-		
-		for (int i = 0; i < keys.length; i++) {
-			d_m_s.put(keys[i], new ArrayList<String>(10));
-			m_s.put(keys[i], new ArrayList<String>(10));
-			u_m_s.put(keys[i], new ArrayList<String>(10));
-			
-			d_p_s.put(keys[i], new ArrayList<String>(10));
-			p_s.put(keys[i], new ArrayList<String>(10));
-			u_p_s.put(keys[i], new ArrayList<String>(10));
-		}
-		*/
 		listOfParams = FXCollections.observableArrayList();
 		twoPoleTypesList = FXCollections.observableArrayList();
 		fourPoleTypesList = FXCollections.observableArrayList();
@@ -348,10 +304,8 @@ public class NewElementController {
 	
 	@FXML
 	private void twoPoleRBClick(ActionEvent event) {
-		currentCountOfParams = 1;
-		//paramsComboBox.setItems(null);		
+		currentCountOfParams = 1;		
 		setParams(currentTypeOfParams, currentCountOfParams);
-		//paramsComboBox.setItems(listOfParams);
 		paramsComboBox.setValue(listOfParams.get(0));
 		elemTypesComboBox.setItems(twoPoleTypesList);
 		elemTypesComboBox.setValue(twoPoleTypesList.get(0));
@@ -361,7 +315,6 @@ public class NewElementController {
 	private void fourPoleRBClick(ActionEvent event) {
 		currentCountOfParams = 4;
 		setParams(currentTypeOfParams, currentCountOfParams);
-		//paramsComboBox.setItems(listOfParams);
 		paramsComboBox.setValue(listOfParams.get(0));
 		elemTypesComboBox.setItems(fourPoleTypesList);
 		elemTypesComboBox.setValue(fourPoleTypesList.get(0));
@@ -374,7 +327,6 @@ public class NewElementController {
 		if (!visibleParamsTable.getCurrentS().equals(this.currentS)) {
 			visibleParamsTable.changeSParametr(currentS);
 		}		
-		this.currentTimeType = TimeType.PRIMARY;
 	}
 	
 	@FXML
@@ -384,7 +336,6 @@ public class NewElementController {
 		if (!visibleParamsTable.getCurrentS().equals(this.currentS)) {
 			visibleParamsTable.changeSParametr(currentS);
 		}
-		this.currentTimeType = TimeType.PERIODIC;
 	}
 				
 	@FXML
@@ -428,8 +379,8 @@ public class NewElementController {
 			}
 		}		
 	}
-//end @FXML methods
 	
+//end @FXML methods	
 	private void setParams(String paramsIndex, int countOfParams) {
 		try {
 			String path = new File(".").getAbsolutePath();
@@ -472,32 +423,13 @@ public class NewElementController {
 		periodicParamsTable.setColumn(0, columnFreqValues);
 	}
 	
-	public void refreshTable(int savingIndex, int showIndex) {			
-		/*
-		if(savingIndex >= 0 && showIndex >= 0) {
-			this.paramsTable.getColumn(0, strFreqs);		
-			this.paramsTable.getColumn(1, d_m_s.get(keys[savingIndex]));
-			this.paramsTable.getColumn(2, m_s.get(keys[savingIndex]));
-			this.paramsTable.getColumn(3, u_m_s.get(keys[savingIndex]));
-			this.paramsTable.getColumn(4, d_p_s.get(keys[savingIndex]));
-			this.paramsTable.getColumn(5, p_s.get(keys[savingIndex]));
-			this.paramsTable.getColumn(6, u_p_s.get(keys[savingIndex]));
-		
-			this.paramsTable.clear();
-		
-			this.paramsTable.setColumn(0, strFreqs);
-			this.paramsTable.setColumn(1, d_m_s.get(keys[showIndex]));
-			this.paramsTable.setColumn(2, m_s.get(keys[showIndex]));
-			this.paramsTable.setColumn(3, u_m_s.get(keys[showIndex]));
-			this.paramsTable.setColumn(4, d_p_s.get(keys[showIndex]));
-			this.paramsTable.setColumn(5, p_s.get(keys[showIndex]));
-			this.paramsTable.setColumn(6, u_p_s.get(keys[showIndex]));
-		}
-		*/
-	}
 //Methods for getting information about element
-	public String getType() {return elemTypesComboBox.getSelectionModel().getSelectedItem().toString();}
-	public String getSerNum() {return serNumberTextField.getText();}
+	public String getType() {
+		return elemTypesComboBox.getSelectionModel().getSelectedItem().toString();
+	}
+	public String getSerNum() {
+		return serNumberTextField.getText();
+	}
 	public int getPoleCount() {
 		if (this.fourPoleRB.isSelected()) return 4;
 		else return 2;
@@ -526,6 +458,8 @@ public class NewElementController {
 		for (int i = 0; i < currentCountOfParams; i++) {
 			String key = MeasUnitPart.MODULE + "_" + S_Parametr.values()[i];
 			nominals.put(key, this.primaryParamsTable.getParametr(key));
+			key = MeasUnitPart.PHASE + "_" + S_Parametr.values()[i];
+			nominals.put(key, this.primaryParamsTable.getParametr(key));
 		}
 		return nominals;
 	}
@@ -542,9 +476,9 @@ public class NewElementController {
 			return null;
 		}
 		for (int i = 0; i < currentCountOfParams; i++) {
-			String key = "DOWN_" + "_" + unit + "_" + S_Parametr.values()[i];
+			String key = "DOWN_" + unit + "_" + S_Parametr.values()[i];
 			params.put(key, currentTable.getParametr(key));
-			key = "UP_" + "_" + unit + "_" + S_Parametr.values()[i];
+			key = "UP_" + unit + "_" + S_Parametr.values()[i];
 			params.put(key, currentTable.getParametr(key));
 		}
 		return params;
@@ -570,87 +504,29 @@ public class NewElementController {
 					}
 				}
 			}
-		}		*/
+		}		
+		*/
 		return 0;
 	}
 	
-//ƒействи€ по закрытию окна		
-	public void remeberTables() {
-		/*
-		try {
-    		int showIndex = paramIndex + timeIndex;		
-    		refreshTable(savingIndex, showIndex);
-    		savingIndex = showIndex;   		
-    		freqs.clear();
-    		for (int i=0; i<paramsTable.getRowCount(); i++) {
-    			try {
-    				double val = Double.parseDouble(paramsTable.getCellValue(0, i));
-    				freqs.add(val);
-    			}
-    			catch(NumberFormatException nfExp) {
-    				freqs.add(0.0);
-    			}
-    		}
-    	}
-    	catch(Exception exp) {
-    		//
-    	}
-    	*/
+//ƒействи€ по закрытию окна	
+	public void saveValues() {
+		this.periodicParamsTable.changeSParametr(this.currentS);
+		this.primaryParamsTable.changeSParametr(this.currentS);
 	}
-	public boolean checkfreqTable() {
-		/*
-		boolean result = true;
-		for (int i = 0; i < this.strFreqs.size(); i++) {		
-			try {
-				double value = Double.parseDouble(this.strFreqs.get(i));
-				if (value <=0) {
-					result = false;
-					break;
-				}
-			} catch(Exception exp) {
-				result = false;
-				break;
-			}			
-		}	*/
-		return true;
+	private boolean checkTable(NewElementStringGridFX table) {
+		table.changeSParametr(this.currentS);
+		return table.isFull(this.currentCountOfParams);
 	}
-	public int checkInfo() {
-		int result = 0;
-		ArrayList<HashMap<String, ArrayList<String>>> maps = new ArrayList<HashMap<String, ArrayList<String>>>();
-	/*	maps.add(m_s);
-		maps.add(p_s);
-		maps.add(d_m_s);
-		maps.add(u_m_s);
-		maps.add(d_p_s);
-		maps.add(u_p_s);
-	*/	
-		String[] currentKeys;
-		if (this.twoPoleRB.isSelected()) {
-			currentKeys = new String[2];
-			currentKeys[0] = this.keys[0];
-			currentKeys[1] = this.keys[4];
-		}
-		else {
-			currentKeys = this.keys;
-		}
-		
-		for (int cMap = 0; cMap < maps.size(); cMap++) { //ƒл€ каждой мапы со значени€ми
-			for (String key: currentKeys) {				 //ƒл€ каждого S параметра и как первичной, так и периодической поверко
-				for (int i = 0; i < maps.get(cMap).get(key).size(); i++) {
-					String strValue = maps.get(cMap).get(key).get(i);
-					try {
-						@SuppressWarnings("unused")
-						double value = Double.parseDouble(strValue);
-					} catch(NumberFormatException nfExp) {
-						result++;
-					}
-				}
-			}
-		}
-		return result;		
+	public boolean checkPrimaryTable() {
+		return checkTable(this.primaryParamsTable);
+	}
+	public boolean checkPeriodicTable() {
+		return checkTable(this.periodicParamsTable);
 	}
 //--------------------------------------------------------------------------------------------------	
-	private void showElementInfo() {/*
+	private void showElementInfo() {
+		/*
 		this.elemTypesComboBox.setValue(this.currentElement.getType());
 		this.serNumberTextField.setText(this.currentElement.getSerialNumber());
 		
@@ -750,7 +626,8 @@ public class NewElementController {
 			this.paramsTable.setColumn(4, d_p_s.get(keys[this.savingIndex]));
 			this.paramsTable.setColumn(5, p_s.get(keys[this.savingIndex]));
 			this.paramsTable.setColumn(6, u_p_s.get(keys[this.savingIndex]));
-		}*/
+		}
+		*/
 	}
 		
 	public MeasResult getNominals() {

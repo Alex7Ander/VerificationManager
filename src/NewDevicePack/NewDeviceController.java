@@ -135,39 +135,25 @@ public class NewDeviceController  {
 		//Создали новое устройство
 		newDevice = new Device(tName, tType, tSerN, tOwner, tGosN);			
 		//Проверим, не существует ли аналогичное в БД
-		if (newDevice.isExist()) {
-			AboutMessageWindow errorMessage = new AboutMessageWindow("Ошибка", "Прибор данного типа с таким серийным номером уже существует!");
+		try {
+			if (newDevice.isExist()) {
+				AboutMessageWindow errorMessage = new AboutMessageWindow("Ошибка", "Прибор данного типа с аналогичным серийным номером\n"
+						+ "зарегистрированна в базе данных!");
+				errorMessage.show();
+				return;
+			}
+		} catch (SQLException sqlExp) {
+			AboutMessageWindow errorMessage = new AboutMessageWindow("Ошибка", "База данных отсутствует или повреждена");
 			errorMessage.show();
 			return;
 		}
 		
-		//Проверим, все ли элементы проинициализированны
-		int notInitializedElementsCount = 0;
-		for (int i=0; i<this.elementsWindow.size(); i++) {			
+		//Create elements
+		//int notInitializedElementsCount = 0;
+		for (int i = 0; i < this.elementsWindow.size(); i++) {			
 			NewElementController ctrl = (NewElementController)this.elementsWindow.get(i).getControllerClass();
-			Element elm = ctrl.getElement();
-			if (elm == null) {
-				notInitializedElementsCount ++;
-			}
-			else {
-				newDevice.addElement(elm);
-			}			
-		}
-		if (notInitializedElementsCount != 0) {
-			int answer = 0;
-			try {
-				YesNoWindow qWin = new YesNoWindow("Не полная инициализация","Вы проиницилизировали не все компоненты создаваемого СИ.\nЕсли Вы желаете сохранить только проинициализированные,"
-						+ "\nто нажмите - \"Да\"."
-						+ "Если желаее продолжить редактирование, "
-						+ "\nто нажмите - \"Нет\".");
-				answer = qWin.showAndWait();
-			}
-			catch(IOException ioExp) {
-				ioExp.getStackTrace();
-			}
-			if (answer != 0) {
-				return;
-			}
+			Element elm = new Element(ctrl); //ctrl.getElement();
+			newDevice.addElement(elm);	
 		}
 		//и наконец, пробуем сохранить все в БД
 		try{

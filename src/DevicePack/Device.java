@@ -81,30 +81,23 @@ public class Device implements dbStorable {
 		this.elementsTableName = "";
 	}
 	
-	public boolean isExist() {
+	public boolean isExist() throws SQLException {
 		String sqlString = null;
 		sqlString = "SELECT COUNT(*) FROM Devices WHERE TypeOfDevice='" + this.type + "' AND NameOfDevice='" + this.name + "' AND SerialNumber='" + this.serialNumber + "'";
-		int isExist = 0;
-		try {
-			isExist = DataBaseManager.getDB().sqlQueryCount(sqlString);
-			if (isExist == 0) {
-				return false;
-			}
-			else {
-				return true;
-			}
+		int isExist = DataBaseManager.getDB().sqlQueryCount(sqlString);
+		if (isExist == 0) {
+			return false;
 		}
-		catch(SQLException exp){
+		else {
 			return true;
-		}		 
+		}				 
 	}
 //dbStorable	
 	@Override
 	public void saveInDB() throws SQLException, SavingException{
 		String sqlString = null;
 		String addStr = name + " " + type + " " + serialNumber;
-		String strElementsTable = "Ёлементы дл€ " + addStr;
-		
+		String strElementsTable = "Ёлементы дл€ " + addStr;		
 		sqlString = "INSERT INTO [Devices] (NameOfDevice, TypeOfDevice, SerialNumber, Owner, GosNumber, CountOfElements, ElementsTable) values ('"+name+"','"+type+"','"+serialNumber+"','"+owner+"','"+gosNumber+"','"+Integer.toString(this.countOfElements)+"','"+strElementsTable+"')";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlString);
 		System.out.println("¬несена запись о новом приборе в таблицу Devices");

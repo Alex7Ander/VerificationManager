@@ -117,6 +117,23 @@ public class NewElementStringGridFX extends StringGridFX {
 		return parametr;
 	}
 	
+	public boolean isFull(int countOfControlledParams) {
+		int expectedCount = this.getRowCount();
+		String prefix[] = new String[] {"DOWN_", "", "UP_"};
+		for (int i = 0; i < countOfControlledParams; i++) {
+			for (int j = 0; j < MeasUnitPart.values().length; j++) {
+				for (String pref: prefix) {
+					String key = pref + MeasUnitPart.values()[j] + "_" + S_Parametr.values()[i];
+					int currentCount = values.get(key).size();
+					if (expectedCount != currentCount) {
+						return false;
+					}
+				}
+			}
+		}
+		return true;
+	}
+	
 	public void setParams(TimeType type, S_Parametr Sxx) {
 		// 1. Сохранить текущее состояние
 
