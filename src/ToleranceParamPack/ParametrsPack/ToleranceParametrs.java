@@ -50,8 +50,9 @@ public class ToleranceParametrs implements Includable<Element>, dbStorable {
 		this();		
 		this.myElement = ownerElement;
 		this.timeType = currentTimeType;
-		this.measUnitPart = currentUnitPart;		
-		this.tableName = "Параметры допуска " + this.timeType.getTableNamePart() + " поверки для " + this.measUnitPart.getTableNamePart() + " S параметров";		
+		this.measUnitPart = currentUnitPart;
+		setTableName();
+		//this.tableName = "Параметры допуска " + this.timeType.getTableNamePart() + " поверки для " + this.measUnitPart.getTableNamePart() + " S параметров";		
 		
 		ArrayList<String> fieldsNames = new ArrayList<String>();
 		fieldsNames.add("freq");
@@ -61,9 +62,10 @@ public class ToleranceParametrs implements Includable<Element>, dbStorable {
 		}
 		
 		String sqlQuery = "SELECT ";
-		for (int i = 0; i < this.myElement.getSParamsCout(); i++) {
+		int stop = fieldsNames.size();
+		for (int i = 0; i < stop; i++) {
 			sqlQuery += fieldsNames.get(i);
-			if (i != this.myElement.getSParamsCout() - 1) sqlQuery += ", ";
+			if (i != stop - 1) sqlQuery += ", ";
 		}
 		sqlQuery += " FROM [" + this.tableName +"]";
 		DataBaseManager.getDB().sqlQueryMapOfDouble(sqlQuery, fieldsNames, this.values);

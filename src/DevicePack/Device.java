@@ -35,25 +35,19 @@ public class Device implements dbStorable {
 	}
 	
 	//Конструктор для извлечения из БД
-	public Device(String Name, String Type, String SerialNumber) throws SQLException {
-		
-		includedElements = new ArrayList<Element>();
-		
+	public Device(String Name, String Type, String SerialNumber) throws SQLException {		
+		includedElements = new ArrayList<Element>();		
 		this.name = Name;
 		this.type = Type;
 		this.serialNumber = SerialNumber;
-		String sqlQuery = "SELECT Owner, GosNumber, CountOfElements, ElementsTable FROM Devices WHERE TypeOfDevice='"+ Type +"' AND NameOfDevice='"+ Name +"' AND SerialNumber='"+ SerialNumber +"'";
-		
+		String sqlQuery = "SELECT Owner, GosNumber, CountOfElements, ElementsTable FROM Devices WHERE TypeOfDevice='"+ Type +"' AND NameOfDevice='"+ Name +"' AND SerialNumber='"+ SerialNumber +"'";		
 		ArrayList<String> fieldName = new ArrayList<String>();
 		fieldName.add("Owner"); 
 		fieldName.add("GosNumber");
 		fieldName.add("CountOfElements");
-		fieldName.add("ElementsTable");
-		
-		ArrayList<ArrayList<String>> arrayResults = new ArrayList<ArrayList<String>>();	
-				
-		DataBaseManager.getDB().sqlQueryString(sqlQuery, fieldName, arrayResults);
-	
+		fieldName.add("ElementsTable");		
+		ArrayList<ArrayList<String>> arrayResults = new ArrayList<ArrayList<String>>();					
+		DataBaseManager.getDB().sqlQueryString(sqlQuery, fieldName, arrayResults);	
 		if (arrayResults.size() > 0) {
 			this.owner = arrayResults.get(0).get(0);
 			this.gosNumber = arrayResults.get(0).get(1);						
