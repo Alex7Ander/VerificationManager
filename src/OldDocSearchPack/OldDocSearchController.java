@@ -79,7 +79,7 @@ public class OldDocSearchController implements InfoRequestable {
 	private void deviceSearchTBClick() {
 		if(!deviceSearchTB.isSelected()) {
 			checkDevice = null;
-			deviceSearchTB.setText("Выбор средства измерения");
+			deviceSearchTB.setText("пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 		}
 		else {
 			try {
@@ -120,18 +120,18 @@ public class OldDocSearchController implements InfoRequestable {
 		}
 		catch(IOException ioExp) {
 			try {
-				AboutMessageWindow msgWin = new AboutMessageWindow("Ошибка", "Файл протокола не найден");
+				AboutMessageWindow msgWin = new AboutMessageWindow("пїЅпїЅпїЅпїЅпїЅпїЅ", "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 				msgWin.show();
 			}
 			catch(IOException exp) {
-				System.out.println("Ошибка создания информациооного окна для сообщения об отсутствии файла");
+				System.out.println("пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
 			}
 		}
 	}
 	
 //InfoRequestable
 	@Override
-	public void setDevice(DevicePack.Device device) {
+	public void setDevice(Device device) {
 		checkDevice = device;	
 		if (checkDevice == null) {
 			deviceSearchTB.setSelected(false);
@@ -139,7 +139,7 @@ public class OldDocSearchController implements InfoRequestable {
 	}
 	@Override
 	public void representRequestedInfo() {
-		String caption = checkDevice.getName() + " " + checkDevice.getType() + " №" + checkDevice.getSerialNumber();
+		String caption = checkDevice.getName() + " " + checkDevice.getType() + " пїЅ" + checkDevice.getSerialNumber();
 		deviceSearchTB.setText(caption);		
 	}
 	
@@ -211,11 +211,11 @@ public class OldDocSearchController implements InfoRequestable {
 		}
 		catch(SQLException sqlExp) {
 			try {
-				AboutMessageWindow msgWin = new AboutMessageWindow("Ошибка", "Ошибка доступа к БД");
+				AboutMessageWindow msgWin = new AboutMessageWindow("пїЅпїЅпїЅпїЅпїЅпїЅ", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅ");
 				msgWin.show();
 			}
 			catch(IOException ioExp) {
-				System.out.println("Ошибка создания информациооного окна для сообщения");
+				System.out.println("пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 			}
 		}		
 	}

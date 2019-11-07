@@ -82,7 +82,13 @@ public class ToleranceParametrs implements Includable<Element>, dbStorable {
 			if (i != this.myElement.getSParamsCout() - 1) sqlQuery += ", ";
 		}
 		sqlQuery += ")";
-		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);			
+		 try {
+			 DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
+		 } catch (SQLException sqlExp) {
+			 throw new SavingException("Не удалось создать таблицу с параметрами для\n ." +
+					 this.measUnitPart.getTableNamePart() + " S параметра при " +
+					 this.timeType.getTableNamePart() + " поверке" );
+		 }
 		for (int i = 0; i < this.freqs.size(); i++) {			
 			sqlQuery = "INSERT INTO [" + this.tableName + "] (freq, ";						
 			for (int j = 0; j < this.myElement.getSParamsCout(); j++) {
@@ -98,8 +104,15 @@ public class ToleranceParametrs implements Includable<Element>, dbStorable {
 				sqlQuery += ("'"+values.get(key).get(freqs.get(i)).toString()+"'");
 				if (j != this.myElement.getSParamsCout() - 1) sqlQuery += ", ";
 			}				
-			sqlQuery += ")";						
-			DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
+			sqlQuery += ")";
+			try {
+				DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
+			} catch (SQLException sqlExp) {
+				throw new SavingException("Не удалось сохранить значения параметров на частоте\n ." +
+						freqs.get(i).toString() + " для " +
+						this.measUnitPart.getTableNamePart() + " S параметра при " +
+						this.timeType.getTableNamePart() + " поверке" );
+			}
 		}			
 	 }
 	

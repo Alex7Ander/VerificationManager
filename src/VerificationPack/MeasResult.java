@@ -36,15 +36,10 @@ public class MeasResult implements Includable<Element>, dbStorable{
 	public Date getDateOfMeas() {return this.dateOfMeas;}
 	public String getDateOfMeasByString() {
 		return new SimpleDateFormat(datePattern).format(this.dateOfMeas);
-	}	
-	
-	//Измеренные значения 
+	}
 	public HashMap<String, HashMap<Double, Double>> values;
-	//Решения о пригодности
-	public HashMap<String, HashMap<Double, String>> suitabilityDecision;  //<Ключ к параметру(S11, S12, S21, S22) <Частота, Решение о годности>>
-	//Списко частот (может использоваться списком ключей для 2-го HashMap)
+	public HashMap<String, HashMap<Double, String>> suitabilityDecision;
 	public ArrayList<Double> freqs;
-	
 	protected  ObservableList<String> paramsNames;
 	
 //Constructors
@@ -69,10 +64,8 @@ public class MeasResult implements Includable<Element>, dbStorable{
 		this.myElement = ownerElement;	
 		freqs = new ArrayList<Double>();
 		values = new HashMap<String, HashMap<Double, Double>>();
-		
 		freqs = elCtrl.getFreqsValues();
 		values = elCtrl.getNominalValues();
-				
 		this.countOfParams = values.size();
 		this.countOfFreq = freqs.size();
 		this.dateOfMeas = Calendar.getInstance().getTime();
@@ -88,8 +81,7 @@ public class MeasResult implements Includable<Element>, dbStorable{
 		String sqlQuery = "SELECT dateOfVerification, resultsTableName  FROM ["+listOfVerificationsTable+"] WHERE id='"+index+"'";
 		fieldsNames.add("dateOfVerification");
 		fieldsNames.add("resultsTableName");
-		DataBaseManager.getDB().sqlQueryString(sqlQuery, fieldsNames, results);		
-		//Дата
+		DataBaseManager.getDB().sqlQueryString(sqlQuery, fieldsNames, results);
 		DateFormat df = new SimpleDateFormat(datePattern);
 		String strDate = results.get(0).get(0);
 		try {
@@ -98,12 +90,10 @@ public class MeasResult implements Includable<Element>, dbStorable{
 		catch(ParseException pExp) {
 			this.dateOfMeas = Calendar.getInstance().getTime();
 		}		
-		String resultsTableName =  results.get(0).get(1);	
-		//Получим частоты
+		String resultsTableName =  results.get(0).get(1);
 		sqlQuery = "SELECT freq FROM ["+resultsTableName+"]";
 		DataBaseManager.getDB().sqlQueryDouble(sqlQuery, "freq", this.freqs);
 		this.countOfFreq = this.freqs.size();
-		//Получим значения параметров
 		for (String key : keys) {
 			try {
 				sqlQuery = "SELECT " + key + " FROM ["+resultsTableName+"]";
@@ -136,7 +126,6 @@ public class MeasResult implements Includable<Element>, dbStorable{
 	@Override
 	public void saveInDB() throws SQLException {
 		ArrayList<String> currentKeys = new ArrayList<String>();
-		//Перепишем все параметры, которые необходимо сохранить в список currentKeys
 		for (String k: keys) {
 			try {
 				int size = this.values.get(k).size();
@@ -150,7 +139,7 @@ public class MeasResult implements Includable<Element>, dbStorable{
 		DateFormat df = new SimpleDateFormat(datePattern);
 		String dateOfVerification = df.format(this.dateOfMeas);		
 		String listOfVerificationsTable = this.myElement.getListOfVerificationsTable();
-		String resultsTableName = "Результат поверки " + 
+		String resultsTableName = "Результаты поверки для " +
 				this.myElement.getMyOwner().getName() + " " + this.myElement.getMyOwner().getType() + " " + this.myElement.getMyOwner().getSerialNumber() + " " + this.myElement.getType() + " " + this.myElement.getSerialNumber() +
 				" проведенной " + dateOfVerification;
 		String sqlQuery = "INSERT INTO [" + listOfVerificationsTable + "] (dateOfVerification, resultsTableName) values ('"+ dateOfVerification +"','"+ resultsTableName +"')";
@@ -161,8 +150,7 @@ public class MeasResult implements Includable<Element>, dbStorable{
 			if (i != currentKeys.size() - 1) sqlQuery += ", ";
 		}
 		sqlQuery += ")";
-		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);		
-		//Заполняем таблицу resultsTableName с результатами измерений
+		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
 		for (int i=0; i<this.countOfFreq; i++) {				
 			sqlQuery = "INSERT INTO [" + resultsTableName + "] (freq, ";			
 			for (int j = 0; j < currentKeys.size(); j++) {
@@ -186,7 +174,7 @@ public class MeasResult implements Includable<Element>, dbStorable{
 		String when = df.format(this.dateOfMeas);
 		String listOfVerificationsTable = this.myElement.getListOfVerificationsTable();
 		String what = this.myElement.getMyOwner().getName() + " " + this.myElement.getMyOwner().getType() + " " + this.myElement.getMyOwner().getSerialNumber() + " " + this.myElement.getType() + " " + this.myElement.getSerialNumber();
-		String resultsTableName = "Результат поверки " + what + " проведенной " + when;
+		String resultsTableName = "Результаты поверки для " + what + " проведенной  " + when;
 		
 		String sqlQuery = "DELETE FROM ["+listOfVerificationsTable+"] WHERE resultsTableName='"+resultsTableName+"'";	
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);

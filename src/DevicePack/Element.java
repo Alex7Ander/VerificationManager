@@ -113,6 +113,7 @@ public class Element implements Includable<Device>, dbStorable{
 		this.primaryPhaseToleranceParams.setTableName();
 		this.periodicModuleToleranceParams.setTableName();
 		this.periodicPhaseToleranceParams.setTableName();
+		listOfVerificationsTable = "Проведенные поверки для " + this.myDevice.getName() + " " + this.myDevice.getType() + " " + this.myDevice.getSerialNumber() + " " + this.type + " " + this.serialNumber;
 	}
 	
 	public Element(Device deviceOwner, int index) throws SQLException{		
@@ -229,11 +230,18 @@ public class Element implements Includable<Device>, dbStorable{
 		}
 		String addStr = myDevice.getName() + " " + myDevice.getType() + " " + myDevice.getSerialNumber();
 		String strElementsTable = this.myDevice.getElementsTableName();
-		String sqlString = "INSERT INTO ["+strElementsTable+"] (ElementType, ElementSerNumber, PoleCount, MeasUnit, ModuleToleranceType, PhaseToleranceType, VerificationsTable, PrimaryModuleParamTable, PeriodicModuleParamTable, PrimaryPhaseParamTable, PeriodicPhaseParamTable, NominalIndex) values "
-				+ "('"+type+"','"+serialNumber+"','"+poleCount+"','"+measUnit+"','"+this.moduleToleranceType+"','"+this.phaseToleranceType+"','"+listOfVerificationsTable+"','" + this.primaryModuleParamTable + "','"+this.periodicModuleParamTable+"','"+this.primaryPhaseParamTable+"','"+this.periodicPhaseParamTable+"','"+Integer.toString(nominalIndex)+"')";
-		DataBaseManager.getDB().sqlQueryUpdate(sqlString);
-		sqlString = "CREATE TABLE [Проведенные поверки для " + (addStr + " " + this.type + " " + this.serialNumber) + "] (id INTEGER PRIMARY KEY AUTOINCREMENT, dateOfVerification VARCHAR(60), resultsTableName VARCHAR(512))";
-		DataBaseManager.getDB().sqlQueryUpdate(sqlString);
+		String sqlQuery = "INSERT INTO ["+strElementsTable+"] (ElementType, ElementSerNumber, PoleCount, MeasUnit, ModuleToleranceType, PhaseToleranceType, " +
+				"VerificationsTable, PrimaryModuleParamTable, PeriodicModuleParamTable, PrimaryPhaseParamTable, PeriodicPhaseParamTable, NominalIndex) values "
+				+ "('"+type+"','"+serialNumber+"','"+poleCount+"','"+measUnit+"','"+this.moduleToleranceType+"','"+this.phaseToleranceType+"','" +listOfVerificationsTable+"','"
+				+ this.primaryModuleToleranceParams.getTableName() + "','" + this.periodicModuleToleranceParams.getTableName() + "','"
+				+ this.primaryPhaseToleranceParams.getTableName() + "','" + this.periodicPhaseToleranceParams.getTableName() + "','" + Integer.toString(nominalIndex) + "')";
+		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
+		sqlQuery = "CREATE TABLE [" + listOfVerificationsTable + "] (id INTEGER PRIMARY KEY AUTOINCREMENT, dateOfVerification VARCHAR(60), resultsTableName VARCHAR(512))";
+		try {
+			DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
+		} catch (SQLException sqlExp) {
+			throw new SavingException("Не удалось создать таблицу\nсо списком проведенных поверок.");
+		}
 		this.primaryModuleToleranceParams.saveInDB();	
 		this.primaryPhaseToleranceParams.saveInDB();
 		this.periodicModuleToleranceParams.saveInDB();	
