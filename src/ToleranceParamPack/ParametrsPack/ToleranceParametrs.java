@@ -3,6 +3,9 @@ package ToleranceParamPack.ParametrsPack;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import DataBasePack.DataBaseManager;
 import DataBasePack.dbStorable;
 import DevicePack.Element;
@@ -13,9 +16,8 @@ import ToleranceParamPack.StrategyPack.StrategyOfSuitability;
 import VerificationPack.MeasResult;
 
 public class ToleranceParametrs implements Includable<Element>, dbStorable {
-	 public HashMap<String, HashMap<Double, Double>> values; 
-	 public ArrayList<Double> freqs;						 
-	
+	 public Map<String, Map<Double, Double>> values;
+	 public ArrayList<Double> freqs;
 	 private String tableName;
 	 public String getTableName(){
 		 return this.tableName;
@@ -27,13 +29,11 @@ public class ToleranceParametrs implements Includable<Element>, dbStorable {
 				 		  this.myElement.getType() + " " + this.myElement.getSerialNumber();
 		 tableName = "Параметры допуска " + this.timeType.getTableNamePart() + " поверки " + this.measUnitPart.getTableNamePart() + " S параметров для " + addrStr;
 	 }
-	 
 	 public TimeType timeType;
 	 public MeasUnitPart measUnitPart;
-	 
 //Constructors
 	 ToleranceParametrs(){
-		this.values = new HashMap<String, HashMap<Double, Double>>();
+		this.values = new LinkedHashMap<String, Map<Double, Double>>();
 		this.freqs = new ArrayList<Double>();
 	 }	 
 //GUI
@@ -73,7 +73,6 @@ public class ToleranceParametrs implements Includable<Element>, dbStorable {
 		sqlQuery = "SELECT freq FROM [" + this.tableName + "]";
 		DataBaseManager.getDB().sqlQueryDouble(sqlQuery, "freq", this.freqs);		
 	}
- 
 //interface dbStorable		    
 	 @Override
 	 public void saveInDB() throws SQLException, SavingException {
@@ -117,34 +116,29 @@ public class ToleranceParametrs implements Includable<Element>, dbStorable {
 			}
 		}			
 	 }
-	
 	 @Override
 	 public void deleteFromDB() throws SQLException {
 		String sqlQuery = "DROP TABLE [" + this.tableName + "]";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
 	 }
-	
 	 @Override
 	 public void editInfoInDB(HashMap<String, String> editingValues) throws SQLException {
 		 // TODO Auto-generated method stub
 	 }
-
 	 private Element myElement; 
 	 @Override
 	 public Element getMyOwner() {
-		 return myElement;
+	 	return myElement;
 	 }
-	
 	 @Override
 	 public void onAdding(Element Owner) {
-		 this.myElement = Owner;				
+	 	this.myElement = Owner;
 	 }
-	 
-	private StrategyOfSuitability strategy;
-	public void setStrategy(StrategyOfSuitability anyStrategy) {
+	 private StrategyOfSuitability strategy;
+	 public void setStrategy(StrategyOfSuitability anyStrategy) {
 		this.strategy = anyStrategy;
-	}
-	public boolean checkResult(MeasResult result) {
-		return this.strategy.checkResult(result, this);		
-	}			
+	 }
+	 public boolean checkResult(MeasResult result) {
+		return this.strategy.checkResult(result, this);
+	 }
 }

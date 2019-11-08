@@ -1,16 +1,16 @@
 package VerificationPack;
 
 import java.util.ArrayList;
-
 import DevicePack.Device;
 import DevicePack.Element;
 import ProtocolCreatePack.ProtocolCreateController;
 import StartVerificationPack.StartVerificationController;
+import ToleranceParamPack.ParametrsPack.TimeType;
 
 public class VerificationProcedure {
 
 //Primary information:
-	private String typeByTime;
+	private TimeType verificationTimeType;
 	private String strTemperature;
 	private String strAtmPreasure;
 	private String strAirHumidity;
@@ -36,34 +36,82 @@ public class VerificationProcedure {
 	private String deviceOwner;
 	private String dateOfCreation;
 	private String finishDate;
+
+	public String getTemperature() {
+		return this.strTemperature;
+	}
+	public String getAtmPreasure() {
+		return this.strAtmPreasure;
+	}
+	public String getAirHumidity() {
+		return this.strAirHumidity;
+	}
 	
-	public String getTypeByTime() {return this.typeByTime;}
-	public String getTemperature() {return this.strTemperature;}
-	public String getAtmPreasure() {return this.strAtmPreasure;}
-	public String getAirHumidity() {return this.strAirHumidity;}
+	public String getDeviceInfo() {
+		return this.deviceMainInfo;
+	}
+	public String getDeviceSerNumber() {
+		return deviceSerNumber;
+	}
+	public String getElementInfo(int index) {
+		return elementsMainInfo.get(index);
+	}
 	
-	public String getDeviceInfo() {return this.deviceMainInfo;}
-	public String getDeviceSerNumber() {return deviceSerNumber;}
-	public String getElementInfo(int index) {return elementsMainInfo.get(index);}
+	public String getWorkerName() {
+		return this.workerName;
+	}
+	public String getBossName() {
+		return this.bossName;
+	}
+	public String getBossStatus() {
+		return this.bossStatus;
+	}
+	public String getDecision() {
+		return this.decision;
+	}
+	public String getProtocolNumber() {
+		return this.protocolNumber;
+	}
+	public String getDocumentNumber() {
+		return this.documentNumber;
+	}
 	
-	public String getWorkerName() {return this.workerName;}
-	public String getBossName() {return this.bossName;}
-	public String getBossStatus() {return this.bossStatus;}
-	public String getDecision() {return this.decision;}
-	public String getProtocolNumber() {return this.protocolNumber;}
-	public String getDocumentNumber() {return this.documentNumber;}
-	
-	public String getDocName() { return this.docName;}
-	public String getDocType() { return this.docType;}
-	public String getVerType() { return this.verType;}
-	public String getMilitaryBasename() { return this.militaryBaseName;}
-	public String getEtalonString() { return this.etalonString;}
-	public String getDeviceOwner() { return this.deviceOwner;}
-	public String getDateOfCreation() { return this.dateOfCreation;}
-	public String getFinishDate() { return this.finishDate;}
-	
+	public String getDocName() {
+		return this.docName;
+	}
+	public String getDocType() {
+		return this.docType;
+	}
+	public String getVerType() {
+		return this.verType;
+	}
+	public String getMilitaryBasename() {
+		return this.militaryBaseName;
+	}
+	public String getEtalonString() {
+		return this.etalonString;
+	}
+	public String getDeviceOwner() {
+		return this.deviceOwner;
+	}
+	public String getDateOfCreation() {
+		return this.dateOfCreation;
+	}
+	public String getFinishDate() {
+		return this.finishDate;
+	}
+
+	public boolean isPrimary(){
+		if (verificationTimeType.equals(TimeType.PRIMARY)){
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
 	public void setPrimaryInformation(StartVerificationController verCtrl) {
-		typeByTime = verCtrl.getTypeBytime();
+		verificationTimeType = verCtrl.getVerificationiTimeType();
 		strTemperature = verCtrl.getStrTemperatur();
 		strAirHumidity = verCtrl.getStrAirHumidity();
 		strAtmPreasure = verCtrl.getStrAtmPreasure();
@@ -90,7 +138,7 @@ public class VerificationProcedure {
 		etalonString = prtCreateCtrl.getEtalonString();
 		docType = prtCreateCtrl.getDocType();
 		dateOfCreation = prtCreateCtrl.getDateOfCreation();
-		finishDate = "Годен до " + prtCreateCtrl.getFinishDate();
+		finishDate = "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ " + prtCreateCtrl.getFinishDate();
 		militaryBaseName = prtCreateCtrl.getMilitryBaseName();
 	}
 	

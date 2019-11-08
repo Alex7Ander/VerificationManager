@@ -2,6 +2,7 @@ package GUIpack.StringGridFXPack;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -229,7 +230,7 @@ public class StringGridFX {
 		}		
 	}
 	
-	public void setColumn(int index, ArrayList<String> columnValues) {
+	public void setColumn(int index, List<String> columnValues) {
 		for (int i=0; i<columnValues.size(); i++) { 
 			try {
 				this.cells.get(i).get(index).setText(columnValues.get(i));
@@ -239,7 +240,7 @@ public class StringGridFX {
 		}
 	}
 	
-	public void setColumnFromDouble(int index, ArrayList<Double> columnValues) {
+	public void setColumnFromDouble(int index, List<Double> columnValues) {
 		for (int i=0; i < this.rowCount; i++) {
 			try {
 				this.cells.get(i).get(index).setText(columnValues.get(i).toString());

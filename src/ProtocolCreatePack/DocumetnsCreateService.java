@@ -121,7 +121,7 @@ public class DocumetnsCreateService extends Service<Integer> {
 					" проведенной " + this.verification.getDateOfCreation();			
 			writer.write(docName + "\n");										//1
 			writer.write(this.verification.getDocType() + "\n");				//2
-			if (this.verification.getTypeByTime().equals("primary")) {
+			if (this.verification.isPrimary()) {
 				writer.write("первичной \n");									//3
 			} else {
 				writer.write("периодической \n");								//3
@@ -177,8 +177,12 @@ public class DocumetnsCreateService extends Service<Integer> {
 		setCellValue(8, 0, "относительная   влажность " + this.verification.getAirHumidity() + " %", ordinaryCellStyle);
 		setCellValue(9, 0, "атмосферное давление " + this.verification.getAtmPreasure() + " мм рт. ст.", ordinaryCellStyle);
 		String s = null;
-		if (this.verification.getTypeByTime().equals("primary")) {s = "первичной";}
-		else {s = "перодической";}
+		if (this.verification.isPrimary()) {
+			s = "первичной";
+		}
+		else {
+			s = "перодической";
+		}
 		setCellValue(11, 0, "И на основании результатов " + s + " поверки признано " + this.verification.getDecision(), ordinaryCellStyle);
 		setCellValue(12, 0, "1. Внешний осмотр: ", boldCellStyle);
 		setCellValue(13, 0, "Исправность средства измерений (внешний осмотр): Исправен.", ordinaryCellStyle);

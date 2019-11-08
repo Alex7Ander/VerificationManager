@@ -5,6 +5,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import _tempHelpers.Adapter;
 
@@ -49,7 +51,7 @@ public class ResultReaderManager {
 		}//end while
 	}
 	
-	private void parseResult(ArrayList<String> res, ArrayList<Double> freqs, HashMap<String, HashMap<Double, Double>> values) {
+	private void parseResult(ArrayList<String> res, ArrayList<Double> freqs, Map<String, Map<Double, Double>> values) {
 
 		//Узнать, сколько параметров измеренно
 		String firstStr = res.get(0);
@@ -84,7 +86,7 @@ public class ResultReaderManager {
 				 		 "MODULE_S22", "ERROR_MODULE_S22", "PHASE_S22", "ERROR_PHASE_S22"};
 		
 		for (int i=1; i<countOfParams; i++) {
-			HashMap<Double, Double> oneFreqHM = new HashMap<Double, Double>();
+			LinkedHashMap<Double, Double> oneFreqHM = new LinkedHashMap<Double, Double>();
 			for (int j=0; j<countOfFreqs; j++) {
 				oneFreqHM.put(freqs.get(j), tempArrays.get(i).get(j));
 			}
@@ -93,7 +95,7 @@ public class ResultReaderManager {
 		
 	}
 
-	public void readResult(int numberOfResult, ArrayList<Double> freqs, HashMap<String, HashMap<Double, Double>> values) throws IOException{		
+	public void readResult(int numberOfResult, ArrayList<Double> freqs, Map<String, Map<Double, Double>> values) throws IOException{
 		ArrayList<String> res = new ArrayList<String>();
 		findResult(numberOfResult, res);
 		parseResult(res, freqs, values);

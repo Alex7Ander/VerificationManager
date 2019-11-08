@@ -253,7 +253,7 @@ public class DBEditController implements InfoRequestable {
 		for (int i = 1; i < 5; i++) {
 			int currentMeasUnitIndex = this.currentMeasUnitComboBox.getSelectionModel().getSelectedIndex();
 			String key = keys[i-1 + currentMeasUnitIndex * 4];
-			this.resultsTable.setColumnFromDouble(i, Adapter.HashMapToArrayList(this.currentResult.values.get(key)));
+			this.resultsTable.setColumnFromDouble(i, Adapter.MapToArrayList(this.currentResult.values.get(key)));
 		}		
 	}
 //---------------------------------------------------------

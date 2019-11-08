@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
+
 import AboutMessageForm.AboutMessageWindow;
 import DevicePack.Device;
 import DevicePack.Element;
@@ -16,6 +18,8 @@ import ProtocolCreatePack.ProtocolCreateWindow;
 import SearchDevicePack.SearchDeviceWindow;
 import StartVerificationPack.StartVerificationController;
 import StartVerificationPack.StartVerificationWindow;
+import ToleranceParamPack.ParametrsPack.MeasUnitPart;
+import ToleranceParamPack.ParametrsPack.S_Parametr;
 import VerificationPack.MeasResult;
 import VerificationPack.VerificationProcedure;
 import _tempHelpers.Adapter;
@@ -102,16 +106,18 @@ public class VerificationController implements InfoRequestable {
 	@FXML
 	private void saveBtnClick(ActionEvent event) throws IOException {
 		if (verificationResult.size() != 0) {
-			for (int i=0; i<verificationResult.size(); i++) {
-				try {
+			AboutMessageWindow msgWin = null;
+			try {
+				for (int i=0; i<verificationResult.size(); i++) {
 					verificationResult.get(i).saveInDB();
-					AboutMessageWindow msgWin = new AboutMessageWindow("Успешно", "Результаты поверки сохранены в БД");
-					msgWin.show();
 				}
-				catch(SQLException sqlExp) {
-					AboutMessageWindow msgWin = new AboutMessageWindow("Ошибка", "Не удалось сохранить результаты в БД");
-					msgWin.show();
-				}
+				msgWin = new AboutMessageWindow("Успешно", "Результаты поверки сохранены в БД");
+			}
+			catch(SQLException sqlExp) {
+				msgWin = new AboutMessageWindow("Ошибка", "Не удалось сохранить результаты в БД");
+			}
+			finally{
+				msgWin.show();
 			}
 		}
 		else {
@@ -180,28 +186,33 @@ public class VerificationController implements InfoRequestable {
 	}
 //---------------------------	
 	public void StartVerification() throws IOException {
-			
 		String absPath = new File(".").getAbsolutePath();
-			
 		//Получение информации об окружающей среде
 		verification = new VerificationProcedure();
 		verification.setPrimaryInformation((StartVerificationController)StartVerificationWindow.getStartVerificationWindow().getControllerClass());
-			
 		//Создание файла psi.ini
 		String psiFilePath = absPath + "\\measurment\\PSI.ini";
 		verificatedDevice.createIniFile(psiFilePath);
-			
 		//Запуск программы measurment
 		File file =new File(absPath + "\\measurment\\Project1.exe");
 		Desktop.getDesktop().open(file);				
 	}
 		
 	private void fillTable() {
-		String keys[] = {"m_S11", "err_m_S11", "p_S11", "err_p_S11", 
+		ArrayList<String> keys = new ArrayList<String>();
+		for (int i = 0; i < S_Parametr.values().length; i++){
+			for (int j=0; j < MeasUnitPart.values().length; j++){
+				String key = MeasUnitPart.values()[j] + "_" + S_Parametr.values()[i];
+				keys.add(key);
+				keys.add("ERROR_" + key);
+			}
+		}
+		/*
+		String keys[] = {"m_S11", "err_m_S11", "p_S11", "err_p_S11",
 					 	 "m_S12", "err_m_S12", "p_S12", "err_p_S12",
 					 	 "m_S21", "err_m_S21", "p_S21", "err_p_S21", 
 					 	 "m_S22", "err_m_S22", "p_S22", "err_p_S22"};
-			
+		*/
 		ArrayList<Double> fr = this.verificationResult.get(currentElementIndex).freqs;
 		int countOfFreq = fr.size();
 		if (this.resultTable.getRowCount() < countOfFreq) {
@@ -212,25 +223,23 @@ public class VerificationController implements InfoRequestable {
 			while (this.resultTable.getRowCount() != countOfFreq) 
 				this.resultTable.deleteRow(this.resultTable.getRowCount());
 		}
-			  
+
+		for (String str : keys){
+			System.out.println(str + "\t");
+		}
+
 		this.resultTable.setColumnFromDouble(0, fr);
-			
-		ArrayList<Double> column1 = Adapter.HashMapToArrayList(this.verificationResult.get(currentElementIndex).values.get(keys[currentParamIndex*4]));
+		List<Double> column1 = Adapter.MapToArrayList(this.verificationResult.get(currentElementIndex).values.get(keys.get(currentParamIndex*4)));
 		this.resultTable.setColumnFromDouble(1, column1);
-			
-		ArrayList<Double> column2 = Adapter.HashMapToArrayList(this.verificationResult.get(currentElementIndex).values.get(keys[1 + currentParamIndex*4]));
+		List<Double> column2 = Adapter.MapToArrayList(this.verificationResult.get(currentElementIndex).values.get(keys.get(1 + currentParamIndex*4)));
 		this.resultTable.setColumnFromDouble(2, column2);
-					
-		ArrayList<Double> column4 = Adapter.HashMapToArrayList(this.verificationResult.get(currentElementIndex).values.get(keys[2 + currentParamIndex*4]));
+		List<Double> column4 = Adapter.MapToArrayList(this.verificationResult.get(currentElementIndex).values.get(keys.get(2 + currentParamIndex*4)));
 		this.resultTable.setColumnFromDouble(4, column4);
-		
-		ArrayList<Double> column5 = Adapter.HashMapToArrayList(this.verificationResult.get(currentElementIndex).values.get(keys[3 + currentParamIndex*4]));
+		List<Double> column5 = Adapter.MapToArrayList(this.verificationResult.get(currentElementIndex).values.get(keys.get(3 + currentParamIndex*4)));
 		this.resultTable.setColumnFromDouble(5, column5);
-			
-		ArrayList<String> column3 = Adapter.HashMapToArrayList(this.verificationResult.get(currentElementIndex).suitabilityDecision.get(keys[currentParamIndex])); 
+		List<String> column3 = Adapter.MapToArrayList(this.verificationResult.get(currentElementIndex).suitabilityDecision.get(keys.get(currentParamIndex)));
 		this.resultTable.setColumn(3, column3);
-			
-		ArrayList<String> column6 = Adapter.HashMapToArrayList(this.verificationResult.get(currentElementIndex).suitabilityDecision.get(keys[2 + currentParamIndex])); 
+		List<String> column6 = Adapter.MapToArrayList(this.verificationResult.get(currentElementIndex).suitabilityDecision.get(keys.get(2 + currentParamIndex)));
 		this.resultTable.setColumn(6, column6);
 	}	
 //---------------------------	
@@ -241,26 +250,23 @@ public class VerificationController implements InfoRequestable {
 		if (this.verification == null) {
 			return;
 		}
-		
 		this.verificationResult.clear();
-		int countOfRes = this.verificatedDevice.getCountOfElements();
-		try {		
-			for (int i=0; i<countOfRes; i++) {
+		try {
+			for (int i=0; i < this.verificatedDevice.getCountOfElements(); i++) {
 				String absPath = new File(".").getAbsolutePath();
 				String resFilePath = absPath + "\\measurment\\protocol.ini";
-
 				MeasResult rs = new MeasResult(resFilePath, i+1, this.verificatedDevice.includedElements.get(i));				
-				this.verificationResult.add(rs);				
-				if (this.verification.getTypeByTime().equals("primary")) {
-					//Проверка результатво
-					//this.verificatedDevice.includedElements.get(i).getPrimaryToleranceParams().checkResult(rs);
+				this.verificationResult.add(rs);
+				//Verificating results
+				if (this.verification.isPrimary()) {
+					verificatedDevice.includedElements.get(i).getPrimaryModuleToleranceParams().checkResult(rs);
+					verificatedDevice.includedElements.get(i).getPrimaryPhaseToleranceParams().checkResult(rs);
 				}
 				else {
-					//Проверка результатов
-					//this.verificatedDevice.includedElements.get(i).getPeriodicToleranceParams().checkResult(rs);
-				}							
-				//Заполним таблицу
-				//fillTable();
+					verificatedDevice.includedElements.get(i).getPeriodicModuleToleranceParams().checkResult(rs);
+					verificatedDevice.includedElements.get(i).getPeriodicPhaseToleranceParams().checkResult(rs);
+				}
+				fillTable();
 			}
 		}
 		catch(IOException ioExp) {

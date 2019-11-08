@@ -177,7 +177,7 @@ public class Device implements dbStorable {
 				double currentFreq = this.includedElements.get(i).getNominal().freqs.get(j);
 				fileStrings.add(Double.toString(currentFreq) + "\n");
 			}			
-			if (i < this.countOfElements-1) {
+			if (i < this.countOfElements - 1) {
 				fileStrings.add("------------------------------------------------------------------\n");
 			}
 			else {

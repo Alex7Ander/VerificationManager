@@ -218,14 +218,16 @@ public class Element implements Includable<Device>, dbStorable{
 		if (this.moduleToleranceType.equals("updown")) {
 			primaryModuleToleranceParams.setStrategy(udStr);
 			periodicModuleToleranceParams.setStrategy(udStr);
-		} else {			
+		}
+		else {
 			primaryModuleToleranceParams.setStrategy(percentStr);
 			periodicModuleToleranceParams.setStrategy(percentStr);
 		}
 		if (this.phaseToleranceType.equals("updown")) {
 			primaryPhaseToleranceParams.setStrategy(udStr);
 			periodicPhaseToleranceParams.setStrategy(udStr);
-		} else {
+		}
+		else {
 			primaryPhaseToleranceParams.setStrategy(percentStr);
 			periodicPhaseToleranceParams.setStrategy(percentStr);
 		}

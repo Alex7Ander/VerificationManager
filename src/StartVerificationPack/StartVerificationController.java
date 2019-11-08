@@ -3,8 +3,8 @@ package StartVerificationPack;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-
 import FileManagePack.FileManager;
+import ToleranceParamPack.ParametrsPack.TimeType;
 import VerificationForm.VerificationController;
 import VerificationForm.VerificationWindow;
 import YesNoDialogPack.YesNoWindow;
@@ -91,8 +91,7 @@ public class StartVerificationController {
 	}
 	
 	@FXML
-	private void startBtnClick() throws Exception {
-		
+	private void startBtnClick() throws IOException {
 		if (!chekEnvironment()) {
 			YesNoWindow ynWin = new YesNoWindow("Внимание", envStatusString + "\nЖелаете продолжить?");
 			int answer = ynWin.showAndWait();
@@ -100,7 +99,6 @@ public class StartVerificationController {
 				return;
 			}
 		}
-		
 		if(!checkVerType()) {
 			YesNoWindow ynWin = new YesNoWindow("Какой тип поверки?", "Будет проводиться первичная поверка?");
 			int answer = ynWin.showAndWait();
@@ -111,7 +109,6 @@ public class StartVerificationController {
 				this.periodicVerRB.setSelected(true);
 			}
 		}
-		
 		if (!checkView()) {
 			//Признание прибора не годным по внешнему остмотру
 			YesNoWindow ynWin = new YesNoWindow("Отрицательный результат внешнего осмотра?", "Вы признали прибор негодным\n по результатам внешнеого осмотра?");
@@ -125,7 +122,6 @@ public class StartVerificationController {
 				this.goodViewRB.setSelected(true);
 			}
 		}
-		
 		if (!checkWork()) {
 			//Признание прибора не годным по опробованию
 			YesNoWindow ynWin = new YesNoWindow("Отрицательный результат опробования?", "Вы признали прибор негодным\n по результатам опробования?");
@@ -140,7 +136,6 @@ public class StartVerificationController {
 				this.goodWorkRB.setSelected(true);
 			}
 		}
-		
 		if(VerificationWindow.getVerificationWindow() != null) {
 			VerificationController vCtrl = (VerificationController)VerificationWindow.getVerificationWindow().getControllerClass();
 			vCtrl.StartVerification();
@@ -154,42 +149,40 @@ public class StartVerificationController {
 			} catch (IOException ioExp) {
 				ioExp.getStackTrace();
 			}
-			if (wait) {vCtrl.waitResults();}
+			if (wait) {
+				vCtrl.waitResults();
+			}
 			this.myWindow.close();
 		}
 	}
 	
 	private boolean chekEnvironment() {
-		boolean environmentStatus = true;
 		envStatusString = "Параметры окружающей среды вне допуска:\n";		
 		try {
 			currentTemparature = Double.parseDouble(this.temperatureTextField.getText());
 			currentAtmPreasure = Double.parseDouble(this.atmPreasureTextField.getText());
 			currentAirHumidity = Double.parseDouble(this.airHumidityTextField.getText());
-			
 			if (currentTemparature > upTemperature || currentTemparature < downTemperature) {
-				environmentStatus = false;
 				if (currentTemparature > upTemperature) envStatusString += "температура выше нормы\n";
 				else envStatusString += "температура ниже нормы\n";
+				return false;
 			}
-			
 			if (currentAtmPreasure > upAtmPreasure || currentAtmPreasure < downAtmPreasure) {
-				environmentStatus = false;
 				if (currentAtmPreasure > upAtmPreasure) envStatusString += "атмосферное давление выше нормы\n";
 				else envStatusString += "атмосферное давление ниже нормы\n";
+				return false;
 			}
-			
 			if (currentAirHumidity > upAirHumidity || currentAirHumidity < downAirHumidity) {
-				environmentStatus = false;
 				if (currentAirHumidity > upAirHumidity) envStatusString += "влажность выше нормы\n";
 				else envStatusString += "влажность ниже нормы\n";
+				return false;
 			}
 		}
 		catch(NumberFormatException nfExp) {
-			environmentStatus = false;
 			envStatusString = "Введенные Вами значения параметров\nокружающей среды не являются действительными числами.";
-		}				
-		return environmentStatus;
+			return false;
+		}
+		return true;
 	}
 	
 	private boolean checkVerType() {
@@ -210,9 +203,11 @@ public class StartVerificationController {
 	public String getStrTemperatur() {return this.temperatureTextField.getText();}
 	public String getStrAirHumidity() {return this.airHumidityTextField.getText();}
 	public String getStrAtmPreasure() {return this.atmPreasureTextField.getText();}
-	public String getTypeBytime() {
-		if (this.primaryVerRB.isSelected()) return "primary";
-		else return "periodic";
+	public TimeType getVerificationiTimeType() {
+		if (this.primaryVerRB.isSelected())
+			return TimeType.PRIMARY;
+		else
+			return TimeType.PERIODIC;
 	}
 	
 }

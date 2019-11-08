@@ -5,11 +5,7 @@ import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
+import java.util.*;
 
 import DataBasePack.DataBaseManager;
 import DataBasePack.dbStorable;
@@ -37,7 +33,7 @@ public class MeasResult implements Includable<Element>, dbStorable{
 	public String getDateOfMeasByString() {
 		return new SimpleDateFormat(datePattern).format(this.dateOfMeas);
 	}
-	public HashMap<String, HashMap<Double, Double>> values;
+	public Map<String, Map<Double, Double>> values;
 	public HashMap<String, HashMap<Double, String>> suitabilityDecision;
 	public ArrayList<Double> freqs;
 	protected  ObservableList<String> paramsNames;
@@ -48,7 +44,7 @@ public class MeasResult implements Includable<Element>, dbStorable{
 		
 		this.myElement = ownerElement;
 		freqs = new ArrayList<Double>();
-		values = new HashMap<String, HashMap<Double, Double>>();
+		values = new LinkedHashMap<String, Map<Double, Double>>();
 		suitabilityDecision = new HashMap<String, HashMap<Double, String>>();
 		
 		ResultReaderManager resReader = new ResultReaderManager(fileWithResults);			
@@ -63,7 +59,7 @@ public class MeasResult implements Includable<Element>, dbStorable{
 	public MeasResult(NewElementController elCtrl, Element ownerElement){		
 		this.myElement = ownerElement;	
 		freqs = new ArrayList<Double>();
-		values = new HashMap<String, HashMap<Double, Double>>();
+		values = new HashMap<String, Map<Double, Double>>();
 		freqs = elCtrl.getFreqsValues();
 		values = elCtrl.getNominalValues();
 		this.countOfParams = values.size();
@@ -72,7 +68,7 @@ public class MeasResult implements Includable<Element>, dbStorable{
 	}	
 //BD
 	public MeasResult(Element ownerElement, int index) throws SQLException {		
-		this.values = new HashMap<String, HashMap<Double, Double>>();
+		this.values = new LinkedHashMap<String, Map<Double, Double>>();
 		this.freqs = new ArrayList<Double>();				
 		this.myElement = ownerElement;		
 		ArrayList<ArrayList<String>> results = new ArrayList<ArrayList<String>>();
@@ -132,7 +128,8 @@ public class MeasResult implements Includable<Element>, dbStorable{
 				if (size > 0) {
 					currentKeys.add(k);
 				}
-			} catch(Exception exp) {
+			}
+			catch(Exception exp) {
 				//
 			}
 		}						

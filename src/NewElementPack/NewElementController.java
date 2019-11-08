@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import DevicePack.Element;
 import FileManagePack.FileManager;
@@ -453,8 +455,8 @@ public class NewElementController {
 		return this.primaryParamsTable.getFreqs();
 	}
 	
-	public HashMap<String, HashMap<Double, Double>> getNominalValues(){
-		HashMap<String, HashMap<Double, Double>> nominals = new HashMap<String, HashMap<Double, Double>>();
+	public Map<String, Map<Double, Double>> getNominalValues(){
+		LinkedHashMap<String, Map<Double, Double>> nominals = new LinkedHashMap<String, Map<Double, Double>>();
 		for (int i = 0; i < currentCountOfParams; i++) {
 			String key = MeasUnitPart.MODULE + "_" + S_Parametr.values()[i];
 			nominals.put(key, this.primaryParamsTable.getParametr(key));
@@ -464,8 +466,8 @@ public class NewElementController {
 		return nominals;
 	}
 		
-	public HashMap<String, HashMap<Double, Double>> getToleranceParamsValues(TimeType timeType, MeasUnitPart unit){
-		HashMap<String, HashMap<Double, Double>> params = new HashMap<String, HashMap<Double, Double>>();
+	public Map<String, Map<Double, Double>> getToleranceParamsValues(TimeType timeType, MeasUnitPart unit){
+		LinkedHashMap<String, Map<Double, Double>> params = new LinkedHashMap<String, Map<Double, Double>>();
 		NewElementStringGridFX currentTable = null;
 		if (timeType.equals(TimeType.PERIODIC)) {
 			currentTable = this.periodicParamsTable;

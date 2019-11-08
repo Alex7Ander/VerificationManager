@@ -5,9 +5,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.*;
 
 public class DataBaseManager {
 
@@ -143,7 +141,7 @@ public class DataBaseManager {
     	}
     }
       
-    public void sqlQueryMapOfDouble(String sqlString, ArrayList<String> paramsNames, HashMap<String, HashMap<Double, Double>> mapResults) throws SQLException{
+    public void sqlQueryMapOfDouble(String sqlString, ArrayList<String> paramsNames, Map<String, Map<Double, Double>> mapResults) throws SQLException{
     	ResultSet rSet = this.state.executeQuery(sqlString);
     	int countOfParams = paramsNames.size();
     	ArrayList<Double[]> values = new ArrayList<Double[]>();  	
@@ -156,7 +154,7 @@ public class DataBaseManager {
     	}
     	int freqCount = values.size();
     	for (int i=1; i < paramsNames.size(); i++) {
-    		HashMap<Double, Double> tempMap = new HashMap<Double, Double>(); 
+    		LinkedHashMap<Double, Double> tempMap = new LinkedHashMap<Double, Double>();
     		for (int j=0; j < freqCount; j++) {
     			double freq = values.get(j)[0];
     			double value = values.get(j)[i];

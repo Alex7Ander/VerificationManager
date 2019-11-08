@@ -142,7 +142,8 @@ public class NewDeviceController  {
 				errorMessage.show();
 				return;
 			}
-		} catch (SQLException sqlExp) {
+		}
+		catch (SQLException sqlExp) {
 			AboutMessageWindow errorMessage = new AboutMessageWindow("Ошибка", "База данных отсутствует или повреждена");
 			errorMessage.show();
 			return;
@@ -205,5 +206,4 @@ public class NewDeviceController  {
 		}
 		this.namesComboBox.setItems(listOfNames);
 	}
-
 }

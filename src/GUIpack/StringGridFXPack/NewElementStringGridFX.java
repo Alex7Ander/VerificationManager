@@ -2,6 +2,8 @@ package GUIpack.StringGridFXPack;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import ToleranceParamPack.ParametrsPack.MeasUnitPart;
 import ToleranceParamPack.ParametrsPack.S_Parametr;
@@ -19,7 +21,7 @@ public class NewElementStringGridFX extends StringGridFX {
 		return currentS;
 	}
 
-	public HashMap<String, ArrayList<String>> values;
+	public Map<String, ArrayList<String>> values;
 	private static ArrayList<String> tableHeads;	
 	static {
 		tableHeads = new ArrayList<String>();
@@ -103,8 +105,8 @@ public class NewElementStringGridFX extends StringGridFX {
 		}
 		return freqs;
 	}
-	public HashMap<Double, Double> getParametr(String paramName){		
-		HashMap<Double, Double> parametr = new HashMap<Double, Double>();
+	public Map<Double, Double> getParametr(String paramName){
+		LinkedHashMap<Double, Double> parametr = new LinkedHashMap<Double, Double>();
 		for (int i=0; i < this.values.get("FREQS").size(); i++) {
 			try {
 				double freq = Double.parseDouble(this.values.get("FREQS").get(i));
