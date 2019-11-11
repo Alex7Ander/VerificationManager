@@ -61,17 +61,14 @@ public class OldDocSearchController implements InfoRequestable {
 	
 	@FXML
 	private void initialize() {	
-		checkDevice = null;
-		
+		checkDevice = null;		
 		docTypeGroup = new ToggleGroup();
 		gDocRB.setSelected(true);
 		gDocRB.setToggleGroup(docTypeGroup);
 		bDocBtn.setToggleGroup(docTypeGroup);
-		typeOfDoc = "Certificate";
-		
+		typeOfDoc = "Certificate";		
 		listOfVerifications = FXCollections.observableArrayList();
-		resultOfSearch = new ArrayList<ArrayList<String>>();
-		
+		resultOfSearch = new ArrayList<ArrayList<String>>();		
 		setVerificationItems();
 	}
 	
@@ -79,7 +76,7 @@ public class OldDocSearchController implements InfoRequestable {
 	private void deviceSearchTBClick() {
 		if(!deviceSearchTB.isSelected()) {
 			checkDevice = null;
-			deviceSearchTB.setText("пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+			deviceSearchTB.setText("Выбор средства измерения");
 		}
 		else {
 			try {
@@ -120,11 +117,11 @@ public class OldDocSearchController implements InfoRequestable {
 		}
 		catch(IOException ioExp) {
 			try {
-				AboutMessageWindow msgWin = new AboutMessageWindow("пїЅпїЅпїЅпїЅпїЅпїЅ", "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+				AboutMessageWindow msgWin = new AboutMessageWindow("Ошибка", "Файл отсутствует");
 				msgWin.show();
 			}
 			catch(IOException exp) {
-				System.out.println("пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
+				exp.getStackTrace();
 			}
 		}
 	}
@@ -164,8 +161,7 @@ public class OldDocSearchController implements InfoRequestable {
 
 		String addFilters = "";
 		ArrayList<String> fieldsNames = new ArrayList<String>();
-		
-		
+				
 		fieldsNames.add("data");
 		fieldsNames.add("pathOfDoc");
 		fieldsNames.add("pathOfProtocol");
@@ -190,7 +186,7 @@ public class OldDocSearchController implements InfoRequestable {
 				Date dateOfVer;
 				String strDateOfVer = resultOfSearch.get(i).get(0);
 				try {
-					dateOfVer = new SimpleDateFormat("DD/MM/yyyy HH:mm:ss").parse(strDateOfVer);
+					dateOfVer = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(strDateOfVer); //dd-MM-yyyy dd/MM/yyyy HH:mm:ss
 				}
 				catch(ParseException pExp) {
 					dateOfVer = Calendar.getInstance().getTime();
@@ -211,11 +207,11 @@ public class OldDocSearchController implements InfoRequestable {
 		}
 		catch(SQLException sqlExp) {
 			try {
-				AboutMessageWindow msgWin = new AboutMessageWindow("пїЅпїЅпїЅпїЅпїЅпїЅ", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅ");
+				AboutMessageWindow msgWin = new AboutMessageWindow("Ошибка", "База данных отсутствует или повреждена");
 				msgWin.show();
 			}
 			catch(IOException ioExp) {
-				System.out.println("пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+				ioExp.getStackTrace();
 			}
 		}		
 	}

@@ -148,16 +148,11 @@ public class ProtocolCreateController {
 	
 	@SuppressWarnings("finally")
 	@FXML
-	private void createBtnClick() {
-		
+	private void createBtnClick() throws IOException{
 		if (!checkDocType()) {
-			try {
-				AboutMessageWindow msgWin = new AboutMessageWindow("Ошибка", "Вы не выбрали тип создаваемого документа");
-				msgWin.show();
-			}
-			finally {
-				return;
-			}
+			AboutMessageWindow msgWin = new AboutMessageWindow("Ошибка", "Вы не выбрали тип создаваемого документа");
+			msgWin.show();
+			return;
 		}		
 		Date dt = protocoledResult.get(0).getDateOfMeas();
 		String strDt = new SimpleDateFormat("dd-MM-yyyy HH-mm-ss").format(dt);
@@ -212,7 +207,7 @@ public class ProtocolCreateController {
 						}			
 					}
 					//Показываем сообщение об успешном создании
-					String docType = docTypeComboBox.getSelectionModel().getSelectedItem().toString();
+					String docType = docTypeComboBox.getSelectionModel().getSelectedItem();
 					goodResMsg = new AboutMessageWindow("Успешно", "Протокол и " + docType + "\nуспешно созданы.");
 					goodResMsg.show();
 				} catch (IOException ioExp) {
@@ -239,9 +234,7 @@ public class ProtocolCreateController {
 				} catch (IOException ioExp) {
 					ioExp.printStackTrace();
 				}
-				finally {
-					return;
-				}					
+				return;
 			}				
 		});
 		//Запускаем поток создания документов
@@ -308,8 +301,12 @@ public class ProtocolCreateController {
 			return "не годным";
 		}
 	}
-	public String getProtocolNumber() {return this.docNumberTextField.getText();}
-	public String getDocumentNumber() {return this.docNumberTextField.getText();}
+	public String getProtocolNumber() {
+		return this.docNumberTextField.getText();
+	}
+	public String getDocumentNumber() {
+		return this.docNumberTextField.getText();
+	}
 	public String getEtalonString() { 
 		if (this.etalonRB.isSelected()) {
 			return "Эталон";

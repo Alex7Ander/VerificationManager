@@ -39,6 +39,7 @@ public class MainController {
 //Verification button
 	@FXML
 	public void mouseOnVerificationBtn(MouseEvent event) {
+		helpTextArea.setText("Режим проведения поверки зарегистрированных приборов.");
 		try {
 			verificationBtn.setOpacity(1.0);
 		}
@@ -48,6 +49,7 @@ public class MainController {
 	}
 	@FXML
 	public void mouseOffVerificationBtn() {
+		helpTextArea.setText("");
 		try {
 			verificationBtn.setOpacity(0.8);
 		}
@@ -57,7 +59,6 @@ public class MainController {
 	}	
 	@FXML
 	public void verificationBtnClick(ActionEvent event) {
-		helpTextArea.setText("Поверка");
 		try {
 			VerificationWindow vW = VerificationWindow.getVerificationWindow();
 			vW.show();
@@ -70,6 +71,7 @@ public class MainController {
 //DB Edit button
 	@FXML
 	public void mouseOnDBEditBtn(MouseEvent event) {
+		helpTextArea.setText("Просмотр и редактирование параметров зарегистрированных приборов.");
 		try {
 			dbEditBtn.setOpacity(1.0);
 		}
@@ -79,6 +81,7 @@ public class MainController {
 	}
 	@FXML
 	public void mouseOffDBEditBtn() {
+		helpTextArea.setText("");
 		try {
 			dbEditBtn.setOpacity(0.8);
 		}
@@ -88,7 +91,6 @@ public class MainController {
 	}
 	@FXML
 	public void dbEditBtnClick(ActionEvent event) {
-		helpTextArea.setText("Просмотр и редактирование БД");
 		try {
 			DBEditWindow dbEditWin = DBEditWindow.getDBEditWindow();
 			dbEditWin.show();
@@ -101,6 +103,7 @@ public class MainController {
 //New Deivce button
 	@FXML
 	public void mouseOnNewDeviceBtn(MouseEvent event) {
+		helpTextArea.setText("Регистрирование нового прибора.");
 		try {
 			newDeviceBtn.setOpacity(1.0);
 		}
@@ -110,6 +113,7 @@ public class MainController {
 	}
 	@FXML
 	public void mouseOffNewDeviceBtn() {
+		helpTextArea.setText("");
 		try {
 			newDeviceBtn.setOpacity(0.8);
 		}
@@ -119,7 +123,6 @@ public class MainController {
 	}
 	@FXML
 	public void newDeviceBtnClick(ActionEvent event) {
-		helpTextArea.setText("Добавление нового СИ");
 		try {
 			NewDeviceWindow newDevWindow = NewDeviceWindow.getNewDeviceWindow();
 			newDevWindow.show();
@@ -132,6 +135,7 @@ public class MainController {
 //Old documents search button
 	@FXML
 	public void mouseOnOldDocSearchBtn(MouseEvent event) {
+		helpTextArea.setText("Поиск документов (свдетельств/извещений) оформленных при проведенных поверках.");
 		try {
 			searchOldDocBtn.setOpacity(1.0);
 		}
@@ -141,6 +145,7 @@ public class MainController {
 	}
 	@FXML
 	public void mouseOffOldDocSearchBtn() {
+		helpTextArea.setText("");
 		try {
 			searchOldDocBtn.setOpacity(0.8);
 		}
@@ -150,7 +155,6 @@ public class MainController {
 	}
 	@FXML
 	public void searchOldDocBtnClick(ActionEvent event) {
-		helpTextArea.setText("Old Doc Search");
 		try {
 			OldDocSearchWindow oldDocWindow = OldDocSearchWindow.getOldDocSearchWindow();
 			oldDocWindow.show();
@@ -163,6 +167,7 @@ public class MainController {
 //About button
 	@FXML
 	public void mouseOnAboutBtn(MouseEvent event) {
+		helpTextArea.setText("Информация о версии программы.");
 		try {
 			aboutBtn.setOpacity(1.0);
 		}
@@ -172,6 +177,7 @@ public class MainController {
 	}
 	@FXML
 	public void mouseOffAboutBtn() {
+		helpTextArea.setText("");
 		try {
 			aboutBtn.setOpacity(0.8);
 		}
@@ -195,6 +201,7 @@ public class MainController {
 //Exit button
 	@FXML
 	public void mouseOnExitBtn(MouseEvent event) {
+		helpTextArea.setText("Без комментариев");
 		try {
 			exitBtn.setOpacity(1.0);
 		}
@@ -204,6 +211,7 @@ public class MainController {
 	}	
 	@FXML
 	public void mouseOffExitBtn() {
+		helpTextArea.setText("");
 		try {
 			exitBtn.setOpacity(0.8);
 		}

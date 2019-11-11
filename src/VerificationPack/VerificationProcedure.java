@@ -138,7 +138,7 @@ public class VerificationProcedure {
 		etalonString = prtCreateCtrl.getEtalonString();
 		docType = prtCreateCtrl.getDocType();
 		dateOfCreation = prtCreateCtrl.getDateOfCreation();
-		finishDate = "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ " + prtCreateCtrl.getFinishDate();
+		finishDate = "Годен до " + prtCreateCtrl.getFinishDate();
 		militaryBaseName = prtCreateCtrl.getMilitryBaseName();
 	}
 	

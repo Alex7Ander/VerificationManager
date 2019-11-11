@@ -46,8 +46,7 @@ public class DocumetnsCreateService extends Service<Integer> {
 	public DocumetnsCreateService(String protocolFileName, ArrayList<MeasResult> result, VerificationProcedure verificationProc){
 		this.verification = verificationProc;
 		this.protocoledResult = result;
-		this.protocolName = protocolFileName;
-		
+		this.protocolName = protocolFileName;		
 		wb = new HSSFWorkbook();
 		String strDate = protocoledResult.get(0).getDateOfMeasByString();
 		sh = wb.createSheet(WorkbookUtil.createSafeSheetName(strDate));
@@ -61,8 +60,7 @@ public class DocumetnsCreateService extends Service<Integer> {
 		Font ordinaryfont = wb.createFont();
 		ordinaryfont.setFontName("Times New Roman");
 		ordinaryfont.setFontHeightInPoints((short)12);
-		borderCellStyle.setFont(ordinaryfont);
-				
+		borderCellStyle.setFont(ordinaryfont);				
 		//Стиль заголовок документа
 		headCellStyle = wb.createCellStyle();
 		Font headFont = wb.createFont();
@@ -70,12 +68,10 @@ public class DocumetnsCreateService extends Service<Integer> {
 		headFont.setFontHeightInPoints((short)14);
 		headFont.setBold(true);
 		headCellStyle.setFont(headFont);
-		headCellStyle.setAlignment(HorizontalAlignment.CENTER);
-		
+		headCellStyle.setAlignment(HorizontalAlignment.CENTER);		
 		//Простой стиль
 		ordinaryCellStyle = wb.createCellStyle();
-		ordinaryCellStyle.setFont(ordinaryfont);
-		
+		ordinaryCellStyle.setFont(ordinaryfont);		
 		//Стиль - Жирный шрифт
 		boldCellStyle = wb.createCellStyle(); 
 		Font boldFont = wb.createFont();
@@ -118,14 +114,14 @@ public class DocumetnsCreateService extends Service<Integer> {
 		FileWriter writer = new FileWriter("proto.txt");
 		try {
 			String docName = this.verification.getDocType() + " для " + this.verification.getDeviceInfo() + " №" + this.verification.getDeviceSerNumber() +
-					" проведенной " + this.verification.getDateOfCreation();			
+					" проведенной " + this.verification.getDateOfCreation() + ".doc";			
 			writer.write(docName + "\n");										//1
 			writer.write(this.verification.getDocType() + "\n");				//2
 			if (this.verification.isPrimary()) {
 				writer.write("первичной \n");									//3
 			} else {
 				writer.write("периодической \n");								//3
-			}			
+			}
 			writer.write(this.verification.getMilitaryBasename() + "\n");		//4
 			writer.write(this.verification.getDocumentNumber() + "\n");			//5
 			writer.write(this.verification.getDeviceInfo() + "\n");				//6
@@ -215,10 +211,10 @@ public class DocumetnsCreateService extends Service<Integer> {
 			dRow++;
 			
 			//Заполнение таблицы
-			String keys[] = {"m_S11", "err_m_S11", "p_S11", "err_m_S11", 
-					 		 "m_S12", "err_m_S12", "p_S12", "err_m_S12",
-					 		 "m_S21", "err_m_S21", "p_S21", "err_m_S21", 
-					 		 "m_S22", "err_m_S22", "p_S22", "err_m_S22"};
+			 String keys[] = {"MODULE_S11", "ERROR_MODULE_S11", "PHASE_S11", "ERROR_PHASE_S11",
+					"MODULE_S12", "ERROR_MODULE_S12", "PHASE_S12", "ERROR_PHASE_S12",
+					"MODULE_S21", "ERROR_MODULE_S21", "PHASE_S21", "ERROR_PHASE_S21",
+					"MODULE_S22", "ERROR_MODULE_S22", "PHASE_S22", "ERROR_PHASE_S22"};
 			
 			for (int j = 0; j < currentRes.getCountOfFreq(); j++) {
 				Double cFreq = currentRes.freqs.get(j);

@@ -108,7 +108,7 @@ public class VerificationController implements InfoRequestable {
 		if (verificationResult.size() != 0) {
 			AboutMessageWindow msgWin = null;
 			try {
-				for (int i=0; i<verificationResult.size(); i++) {
+				for (int i = 0; i < verificationResult.size(); i++) {
 					verificationResult.get(i).saveInDB();
 				}
 				msgWin = new AboutMessageWindow("Успешно", "Результаты поверки сохранены в БД");
@@ -207,12 +207,7 @@ public class VerificationController implements InfoRequestable {
 				keys.add("ERROR_" + key);
 			}
 		}
-		/*
-		String keys[] = {"m_S11", "err_m_S11", "p_S11", "err_p_S11",
-					 	 "m_S12", "err_m_S12", "p_S12", "err_p_S12",
-					 	 "m_S21", "err_m_S21", "p_S21", "err_p_S21", 
-					 	 "m_S22", "err_m_S22", "p_S22", "err_p_S22"};
-		*/
+
 		ArrayList<Double> fr = this.verificationResult.get(currentElementIndex).freqs;
 		int countOfFreq = fr.size();
 		if (this.resultTable.getRowCount() < countOfFreq) {
@@ -222,10 +217,6 @@ public class VerificationController implements InfoRequestable {
 		else if (this.resultTable.getRowCount() > countOfFreq) {
 			while (this.resultTable.getRowCount() != countOfFreq) 
 				this.resultTable.deleteRow(this.resultTable.getRowCount());
-		}
-
-		for (String str : keys){
-			System.out.println(str + "\t");
 		}
 
 		this.resultTable.setColumnFromDouble(0, fr);
