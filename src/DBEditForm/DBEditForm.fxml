@@ -1,112 +1,146 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="725.0" prefWidth="1223.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="DBEditForm.DBEditController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="895.0" prefWidth="1324.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="DBEditForm.DBEditController">
    <children>
-      <HBox layoutX="525.0" layoutY="162.0" prefHeight="100.0" prefWidth="200.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+      <HBox prefHeight="895.0" prefWidth="1324.0">
          <children>
-            <VBox prefHeight="705.0" prefWidth="374.0">
+            <VBox prefHeight="839.0" prefWidth="369.0">
                <children>
-                  <Pane prefHeight="40.0" prefWidth="374.0">
-                     <children>
-                        <Button fx:id="errorParamsBtn" layoutX="13.0" layoutY="7.0" mnemonicParsing="false" onAction="#errorParamsBtnClick" prefHeight="26.0" prefWidth="352.0" stylesheets="@../../bin/application/commonButton.css" text="Параметры погрешности" />
-                     </children>
-                  </Pane>
-                  <Pane prefHeight="40.0" prefWidth="200.0">
-                     <children>
-                        <Button fx:id="searchDeviceBtn" layoutX="14.0" layoutY="8.0" mnemonicParsing="false" onAction="#searchDeviceBtnClick" prefHeight="25.0" prefWidth="352.0" stylesheets="@../../bin/application/commonButton.css" text="Выбрать СИ" />
-                     </children>
-                  </Pane>
-                  <TitledPane animated="false" prefHeight="299.0" prefWidth="374.0" style="-fx-font-size: 14; -fx-font-family: Arial Narrow; -fx-font-weight: bold;" text="Информация о СИ">
-                    <content>
-                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="34.0" prefWidth="372.0">
+                  <Button fx:id="searchDeviceBtn" mnemonicParsing="false" onAction="#searchDeviceBtnClick" prefHeight="40.0" prefWidth="358.0" stylesheets="@../../bin/application/commonButton.css" text="Выбрать СИ" textAlignment="CENTER">
+                     <VBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </VBox.margin>
+                  </Button>
+                  <TitledPane animated="false" prefHeight="200.0" prefWidth="364.0" style="-fx-font-size: 14; -fx-font-family: Arial Narrow; -fx-font-weight: bold;" text="Информация о СИ">
+                     <VBox.margin>
+                        <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                     </VBox.margin>
+                     <content>
+                        <VBox prefHeight="158.0" prefWidth="362.0">
                            <children>
-                              <VBox layoutX="54.0" layoutY="-29.0" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                              <HBox prefHeight="30.0" prefWidth="200.0">
                                  <children>
-                                    <HBox prefHeight="30.0" prefWidth="200.0">
-                                       <children>
-                                          <Label prefWidth="130.0" stylesheets="@../../bin/application/commonLabel.css" text="Наименование СИ:" />
-                                          <Separator orientation="VERTICAL" prefHeight="200.0" />
-                                          <ComboBox fx:id="nameComboBox" prefHeight="26.0" prefWidth="214.0" />
-                                       </children>
-                                    </HBox>
-                                    <HBox prefHeight="30.0" prefWidth="200.0">
-                                       <children>
-                                          <Label prefWidth="130.0" stylesheets="@../../bin/application/commonLabel.css" text="Тип СИ:" />
-                                          <Separator orientation="VERTICAL" prefHeight="200.0" />
-                                          <TextField fx:id="typeTextFiel" prefWidth="215.0" />
-                                       </children>
-                                    </HBox>
-                                    <HBox prefHeight="30.0" prefWidth="200.0">
-                                       <children>
-                                          <Label prefWidth="130.0" stylesheets="@../../bin/application/commonLabel.css" text="Заводской номер:" />
-                                          <Separator orientation="VERTICAL" prefHeight="200.0" />
-                                          <TextField fx:id="serNumTextField" prefWidth="215.0" />
-                                       </children>
-                                    </HBox>
-                                    <HBox prefHeight="30.0" prefWidth="200.0">
-                                       <children>
-                                          <Label prefWidth="130.0" stylesheets="@../../bin/application/commonLabel.css" text="Владелец:" />
-                                          <Separator orientation="VERTICAL" prefHeight="200.0" />
-                                          <TextField fx:id="ownerTextField" prefWidth="215.0" />
-                                       </children>
-                                    </HBox>
-                                    <HBox prefHeight="30.0" prefWidth="200.0">
-                                       <children>
-                                          <Label prefHeight="16.0" prefWidth="130.0" stylesheets="@../../bin/application/commonLabel.css" text="Номер в Гос. Реестре:" />
-                                          <Separator orientation="VERTICAL" prefHeight="200.0" />
-                                          <TextField fx:id="gosNumTextField" prefWidth="215.0" />
-                                       </children>
-                                    </HBox>
-                                    <Separator prefWidth="200.0" />
-                                    <Button fx:id="saveDeviceModificationBtn" mnemonicParsing="false" onAction="#saveDeviceModificationBtnClick" prefHeight="42.0" prefWidth="353.0" stylesheets="@../../bin/application/commonButton.css" text="Сохранить изменения" />
-                                    <Pane prefHeight="11.0" prefWidth="353.0" />
-                                    <Button fx:id="deleteDeviceBtn" mnemonicParsing="false" onAction="#deleteDeviceBtnClick" prefHeight="40.0" prefWidth="355.0" stylesheets="@../../bin/application/commonButton.css" text="Удалить СИ" />
+                                    <Label prefWidth="130.0" stylesheets="@../../bin/application/commonLabel.css" text="Наименование СИ:" />
+                                    <ComboBox fx:id="nameComboBox" prefHeight="26.0" prefWidth="214.0">
+                                       <HBox.margin>
+                                          <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                       </HBox.margin></ComboBox>
                                  </children>
-                              </VBox>
+                              </HBox>
+                              <HBox prefHeight="30.0" prefWidth="200.0">
+                                 <children>
+                                    <Label prefWidth="130.0" stylesheets="@../../bin/application/commonLabel.css" text="Тип СИ:" />
+                                    <TextField fx:id="typeTextFiel" prefWidth="215.0">
+                                       <HBox.margin>
+                                          <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                       </HBox.margin></TextField>
+                                 </children>
+                              </HBox>
+                              <HBox prefHeight="30.0" prefWidth="200.0">
+                                 <children>
+                                    <Label prefWidth="130.0" stylesheets="@../../bin/application/commonLabel.css" text="Заводской номер:" />
+                                    <TextField fx:id="serNumTextField" prefWidth="215.0">
+                                       <HBox.margin>
+                                          <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                       </HBox.margin></TextField>
+                                 </children>
+                              </HBox>
+                              <HBox prefHeight="30.0" prefWidth="200.0">
+                                 <children>
+                                    <Label prefWidth="130.0" stylesheets="@../../bin/application/commonLabel.css" text="Владелец:" />
+                                    <TextField fx:id="ownerTextField" prefWidth="215.0">
+                                       <HBox.margin>
+                                          <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                       </HBox.margin></TextField>
+                                 </children>
+                              </HBox>
+                              <HBox prefHeight="30.0" prefWidth="200.0">
+                                 <children>
+                                    <Label prefHeight="16.0" prefWidth="130.0" stylesheets="@../../bin/application/commonLabel.css" text="Номер в Гос. Реестре:" />
+                                    <TextField fx:id="gosNumTextField" prefWidth="215.0">
+                                       <HBox.margin>
+                                          <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                       </HBox.margin></TextField>
+                                 </children>
+                              </HBox>
                            </children>
-                        </AnchorPane>
-                    </content>
+                        </VBox>
+                     </content>
                   </TitledPane>
-                  <Label stylesheets="@../../bin/application/commonLabel.css" text="Составные элементы данного СИ:" />
-                  <Separator prefWidth="200.0" />
-                  <ListView fx:id="elementsListView" onEditStart="#elementsListViewClick" onMouseClicked="#elementsListViewClick" prefHeight="305.0" prefWidth="374.0" />
+                  <Label stylesheets="@../../bin/application/commonLabel.css" text="Составные элементы данного СИ:">
+                     <VBox.margin>
+                        <Insets bottom="2.0" left="5.0" right="2.0" top="2.0" />
+                     </VBox.margin>
+                  </Label>
+                  <ListView fx:id="elementsListView" onEditStart="#elementsListViewClick" onMouseClicked="#elementsListViewClick" prefHeight="234.0" prefWidth="364.0">
+                     <VBox.margin>
+                        <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                     </VBox.margin>
+                  </ListView>
+                  <Label fx:id="dateLabel" stylesheets="@../../bin/application/commonLabel.css" text="Дата проведения поверки:">
+                     <VBox.margin>
+                        <Insets bottom="2.0" left="5.0" right="2.0" top="2.0" />
+                     </VBox.margin>
+                  </Label>
+                  <ListView fx:id="verificationDateListView" onEditStart="#verificationDateListViewClick" onMouseClicked="#verificationDateListViewClick" prefHeight="305.0" prefWidth="364.0">
+                     <VBox.margin>
+                        <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                     </VBox.margin>
+                  </ListView>
+                  <Label fx:id="measUnitLabel" stylesheets="@../../bin/application/commonLabel.css" text="Измеряемая величина:">
+                     <VBox.margin>
+                        <Insets bottom="2.0" left="5.0" right="2.0" top="2.0" />
+                     </VBox.margin>
+                  </Label>
+                  <ListView fx:id="currentMeasUnitListView" onEditStart="#currentMeasUnitListViewClick" onMouseClicked="#currentMeasUnitListViewClick" prefHeight="174.0" prefWidth="364.0">
+                     <VBox.margin>
+                        <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                     </VBox.margin>
+                  </ListView>
+                  <Button fx:id="saveDeviceModificationBtn" mnemonicParsing="false" onAction="#saveDeviceModificationBtnClick" prefHeight="30.0" prefWidth="363.0" stylesheets="@../../bin/application/commonButton.css" text="Сохранить изменения">
+                     <VBox.margin>
+                        <Insets bottom="5.0" left="2.0" right="2.0" top="2.0" />
+                     </VBox.margin>
+                  </Button>
+                  <Button fx:id="deleteDeviceBtn" mnemonicParsing="false" onAction="#deleteDeviceBtnClick" prefHeight="29.0" prefWidth="365.0" stylesheets="@../../bin/application/commonButton.css" text="Удалить СИ">
+                     <VBox.margin>
+                        <Insets bottom="5.0" left="2.0" right="2.0" top="2.0" />
+                     </VBox.margin>
+                  </Button>
                </children>
             </VBox>
-            <Separator orientation="VERTICAL" prefHeight="200.0" />
-            <VBox prefHeight="705.0" prefWidth="823.0">
+            <VBox prefHeight="895.0" prefWidth="957.0">
                <children>
-                  <AnchorPane prefHeight="110.0" prefWidth="823.0">
+                  <AnchorPane prefHeight="130.0" prefWidth="956.0">
                      <children>
-                        <Label fx:id="dateLabel" layoutY="14.0" stylesheets="@../../bin/application/commonLabel.css" text="Дата проведения поверки:" />
-                        <ComboBox fx:id="verificationDateComboBox" layoutX="162.0" layoutY="10.0" onAction="#verificationDateComboBoxClick" prefHeight="25.0" prefWidth="268.0" />
-                        <Label fx:id="measUnitLabel" layoutY="47.0" stylesheets="@../../bin/application/commonLabel.css" text="Измеряемая величина:" />
-                        <ComboBox fx:id="currentMeasUnitComboBox" layoutX="162.0" layoutY="43.0" prefHeight="25.0" prefWidth="268.0" />
-                        <Button fx:id="deletResBtn" layoutX="442.0" layoutY="9.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="374.0" stylesheets="@../../bin/application/commonButton.css" text="Удалить" />
+                        <Label layoutX="14.0" layoutY="14.0" stylesheets="@../application/commonLabel.css" text="Таблица результатов  измерений для " />
                      </children>
                   </AnchorPane>
-                  <Separator prefHeight="12.0" prefWidth="823.0" />
-                  <VBox fx:id="resultBox" prefHeight="705.0" prefWidth="827.0">
+                  <ScrollPane fx:id="resultsScrollPane" prefHeight="857.0" prefWidth="952.0">
+                     <content>
+                        <AnchorPane fx:id="resultsTablePane" minHeight="0.0" minWidth="0.0" prefHeight="155.0" prefWidth="474.0" />
+                     </content>
+                     <VBox.margin>
+                        <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                     </VBox.margin>
+                  </ScrollPane>
+                  <HBox prefHeight="100.0" prefWidth="200.0">
                      <children>
-                        <ScrollPane fx:id="resultsScrollPane" prefHeight="621.0" prefWidth="823.0">
-                           <content>
-                              <AnchorPane fx:id="resultsTablePane" minHeight="0.0" minWidth="0.0" prefHeight="501.0" prefWidth="800.0" />
-                           </content>
-                        </ScrollPane>
+                        <Button fx:id="errorParamsBtn" disable="true" mnemonicParsing="false" onAction="#errorParamsBtnClick" opacity="0.05" prefHeight="26.0" prefWidth="37.0" stylesheets="@../../bin/application/commonButton.css" text="Параметры погрешности" />
                      </children>
-                  </VBox>
+                  </HBox>
                </children>
             </VBox>
          </children>

@@ -71,7 +71,8 @@ public class MainController {
 //DB Edit button
 	@FXML
 	public void mouseOnDBEditBtn(MouseEvent event) {
-		helpTextArea.setText("Просмотр и редактирование параметров зарегистрированных приборов.");
+		helpTextArea.setText("Работа с базой данных измерительно установки: проссмотр результатов измерений,\n"
+				+ "редактирование критериев годности.");
 		try {
 			dbEditBtn.setOpacity(1.0);
 		}

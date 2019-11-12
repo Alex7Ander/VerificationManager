@@ -1,6 +1,9 @@
 package GUIpack.StringGridFXPack;
 
 import java.util.ArrayList;
+
+import ToleranceParamPack.ParametrsPack.MeasUnitPart;
+import ToleranceParamPack.ParametrsPack.S_Parametr;
 import VerificationPack.MeasResult;
 
 public class ResultsStringGridFX extends StringGridFX {
@@ -19,7 +22,34 @@ public class ResultsStringGridFX extends StringGridFX {
 		tableHeads.add("Погрешность");
 	}
 	
-	public void setResult(MeasResult result) {
-		
+	public void showResult(MeasResult result, S_Parametr sParam) {	
+		this.clear();
+		if (result.freqs.size() > this.getRowCount()) {
+			while (result.freqs.size() != this.getRowCount()) {
+				this.addRow();
+			}
+		} else if (result.freqs.size() < this.getRowCount()) {
+			while (result.freqs.size() != this.getRowCount()) {
+				this.deleteRow(this.getRowCount());
+			}
+		}
+		this.setColumnFromDouble(0, result.freqs);		
+		int currentRow = 0;
+		for (double freq : result.freqs) {
+			double val = result.values.get(MeasUnitPart.MODULE + "_" + sParam).get(freq);
+			this.setCellValue(1, currentRow, Double.toString(val));
+			
+			val = result.values.get("ERROR_" + MeasUnitPart.MODULE + "_" + sParam).get(freq);
+			this.setCellValue(2, currentRow, Double.toString(val));
+			
+			val = result.values.get("ERROR_" + MeasUnitPart.PHASE + "_" + sParam).get(freq);
+			this.setCellValue(3, currentRow, Double.toString(val));
+			
+			val = result.values.get("ERROR_" + MeasUnitPart.PHASE + "_" + sParam).get(freq);
+			this.setCellValue(4, currentRow, Double.toString(val));
+			
+			++currentRow;
+		}
 	}
+	
 }

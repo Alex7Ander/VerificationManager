@@ -26,16 +26,16 @@
                      </padding>
                   </Button>
                   <Pane prefHeight="40.0" prefWidth="90.0" />
-                  <Button fx:id="dbEditBtn" mnemonicParsing="false" onAction="#dbEditBtnClick" onMouseEntered="#mouseOnDBEditBtn" onMouseExited="#mouseOffDBEditBtn" opacity="0.8" prefHeight="55.0" prefWidth="190.0" stylesheets="@commonButton.css" text="Редактирование БД" />
+                  <Button fx:id="dbEditBtn" mnemonicParsing="false" onAction="#dbEditBtnClick" onMouseEntered="#mouseOnDBEditBtn" onMouseExited="#mouseOffDBEditBtn" opacity="0.8" prefHeight="55.0" prefWidth="190.0" stylesheets="@commonButton.css" text="База данных &quot;Аксоль&quot;" />
                   <Pane prefHeight="40.0" prefWidth="90.0" />
-                  <Button fx:id="newDeviceBtn" mnemonicParsing="false" onAction="#newDeviceBtnClick" onMouseEntered="#mouseOnNewDeviceBtn" onMouseExited="#mouseOffNewDeviceBtn" opacity="0.8" prefHeight="55.0" prefWidth="190.0" stylesheets="@commonButton.css" text="Прибор" />
+                  <Button fx:id="newDeviceBtn" mnemonicParsing="false" onAction="#newDeviceBtnClick" onMouseEntered="#mouseOnNewDeviceBtn" onMouseExited="#mouseOffNewDeviceBtn" opacity="0.8" prefHeight="55.0" prefWidth="190.0" stylesheets="@commonButton.css" text="Новый прибор" />
                   <Pane prefHeight="40.0" prefWidth="90.0" />
                   <Button fx:id="searchOldDocBtn" mnemonicParsing="false" onAction="#searchOldDocBtnClick" onMouseEntered="#mouseOnOldDocSearchBtn" onMouseExited="#mouseOffOldDocSearchBtn" opacity="0.8" prefHeight="55.0" prefWidth="190.0" stylesheets="@commonButton.css" text="Протоколы поверок" />
                   <Pane prefHeight="200.0" prefWidth="30.0" />
                </children>
             </HBox>
             <Separator prefHeight="13.0" prefWidth="869.0" />
-            <TextArea fx:id="helpTextArea" prefHeight="49.0" prefWidth="851.0" promptText="Информация">
+            <TextArea fx:id="helpTextArea" prefHeight="64.0" prefWidth="869.0" promptText="Информация">
                <font>
                   <Font name="Calibri Bold Italic" size="18.0" />
                </font></TextArea>

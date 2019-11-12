@@ -14,14 +14,12 @@ import ErrorParamsPack.ErrorParamsWindow;
 import FileManagePack.FileManager;
 import GUIpack.InfoRequestable;
 import GUIpack.StringGridFXPack.ResultsStringGridFX;
-import GUIpack.StringGridFXPack.StringGridFX;
 import GUIpack.StringGridFXPack.StringGridPosition;
 import NewElementPack.NewElementWindow;
 import SearchDevicePack.SearchDeviceWindow;
-import ToleranceParamPack.ParametrsPack.ToleranceParametrs;
+import ToleranceParamPack.ParametrsPack.S_Parametr;
 import VerificationPack.MeasResult;
 import YesNoDialogPack.YesNoWindow;
-import _tempHelpers.Adapter;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -34,7 +32,6 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.VBox;
 
 public class DBEditController implements InfoRequestable {
 	
@@ -61,45 +58,25 @@ public class DBEditController implements InfoRequestable {
 	@FXML
 	private ListView<String> elementsListView;
 	private ContextMenu elemtnsListViewContextMenu;
+	private ContextMenu verificationsDatesListViewContextMenu;
 	private ObservableList<String> elementsList;
 //---------------------------------------------
 
 //Правая часть окна
-	//Шапка
-	//---------------------------------
-/*	//Редактирование параметров годности
-	@FXML
-	private VBox paramsBox;
-	//Таблица для параметров
-	@FXML
-	private ScrollPane paramsScrollPane;
-	@FXML
-	private AnchorPane paramsTablePane;
-	private StringGridFX paramsTable;
-	@FXML
-	private Pane paramsBtnPane;
-	@FXML
-	private Button deleteParamsBtn;
-	@FXML
-	private Button saveParamsModBtn;*/
 	//------------------------------
 	//Просмотр результатов измерений
 	@FXML
-	private VBox resultBox;
-	@FXML
-	private ComboBox<String> verificationDateComboBox;
+	private ListView<String> verificationDateListView;
 	private ObservableList<String> verificationDateList;	
 	@FXML
-	private ComboBox<String> currentMeasUnitComboBox;
+	private ListView<String> currentMeasUnitListView;
 	private ObservableList<String> measUnitsList;	
 	//таблица для результатов
 	@FXML
 	private ScrollPane resultsScrollPane;
 	@FXML
 	private AnchorPane resultsTablePane;
-	private StringGridFX resultsTable;
-	@FXML
-	private Button deletResBtn;
+	private ResultsStringGridFX resultsTable;
 	@FXML
 	private Label measUnitLabel;
 	@FXML
@@ -108,8 +85,10 @@ public class DBEditController implements InfoRequestable {
 //---------------------------------------------	
 	private Device modDevice;  //Редактируемое средство измерения
 	private MeasResult currentResult;  //Отображаемый результат измерения
-	ToleranceParametrs currentParams;
-	private int currentElementIndex;
+	private Integer currentElementIndex = null;
+	private Integer currentDateIndex = null;
+	private Integer currentMeasUnitIndex = null;	
+	private Element currentElement = null;
 	private ArrayList<ArrayList<String>> verifications;
 	
 //---------------------------------------------------------
@@ -134,21 +113,20 @@ public class DBEditController implements InfoRequestable {
 		} 
 		nameComboBox.setItems(devNamesList);
 		
-		//propertiesList = FXCollections.observableArrayList();
-		//propertiesList.add("Критерий годности");
-		//propertiesList.add("Результат измерения");
+		this.verificationDateListView.setItems(this.verificationDateList);				
+		this.currentMeasUnitListView.setItems(measUnitsList);
 		
-		this.verificationDateComboBox.setItems(this.verificationDateList);
-		//this.currentMeasUnitComboBox.setItems(this.measUnitsList);				
-		this.currentMeasUnitComboBox.setItems(measUnitsList);
-		//this.editedPropertyComboBox.setItems(propertiesList);
-		
+		createElemtnsListViewContextMenu();		
+		createVerificationsDatesContextMenu();
+	}
+	
+	private void createElemtnsListViewContextMenu() {
 		elemtnsListViewContextMenu = new ContextMenu();
-		MenuItem deleteItem = new MenuItem("Удалить");
-		MenuItem editItem = new MenuItem("Редактировать");
-		elemtnsListViewContextMenu.getItems().addAll(deleteItem, editItem);
+		MenuItem deleteElementItem = new MenuItem("Удалить");
+		MenuItem editElementItem = new MenuItem("Редактировать");
+		elemtnsListViewContextMenu.getItems().addAll(deleteElementItem, editElementItem);
 		
-		deleteItem.setOnAction(event->{
+		deleteElementItem.setOnAction(event->{
 			try {
 				YesNoWindow qWin = new YesNoWindow("Удалить?", "Удалить выбранный элемент:\n" + 
 								this.elementsListView.getSelectionModel().getSelectedItem().toString());
@@ -161,7 +139,7 @@ public class DBEditController implements InfoRequestable {
 			}
 		});
 		
-		editItem.setOnAction(event->{
+		editElementItem.setOnAction(event->{
 			int index = this.elementsListView.getSelectionModel().getSelectedIndex();
 			Element elm = this.modDevice.includedElements.get(index);
 			try {
@@ -175,9 +153,38 @@ public class DBEditController implements InfoRequestable {
 		this.elementsListView.setOnContextMenuRequested(event->{
 			double x = event.getScreenX();
 			double y = event.getScreenY();
-			elemtnsListViewContextMenu.show(this.elementsListView, x, y);
+			elemtnsListViewContextMenu.show(elementsListView, x, y);
 		});
 	}
+	
+	private void createVerificationsDatesContextMenu() {
+		verificationsDatesListViewContextMenu = new ContextMenu();
+		MenuItem deleteResultItem = new MenuItem("Удалить результат");
+		verificationsDatesListViewContextMenu.getItems().addAll(deleteResultItem);
+		
+		deleteResultItem.setOnAction(event -> {
+			int resIndex = Integer.parseInt(verifications.get(currentDateIndex).get(0));
+			MeasResult deletedResult;
+			try {
+				deletedResult = new MeasResult(modDevice.includedElements.get(currentElementIndex), resIndex);
+				deletedResult.deleteFromDB();
+			} catch (SQLException sqlExp) {
+				try {
+					AboutMessageWindow msgWin = new AboutMessageWindow("Ошибка", "Ошибка доступа к БД\nпри попытке удаления");
+					msgWin.show();
+				} catch (IOException ioExp) {
+					ioExp.printStackTrace();
+				}	
+			}
+		});
+		
+		this.verificationDateListView.setOnContextMenuRequested(event->{
+			double x = event.getScreenX();
+			double y = event.getScreenY();
+			verificationsDatesListViewContextMenu.show(verificationDateListView, x, y);
+		});
+	}
+	
 //InfoRequestable
 	@Override
 	public void setDevice(Device device) {
@@ -199,22 +206,6 @@ public class DBEditController implements InfoRequestable {
 		}
 		this.elementsListView.setItems(elementsList);		
 	}
-//---------------------------------------------------------	
-/*	//Создание таблиц
-	private StringGridFX createParamsTable() {
-		ArrayList<String> tableHeads = new ArrayList<String>();
-		tableHeads.add("Частота, ГГц");
-		tableHeads.add("Модуль - нижний допуск");
-		tableHeads.add("Модуль - верхний допуск");
-		tableHeads.add("Фаза - нижний допуск");
-		tableHeads.add("Фаза - верхний допуск");
-		return new StringGridFX(5, 10, 800, 100, paramsScrollPane, paramsTablePane, tableHeads);
-	}
-*/	
-	private StringGridFX createResultsTable() {
-		StringGridPosition position = new StringGridPosition(800, 100, resultsScrollPane, resultsTablePane); //5, 10, 800, 100, resultsScrollPane, resultsTablePane, tableHeads
-		return new ResultsStringGridFX(position);
-	}
 //---------------------------------------------------------
 	//Очистка окна
 	private void clearGUI() {
@@ -227,34 +218,7 @@ public class DBEditController implements InfoRequestable {
 		this.elementsList.clear();
 		this.elementsListView.setItems(elementsList);
 		this.verificationDateList.clear();
-		this.verificationDateComboBox.setItems(verificationDateList);
-	}
-//---------------------------------------------------------	
-//---------------------------------------------------------		
-	//Отображение результатов
-	private void showResult() throws SQLException {	
-		this.resultsTable.clear();
-		int necessaryRowCount = this.currentResult.freqs.size();
-		if (this.resultsTable.getRowCount() < necessaryRowCount) {
-			while(this.resultsTable.getRowCount() < necessaryRowCount) {
-				this.resultsTable.addRow();
-			}
-		}
-		else if (this.resultsTable.getRowCount() > necessaryRowCount) {
-			while(this.resultsTable.getRowCount() > necessaryRowCount) {
-				this.resultsTable.deleteRow(this.resultsTable.getRowCount());
-			}				
-		}
-		this.resultsTable.setColumnFromDouble(0, this.currentResult.freqs);
-		String keys[] = {"m_S11", "err_m_S11", "p_S11", "err_p_S11", 
-				 "m_S12", "err_m_S12", "p_S12", "err_p_S12",
-				 "m_S21", "err_m_S21", "p_S21", "err_p_S21", 
-				 "m_S22", "err_m_S22", "p_S22", "err_p_S22"};
-		for (int i = 1; i < 5; i++) {
-			int currentMeasUnitIndex = this.currentMeasUnitComboBox.getSelectionModel().getSelectedIndex();
-			String key = keys[i-1 + currentMeasUnitIndex * 4];
-			this.resultsTable.setColumnFromDouble(i, Adapter.MapToArrayList(this.currentResult.values.get(key)));
-		}		
+		this.verificationDateListView.setItems(verificationDateList);
 	}
 //---------------------------------------------------------
 	@FXML
@@ -342,29 +306,27 @@ public class DBEditController implements InfoRequestable {
 			//
 		}
 	}
-		
-	@FXML
-	private void deletResBtnClick() throws IOException {
-		try {
-			currentResult.deleteFromDB();
-		}
-		catch(SQLException sqlExp) {
-			AboutMessageWindow msgWin = new AboutMessageWindow("Ошибка", "Ошибка доступа к БД\nпри удалении результатов измерения");
-			msgWin.show();	
-		}
-	}	
-	
+			
 	@FXML
 	private void elementsListViewClick() throws IOException {
+		if (modDevice == null) {
+			return;
+		}		
+		resultsTable.clear();
+		verificationDateList.clear();
+		measUnitsList.clear();
+		
+		currentDateIndex = null;
+		currentMeasUnitIndex = null;		
 		currentElementIndex = elementsListView.getSelectionModel().getSelectedIndex();
-		Element cElm = this.modDevice.includedElements.get(currentElementIndex);
+		currentElement = modDevice.includedElements.get(currentElementIndex);
+		
 		try {
-			verifications = cElm.getListOfVerifications();
-			this.verificationDateList.clear();
+			verifications = currentElement.getListOfVerifications();			
 			for (int i = 0; i < verifications.size(); i++) {
 				verificationDateList.add(verifications.get(i).get(1));
 			}						
-			this.verificationDateComboBox.setItems(verificationDateList);			
+			verificationDateListView.setItems(verificationDateList);			
 		}
 		catch(SQLException exp) {
 			AboutMessageWindow msgWin = new AboutMessageWindow("Ошибка", "Ошибка доступа к БД\nпри получении списка проведенных поверок");
@@ -373,45 +335,50 @@ public class DBEditController implements InfoRequestable {
 	}	
 		
 	@FXML
-	private void verificationDateComboBoxClick() throws IOException {
-		Element cElm = this.modDevice.includedElements.get(currentElementIndex);
+	private void verificationDateListViewClick() throws IOException {
+		if (currentElement == null) {
+			return;
+		}
+		currentDateIndex = verificationDateListView.getSelectionModel().getSelectedIndex();
 		try {
 			ArrayList<String> items = new ArrayList<String>();
 			String path = new File(".").getAbsolutePath();
-			if (cElm.getMeasUnit().equals("vswr")) {
-				path += "\\files\\vswr.txt";			
-			}
-			else {
-				path += "\\files\\gamma.txt";
-			}
-			FileManager.LinesToItems(path, items);
-			
+			path += "\\files\\" + currentElement.getMeasUnit() + ".txt";
+			FileManager.LinesToItems(path, items);			
 			measUnitsList.clear();
-			measUnitsList.add(items.get(0));			
-			if (cElm.getPoleCount() == 4) {
-				measUnitsList.add(items.get(1));
-				measUnitsList.add(items.get(2));
-				measUnitsList.add(items.get(3));
-			}	
+			for (int i = 0; i < currentElement.getSParamsCout(); i++) {
+				measUnitsList.add(items.get(i));
+			}
 		}
 		catch(Exception Exp) {
 			measUnitsList.add("S11");			
-			if (cElm.getPoleCount() == 4) {
+			if (currentElement.getPoleCount() == 4) {
 				measUnitsList.add("S12");
 				measUnitsList.add("S21");
 				measUnitsList.add("S22");
 			}	
-			this.currentMeasUnitComboBox.setItems(measUnitsList);
+			this.currentMeasUnitListView.setItems(measUnitsList);
+		}
+		
+		if (currentMeasUnitIndex != null) {
+			showResult();
 		}
 	}		
 	
 	@FXML
-	private void currentMeasUnitComboBoxClick() throws IOException {
+	private void currentMeasUnitListViewClick() throws IOException {
+		if (currentElement == null || currentDateIndex == null) {
+			return;
+		}
+		currentMeasUnitIndex = currentMeasUnitListView.getSelectionModel().getSelectedIndex();
+		showResult();
+	}
+	
+	private void showResult() throws IOException {
 		try {
-			int resIndex = Integer.parseInt(this.verifications.get(
-					this.verificationDateComboBox.getSelectionModel().getSelectedIndex()).get(0));
-			this.currentResult = new MeasResult(this.modDevice.includedElements.get(currentElementIndex), resIndex);
-			showResult();
+			int resIndex = Integer.parseInt(verifications.get(currentDateIndex).get(0));
+			currentResult = new MeasResult(modDevice.includedElements.get(currentElementIndex), resIndex);
+			resultsTable.showResult(currentResult, S_Parametr.values()[currentMeasUnitIndex]);
 		}
 		catch(SQLException sqlExp) {
 			AboutMessageWindow msgWin = new AboutMessageWindow("Ошибка", "Ошибка доступа к БД\nпри получении результатов измерения");
