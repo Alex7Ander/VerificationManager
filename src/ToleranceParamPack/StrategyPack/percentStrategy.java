@@ -1,7 +1,6 @@
 package ToleranceParamPack.StrategyPack;
 
 import java.util.HashMap;
-
 import ToleranceParamPack.ParametrsPack.S_Parametr;
 import ToleranceParamPack.ParametrsPack.ToleranceParametrs;
 import VerificationPack.MeasResult;
@@ -18,9 +17,11 @@ public class percentStrategy implements StrategyOfSuitability {
 				String key = tolerance.measUnitPart + "_" + S_Parametr.values()[i];
 				double res = result.values.get(key).get(cFreq);
 				double nominal = tolerance.getMyOwner().getNominal().values.get(key).get(cFreq);
-				double down = tolerance.values.get("DOWN_" + key).get(cFreq) * nominal / 100;
-				double up = tolerance.values.get("UP_" + key).get(cFreq) * nominal / 100;;
-				if(res > up || res < down) {
+				
+				double part = (nominal - res)/100;
+				double down = tolerance.values.get("DOWN_" + key).get(cFreq);
+				double up = tolerance.values.get("UP_" + key).get(cFreq);				
+				if(part > up || part < down) {
 					decisions.put(cFreq, "Не годен");
 					resultOfCheck = false;
 				}

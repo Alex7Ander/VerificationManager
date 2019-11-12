@@ -296,8 +296,7 @@ public class Element implements Includable<Device>, dbStorable{
 	}
 	
 	public ArrayList<ArrayList<String>> getListOfVerifications() throws SQLException {		
-		String addStr = myDevice.getName() + " " + myDevice.getType() + " " + myDevice.getSerialNumber();	
-		String measurementsOfTableName = " " + addStr + " " + this.type + " " + this.serialNumber;
+		String measurementsOfTableName = this.listOfVerificationsTable;
 		String sqlString = "SELECT id, dateOfVerification, resultsTableName FROM ["+measurementsOfTableName+"]";
 		
 		ArrayList<String> fieldName = new ArrayList<String>();
