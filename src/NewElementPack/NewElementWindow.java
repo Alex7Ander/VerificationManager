@@ -14,7 +14,7 @@ public class NewElementWindow extends guiWindow {
 		super("", "NewElementForm.fxml");
 		NewElementController ctrl = (NewElementController) loader.getController();
 		//Установим действия по проверке введенных параметров перед закрытием
-		this.stage.setOnCloseRequest( event -> {
+		stage.setOnCloseRequest( event -> {
 			ctrl.saveValues();
 			/*
 			if (!ctrl.checkPrimaryTable()) {
@@ -55,7 +55,7 @@ public class NewElementWindow extends guiWindow {
 		super(elm.getType(), "NewElementForm.fxml");
 		NewElementController ctrl = (NewElementController) loader.getController();
 		ctrl.setElement(elm);		
-		this.stage.setOnCloseRequest( event -> {
+		stage.setOnCloseRequest( event -> {
 			/*
 			ctrl.remeberTables();
 			int answer = 1;

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import DevicePack.Element;
 import ToleranceParamPack.ParametrsPack.MeasUnitPart;
 import ToleranceParamPack.ParametrsPack.S_Parametr;
 import ToleranceParamPack.ParametrsPack.TimeType;
@@ -67,8 +68,7 @@ public class NewElementStringGridFX extends StringGridFX {
 		} //end for (ObservableList<TextField> line: this.cells)
 	}
 	
-	public void changeSParametr(S_Parametr parametr) {
-		//Get values
+	public void saveInputedValues() {
 		this.getColumn(0, values.get("FREQS"));
 		this.getColumn(1, values.get("DOWN_" + MeasUnitPart.MODULE + "_" + currentS));
 		this.getColumn(2, values.get(MeasUnitPart.MODULE + "_" + currentS));
@@ -76,22 +76,45 @@ public class NewElementStringGridFX extends StringGridFX {
 		this.getColumn(4, values.get("DOWN_" + MeasUnitPart.PHASE + "_" + currentS));
 		this.getColumn(5, values.get(MeasUnitPart.PHASE + "_" + currentS));
 		this.getColumn(6, values.get("UP_" + MeasUnitPart.PHASE + "_" + currentS));
-		//Clear table
-		this.clear();
-		//Set new values
+	}
+	public void showParametr(S_Parametr parametr) {
 		this.setColumn(0, values.get("FREQS"));
 		this.setColumn(1, values.get("DOWN_" + MeasUnitPart.MODULE + "_" + parametr));
 		this.setColumn(2, values.get(MeasUnitPart.MODULE + "_" + parametr));
 		this.setColumn(3, values.get("UP_" + MeasUnitPart.MODULE + "_" + parametr));		
 		this.setColumn(4, values.get("DOWN_" + MeasUnitPart.PHASE + "_" + parametr));
 		this.setColumn(5, values.get(MeasUnitPart.PHASE + "_" + parametr));
-		this.setColumn(6, values.get("UP_" + MeasUnitPart.PHASE + "_" + parametr));		
+		this.setColumn(6, values.get("UP_" + MeasUnitPart.PHASE + "_" + parametr));	
+	}
+	public void changeSParametr(S_Parametr parametr) {		
+		saveInputedValues(); 	//Get values		
+		this.clear(); 			//Clear table		
+		showParametr(parametr); //show other values
 		currentS = parametr;
 	}
 	
-	public HashMap<Double, Double> getColumnByKey(String key){		
-		return null; //values.get(key);		
+	public void setValuesFromElement(Element element) {		
+		for (Double freq : element.getNominal().freqs) {
+			values.get("FREQS").add(freq.toString());
+		}		
+		for (int i = 0; i < element.getSParamsCout(); i++) {
+			for (int j = 0; j < MeasUnitPart.values().length; j++) {
+				String currentKeys[] = new String[]{"DOWN_" + MeasUnitPart.values()[j] + "_" + S_Parametr.values()[i], MeasUnitPart.values()[j] + "_" + S_Parametr.values()[i], "UP_" + MeasUnitPart.values()[j] + "_" + S_Parametr.values()[i]};
+				for (String key: currentKeys){
+					values.get(key).clear();
+					for (Double freq : element.getNominal().freqs) {
+						Double val = null;
+						if (key.contains("DOWN") || key.contains("UP"))
+							val = element.getToleranceParametrs(this.myTimeType, MeasUnitPart.values()[j]).values.get(key).get(freq);
+						else
+							val = element.getNominal().values.get(key).get(freq);
+						values.get(key).add(val.toString());
+					}
+				}
+			}
+		}		
 	}
+	
 	
 	public ArrayList<Double> getFreqs(){
 		ArrayList<Double> freqs = new ArrayList<Double>();

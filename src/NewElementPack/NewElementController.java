@@ -154,16 +154,30 @@ public class NewElementController {
 //************************************************	
 	//представляемый элемент	
 	private Element currentElement;
-	public void setElement(Element Elm) { 
-		this.currentElement = Elm;
-		if (this.currentElement != null) {
-			showElementInfo();
+	public void setElement(Element element) { 
+		currentElement = element;
+		if (currentElement != null) {
+			serNumberTextField.setText(currentElement.getSerialNumber());
+			elemTypesComboBox.setValue(currentElement.getType());
+			setParams(currentTypeOfParams, currentElement.getSParamsCout());
+			
+			periodicParamsTable.setValuesFromElement(currentElement);
+			periodicParamsTable.showParametr(currentS);
+			
+			primaryParamsTable.setValuesFromElement(currentElement);			
+			primaryParamsTable.showParametr(currentS);
+			
+			if (primaryVerificationRB.isSelected()) {
+				periodicScrollPane.toBack();
+			} else {
+				primaryScrollPane.toBack();
+			}
 		}
 	}
 	//Метод инициализирующий элемент
-	public void initializeElement() {
+	/*public void initializeElement() {
 		this.currentElement = new Element(this);
-	}
+	}*/
 	public Element getElement() {
 		return this.currentElement;
 	}
@@ -294,14 +308,14 @@ public class NewElementController {
 	private void vswrRBClick(ActionEvent event) {
 		currentTypeOfParams = "vswr";
 		setParams(currentTypeOfParams, currentCountOfParams);
-		paramsComboBox.setItems(listOfParams);
+		//paramsComboBox.setItems(listOfParams);
 	}
 	
 	@FXML
 	private void gammaClick(ActionEvent event) {
 		currentTypeOfParams = "gamma";
 		setParams(currentTypeOfParams, currentCountOfParams);
-		paramsComboBox.setItems(listOfParams);
+		//paramsComboBox.setItems(listOfParams);
 	}
 	
 	@FXML
@@ -325,8 +339,8 @@ public class NewElementController {
 	@FXML
 	private void primaryRBClick() {
 		visibleParamsTable = this.primaryParamsTable;
-		this.periodicScrollPane.toBack();
-		if (!visibleParamsTable.getCurrentS().equals(this.currentS)) {
+		periodicScrollPane.toBack();
+		if (!visibleParamsTable.getCurrentS().equals(currentS)) {
 			visibleParamsTable.changeSParametr(currentS);
 		}		
 	}
@@ -334,8 +348,8 @@ public class NewElementController {
 	@FXML
 	private void periodicRBClick() {
 		visibleParamsTable = this.periodicParamsTable;	
-		this.primaryScrollPane.toBack();
-		if (!visibleParamsTable.getCurrentS().equals(this.currentS)) {
+		primaryScrollPane.toBack();
+		if (!visibleParamsTable.getCurrentS().equals(currentS)) {
 			visibleParamsTable.changeSParametr(currentS);
 		}
 	}
@@ -385,9 +399,9 @@ public class NewElementController {
 //end @FXML methods	
 	private void setParams(String paramsIndex, int countOfParams) {
 		try {
-			String path = new File(".").getAbsolutePath();
-			if (paramsIndex.equals("vswr")) path += "\\files\\vswr.txt";
-			else if (paramsIndex.equals("gamma")) path += "\\files\\gamma.txt";
+			String path = new File(".").getAbsolutePath() + "\\files\\" + paramsIndex + ".txt";
+			//if (paramsIndex.equals("vswr")) path += "\\files\\vswr.txt";
+			//else if (paramsIndex.equals("gamma")) path += "\\files\\gamma.txt";			
 			listOfParams.clear();
 			FileManager.LinesToItems(path, countOfParams, listOfParams);
 			this.paramsComboBox.setValue(listOfParams.get(this.currentS.ordinal()));
@@ -525,113 +539,7 @@ public class NewElementController {
 	}
 	public boolean checkPeriodicTable() {
 		return checkTable(this.periodicParamsTable);
-	}
-//--------------------------------------------------------------------------------------------------	
-	private void showElementInfo() {
-		/*
-		this.elemTypesComboBox.setValue(this.currentElement.getType());
-		this.serNumberTextField.setText(this.currentElement.getSerialNumber());
-		
-		if (this.currentElement.getPoleCount() == 4) {
-			this.fourPoleRB.setSelected(true);
-			this.fourPoleRBClick(null);
-		}
-		else {
-			this.twoPoleRB.setSelected(true);
-			this.twoPoleRBClick(null);
-		}
-		
-		this.paramsTable.clear();	
-		for (String key : keys) {
-			m_s.get(key).clear();
-		}
-
-		Double fr[] = new Double[this.currentElement.getNominal().freqs.size()];
-		this.currentElement.getNominal().freqs.toArray(fr);
-		for (Double freq : fr) {
-			this.freqs.add(freq);
-			strFreqs.add(freq.toString());
-			m_s.get("primary_S11").add(this.currentElement.getNominal().values.get("m_S11").get(freq).toString());
-			m_s.get("periodic_S11").add(this.currentElement.getNominal().values.get("m_S11").get(freq).toString());
-			p_s.get("primary_S11").add(this.currentElement.getNominal().values.get("p_S11").get(freq).toString());
-			p_s.get("periodic_S11").add(this.currentElement.getNominal().values.get("p_S11").get(freq).toString());
-			
-			d_m_s.get("primary_S11").add(this.currentElement.getPrimaryModuleToleranceParams().values.get("d_m_S11").get(freq).toString());
-			d_m_s.get("periodic_S11").add(this.currentElement.getPeriodicModuleToleranceParams().values.get("d_m_S11").get(freq).toString());
-			u_m_s.get("primary_S11").add(this.currentElement.getPrimaryToleranceParams().values.get("u_m_S11").get(freq).toString());
-			u_m_s.get("periodic_S11").add(this.currentElement.getPeriodicModuleToleranceParams().values.get("u_m_S11").get(freq).toString());
-			
-			d_p_s.get("primary_S11").add(this.currentElement.getPrimaryToleranceParams().values.get("d_p_S11").get(freq).toString());
-			d_p_s.get("periodic_S11").add(this.currentElement.getPeriodicToleranceParams().values.get("d_p_S11").get(freq).toString());
-			u_p_s.get("primary_S11").add(this.currentElement.getPrimaryToleranceParams().values.get("u_p_S11").get(freq).toString());
-			u_p_s.get("periodic_S11").add(this.currentElement.getPeriodicToleranceParams().values.get("u_p_S11").get(freq).toString());
-			
-			if (this.currentElement.getPoleCount() == 4) {
-				m_s.get("primary_S12").add(this.currentElement.getNominal().values.get("m_S12").get(freq).toString());
-				m_s.get("periodic_S12").add(this.currentElement.getNominal().values.get("m_S12").get(freq).toString());
-				p_s.get("primary_S12").add(this.currentElement.getNominal().values.get("p_S12").get(freq).toString());
-				p_s.get("periodic_S12").add(this.currentElement.getNominal().values.get("p_S12").get(freq).toString());
-				
-				d_m_s.get("primary_S12").add(this.currentElement.getPrimaryToleranceParams().values.get("d_m_S12").get(freq).toString());
-				d_m_s.get("periodic_S12").add(this.currentElement.getPeriodicToleranceParams().values.get("d_m_S12").get(freq).toString());
-				u_m_s.get("primary_S12").add(this.currentElement.getPrimaryToleranceParams().values.get("u_m_S12").get(freq).toString());
-				u_m_s.get("periodic_S12").add(this.currentElement.getPeriodicToleranceParams().values.get("u_m_S12").get(freq).toString());
-				
-				d_p_s.get("primary_S12").add(this.currentElement.getPrimaryToleranceParams().values.get("d_p_S12").get(freq).toString());
-				d_p_s.get("periodic_S12").add(this.currentElement.getPeriodicToleranceParams().values.get("d_p_S12").get(freq).toString());
-				u_p_s.get("primary_S12").add(this.currentElement.getPrimaryToleranceParams().values.get("u_p_S12").get(freq).toString());
-				u_p_s.get("periodic_S12").add(this.currentElement.getPeriodicToleranceParams().values.get("u_p_S12").get(freq).toString());
-				//--------------------------------------------------------------------------------------------------------------------------
-				m_s.get("primary_S21").add(this.currentElement.getNominal().values.get("m_S21").get(freq).toString());
-				m_s.get("periodic_S21").add(this.currentElement.getNominal().values.get("m_S21").get(freq).toString());
-				p_s.get("primary_S21").add(this.currentElement.getNominal().values.get("p_S21").get(freq).toString());
-				p_s.get("periodic_S21").add(this.currentElement.getNominal().values.get("p_S21").get(freq).toString());
-				
-				d_m_s.get("primary_S21").add(this.currentElement.getPrimaryToleranceParams().values.get("d_m_S21").get(freq).toString());
-				d_m_s.get("periodic_S21").add(this.currentElement.getPeriodicToleranceParams().values.get("d_m_S21").get(freq).toString());
-				u_m_s.get("primary_S21").add(this.currentElement.getPrimaryToleranceParams().values.get("u_m_S21").get(freq).toString());
-				u_m_s.get("periodic_S21").add(this.currentElement.getPeriodicToleranceParams().values.get("u_m_S21").get(freq).toString());
-				
-				d_p_s.get("primary_S21").add(this.currentElement.getPrimaryToleranceParams().values.get("d_p_S21").get(freq).toString());
-				d_p_s.get("periodic_S21").add(this.currentElement.getPeriodicToleranceParams().values.get("d_p_S21").get(freq).toString());
-				u_p_s.get("primary_S21").add(this.currentElement.getPrimaryToleranceParams().values.get("u_p_S21").get(freq).toString());
-				u_p_s.get("periodic_S21").add(this.currentElement.getPeriodicToleranceParams().values.get("u_p_S21").get(freq).toString());
-				//--------------------------------------------------------------------------------------------------------------------------
-				m_s.get("primary_S22").add(this.currentElement.getNominal().values.get("m_S22").get(freq).toString());
-				m_s.get("periodic_S22").add(this.currentElement.getNominal().values.get("m_S22").get(freq).toString());
-				p_s.get("primary_S22").add(this.currentElement.getNominal().values.get("p_S22").get(freq).toString());
-				p_s.get("periodic_S22").add(this.currentElement.getNominal().values.get("p_S22").get(freq).toString());
-				
-				d_m_s.get("primary_S22").add(this.currentElement.getPrimaryToleranceParams().values.get("d_m_S22").get(freq).toString());
-				d_m_s.get("periodic_S22").add(this.currentElement.getPeriodicToleranceParams().values.get("d_m_S22").get(freq).toString());
-				u_m_s.get("primary_S22").add(this.currentElement.getPrimaryToleranceParams().values.get("u_m_S22").get(freq).toString());
-				u_m_s.get("periodic_S22").add(this.currentElement.getPeriodicToleranceParams().values.get("u_m_S22").get(freq).toString());
-				
-				d_p_s.get("primary_S22").add(this.currentElement.getPrimaryToleranceParams().values.get("d_p_S22").get(freq).toString());
-				d_p_s.get("periodic_S22").add(this.currentElement.getPeriodicToleranceParams().values.get("d_p_S22").get(freq).toString());
-				u_p_s.get("primary_S22").add(this.currentElement.getPrimaryToleranceParams().values.get("u_p_S22").get(freq).toString());
-				u_p_s.get("periodic_S22").add(this.currentElement.getPeriodicToleranceParams().values.get("u_p_S22").get(freq).toString());
-			}
-			int freqCount = this.currentElement.getNominal().freqs.size();
-			if (freqCount > this.paramsTable.getRowCount()) {
-				while(freqCount != this.paramsTable.getRowCount()) 
-					this.paramsTable.addRow();
-			}
-			else if (freqCount < this.paramsTable.getRowCount()) {
-				while(freqCount != this.paramsTable.getRowCount()) 
-					this.paramsTable.deleteRow(this.paramsTable.getRowCount());
-			}
-			this.paramsTable.setColumn(0, strFreqs);			
-			this.paramsTable.setColumn(1, d_m_s.get(keys[this.savingIndex]));
-			this.paramsTable.setColumn(2, m_s.get(keys[this.savingIndex]));
-			this.paramsTable.setColumn(3, u_m_s.get(keys[this.savingIndex]));
-			this.paramsTable.setColumn(4, d_p_s.get(keys[this.savingIndex]));
-			this.paramsTable.setColumn(5, p_s.get(keys[this.savingIndex]));
-			this.paramsTable.setColumn(6, u_p_s.get(keys[this.savingIndex]));
-		}
-		*/
-	}
-		
+	}		
 	public MeasResult getNominals() {
 		if (this.gammaRB.isSelected()) {
 			Gamma_Result gr = new Gamma_Result(this, this.currentElement);

@@ -46,47 +46,45 @@ public class Element implements Includable<Device>, dbStorable{
 	private String moduleToleranceType;
 	private String phaseToleranceType;
 	public String getModuleToleranceType() {
-		return this.moduleToleranceType;
+		return moduleToleranceType;
 	}
 	public String getPhaseToleranceType() {
-		return this.phaseToleranceType;
+		return phaseToleranceType;
 	}	
 	public String getPeriodicModuleParamTable() {
-		return this.periodicModuleParamTable;
+		return periodicModuleParamTable;
 	}
 	public String getPrimaryModuleParamTable() {
-		return this.primaryModuleParamTable;
+		return primaryModuleParamTable;
 	}
 	public String getPeriodicPhaseParamTable() {
-		return this.periodicPhaseParamTable;
+		return periodicPhaseParamTable;
 	}
 	public String getPrimaryPhaseParamTable() {
-		return this.primaryPhaseParamTable;
+		return primaryPhaseParamTable;
 	}	
 	public String getNominalTable() {
-		return this.nominalTable;
-	}
-	public String getListOfVerificationsTable() {
-		return this.listOfVerificationsTable;
-	}
-	public String getType() {
-		return this.type;
-	}
-	public String getSerialNumber() {
-		return this.serialNumber;
-	}
-	public int getPoleCount() {
-		return this.poleCount;
-	}
-	public int getSParamsCout() {
-		return this.sParamsCount;
-	}
-	public String getMeasUnit() {
-		return this.measUnit;
-	}
-	public String getNominaltable() {
 		return nominalTable;
 	}
+	public String getListOfVerificationsTable() {
+		return listOfVerificationsTable;
+	}
+	public String getType() {
+		return type;
+	}
+	public String getSerialNumber() {
+		return serialNumber;
+	}
+	public int getPoleCount() {
+		return poleCount;
+	}
+	public int getSParamsCout() {
+		return sParamsCount;
+	}
+	public String getMeasUnit() {
+		return measUnit;
+	}
+
 	public MeasResult getNominal() {
 		return nominal;
 	}
@@ -102,6 +100,18 @@ public class Element implements Includable<Device>, dbStorable{
 	public ToleranceParametrs getPeriodicPhaseToleranceParams() {
 		return periodicPhaseToleranceParams;
 	}
+	public ToleranceParametrs getToleranceParametrs(TimeType time, MeasUnitPart unit) {		
+		switch(time) {
+			case PERIODIC:
+				if(unit.equals(MeasUnitPart.MODULE)) return this.periodicModuleToleranceParams;
+				else return this.periodicPhaseToleranceParams;
+			case PRIMARY:
+				if (unit.equals(MeasUnitPart.MODULE)) return this.primaryModuleToleranceParams;
+				else return this.primaryPhaseToleranceParams;
+			default:
+				return null;
+		}
+	}	
 	@Override
 	public Device getMyOwner() {
 		return this.myDevice;
@@ -239,9 +249,7 @@ public class Element implements Includable<Device>, dbStorable{
 		if (this.myDevice == null) {
 			throw new NoOwnerException(this);
 		}
-		String addStr = myDevice.getName() + " " + myDevice.getType() + " " + myDevice.getSerialNumber();
-		String strElementsTable = this.myDevice.getElementsTableName();
-		String sqlQuery = "INSERT INTO ["+strElementsTable+"] (ElementType, ElementSerNumber, PoleCount, MeasUnit, ModuleToleranceType, PhaseToleranceType, " +
+		String sqlQuery = "INSERT INTO ["+ myDevice.getElementsTableName() +"] (ElementType, ElementSerNumber, PoleCount, MeasUnit, ModuleToleranceType, PhaseToleranceType, " +
 				"VerificationsTable, PrimaryModuleParamTable, PeriodicModuleParamTable, PrimaryPhaseParamTable, PeriodicPhaseParamTable, NominalIndex) values "
 				+ "('"+type+"','"+serialNumber+"','"+poleCount+"','"+measUnit+"','"+this.moduleToleranceType+"','"+this.phaseToleranceType+"','" +listOfVerificationsTable+"','"
 				+ this.primaryModuleToleranceParams.getTableName() + "','" + this.periodicModuleToleranceParams.getTableName() + "','"
@@ -295,22 +303,27 @@ public class Element implements Includable<Device>, dbStorable{
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);	
 	}
 	
-	public ArrayList<ArrayList<String>> getListOfVerifications() throws SQLException {		
-		String measurementsOfTableName = this.listOfVerificationsTable;
-		String sqlString = "SELECT id, dateOfVerification, resultsTableName FROM ["+measurementsOfTableName+"]";
-		
-		ArrayList<String> fieldName = new ArrayList<String>();
-		fieldName.add("id");
-		fieldName.add("dateOfVerification");
-		fieldName.add("resultsTableName");
-		ArrayList<ArrayList<String>> arrayResults = new ArrayList<ArrayList<String>>();
-		
-		DataBaseManager.getDB().sqlQueryString(sqlString, fieldName, arrayResults);
-			
-		return arrayResults;
+	public void rewriteTableNames() throws SQLException {
+		//First of all we must rewrite table names for results of measurements
+		String sqlQuery = "SELECT COUNT(*) FROM [" + listOfVerificationsTable + "]";
+		int countOfMeas = DataBaseManager.getDB().sqlQueryCount(sqlQuery);
+		for (int i = 0; i < countOfMeas; i++) {
+			MeasResult measRes = new MeasResult(this, i);
+			measRes.rewriteTableNames();
+		}
+		//Now we are rewriting name of the table with the list of verifications
+		String newListOfVerificationsTable = "Проведенные поверки для " + myDevice.getName() + " " + myDevice.getType() + " " + myDevice.getSerialNumber() + " " + type + " " + serialNumber;
+		sqlQuery = "ALTER TABLE " + listOfVerificationsTable + " RENAME TO " + newListOfVerificationsTable;
+		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
+		// Field listOfVerificationsTable takes new value only after successful query to DB
+		listOfVerificationsTable = newListOfVerificationsTable;
+		//And finally we are rewriting tables names of tolerance parameters
+		this.primaryModuleToleranceParams.rewriteTableNames();
+		this.primaryPhaseToleranceParams.rewriteTableNames();
+		this.periodicModuleToleranceParams.rewriteTableNames();
+		this.periodicPhaseToleranceParams.rewriteTableNames();	
 	}
-
-	public void rewriteParams() throws SQLException {}
+	
 	public void rewriteParams(ToleranceParametrs newModulePrimaryParams, ToleranceParametrs newModulePeriodicParams,
 							  ToleranceParametrs newPhasePrimaryParams, ToleranceParametrs newPhasePeriodicparams, MeasResult newNominals) throws SQLException{
 		this.primaryModuleToleranceParams.deleteFromDB();
@@ -325,4 +338,17 @@ public class Element implements Includable<Device>, dbStorable{
 		newPhasePeriodicparams.saveInDB();
 		newNominals.saveInDB();*/
 	}
+	
+	public ArrayList<ArrayList<String>> getListOfVerifications() throws SQLException {		
+		String sqlString = "SELECT id, dateOfVerification, resultsTableName FROM [" + listOfVerificationsTable + "]";		
+		ArrayList<String> fieldName = new ArrayList<String>();
+		fieldName.add("id");
+		fieldName.add("dateOfVerification");
+		fieldName.add("resultsTableName");
+		ArrayList<ArrayList<String>> arrayResults = new ArrayList<ArrayList<String>>();		
+		DataBaseManager.getDB().sqlQueryString(sqlString, fieldName, arrayResults);			
+		return arrayResults;
+	}
+	
+	
 }

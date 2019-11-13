@@ -237,8 +237,10 @@ public class DBEditController implements InfoRequestable {
 		editingValues.put("Owner", this.ownerTextField.getText());
 		editingValues.put("GosNumber", this.gosNumTextField.getText());
 		try {
-			this.modDevice.editInfoInDB(editingValues);
-			try {
+			DataBaseManager.getDB().BeginTransaction();
+			modDevice.editInfoInDB(editingValues);
+			DataBaseManager.getDB().Commit();
+			try {				
 				AboutMessageWindow aboutWin = new AboutMessageWindow("Успешно", "Изменения сохранены");
 				aboutWin.show();
 			}
@@ -247,6 +249,7 @@ public class DBEditController implements InfoRequestable {
 			}
 		}
 		catch(SQLException sqlExp) {
+			DataBaseManager.getDB().RollBack();
 			try {
 				AboutMessageWindow aboutWin = new AboutMessageWindow("Ошибка", "Не удалось сохранить изменения");
 				aboutWin.show();

@@ -125,6 +125,18 @@ public class ToleranceParametrs implements Includable<Element>, dbStorable {
 	 public void editInfoInDB(HashMap<String, String> editingValues) throws SQLException {
 		 // TODO Auto-generated method stub
 	 }
+	 
+	 public void rewriteTableNames() throws SQLException {
+		 String addrStr = this.myElement.getMyOwner().getName() + " " +
+		 		  this.myElement.getMyOwner().getType() + " " +
+		 		  this.myElement.getMyOwner().getSerialNumber() + " " +
+		 		  this.myElement.getType() + " " + this.myElement.getSerialNumber();
+		 String newTableName = "Параметры допуска " + this.timeType.getTableNamePart() + " поверки " + this.measUnitPart.getTableNamePart() + " S параметров для " + addrStr;		  
+		 String sqlQuery = "ALTER TABLE " + this.tableName + " RENAME TO " + newTableName;
+		 DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
+		 tableName = newTableName;
+	 }
+	 
 	 private Element myElement; 
 	 @Override
 	 public Element getMyOwner() {

@@ -30,10 +30,6 @@ public class Device implements dbStorable {
 	public String getElementsTableName() { return this.elementsTableName;}
 	public int getCountOfElements() {return this.countOfElements;}
 		
-	public Device(){
-		//
-	}
-	
 	//Конструктор для извлечения из БД
 	public Device(String Name, String Type, String SerialNumber) throws SQLException {		
 		includedElements = new ArrayList<Element>();		
@@ -54,13 +50,11 @@ public class Device implements dbStorable {
 			this.elementsTableName = arrayResults.get(0).get(3);			
 			this.countOfElements = 0;			
 			int predictableCount = Integer.parseInt(arrayResults.get(0).get(2));
-			for (int i=0; i<predictableCount; i++) {			
-				this.includedElements.add(new Element(this, i+1));
+			for (int i=0; i<predictableCount; i++) {
+				Element element = new Element(this, i+1);
+				this.includedElements.add(element);
 				this.countOfElements++;		
 			}
-		}
-		else {
-			//
 		}
 	}
 	
@@ -91,19 +85,18 @@ public class Device implements dbStorable {
 	public void saveInDB() throws SQLException, SavingException{
 		String sqlString = null;
 		String addStr = name + " " + type + " " + serialNumber;
-		String strElementsTable = "Элементы для " + addStr;		
-		sqlString = "INSERT INTO [Devices] (NameOfDevice, TypeOfDevice, SerialNumber, Owner, GosNumber, CountOfElements, ElementsTable) values ('"+name+"','"+type+"','"+serialNumber+"','"+owner+"','"+gosNumber+"','"+Integer.toString(this.countOfElements)+"','"+strElementsTable+"')";
+		elementsTableName = "Элементы для " + addStr;		
+		sqlString = "INSERT INTO [Devices] (NameOfDevice, TypeOfDevice, SerialNumber, Owner, GosNumber, CountOfElements, ElementsTable) values ('"+name+"','"+type+"','"+serialNumber+"','"+owner+"','"+gosNumber+"','"+Integer.toString(this.countOfElements)+"','"+elementsTableName+"')";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlString);
 		System.out.println("Внесена запись о новом приборе в таблицу Devices");
 		//Создание таблицы со списком включенных элементов
-		sqlString = "CREATE TABLE ["+strElementsTable+"] (id INTEGER PRIMARY KEY AUTOINCREMENT, ElementType VARCHAR(256), ElementSerNumber VARCHAR(256), PoleCount VARCHAR(256), MeasUnit VARCHAR(256), ModuleToleranceType VARCHAR(256), PhaseToleranceType VARCHAR(256), VerificationsTable VARCHAR(256), PrimaryModuleParamTable VARCHAR(256), PeriodicModuleParamTable VARCHAR(256), PrimaryPhaseParamTable VARCHAR(256), PeriodicPhaseParamTable VARCHAR(256), NominalIndex VARCHAR(10))";
+		sqlString = "CREATE TABLE [" + elementsTableName + "] (id INTEGER PRIMARY KEY AUTOINCREMENT, ElementType VARCHAR(256), ElementSerNumber VARCHAR(256), PoleCount VARCHAR(256), MeasUnit VARCHAR(256), ModuleToleranceType VARCHAR(256), PhaseToleranceType VARCHAR(256), VerificationsTable VARCHAR(256), PrimaryModuleParamTable VARCHAR(256), PeriodicModuleParamTable VARCHAR(256), PrimaryPhaseParamTable VARCHAR(256), PeriodicPhaseParamTable VARCHAR(256), NominalIndex VARCHAR(10))";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlString);
 		System.out.println("Создана таблица со списком элементов данного устройства");
-		this.elementsTableName = strElementsTable;
 		for (int i=0; i < this.countOfElements; i++){
 			System.out.println("Начато сохранение элемента №" + i + ": ");
 			//Сохранение в БД данных о составных элементах
-			this.includedElements.get(i).saveInDB(); 		
+			includedElements.get(i).saveInDB(); 		
 		}
 	}
 	
@@ -113,7 +106,7 @@ public class Device implements dbStorable {
 			elm.deleteFromDB();
 		}
 		this.includedElements.clear();
-		String sqlQuery = "DROP TABLE [" + this.elementsTableName + "]";
+		String sqlQuery = "DROP TABLE [" + elementsTableName + "]";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
 		sqlQuery = "DELETE FROM [Devices] WHERE NameOfDevice='"+this.name+"' AND TypeOfDevice='"+this.type+"' AND SerialNumber='"+this.serialNumber+"'";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
@@ -134,7 +127,40 @@ public class Device implements dbStorable {
 			count++;
 		}
 		sqlQuery += "WHERE NameOfDevice='"+this.name+"' AND TypeOfDevice='"+this.type+"' AND SerialNumber='"+this.serialNumber+"'";
-		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);		
+		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
+		
+		boolean tableNamesMustBeRewrited = false;
+		for (String field : editingValues.keySet()) {
+			if (field.equals("NameOfDevice")) {
+				this.name = editingValues.get(field);
+				tableNamesMustBeRewrited = true;
+			} 
+			else if (field.equals("TypeOfDevice")) {
+				this.type = editingValues.get(field);
+				tableNamesMustBeRewrited = true;
+			}
+			else if (field.equals("SerialNumber")) {
+				this.serialNumber = editingValues.get(field);
+				tableNamesMustBeRewrited = true;
+			}
+			else if(field.equals("Owner")) {
+				this.owner = editingValues.get(field);
+			}
+			else if (field.equals("GosNumber")) {
+				this.gosNumber = editingValues.get(field);
+			}
+		}
+		
+		if (tableNamesMustBeRewrited) {
+			String oldElementsTableName = elementsTableName;
+			elementsTableName = "Элементы для " + name + " " + type + " " + serialNumber;
+			sqlQuery = "UPDATE Devices SET ElementsTable='" + elementsTableName + "' WHERE NameOfDevice='" + name + "' AND TypeOfDevice='" + type + "' AND SerialNumber='" + serialNumber + "'";
+			DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
+			sqlQuery = "ALTER TABLE " + oldElementsTableName + " RENAME TO "+ elementsTableName;			
+			for (Element element : includedElements) {
+				element.rewriteTableNames();
+			}
+		}		
 	}
 		
 	public void addElement(Element element) {
