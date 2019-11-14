@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Random;
 
 import DevicePack.Element;
 import ToleranceParamPack.ParametrsPack.MeasUnitPart;
@@ -130,10 +131,10 @@ public class NewElementStringGridFX extends StringGridFX {
 	}
 	public Map<Double, Double> getParametr(String paramName){
 		LinkedHashMap<Double, Double> parametr = new LinkedHashMap<Double, Double>();
-		for (int i=0; i < this.values.get("FREQS").size(); i++) {
+		for (int i=0; i < values.get("FREQS").size(); i++) {
 			try {
-				double freq = Double.parseDouble(this.values.get("FREQS").get(i));
-				double currentValue = Double.parseDouble(this.values.get(paramName).get(i));
+				double freq = Double.parseDouble(values.get("FREQS").get(i));
+				double currentValue = Double.parseDouble(values.get(paramName).get(i));
 				parametr.put(freq, currentValue);
 			} catch (NumberFormatException nfExp) {
 				//
@@ -143,7 +144,7 @@ public class NewElementStringGridFX extends StringGridFX {
 	}
 	
 	public boolean isFull(int countOfControlledParams) {
-		int expectedCount = this.getRowCount();
+		int expectedCount = getRowCount();
 		String prefix[] = new String[] {"DOWN_", "", "UP_"};
 		for (int i = 0; i < countOfControlledParams; i++) {
 			for (int j = 0; j < MeasUnitPart.values().length; j++) {
@@ -158,42 +159,18 @@ public class NewElementStringGridFX extends StringGridFX {
 		}
 		return true;
 	}
-	
-	public void setParams(TimeType type, S_Parametr Sxx) {
-		// 1. Сохранить текущее состояние
 
-		// 2. Записать новое состояние
-		
-		/*
-			String key = type + "_" + "UP" + "_" + MeasUnitPart.MODULE + "_" + Sxx;
-			ArrayList<Double> columnValues = Adapter.HashMapToArrayList(this.values.get(key));
-			this.setColumnFromDouble(1, columnValues);
-			
-			key = type + "_" + MeasUnitPart.MODULE + "_" + Sxx;
-			columnValues = Adapter.HashMapToArrayList(this.values.get(key));
-			this.setColumnFromDouble(2, columnValues);
-			
-			key = type + "_" + "DOWN" + "_" + MeasUnitPart.MODULE + "_" + Sxx;
-			columnValues = Adapter.HashMapToArrayList(this.values.get(key));
-			this.setColumnFromDouble(3, columnValues);
-			
-			key = type + "_" + "UP" + "_" + MeasUnitPart.PHASE + "_" + Sxx;
-			columnValues = Adapter.HashMapToArrayList(this.values.get(key));
-			this.setColumnFromDouble(4, columnValues);
-			
-			key = type + "_" + MeasUnitPart.PHASE + "_" + Sxx;
-			columnValues = Adapter.HashMapToArrayList(this.values.get(key));
-			this.setColumnFromDouble(5, columnValues);
-			
-			key = type + "_" + "DOWN" + "_" + MeasUnitPart.PHASE + "_" + Sxx;
-			columnValues = Adapter.HashMapToArrayList(this.values.get(key));
-			this.setColumnFromDouble(6, columnValues);
-			
-			columnValues.clear();
-			HashSet<Double> fr = (HashSet<Double>)this.values.get(key).keySet();
-			for (Double d : fr) {
-				columnValues.add(d);
+	public void setRandomValues() {
+		Random rand = new Random();
+		for (String key : values.keySet()) {
+			if (!key.equals("FREQS")) {
+				for (int i = 0; i < getRowCount(); i++) {
+					Double value = rand.nextDouble();
+					this.values.get(key).add(value.toString());
+				}
 			}
-			this.setColumnFromDouble(0, columnValues);*/
+		}
 	}
+	
+	
 }

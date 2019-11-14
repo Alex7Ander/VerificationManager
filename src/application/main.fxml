@@ -45,7 +45,7 @@
                   <Pane prefHeight="250.0" prefWidth="96.0" />
                   <ImageView fitHeight="250.0" fitWidth="287.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@../../files/logo.png" />
+                        <Image url="@../../bin/application/logo.png" />
                      </image></ImageView>
                   <Pane prefHeight="250.0" prefWidth="267.0" />
                   <VBox prefHeight="250.0" prefWidth="245.0">

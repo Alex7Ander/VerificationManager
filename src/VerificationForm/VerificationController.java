@@ -191,10 +191,10 @@ public class VerificationController implements InfoRequestable {
 		verification = new VerificationProcedure();
 		verification.setPrimaryInformation((StartVerificationController)StartVerificationWindow.getStartVerificationWindow().getControllerClass());
 		//Создание файла psi.ini
-		String psiFilePath = absPath + "\\measurment\\PSI.ini";
+		String psiFilePath = absPath + "\\measurement\\PSI.ini";
 		verificatedDevice.createIniFile(psiFilePath);
-		//Запуск программы measurment
-		File file =new File(absPath + "\\measurment\\Project1.exe");
+		//Запуск программы measurement
+		File file =new File(absPath + "\\measurement\\Project1.exe");
 		Desktop.getDesktop().open(file);				
 	}
 		
@@ -245,7 +245,7 @@ public class VerificationController implements InfoRequestable {
 		try {
 			for (int i=0; i < this.verificatedDevice.getCountOfElements(); i++) {
 				String absPath = new File(".").getAbsolutePath();
-				String resFilePath = absPath + "\\measurment\\protocol.ini";
+				String resFilePath = absPath + "\\measurement\\protokol.ini";
 				MeasResult rs = new MeasResult(resFilePath, i+1, this.verificatedDevice.includedElements.get(i));				
 				this.verificationResult.add(rs);
 				//Verificating results

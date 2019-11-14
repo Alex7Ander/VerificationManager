@@ -36,18 +36,33 @@ public class ResultsStringGridFX extends StringGridFX {
 		this.setColumnFromDouble(0, result.freqs);		
 		int currentRow = 0;
 		for (double freq : result.freqs) {
-			double val = result.values.get(MeasUnitPart.MODULE + "_" + sParam).get(freq);
-			this.setCellValue(1, currentRow, Double.toString(val));
-			
-			val = result.values.get("ERROR_" + MeasUnitPart.MODULE + "_" + sParam).get(freq);
-			this.setCellValue(2, currentRow, Double.toString(val));
-			
-			val = result.values.get("ERROR_" + MeasUnitPart.PHASE + "_" + sParam).get(freq);
-			this.setCellValue(3, currentRow, Double.toString(val));
-			
-			val = result.values.get("ERROR_" + MeasUnitPart.PHASE + "_" + sParam).get(freq);
-			this.setCellValue(4, currentRow, Double.toString(val));
-			
+			//Column 1 with module S
+			String val = result.values.get(MeasUnitPart.MODULE + "_" + sParam).get(freq).toString();
+			this.setCellValue(1, currentRow, val);
+			//Column 2 with error of module S (it could not exist)
+			try {
+				val = result.values.get("ERROR_" + MeasUnitPart.MODULE + "_" + sParam).get(freq).toString();				
+			} 
+			catch(NullPointerException npExp) {
+				val = "-";
+			}
+			finally {
+				this.setCellValue(2, currentRow, val);
+			}
+			//Column 3 with phase S
+			val = result.values.get(MeasUnitPart.PHASE + "_" + sParam).get(freq).toString();
+			this.setCellValue(3, currentRow, val);
+			//Column 4 with error of phase S (it is also could not exist)
+			try {
+				val = result.values.get("ERROR_" + MeasUnitPart.PHASE + "_" + sParam).get(freq).toString();
+			}
+			catch (NullPointerException npExp) {
+				val = "-";
+			}
+			finally {
+				this.setCellValue(4, currentRow, val);
+			}
+						
 			++currentRow;
 		}
 	}

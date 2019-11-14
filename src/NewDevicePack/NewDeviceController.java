@@ -13,7 +13,6 @@ import Exceptions.SavingException;
 import FileManagePack.FileManager;
 import NewElementPack.NewElementController;
 import NewElementPack.NewElementWindow;
-import YesNoDialogPack.YesNoWindow;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -206,4 +205,5 @@ public class NewDeviceController  {
 		}
 		this.namesComboBox.setItems(listOfNames);
 	}
+	
 }

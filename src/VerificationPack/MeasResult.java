@@ -44,16 +44,13 @@ public class MeasResult implements Includable<Element>, dbStorable{
 	
 //Constructors
 //FILE
-	public MeasResult(String fileWithResults, int resultNumber, Element ownerElement) throws IOException{
-		
+	public MeasResult(String fileWithResults, int resultNumber, Element ownerElement) throws IOException{		
 		myElement = ownerElement;
 		freqs = new ArrayList<Double>();
 		values = new LinkedHashMap<String, Map<Double, Double>>();
-		suitabilityDecision = new HashMap<String, HashMap<Double, String>>();
-		
+		suitabilityDecision = new HashMap<String, HashMap<Double, String>>();		
 		ResultReaderManager resReader = new ResultReaderManager(fileWithResults);			
-		resReader.readResult(resultNumber, freqs, values);
-				
+		resReader.readResult(resultNumber, freqs, values);				
 		countOfParams = values.size();
 		countOfFreq = freqs.size();
 		dateOfMeas = Calendar.getInstance().getTime();
@@ -70,10 +67,6 @@ public class MeasResult implements Includable<Element>, dbStorable{
 		countOfFreq = freqs.size();
 		dateOfMeas = Calendar.getInstance().getTime();
 		dateFormat = new SimpleDateFormat(datePattern);
-		String strDateOfMeas = dateFormat.format(dateOfMeas);
-		tableName = "Результаты поверки для " +
-				this.myElement.getMyOwner().getName() + " " + this.myElement.getMyOwner().getType() + " " + this.myElement.getMyOwner().getSerialNumber() + " " + this.myElement.getType() + " " + this.myElement.getSerialNumber() +
-				" проведенной " + strDateOfMeas;		
 	}	
 //DB
 	public MeasResult(Element ownerElement, int index) throws SQLException {		
@@ -103,8 +96,7 @@ public class MeasResult implements Includable<Element>, dbStorable{
 			try {
 				sqlQuery = "SELECT " + key + " FROM [" + tableName + "]";
 				ArrayList<Double> arrayResults = new ArrayList<Double>();
-				DataBaseManager.getDB().sqlQueryDouble(sqlQuery, key, arrayResults);
-				
+				DataBaseManager.getDB().sqlQueryDouble(sqlQuery, key, arrayResults);				
 				HashMap<Double, Double> tempHM = new HashMap<Double, Double>();
 				for (int i=0; i<this.countOfFreq; i++) {
 					tempHM.put(freqs.get(i), arrayResults.get(i));
@@ -141,9 +133,12 @@ public class MeasResult implements Includable<Element>, dbStorable{
 			catch(Exception exp) {
 				//
 			}
-		}								
-		String listOfVerificationsTable = this.myElement.getListOfVerificationsTable();
+		}
 		String strDateOfMeas = dateFormat.format(dateOfMeas);
+		tableName = "Результаты поверки для " +
+				this.myElement.getMyOwner().getName() + " " + this.myElement.getMyOwner().getType() + " " + this.myElement.getMyOwner().getSerialNumber() + " " + this.myElement.getType() + " " + this.myElement.getSerialNumber() +
+				" проведенной " + strDateOfMeas;		
+		String listOfVerificationsTable = this.myElement.getListOfVerificationsTable();
 		String sqlQuery = "INSERT INTO [" + listOfVerificationsTable + "] (dateOfVerification, resultsTableName) values ('"+ strDateOfMeas +"','"+ tableName +"')";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
 		sqlQuery = "CREATE TABLE [" + tableName + "] (id INTEGER PRIMARY KEY AUTOINCREMENT, freq VARCHAR(20), ";
@@ -158,8 +153,7 @@ public class MeasResult implements Includable<Element>, dbStorable{
 			for (int j = 0; j < currentKeys.size(); j++) {
 				sqlQuery += (currentKeys.get(j));
 				if (j != currentKeys.size() - 1) sqlQuery += ", ";
-			}
-			
+			}			
 			sqlQuery += ") values ('"+freqs.get(i)+"', ";			
 			for (int j = 0; j < currentKeys.size(); j++) {
 				sqlQuery += ("'"+values.get(currentKeys.get(j)).get(freqs.get(i)).toString()+"'");

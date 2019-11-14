@@ -3,7 +3,6 @@ package NewElementPack;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -16,9 +15,6 @@ import ToleranceParamPack.ParametrsPack.MeasUnitPart;
 import ToleranceParamPack.ParametrsPack.S_Parametr;
 import ToleranceParamPack.ParametrsPack.TimeType;
 import ToleranceParamPack.ParametrsPack.ToleranceParametrs;
-import ToleranceParamPack.StrategyPack.StrategyOfSuitability;
-import ToleranceParamPack.StrategyPack.percentStrategy;
-import ToleranceParamPack.StrategyPack.upDownStrategy;
 import VerificationPack.Gamma_Result;
 import VerificationPack.MeasResult;
 import VerificationPack.VSWR_Result;
@@ -131,26 +127,6 @@ public class NewElementController {
 	private ToggleGroup toleranceTypeGroup;
 	private ToggleGroup verificationTypeGroup;
 	private ToggleGroup phaseTolearnceTypeGroup;
-	
-	//Стратегии определения годности
-	private StrategyOfSuitability moduleStrategy;
-	private StrategyOfSuitability phaseStrategy;
-	@FXML
-	private void phasePercentRBClick() {
-		phaseStrategy = new percentStrategy();
-	}
-	@FXML
-	private void phaseUpDownRBClick() {
-		phaseStrategy = new upDownStrategy();
-	}
-	@FXML
-	private void modulePercentRBClick() {
-		moduleStrategy = new percentStrategy();
-	}
-	@FXML
-	private void moduleUpDownRBClick() {
-		moduleStrategy = new upDownStrategy();
-	}
 //************************************************	
 	//представляемый элемент	
 	private Element currentElement;
@@ -558,5 +534,15 @@ public class NewElementController {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
+	@FXML
+	private Button randomBtn;
+	@FXML
+	public void randomBtnClick() {
+		periodicParamsTable.setRandomValues();
+		periodicParamsTable.showParametr(currentS);
+		primaryParamsTable.setRandomValues();
+		primaryParamsTable.showParametr(currentS);
+	}
+
 }
