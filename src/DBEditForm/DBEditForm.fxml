@@ -42,7 +42,7 @@
                               <HBox prefHeight="30.0" prefWidth="200.0">
                                  <children>
                                     <Label prefWidth="130.0" stylesheets="@../../bin/application/commonLabel.css" text="Тип СИ:" />
-                                    <TextField fx:id="typeTextFiel" prefWidth="215.0">
+                                    <TextField fx:id="typeTextField" prefWidth="215.0">
                                        <HBox.margin>
                                           <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
                                        </HBox.margin></TextField>

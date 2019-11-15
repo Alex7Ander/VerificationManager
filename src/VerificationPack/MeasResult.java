@@ -18,9 +18,9 @@ import javafx.collections.ObservableList;
 public class MeasResult implements Includable<Element>, dbStorable{
 	
 	private static String keys[] = {"MODULE_S11", "ERROR_MODULE_S11", "PHASE_S11", "ERROR_PHASE_S11",
-			 "MODULE_S12", "ERROR_MODULE_S12", "PHASE_S12", "ERROR_PHASE_S12",
-			 "MODULE_S21", "ERROR_MODULE_S21", "PHASE_S21", "ERROR_PHASE_S21", 
-			 "MODULE_S22", "ERROR_MODULE_S22", "PHASE_S22", "ERROR_PHASE_S22"};
+			 					    "MODULE_S12", "ERROR_MODULE_S12", "PHASE_S12", "ERROR_PHASE_S12",
+			 					    "MODULE_S21", "ERROR_MODULE_S21", "PHASE_S21", "ERROR_PHASE_S21", 
+			 					    "MODULE_S22", "ERROR_MODULE_S22", "PHASE_S22", "ERROR_PHASE_S22"};
 	
 	protected int countOfFreq;
 	protected int countOfParams;
@@ -53,6 +53,7 @@ public class MeasResult implements Includable<Element>, dbStorable{
 		resReader.readResult(resultNumber, freqs, values);				
 		countOfParams = values.size();
 		countOfFreq = freqs.size();
+		dateFormat = new SimpleDateFormat(datePattern);
 		dateOfMeas = Calendar.getInstance().getTime();
 	}
 	
@@ -136,7 +137,7 @@ public class MeasResult implements Includable<Element>, dbStorable{
 		}
 		String strDateOfMeas = dateFormat.format(dateOfMeas);
 		tableName = "Результаты поверки для " +
-				this.myElement.getMyOwner().getName() + " " + this.myElement.getMyOwner().getType() + " " + this.myElement.getMyOwner().getSerialNumber() + " " + this.myElement.getType() + " " + this.myElement.getSerialNumber() +
+				myElement.getMyOwner().getName() + " " + myElement.getMyOwner().getType() + " " + myElement.getMyOwner().getSerialNumber() + " " + myElement.getType() + " " + myElement.getSerialNumber() +
 				" проведенной " + strDateOfMeas;		
 		String listOfVerificationsTable = this.myElement.getListOfVerificationsTable();
 		String sqlQuery = "INSERT INTO [" + listOfVerificationsTable + "] (dateOfVerification, resultsTableName) values ('"+ strDateOfMeas +"','"+ tableName +"')";
@@ -148,7 +149,7 @@ public class MeasResult implements Includable<Element>, dbStorable{
 		}
 		sqlQuery += ")";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
-		for (int i=0; i<this.countOfFreq; i++) {				
+		for (int i = 0; i < countOfFreq; i++) {				
 			sqlQuery = "INSERT INTO [" + tableName + "] (freq, ";			
 			for (int j = 0; j < currentKeys.size(); j++) {
 				sqlQuery += (currentKeys.get(j));
@@ -156,7 +157,7 @@ public class MeasResult implements Includable<Element>, dbStorable{
 			}			
 			sqlQuery += ") values ('"+freqs.get(i)+"', ";			
 			for (int j = 0; j < currentKeys.size(); j++) {
-				sqlQuery += ("'"+values.get(currentKeys.get(j)).get(freqs.get(i)).toString()+"'");
+				sqlQuery += ("'" + values.get(currentKeys.get(j)).get(freqs.get(i)).toString() + "'");
 				if (j != currentKeys.size() - 1) sqlQuery += ", ";
 			}			
 			sqlQuery += ")";			
@@ -166,12 +167,11 @@ public class MeasResult implements Includable<Element>, dbStorable{
 	
 	@Override
 	public void deleteFromDB() throws SQLException {
-		DateFormat df = new SimpleDateFormat(datePattern);
-		String when = df.format(this.dateOfMeas);
+		String when = dateFormat.format(this.dateOfMeas);
 		String listOfVerificationsTable = myElement.getListOfVerificationsTable();
 		String what = myElement.getMyOwner().getName() + " " + myElement.getMyOwner().getType() + " " + myElement.getMyOwner().getSerialNumber() + " " + myElement.getType() + " " + myElement.getSerialNumber();
 		String resultsTableName = "Результаты поверки для " + what + " проведенной  " + when;		
-		String sqlQuery = "DELETE FROM ["+listOfVerificationsTable+"] WHERE resultsTableName='"+resultsTableName+"'";	
+		String sqlQuery = "DELETE FROM ["+ listOfVerificationsTable +"] WHERE resultsTableName='"+resultsTableName+"'";	
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);		
 		sqlQuery = "DROP TABLE [" + resultsTableName + "]";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
@@ -180,6 +180,19 @@ public class MeasResult implements Includable<Element>, dbStorable{
 	@Override
 	public void editInfoInDB(HashMap<String, String> editingValues) throws SQLException {
 		// TODO Auto-generated method stub		
+	}
+	
+	public void setNominalStatus() throws SQLException {
+		String listOfVerificationTable = myElement.getListOfVerificationsTable();
+		String sqlQuery = "SELECT id FROM [" + listOfVerificationTable + "] WHERE nominalStauts = '+'";
+		int nominalId = DataBaseManager.getDB().sqlQueryCount(sqlQuery);
+		if (nominalId <= 0) {
+			return;
+		}
+		sqlQuery = "UPDATE [" + listOfVerificationTable + "] SET nominalStauts = '-' WHERE id = '" + Integer.toString(nominalId) + "'";
+		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
+		String strDateOfMeas = dateFormat.format(dateOfMeas);
+		sqlQuery = "UPDATE [" + listOfVerificationTable + "] SET nominalStauts = '+' WHERE dateOfVerification='" + strDateOfMeas + "'";
 	}
 	
 	public void rewriteTableNames() throws SQLException {

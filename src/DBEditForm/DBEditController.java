@@ -44,7 +44,7 @@ public class DBEditController implements InfoRequestable {
 	private ComboBox<String> nameComboBox;
 	private ObservableList<String> devNamesList;
 	@FXML
-	private TextField typeTextFiel;
+	private TextField typeTextField;
 	@FXML
 	private TextField serNumTextField;
 	@FXML
@@ -190,11 +190,14 @@ public class DBEditController implements InfoRequestable {
 	public void setDevice(Device device) {
 		modDevice = device;	
 	}
+	public void removeDevice() {
+		modDevice = null;
+	}
 
 	@Override
 	public void representRequestedInfo() {
 		this.nameComboBox.setValue(modDevice.getName());
-		this.typeTextFiel.setText(modDevice.getType());
+		this.typeTextField.setText(modDevice.getType());
 		this.ownerTextField.setText(modDevice.getOwner());
 		this.serNumTextField.setText(modDevice.getSerialNumber());
 		this.gosNumTextField.setText(modDevice.getGosNumber());	
@@ -210,7 +213,7 @@ public class DBEditController implements InfoRequestable {
 	//Очистка окна
 	private void clearGUI() {
 		this.nameComboBox.setValue("");
-		this.typeTextFiel.setText("");
+		this.typeTextField.setText("");
 		this.ownerTextField.setText("");
 		this.serNumTextField.setText("");
 		this.gosNumTextField.setText("");
@@ -232,7 +235,7 @@ public class DBEditController implements InfoRequestable {
 	private void saveDeviceModificationBtnClick(){
 		HashMap<String, String> editingValues = new HashMap<String, String>();
 		editingValues.put("NameOfDevice", this.nameComboBox.getSelectionModel().getSelectedItem().toString()); 
-		editingValues.put("TypeOfDevice", this.typeTextFiel.getText());
+		editingValues.put("TypeOfDevice", this.typeTextField.getText());
 		editingValues.put("SerialNumber", this.serNumTextField.getText());
 		editingValues.put("Owner", this.ownerTextField.getText());
 		editingValues.put("GosNumber", this.gosNumTextField.getText());
