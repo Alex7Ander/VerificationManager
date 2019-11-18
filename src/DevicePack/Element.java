@@ -251,7 +251,7 @@ public class Element implements Includable<Device>, dbStorable{
 		}
 		String sqlQuery = "INSERT INTO ["+ myDevice.getElementsTableName() +"] (ElementType, ElementSerNumber, PoleCount, MeasUnit, ModuleToleranceType, PhaseToleranceType, " +
 				"VerificationsTable, PrimaryModuleParamTable, PeriodicModuleParamTable, PrimaryPhaseParamTable, PeriodicPhaseParamTable, NominalIndex) values "
-				+ "('"+type+"','"+serialNumber+"','"+poleCount+"','"+measUnit+"','"+ moduleToleranceType +"','"+ phaseToleranceType +"','" + listOfVerificationsTable +"','"
+				+ "('" + type + "','" + serialNumber + "','" + poleCount + "','" + measUnit+"','" + moduleToleranceType + "','" + phaseToleranceType + "','" + listOfVerificationsTable + "','"
 				+ primaryModuleToleranceParams.getTableName() + "','" + periodicModuleToleranceParams.getTableName() + "','"
 				+ primaryPhaseToleranceParams.getTableName() + "','" + periodicPhaseToleranceParams.getTableName() + "','" + Integer.toString(nominalIndex) + "')";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
@@ -269,18 +269,20 @@ public class Element implements Includable<Device>, dbStorable{
 	}
 	
 	@Override
-	public void deleteFromDB() throws SQLException {		
-		String addStr = myDevice.getName() + " " + myDevice.getType() + " " + myDevice.getSerialNumber();	
-		String strElementsTable = myDevice.getElementsTableName();
-		String measurementsOfTableName = " " + addStr + " " + type + " " + serialNumber;		
+	public void deleteFromDB() throws SQLException {					
 		nominal.deleteFromDB();
 		primaryModuleToleranceParams.deleteFromDB();
 		primaryPhaseToleranceParams.deleteFromDB();
 		periodicModuleToleranceParams.deleteFromDB();
 		periodicPhaseToleranceParams.deleteFromDB();		
-		String sqlString = "DROP TABLE ["+measurementsOfTableName+"]";
+		String sqlString = "DROP TABLE [" + listOfVerificationsTable + "]";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlString);
-		sqlString = "DELETE FROM ["+ strElementsTable +"] WHERE ElementType='"+type+"' AND ElementSerNumber='"+serialNumber+"'";
+		sqlString = "DELETE FROM [" + myDevice.getElementsTableName() + "] WHERE ElementType='" + type + "' AND ElementSerNumber='" + serialNumber + "'";
+		DataBaseManager.getDB().sqlQueryUpdate(sqlString);
+		int val = myDevice.getCountOfElements();
+		--val;
+		sqlString = "UPDATE [Devices] SET CountOfElements = '" + Integer.toString(val) + "' WHERE NameOfDevice='" + myDevice.getName()
+		+"' AND TypeOfDevice='" + myDevice.getType() + "' AND SerialNumber='" + myDevice.getSerialNumber() + "'";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlString);		
 	}
 	

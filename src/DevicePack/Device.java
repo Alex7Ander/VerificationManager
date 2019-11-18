@@ -164,27 +164,27 @@ public class Device implements dbStorable {
 	}
 		
 	public void addElement(Element element) {
-		this.includedElements.add(element);
+		includedElements.add(element);
 		element.onAdding(this);
-		this.countOfElements = this.includedElements.size();	
+		countOfElements = includedElements.size();	
 	}
 	
 	public void removeElement(int index) {
-		this.includedElements.remove(index);
-		this.countOfElements--;	
+		includedElements.remove(index);
+		countOfElements--;	
 	}
 	
 	public void createIniFile(String psiFilePath) throws IOException {
 		ArrayList<String> fileStrings = new ArrayList<String>();
 		fileStrings.add("Параметры поверки:\n");
-		fileStrings.add("1.Наименование типа средства измерения <" + this.name + ">\n");
-		fileStrings.add("2.Тип поверяемого средства измерения <" + this.type + ">\n");
-		fileStrings.add("3.Заводской номер <" + this.serialNumber + ">\n");
-		fileStrings.add("4.В состав входят элементов в количестве <" + Integer.toString(this.countOfElements) + ">\n");
+		fileStrings.add("1.Наименование типа средства измерения <" + name + ">\n");
+		fileStrings.add("2.Тип поверяемого средства измерения <" + type + ">\n");
+		fileStrings.add("3.Заводской номер <" + serialNumber + ">\n");
+		fileStrings.add("4.В состав входят элементов в количестве <" + Integer.toString(countOfElements) + ">\n");
 		fileStrings.add("------------------------------------------------------------------\n");
-		for (int i=0; i<this.countOfElements; i++) {
-			fileStrings.add("Элемент № " + Integer.toString(i) + ": " + this.includedElements.get(i).getType() + "\n");
-			fileStrings.add("Серийный номер: " + this.includedElements.get(i).getSerialNumber() + "\n");
+		for (int i = 0; i < countOfElements; i++) {
+			fileStrings.add("Элемент № " + Integer.toString(i) + ": " + includedElements.get(i).getType() + "\n");
+			fileStrings.add("Серийный номер: " + includedElements.get(i).getSerialNumber() + "\n");
 			String ruTextOfMeasUnit;
 			if (this.includedElements.get(i).getMeasUnit().equals("vswr")) {
 				ruTextOfMeasUnit = "КСВН";
@@ -194,16 +194,16 @@ public class Device implements dbStorable {
 			}
 			fileStrings.add("Измеряемая величина: " + ruTextOfMeasUnit + "\n");
 			String paramsStr = "S11";
-			if (this.includedElements.get(i).getPoleCount() == 4) {
+			if (includedElements.get(i).getPoleCount() == 4) {
 				paramsStr += ", S12, S21, S22";
 			}				
 			fileStrings.add("Параметры: " + paramsStr + "\n");
-			int currentCountOfFreq = this.includedElements.get(i).getNominal().getCountOfFreq();
+			int currentCountOfFreq = includedElements.get(i).getNominal().getCountOfFreq();
 			for (int j=0; j<currentCountOfFreq; j++) {
-				double currentFreq = this.includedElements.get(i).getNominal().freqs.get(j);
+				double currentFreq = includedElements.get(i).getNominal().freqs.get(j);
 				fileStrings.add(Double.toString(currentFreq) + "\n");
 			}			
-			if (i < this.countOfElements - 1) {
+			if (i < countOfElements - 1) {
 				fileStrings.add("------------------------------------------------------------------\n");
 			}
 			else {

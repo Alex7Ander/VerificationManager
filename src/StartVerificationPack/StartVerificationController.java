@@ -93,15 +93,13 @@ public class StartVerificationController {
 	@FXML
 	private void startBtnClick() throws IOException {
 		if (!chekEnvironment()) {
-			YesNoWindow ynWin = new YesNoWindow("Внимание", envStatusString + "\nЖелаете продолжить?");
-			int answer = ynWin.showAndWait();
+			int answer = YesNoWindow.createYesNoWindow("Внимание", envStatusString + "\nЖелаете продолжить?").showAndWait();
 			if (answer == 1) {
 				return;
 			}
 		}
 		if(!checkVerType()) {
-			YesNoWindow ynWin = new YesNoWindow("Какой тип поверки?", "Будет проводиться первичная поверка?");
-			int answer = ynWin.showAndWait();
+			int answer = YesNoWindow.createYesNoWindow("Какой тип поверки?", "Будет проводиться первичная поверка?").showAndWait();
 			if (answer == 0) {
 				this.primaryVerRB.setSelected(true);
 			}
@@ -111,8 +109,7 @@ public class StartVerificationController {
 		}
 		if (!checkView()) {
 			//Признание прибора не годным по внешнему остмотру
-			YesNoWindow ynWin = new YesNoWindow("Отрицательный результат внешнего осмотра?", "Вы признали прибор негодным\n по результатам внешнеого осмотра?");
-			int answer = ynWin.showAndWait();
+			int answer = YesNoWindow.createYesNoWindow("Отрицательный результат внешнего осмотра?", "Вы признали прибор негодным\n по результатам внешнеого осмотра?").showAndWait();
 			if (answer == 0) {
 				String[] docTypes = {"Извещение о непригодности"};
 				VerificationWindow.getVerificationWindow().getController().createProtocol(docTypes);
@@ -124,8 +121,7 @@ public class StartVerificationController {
 		}
 		if (!checkWork()) {
 			//Признание прибора не годным по опробованию
-			YesNoWindow ynWin = new YesNoWindow("Отрицательный результат опробования?", "Вы признали прибор негодным\n по результатам опробования?");
-			int answer = ynWin.showAndWait();
+			int answer = YesNoWindow.createYesNoWindow("Отрицательный результат опробования?", "Вы признали прибор негодным\n по результатам опробования?").showAndWait();
 			if (answer == 0) {
 				this.badWorkRB.setSelected(true);
 				String[] docTypes = {"Извещение о непригодности"};

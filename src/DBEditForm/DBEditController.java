@@ -127,16 +127,12 @@ public class DBEditController implements InfoRequestable {
 		elemtnsListViewContextMenu.getItems().addAll(deleteElementItem, editElementItem);
 		
 		deleteElementItem.setOnAction(event->{
-			try {
-				YesNoWindow qWin = new YesNoWindow("Удалить?", "Удалить выбранный элемент:\n" + 
-								this.elementsListView.getSelectionModel().getSelectedItem().toString());
-				int answer = qWin.showAndWait();
-				if (answer == 0) {
-					deleteElement(this.elementsListView.getSelectionModel().getSelectedIndex());
-				}	
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			int answer = YesNoWindow.createYesNoWindow("Удалить?", "Удалить выбранный элемент:\n" + 
+							this.elementsListView.getSelectionModel().getSelectedItem().toString()).showAndWait();
+			if (answer == 0) {
+				int deletedElementIndex = this.elementsListView.getSelectionModel().getSelectedIndex();
+				deleteElement(deletedElementIndex);
+			}	
 		});
 		
 		editElementItem.setOnAction(event->{
@@ -181,12 +177,13 @@ public class DBEditController implements InfoRequestable {
 	}
 //--------------------Удаление элемента--------------------
 	private void deleteElement(int index) {
-		if (index > 0) return;
+		if (index < 0) return;
 		try {
 			DataBaseManager.getDB().BeginTransaction();
-			this.modDevice.includedElements.get(index).deleteFromDB();
+			modDevice.includedElements.get(index).deleteFromDB();
 			DataBaseManager.getDB().Commit();
-			this.elementsList.remove(index);
+			modDevice.removeElement(index);
+			elementsList.remove(index);
 		}
 		catch(SQLException sqlExp) {
 			DataBaseManager.getDB().RollBack();
@@ -204,32 +201,31 @@ public class DBEditController implements InfoRequestable {
 
 	@Override
 	public void representRequestedInfo() {
-		this.nameComboBox.setValue(modDevice.getName());
-		this.typeTextField.setText(modDevice.getType());
-		this.ownerTextField.setText(modDevice.getOwner());
-		this.serNumTextField.setText(modDevice.getSerialNumber());
-		this.gosNumTextField.setText(modDevice.getGosNumber());	
-			
-		this.elementsList.clear();
+		nameComboBox.setValue(modDevice.getName());
+		typeTextField.setText(modDevice.getType());
+		ownerTextField.setText(modDevice.getOwner());
+		serNumTextField.setText(modDevice.getSerialNumber());
+		gosNumTextField.setText(modDevice.getGosNumber());				
+		elementsList.clear();
 		for (Element elm : this.modDevice.includedElements) {
 			String item = elm.getType() + " №" + elm.getSerialNumber();
-			this.elementsList.add(item);
+			elementsList.add(item);
 		}
-		this.elementsListView.setItems(elementsList);		
+		elementsListView.setItems(elementsList);		
 	}
 //---------------------------------------------------------
 	//Очистка окна
 	private void clearGUI() {
-		this.nameComboBox.setValue("");
-		this.typeTextField.setText("");
-		this.ownerTextField.setText("");
-		this.serNumTextField.setText("");
-		this.gosNumTextField.setText("");
+		nameComboBox.setValue("");
+		typeTextField.setText("");
+		ownerTextField.setText("");
+		serNumTextField.setText("");
+		gosNumTextField.setText("");
 		
-		this.elementsList.clear();
-		this.elementsListView.setItems(elementsList);
-		this.verificationDateList.clear();
-		this.verificationDateListView.setItems(verificationDateList);
+		elementsList.clear();
+		verificationDateList.clear();
+		measUnitsList.clear();
+		resultsTable.clear();
 	}
 //---------------------------------------------------------
 	@FXML
@@ -240,13 +236,13 @@ public class DBEditController implements InfoRequestable {
 //---Работа с устройством---
 //Сохранение изменений в устройство
 	@FXML
-	private void saveDeviceModificationBtnClick(){
+	private void saveDeviceModificationBtnClick() {
 		HashMap<String, String> editingValues = new HashMap<String, String>();
-		editingValues.put("NameOfDevice", this.nameComboBox.getSelectionModel().getSelectedItem().toString()); 
-		editingValues.put("TypeOfDevice", this.typeTextField.getText());
-		editingValues.put("SerialNumber", this.serNumTextField.getText());
-		editingValues.put("Owner", this.ownerTextField.getText());
-		editingValues.put("GosNumber", this.gosNumTextField.getText());
+		editingValues.put("NameOfDevice", nameComboBox.getSelectionModel().getSelectedItem().toString()); 
+		editingValues.put("TypeOfDevice", typeTextField.getText());
+		editingValues.put("SerialNumber", serNumTextField.getText());
+		editingValues.put("Owner", ownerTextField.getText());
+		editingValues.put("GosNumber", gosNumTextField.getText());
 		try {
 			DataBaseManager.getDB().BeginTransaction();
 			modDevice.editInfoInDB(editingValues);
@@ -260,9 +256,8 @@ public class DBEditController implements InfoRequestable {
 	}	
 //---------------------------------------------------------
 	@FXML
-	private void deleteDeviceBtnClick() throws IOException {
-		YesNoWindow dialogWin = new YesNoWindow("Удалить?", "Вы уверены, что хотите удалить этот прибор?");
-		int answer = dialogWin.showAndWait();
+	private void deleteDeviceBtnClick() {
+		int answer = YesNoWindow.createYesNoWindow("Удалить?", "Вы уверены, что хотите удалить этот прибор?").showAndWait();
 		if (answer == 0) {
 			try {
 				DataBaseManager.getDB().BeginTransaction();
@@ -270,6 +265,7 @@ public class DBEditController implements InfoRequestable {
 				DataBaseManager.getDB().Commit();
 				clearGUI(); 
 				modDevice = null;
+				AboutMessageWindow.createWindow("Успешно", "Прибор удален").show();
 			}
 			catch(SQLException sqlExp) {
 				DataBaseManager.getDB().RollBack();
@@ -285,13 +281,13 @@ public class DBEditController implements InfoRequestable {
 		try {
 			SearchDeviceWindow.getSearchDeviceWindow(modDevice, this).show();
 		}
-		catch(IOException exp) {
-			//
+		catch(IOException ioExp) {
+			System.out.println("Ошибка при создании окна поиска прибора. " + ioExp.getStackTrace());
 		}
 	}
 			
 	@FXML
-	private void elementsListViewClick() throws IOException {
+	private void elementsListViewClick() {
 		if (modDevice == null) {
 			return;
 		}		
@@ -317,7 +313,7 @@ public class DBEditController implements InfoRequestable {
 	}	
 		
 	@FXML
-	private void verificationDateListViewClick() throws IOException {
+	private void verificationDateListViewClick() {
 		if (currentElement == null) {
 			return;
 		}
@@ -356,7 +352,7 @@ public class DBEditController implements InfoRequestable {
 		showResult();
 	}
 	
-	private void showResult() throws IOException {
+	private void showResult() {
 		try {
 			int resIndex = Integer.parseInt(verifications.get(currentDateIndex).get(0));
 			currentResult = new MeasResult(modDevice.includedElements.get(currentElementIndex), resIndex);

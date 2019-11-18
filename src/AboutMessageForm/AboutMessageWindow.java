@@ -12,13 +12,13 @@ public class AboutMessageWindow extends guiWindow{
     }
 
     public static AboutMessageWindow createWindow(String title, String message) {
-    	AboutMessageWindow aboutWindow = null;
+    	AboutMessageWindow aboutMessageWindow = null;
     	try {
-    		aboutWindow = new AboutMessageWindow(title, message);
+    		aboutMessageWindow = new AboutMessageWindow(title, message);
     	}
     	catch (IOException ioExp) {
     		System.out.println("Ошибка при создании диалогового окна (" + message + ")" + ioExp.getMessage());
     	}
-    	return aboutWindow;
+    	return aboutMessageWindow;
     }
 }

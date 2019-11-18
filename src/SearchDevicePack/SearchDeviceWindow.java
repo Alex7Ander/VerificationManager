@@ -27,4 +27,9 @@ public class SearchDeviceWindow extends guiWindow{
 		return instanceSearchDeviceWindow;
 	}
 	
+	@Override
+	public void show() {
+		stage.showAndWait();
+	}
+	
 }

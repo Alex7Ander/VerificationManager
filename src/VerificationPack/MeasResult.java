@@ -171,9 +171,9 @@ public class MeasResult implements Includable<Element>, dbStorable{
 		String listOfVerificationsTable = myElement.getListOfVerificationsTable();
 		String what = myElement.getMyOwner().getName() + " " + myElement.getMyOwner().getType() + " " + myElement.getMyOwner().getSerialNumber() + " " + myElement.getType() + " " + myElement.getSerialNumber();
 		String resultsTableName = "Результаты поверки для " + what + " проведенной  " + when;		
-		String sqlQuery = "DELETE FROM ["+ listOfVerificationsTable +"] WHERE resultsTableName='"+resultsTableName+"'";	
+		String sqlQuery = "DELETE FROM ["+ listOfVerificationsTable +"] WHERE resultsTableName='" + tableName + "'";	
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);		
-		sqlQuery = "DROP TABLE [" + resultsTableName + "]";
+		sqlQuery = "DROP TABLE [" + tableName + "]";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
 	}
 	
