@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
 import AboutMessageForm.AboutMessageWindow;
 import DevicePack.Device;
 import DevicePack.Element;
@@ -97,8 +96,7 @@ public class VerificationController implements InfoRequestable {
 			StartVerificationWindow.getStartVerificationWindow().show();						
 		}
 		else{
-			AboutMessageWindow msgWin = new AboutMessageWindow("Ошибка","Вы не выбрали средство измерения для поверки");
-			msgWin.show();
+			AboutMessageWindow.createWindow("Ошибка","Вы не выбрали средство измерения для поверки").show();
 		}
 	}
 	
@@ -106,23 +104,18 @@ public class VerificationController implements InfoRequestable {
 	@FXML
 	private void saveBtnClick(ActionEvent event) throws IOException {
 		if (verificationResult.size() != 0) {
-			AboutMessageWindow msgWin = null;
 			try {
 				for (int i = 0; i < verificationResult.size(); i++) {
 					verificationResult.get(i).saveInDB();
 				}
-				msgWin = new AboutMessageWindow("Успешно", "Результаты поверки сохранены в БД");
+				AboutMessageWindow.createWindow("Успешно", "Результаты поверки сохранены в БД").show();
 			}
 			catch(SQLException sqlExp) {
-				msgWin = new AboutMessageWindow("Ошибка", "Не удалось сохранить результаты в БД");
-			}
-			finally{
-				msgWin.show();
+				AboutMessageWindow.createWindow("Ошибка", "Не удалось сохранить результаты в БД");
 			}
 		}
 		else {
-			AboutMessageWindow msgWin = new AboutMessageWindow("Ошибка","Процедура поверки еще не закончена");
-			msgWin.show();
+			AboutMessageWindow.createWindow("Ошибка","Процедура поверки еще не закончена").show();
 		}
 	}
 	
@@ -134,8 +127,7 @@ public class VerificationController implements InfoRequestable {
 			createProtocol(docTypes);
 		}
 		else {
-			AboutMessageWindow msgWin = new AboutMessageWindow("Ошибка","Процедура поверки еще не закончена");
-			msgWin.show();
+			AboutMessageWindow.createWindow("Ошибка","Процедура поверки еще не закончена").show();
 		}
 	}
 	public void createProtocol(String[] docTypes) throws IOException {
@@ -261,13 +253,7 @@ public class VerificationController implements InfoRequestable {
 			}
 		}
 		catch(IOException ioExp) {
-			try {
-				AboutMessageWindow msgWin = new AboutMessageWindow("Ошибка", "Отсутствует или поврежден файл\n с результатами измерений");
-				msgWin.show();
-			}
-			catch(Exception exp) {
-				//
-			}
+			AboutMessageWindow.createWindow("Ошибка", "Отсутствует или поврежден файл\n с результатами измерений").show();
 		}
 	}
 //----------------------------------------	
@@ -288,8 +274,7 @@ public class VerificationController implements InfoRequestable {
 				this.elementComboBox.setItems(listOfElements);
 			}
 			else {
-				AboutMessageWindow msgWin = new AboutMessageWindow("Внимание", "Не удалось найти составные элементы для данного прибора.\nПроведение поверки не возможно");
-				msgWin.show();
+				AboutMessageWindow.createWindow("Внимание", "Не удалось найти составные элементы для данного прибора.\nПроведение поверки не возможно").show();
 			}
 		}
 		catch(Exception exp) {

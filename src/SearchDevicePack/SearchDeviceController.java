@@ -97,7 +97,7 @@ public class SearchDeviceController {
 	}
 	
 	@FXML
-	private void chooseBtnClick() throws IOException {		
+	private void chooseBtnClick() {		
 		int index =  this.devicesListView.getSelectionModel().getSelectedIndex();
 		String cName = listOfDevicesInfo.get(index).get(0);
 		String cType = listOfDevicesInfo.get(index).get(1);
@@ -110,8 +110,7 @@ public class SearchDeviceController {
 			this.myRequester.representRequestedInfo();									
 		}
 		catch(SQLException exp){			
-			AboutMessageWindow errorWindow = new AboutMessageWindow("Ошибка", "Ошибка доступа к БД.\nОбъект не может быть инициализирован");
-			errorWindow.show();
+			AboutMessageWindow.createWindow("Ошибка", "Ошибка доступа к БД.\nОбъект не может быть инициализирован").show();
 		}
 		Stage stage = (Stage) chooseBtn.getScene().getWindow();
 	    stage.close();
@@ -135,23 +134,11 @@ public class SearchDeviceController {
 			devicesListView.setItems(items);			
 		}
 		catch(SQLException sqlExp) {
-			//Ошабка доступа к БД
-			try {
-				AboutMessageWindow errorWindow = new AboutMessageWindow("Ошибка", "Ошибка доступа к БД. \nНевозможно инициализировать список устройств.");
-			}
-			catch(IOException ioExp) {
-				//
-			}
+			AboutMessageWindow.createWindow("Ошибка", "Ошибка доступа к БД. \nНевозможно инициализировать список устройств.").show();
 		}
-		catch(Exception exp) {
-			//Здесь на NullPointerException необходимо проверить
-			System.out.println("Ошибка: " + exp.getMessage());
-			try {
-				AboutMessageWindow errorWindow = new AboutMessageWindow("Непредвиденная ошибка", "Место ошибки: \nБлок catch(Exception exp) \n Метод setDeviceItems() \nКласса SearchDeviceCintroller");
-			}
-			catch(IOException ioExp) {
-				//
-			}
+		catch(NullPointerException npExp) {
+			System.out.println("Ошибка: " + npExp.getMessage());
+			AboutMessageWindow.createWindow("Непредвиденная ошибка", "Место ошибки: \nБлок catch(Exception exp) \n Метод setDeviceItems() \nКласса SearchDeviceCintroller").show();
 		}
 	}
 	

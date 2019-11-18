@@ -106,14 +106,13 @@ public class NewDeviceController  {
 	}	
 	
 	@FXML
-	public void saveBtnClick(ActionEvent event) throws IOException {		
+	public void saveBtnClick(ActionEvent event) {		
 		String tName = null;
 		try{
 			tName = this.namesComboBox.getValue().toString();		
 		}
 		catch(NullPointerException npExp) {
-			AboutMessageWindow errorMessage = new AboutMessageWindow("Ошибка", "Не указано наименование типа создаваемого СИ!");
-			errorMessage.show();
+			AboutMessageWindow.createWindow("Ошибка", "Не указано наименование типа создаваемого СИ!").show();
 			return;
 		}
 		
@@ -124,8 +123,7 @@ public class NewDeviceController  {
 			
 		//Если критически важные для сохранения поля пусты, то прерываем процедуру
 		if (tName.length()==0 || tType.length()==0 || tSerN.length()==0){
-			AboutMessageWindow errorMessage = new AboutMessageWindow("Ошибка", "Заполнены не все обходимые поля");
-			errorMessage.show();
+			AboutMessageWindow.createWindow("Ошибка", "Заполнены не все обходимые поля").show();
 			return;
 		}
 		if (tOwner.length() == 0) tOwner = "-"; //Не критически важные заполняем условно прочерком
@@ -136,15 +134,13 @@ public class NewDeviceController  {
 		//Проверим, не существует ли аналогичное в БД
 		try {
 			if (newDevice.isExist()) {
-				AboutMessageWindow errorMessage = new AboutMessageWindow("Ошибка", "Прибор данного типа с аналогичным серийным номером\n"
-						+ "зарегистрированна в базе данных!");
-				errorMessage.show();
+				AboutMessageWindow.createWindow("Ошибка", "Прибор данного типа с аналогичным серийным номером\n"
+						+ "зарегистрированна в базе данных!").show();
 				return;
 			}
 		}
 		catch (SQLException sqlExp) {
-			AboutMessageWindow errorMessage = new AboutMessageWindow("Ошибка", "База данных отсутствует или повреждена");
-			errorMessage.show();
+			AboutMessageWindow.createWindow("Ошибка", "База данных отсутствует или повреждена").show();
 			return;
 		}
 		
@@ -160,21 +156,18 @@ public class NewDeviceController  {
 			DataBaseManager.getDB().BeginTransaction();
 			newDevice.saveInDB();
 			DataBaseManager.getDB().Commit();
-			AboutMessageWindow sucsessMessage = new AboutMessageWindow("Успешно", "Успешное сохранение");
-			sucsessMessage.show();
+			AboutMessageWindow.createWindow("Успешно", "Успешное сохранение").show();
 			Stage stage = (Stage) saveBtn.getScene().getWindow();
 			stage.close();
 			NewDeviceWindow.deleteNewDeviceWindow();
 		}
 		catch(SQLException sqlExp){
 			DataBaseManager.getDB().RollBack();
-			AboutMessageWindow errorMessage = new AboutMessageWindow("Ошибка", "Ошибка: " + sqlExp.getMessage());
-			errorMessage.show();
+			AboutMessageWindow.createWindow("Ошибка", "Ошибка: " + sqlExp.getMessage()).show();
 		}
 		catch(SavingException noExp) {
 			DataBaseManager.getDB().RollBack();
-			AboutMessageWindow errorMessage = new AboutMessageWindow("Ошибка", "Ошибка: " + noExp.getMessage());
-			errorMessage.show();
+			AboutMessageWindow.createWindow("Ошибка", "Ошибка: " + noExp.getMessage()).show();
 		}
 	}
 	

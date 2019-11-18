@@ -1,9 +1,7 @@
 package ErrorParamsPack;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-
 import AboutMessageForm.AboutMessageWindow;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -43,15 +41,13 @@ public class ErrorParamsController {
 	private Button saveBtn;
 	
 	@FXML
-	private void initialize() throws IOException {
+	private void initialize() {
 		try {
 			erp = new ErrorParams();
 		}
 		catch(SQLException sqlExp) {
-			AboutMessageWindow msg = new AboutMessageWindow("Ошибка", "Не удалось найти параметры\nНет свзи с БД");
-			msg.show();
-		}
-		
+			AboutMessageWindow.createWindow("Ошибка", "Не удалось найти параметры\nНет свзи с БД").show();
+		}		
 		tractComboBox.setItems(FXCollections.observableArrayList(new String("5,2"), 
 																 new String("3,6"), 
 																 new String("2,4"),  
@@ -76,7 +72,7 @@ public class ErrorParamsController {
 		}
 	}
 	@FXML
-	private void saveBtnClick() throws IOException {		
+	private void saveBtnClick() {		
 		try {
 			ArrayList<Double> newParams = new ArrayList<Double>();
 			newParams.add(Double.parseDouble(this.a1TextField.getText()));
@@ -105,16 +101,13 @@ public class ErrorParamsController {
 					break;
 			}
 			erp.saveInDB();
-			AboutMessageWindow msg = new AboutMessageWindow("Успешно", "Параметры для тракта " +tract+ "\nуспешно сохранены в БД");
-			msg.show();
+			AboutMessageWindow.createWindow("Успешно", "Параметры для тракта " +tract+ "\nуспешно сохранены в БД").show();
 		}
 		catch(NumberFormatException nfExp) {
-			AboutMessageWindow msg = new AboutMessageWindow("Ошибка", "Введенные вами параметры\nне являются действительными числами");
-			msg.show();
+			AboutMessageWindow.createWindow("Ошибка", "Введенные вами параметры\nне являются действительными числами").show();
 		}
 		catch(SQLException sqlExp) {
-			AboutMessageWindow msg = new AboutMessageWindow("Ошибка", "Не удалось сохранить изменения\nНет свзи с БД");
-			msg.show();
+			AboutMessageWindow.createWindow("Ошибка", "Не удалось сохранить изменения\nНет свзи с БД").show();
 		}
 	}
 	

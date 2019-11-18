@@ -169,12 +169,7 @@ public class DBEditController implements InfoRequestable {
 				deletedResult = new MeasResult(modDevice.includedElements.get(currentElementIndex), resIndex);
 				deletedResult.deleteFromDB();
 			} catch (SQLException sqlExp) {
-				try {
-					AboutMessageWindow msgWin = new AboutMessageWindow("Ошибка", "Ошибка доступа к БД\nпри попытке удаления");
-					msgWin.show();
-				} catch (IOException ioExp) {
-					ioExp.printStackTrace();
-				}	
+				AboutMessageWindow.createWindow("Ошибка", "Ошибка доступа к БД\nпри попытке удаления").show();;	
 			}
 		});
 		
@@ -184,7 +179,20 @@ public class DBEditController implements InfoRequestable {
 			verificationsDatesListViewContextMenu.show(verificationDateListView, x, y);
 		});
 	}
-	
+//--------------------Удаление элемента--------------------
+	private void deleteElement(int index) {
+		if (index > 0) return;
+		try {
+			DataBaseManager.getDB().BeginTransaction();
+			this.modDevice.includedElements.get(index).deleteFromDB();
+			DataBaseManager.getDB().Commit();
+			this.elementsList.remove(index);
+		}
+		catch(SQLException sqlExp) {
+			DataBaseManager.getDB().RollBack();
+			AboutMessageWindow.createWindow("Ошибка", "Ошибка доступа к БД\nпри попытке удаления").show();
+		}
+	}	
 //InfoRequestable
 	@Override
 	public void setDevice(Device device) {
@@ -242,63 +250,32 @@ public class DBEditController implements InfoRequestable {
 		try {
 			DataBaseManager.getDB().BeginTransaction();
 			modDevice.editInfoInDB(editingValues);
-			DataBaseManager.getDB().Commit();
-			try {				
-				AboutMessageWindow aboutWin = new AboutMessageWindow("Успешно", "Изменения сохранены");
-				aboutWin.show();
-			}
-			catch(IOException ioExp) {
-				ioExp.getStackTrace();
-			}
+			DataBaseManager.getDB().Commit();				
+			AboutMessageWindow.createWindow("Успешно", "Изменения сохранены").show();
 		}
 		catch(SQLException sqlExp) {
 			DataBaseManager.getDB().RollBack();
-			try {
-				AboutMessageWindow aboutWin = new AboutMessageWindow("Ошибка", "Не удалось сохранить изменения");
-				aboutWin.show();
-			}
-			catch(IOException ioExp) {
-				ioExp.getStackTrace();
-			}
-		}
-	}
-//----------------------УДАЛЕНИЯ---------------------------
-//-----------------Удаление устройства---------------------	
-	private void deleteDevice() throws IOException {
-		try {
-			DataBaseManager.getDB().BeginTransaction();
-			modDevice.deleteFromDB();
-			DataBaseManager.getDB().Commit();
-			clearGUI(); 
-			modDevice = null;
-		}
-		catch(SQLException sqlExp) {
-			DataBaseManager.getDB().RollBack();
-			AboutMessageWindow msgWin = new AboutMessageWindow("Ошибка", "Ошибка доступа к БД\nпри попытке удаления");
-			msgWin.show();
-		}
-	}
-//---------------------------------------------------------
-//--------------------Удаление элемента--------------------
-	private void deleteElement(int index) throws IOException {
-		if (index > 0) return;
-		try {
-			DataBaseManager.getDB().BeginTransaction();
-			this.modDevice.includedElements.get(index).deleteFromDB();
-			DataBaseManager.getDB().Commit();
-			this.elementsList.remove(index);
-		}
-		catch(SQLException sqlExp) {
-			DataBaseManager.getDB().RollBack();
-			AboutMessageWindow msgWin = new AboutMessageWindow("Ошибка", "Ошибка доступа к БД\nпри попытке удаления");
-			msgWin.show();
+			AboutMessageWindow.createWindow("Ошибка", "Не удалось сохранить изменения").show();
 		}
 	}	
 //---------------------------------------------------------
-//---------------------------------------------------------
 	@FXML
 	private void deleteDeviceBtnClick() throws IOException {
-		deleteDevice();
+		YesNoWindow dialogWin = new YesNoWindow("Удалить?", "Вы уверены, что хотите удалить этот прибор?");
+		int answer = dialogWin.showAndWait();
+		if (answer == 0) {
+			try {
+				DataBaseManager.getDB().BeginTransaction();
+				modDevice.deleteFromDB();
+				DataBaseManager.getDB().Commit();
+				clearGUI(); 
+				modDevice = null;
+			}
+			catch(SQLException sqlExp) {
+				DataBaseManager.getDB().RollBack();
+				AboutMessageWindow.createWindow("Ошибка", "Ошибка доступа к БД\nпри попытке удаления").show();
+			}
+		}		
 	}	
 //--- Работа с результатами измерений ---
 
@@ -335,8 +312,7 @@ public class DBEditController implements InfoRequestable {
 			verificationDateListView.setItems(verificationDateList);			
 		}
 		catch(SQLException exp) {
-			AboutMessageWindow msgWin = new AboutMessageWindow("Ошибка", "Ошибка доступа к БД\nпри получении списка проведенных поверок");
-			msgWin.show();
+			AboutMessageWindow.createWindow("Ошибка", "Ошибка доступа к БД\nпри получении списка проведенных поверок").show();
 		}		
 	}	
 		
@@ -387,8 +363,7 @@ public class DBEditController implements InfoRequestable {
 			resultsTable.showResult(currentResult, S_Parametr.values()[currentMeasUnitIndex]);
 		}
 		catch(SQLException sqlExp) {
-			AboutMessageWindow msgWin = new AboutMessageWindow("Ошибка", "Ошибка доступа к БД\nпри получении результатов измерения");
-			msgWin.show();
+			AboutMessageWindow.createWindow("Ошибка", "Ошибка доступа к БД\nпри получении результатов измерения").show();
 		}
 	}
 }

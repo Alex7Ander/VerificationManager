@@ -146,12 +146,10 @@ public class ProtocolCreateController {
 		}
 	}
 	
-	@SuppressWarnings("finally")
 	@FXML
 	private void createBtnClick() throws IOException{
 		if (!checkDocType()) {
-			AboutMessageWindow msgWin = new AboutMessageWindow("Ошибка", "Вы не выбрали тип создаваемого документа");
-			msgWin.show();
+			AboutMessageWindow.createWindow("Ошибка", "Вы не выбрали тип создаваемого документа").show();
 			return;
 		}		
 		Date dt = protocoledResult.get(0).getDateOfMeas();
@@ -180,20 +178,13 @@ public class ProtocolCreateController {
 				infoBox.toFront();
 				infoBox.setOpacity(1.0);
 				progressPane.setVisible(false);
-				AboutMessageWindow goodResMsg;
 				try {
 					//Вносим запись в БД о созданных протоколе и документе
 					try {
 						makeRecordInDB();
 					}
 					catch(SQLException sqlExp) {
-						try {
-							AboutMessageWindow msgWin = new AboutMessageWindow("Ошибка", "Ошибка внесения данных о созданном протоколе в БД");
-							msgWin.show();
-						}
-						catch(IOException ioExp) {
-							ioExp.getStackTrace();
-						}
+						AboutMessageWindow.createWindow("Ошибка", "Ошибка внесения данных о созданном протоколе в БД").show();
 					}
 					//Открываем созданный файл, если требуется
 					if (printRB.isSelected()) {
@@ -208,10 +199,7 @@ public class ProtocolCreateController {
 					}
 					//Показываем сообщение об успешном создании
 					String docType = docTypeComboBox.getSelectionModel().getSelectedItem();
-					goodResMsg = new AboutMessageWindow("Успешно", "Протокол и " + docType + "\nуспешно созданы.");
-					goodResMsg.show();
-				} catch (IOException ioExp) {
-					ioExp.printStackTrace();
+					AboutMessageWindow.createWindow("Успешно", "Протокол и " + docType + "\nуспешно созданы.").show();
 				}
 				finally {
 					ProtocolCreateWindow.closeInstanceWindow();
@@ -221,19 +209,12 @@ public class ProtocolCreateController {
 		});
 		//Устанавливаем действие при провале
 		docService.setOnFailed(new EventHandler<WorkerStateEvent>() {
-			@SuppressWarnings("finally")
 			@Override
 			public void handle(WorkerStateEvent event) {
 				infoBox.toFront();
 				infoBox.setOpacity(1.0);
 				progressPane.setVisible(false);  
-				AboutMessageWindow aboutWin;
-				try {
-					aboutWin = new AboutMessageWindow("Ошибка", "Произошла ошибка при создании протокола.\nПовторите попытку.");
-					aboutWin.show();
-				} catch (IOException ioExp) {
-					ioExp.printStackTrace();
-				}
+				AboutMessageWindow.createWindow("Ошибка", "Произошла ошибка при создании протокола.\nПовторите попытку.").show();
 				return;
 			}				
 		});

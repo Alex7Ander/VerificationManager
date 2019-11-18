@@ -41,7 +41,7 @@ public class OldDocSearchController implements InfoRequestable {
 	private ToggleGroup docTypeGroup;
 		
 	@FXML
-	private ListView verificationListView;
+	private ListView<String> verificationListView;
 	
 	@FXML
 	private ToggleButton deviceSearchTB;
@@ -112,17 +112,11 @@ public class OldDocSearchController implements InfoRequestable {
 			
 			File docFile = new File(pathOfDoc);
 			File protocolFile = new File(pathOfProtocol);
-			//Desktop.getDesktop().open(docFile);
+			Desktop.getDesktop().open(docFile);
 			Desktop.getDesktop().open(protocolFile);
 		}
 		catch(IOException ioExp) {
-			try {
-				AboutMessageWindow msgWin = new AboutMessageWindow("Ошибка", "Файл отсутствует");
-				msgWin.show();
-			}
-			catch(IOException exp) {
-				exp.getStackTrace();
-			}
+			AboutMessageWindow.createWindow("Ошибка", "Файл отсутствует").show();
 		}
 	}
 	
@@ -206,13 +200,7 @@ public class OldDocSearchController implements InfoRequestable {
 			this.verificationListView.setItems(listOfVerifications);
 		}
 		catch(SQLException sqlExp) {
-			try {
-				AboutMessageWindow msgWin = new AboutMessageWindow("Ошибка", "База данных отсутствует или повреждена");
-				msgWin.show();
-			}
-			catch(IOException ioExp) {
-				ioExp.getStackTrace();
-			}
+			AboutMessageWindow.createWindow("Ошибка", "База данных отсутствует или повреждена").show();
 		}		
 	}
 	

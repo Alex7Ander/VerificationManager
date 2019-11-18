@@ -34,10 +34,16 @@ public class YesNoController {
 		myWin.close();
 	}
 	
-	public void setMyWin(YesNoWindow MyWindow) {myWin = MyWindow;}
+	public void setMyWin(YesNoWindow MyWindow) {
+		myWin = MyWindow;
+	}
+	
 	public void setMessage(String message) { 
 		this.msgLabel.setText(message);
 	}
-	public int getResult() { return result;}
+	
+	public int getResult() { 
+		return result;
+	}
 	
 }

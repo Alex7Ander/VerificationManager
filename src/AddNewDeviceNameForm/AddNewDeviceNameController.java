@@ -1,12 +1,9 @@
 package AddNewDeviceNameForm;
 
 import java.io.File;
-import java.util.Iterator;
-
+import java.io.IOException;
 import AboutMessageForm.AboutMessageWindow;
-import DevicePack.Includable;
 import FileManagePack.FileManager;
-import NewDevicePack.NewDeviceController;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -24,7 +21,7 @@ public class AddNewDeviceNameController {
     private Button saveBtn;
 
     @FXML
-    private ListView namesListView;
+    private ListView<String> namesListView;
 
     @FXML
     private TextField newNameTextField;
@@ -36,11 +33,19 @@ public class AddNewDeviceNameController {
         listOfNames = FXCollections.observableArrayList();
         try {
             String absPath = new File(".").getAbsolutePath();
-            FileManager.LinesToItems(absPath + "\\files\\sitypes.txt", listOfNames);
-            this.namesListView.setItems(listOfNames);
+            FileManager.LinesToItems(absPath + "\\files\\sitypes.txt", listOfNames);           
         }
         catch(Exception exp) {
-            System.out.println("Error: " + exp.getMessage());
+        	listOfNames.add("Рабочий эталон ККПиО");
+        	listOfNames.add("Набор нагрузок волноводных");
+        	listOfNames.add("Нагрузки волноводные согласованные");
+        	listOfNames.add("Комплект поверочный");
+        	listOfNames.add("Калибровочный и поверочный комплекты мер");
+        	listOfNames.add("Нагрузки волноводные КЗ подвижные");
+            System.out.println("Не удалось загрузить список типов приборов из фала. Возникло исключение с сообщением: " + exp.getMessage());
+        }
+        finally {
+        	namesListView.setItems(listOfNames);
         }
     }
 
@@ -67,19 +72,20 @@ public class AddNewDeviceNameController {
 
     @FXML
     private void saveBtnClick() {
-        this.listOfNames = this.namesListView.getItems();
-        try {
+    	AboutMessageWindow msgWin = null;
+    	try {
             String absPath = new File(".").getAbsolutePath();
             FileManager.ItemsToLines(absPath + "\\files\\sitypes.txt", listOfNames);
             myWindow.getMyOwner().setItemsOfNames();
-            AboutMessageWindow msgWin = new AboutMessageWindow("РЈСЃРїРµС€РЅРѕ", "РР·РјРµРЅРµРЅРёСЏ СЃРїРёСЃРєР° РЅР°РёРјРµРЅРѕРІР°РЅРёР№ С‚РёРїРѕРІ РЎР\nСѓСЃРїРµС€РЅРѕ СЃРѕС…СЂР°РЅРµРЅС‹.");
-            msgWin.show();
+            msgWin = AboutMessageWindow.createWindow("Успешно", "Новый тип СИ добавлен");
             myWindow.close();
-        }
-        catch(Exception exp) {
-            //
-        }
-
+    	}
+    	catch(IOException ioExp) {
+            msgWin = AboutMessageWindow.createWindow("Ошибка", "Не удалось добавить новый тип СИ\nПроверьте существование файла\n...\\files\\sitypes.txt");    
+    	}
+    	finally {
+    		msgWin.show();
+    	}
     }
 
 
