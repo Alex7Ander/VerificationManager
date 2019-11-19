@@ -338,7 +338,8 @@ public class Element implements Includable<Device>, dbStorable{
 		newModulePeriodicParams.saveInDB();
 		newPhasePrimaryParams.saveInDB();
 		newPhasePeriodicparams.saveInDB();
-		newNominals.saveInDB();*/
+		newNominals.saveInDB();
+		*/
 	}
 	
 	public ArrayList<ArrayList<String>> getListOfVerifications() throws SQLException {		

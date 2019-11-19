@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import DataBasePack.DataBaseManager;
 import DataBasePack.dbStorable;
@@ -22,20 +23,34 @@ public class Device implements dbStorable {
 	
 	public ArrayList<Element> includedElements;
 	
-	public String getType() {return type;}
-	public String getName() {return name;}
-	public String getOwner() {return this.owner;}
-	public String getSerialNumber() {return serialNumber;}
-	public String getGosNumber() {return gosNumber;}
-	public String getElementsTableName() { return this.elementsTableName;}
-	public int getCountOfElements() {return this.countOfElements;}
+	public String getType() {
+		return type;
+	}
+	public String getName() {
+		return name;
+	}
+	public String getOwner() {
+		return owner;
+	}
+	public String getSerialNumber() {
+		return serialNumber;
+	}
+	public String getGosNumber() {
+		return gosNumber;
+	}
+	public String getElementsTableName() { 
+		return elementsTableName;
+	}
+	public int getCountOfElements() {
+		return countOfElements;
+	}
 		
 	//Конструктор для извлечения из БД
 	public Device(String Name, String Type, String SerialNumber) throws SQLException {		
 		includedElements = new ArrayList<Element>();		
-		this.name = Name;
-		this.type = Type;
-		this.serialNumber = SerialNumber;
+		name = Name;
+		type = Type;
+		serialNumber = SerialNumber;
 		String sqlQuery = "SELECT Owner, GosNumber, CountOfElements, ElementsTable FROM Devices WHERE TypeOfDevice='"+ Type +"' AND NameOfDevice='"+ Name +"' AND SerialNumber='"+ SerialNumber +"'";		
 		ArrayList<String> fieldName = new ArrayList<String>();
 		fieldName.add("Owner"); 
@@ -49,11 +64,13 @@ public class Device implements dbStorable {
 			this.gosNumber = arrayResults.get(0).get(1);						
 			this.elementsTableName = arrayResults.get(0).get(3);			
 			this.countOfElements = 0;			
-			int predictableCount = Integer.parseInt(arrayResults.get(0).get(2));
-			for (int i=0; i<predictableCount; i++) {
-				Element element = new Element(this, i+1);
-				this.includedElements.add(element);
-				this.countOfElements++;		
+			List<String> indices = new ArrayList<String>();
+			sqlQuery = "SELECT id FROM [" + elementsTableName + "]";
+			DataBaseManager.getDB().sqlQueryString(sqlQuery, "id", indices);
+			for (int i = 0; i < indices.size(); i++) {
+				Element element = new Element(this, Integer.parseInt(indices.get(i)));
+				includedElements.add(element);
+				countOfElements++;		
 			}
 		}
 	}
