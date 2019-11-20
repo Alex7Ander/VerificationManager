@@ -110,7 +110,7 @@ public class DataBaseManager {
     	}
     }
     
-    public void sqlQueryString(String sqlString, String fieldName, Collection<String> arrayResults) throws SQLException{
+    public void sqlQueryString(String sqlString, String fieldName, List<String> arrayResults) throws SQLException{
     	ResultSet rSet = this.state.executeQuery(sqlString);
     	while(rSet.next()) {
     		arrayResults.add(rSet.getString(fieldName));

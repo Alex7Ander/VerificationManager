@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
 import DataBasePack.DataBaseManager;
 import DataBasePack.dbStorable;
 import DevicePack.Element;
@@ -23,42 +22,41 @@ public class ToleranceParametrs implements Includable<Element>, dbStorable {
 		 return this.tableName;
 	 }
 	 public void setTableName(){
-		 String addrStr = this.myElement.getMyOwner().getName() + " " +
-				 		  this.myElement.getMyOwner().getType() + " " +
-				 		  this.myElement.getMyOwner().getSerialNumber() + " " +
-				 		  this.myElement.getType() + " " + this.myElement.getSerialNumber();
-		 tableName = "Параметры допуска " + this.timeType.getTableNamePart() + " поверки " + this.measUnitPart.getTableNamePart() + " S параметров для " + addrStr;
+		 String addrStr = myElement.getMyOwner().getName() + " " +
+				 		  myElement.getMyOwner().getType() + " " +
+				 		  myElement.getMyOwner().getSerialNumber() + " " +
+				 		  myElement.getType() + " " + myElement.getSerialNumber();
+		 tableName = "Параметры допуска " + timeType.getTableNamePart() + " поверки " + measUnitPart.getTableNamePart() + " S параметров для " + addrStr;
 	 }
 	 public TimeType timeType;
 	 public MeasUnitPart measUnitPart;
 //Constructors
 	 ToleranceParametrs(){
-		this.values = new LinkedHashMap<String, Map<Double, Double>>();
-		this.freqs = new ArrayList<Double>();
+		values = new LinkedHashMap<String, Map<Double, Double>>();
+		freqs = new ArrayList<Double>();
 	 }	 
 //GUI
 	public ToleranceParametrs(TimeType currentTimeType, MeasUnitPart currentUnitPart, NewElementController elCtrl, Element ownerElement){		
 		this();
-		this.myElement = ownerElement;
-		this.timeType = currentTimeType;
-		this.measUnitPart = currentUnitPart;		
-		this.freqs = elCtrl.getFreqsValues();
-		this.values = elCtrl.getToleranceParamsValues(this.timeType, this.measUnitPart);
+		myElement = ownerElement;
+		timeType = currentTimeType;
+		measUnitPart = currentUnitPart;		
+		freqs = elCtrl.getFreqsValues();
+		values = elCtrl.getToleranceParamsValues(timeType, measUnitPart);
 	}
 //DataBase
 	public ToleranceParametrs(TimeType currentTimeType, MeasUnitPart currentUnitPart, Element ownerElement) throws SQLException {
 		this();		
-		this.myElement = ownerElement;
-		this.timeType = currentTimeType;
-		this.measUnitPart = currentUnitPart;
-		setTableName();
-		//this.tableName = "Параметры допуска " + this.timeType.getTableNamePart() + " поверки для " + this.measUnitPart.getTableNamePart() + " S параметров";		
+		myElement = ownerElement;
+		timeType = currentTimeType;
+		measUnitPart = currentUnitPart;
+		setTableName();	
 		
 		ArrayList<String> fieldsNames = new ArrayList<String>();
 		fieldsNames.add("freq");
 		for (int i = 0; i < this.myElement.getSParamsCout(); i++) {
-			fieldsNames.add("DOWN_" + this.measUnitPart + "_" + S_Parametr.values()[i]);
-			fieldsNames.add("UP_" + this.measUnitPart + "_" + S_Parametr.values()[i]);
+			fieldsNames.add("DOWN_" + measUnitPart + "_" + S_Parametr.values()[i]);
+			fieldsNames.add("UP_" + measUnitPart + "_" + S_Parametr.values()[i]);
 		}
 		
 		String sqlQuery = "SELECT ";
@@ -78,32 +76,32 @@ public class ToleranceParametrs implements Includable<Element>, dbStorable {
 	 public void saveInDB() throws SQLException, SavingException {
 		String sqlQuery = "CREATE TABLE [" + this.tableName + "] (id INTEGER PRIMARY KEY AUTOINCREMENT, freq VARCHAR(20), ";
 		for (int i = 0; i < this.myElement.getSParamsCout(); i++) {
-			sqlQuery += ("DOWN_" + this.measUnitPart + "_" + S_Parametr.values()[i] + " VARCHAR(20), ");
-			sqlQuery += ("UP_" + this.measUnitPart + "_" + S_Parametr.values()[i] + " VARCHAR(20)");
-			if (i != this.myElement.getSParamsCout() - 1) sqlQuery += ", ";
+			sqlQuery += ("DOWN_" + measUnitPart + "_" + S_Parametr.values()[i] + " VARCHAR(20), ");
+			sqlQuery += ("UP_" + measUnitPart + "_" + S_Parametr.values()[i] + " VARCHAR(20)");
+			if (i != myElement.getSParamsCout() - 1) sqlQuery += ", ";
 		}
 		sqlQuery += ")";
 		 try {
 			 DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
 		 } catch (SQLException sqlExp) {
 			 throw new SavingException("Не удалось создать таблицу с параметрами для\n ." +
-					 this.measUnitPart.getTableNamePart() + " S параметра при " +
-					 this.timeType.getTableNamePart() + " поверке" );
+					 measUnitPart.getTableNamePart() + " S параметра при " +
+					 timeType.getTableNamePart() + " поверке" );
 		 }
-		for (int i = 0; i < this.freqs.size(); i++) {			
-			sqlQuery = "INSERT INTO [" + this.tableName + "] (freq, ";						
-			for (int j = 0; j < this.myElement.getSParamsCout(); j++) {
-				sqlQuery += ("DOWN_" + this.measUnitPart + "_" + S_Parametr.values()[j] + ", ");
-				sqlQuery += ("UP_" + this.measUnitPart + "_" + S_Parametr.values()[j]);
-				if (j !=  this.myElement.getSParamsCout() - 1) sqlQuery += ", ";
+		for (int i = 0; i < freqs.size(); i++) {			
+			sqlQuery = "INSERT INTO [" + tableName + "] (freq, ";						
+			for (int j = 0; j < myElement.getSParamsCout(); j++) {
+				sqlQuery += ("DOWN_" + measUnitPart + "_" + S_Parametr.values()[j] + ", ");
+				sqlQuery += ("UP_" + measUnitPart + "_" + S_Parametr.values()[j]);
+				if (j !=  myElement.getSParamsCout() - 1) sqlQuery += ", ";
 			}
 			sqlQuery += ") values ('"+freqs.get(i)+"', ";		
-			for (int j = 0; j < this.myElement.getSParamsCout(); j++) {
-				String key = "DOWN_" + this.measUnitPart + "_" + S_Parametr.values()[j];
+			for (int j = 0; j < myElement.getSParamsCout(); j++) {
+				String key = "DOWN_" + measUnitPart + "_" + S_Parametr.values()[j];
 				sqlQuery += ("'"+values.get(key).get(freqs.get(i)).toString()+"', ");
-				key = "UP_" + this.measUnitPart + "_" + S_Parametr.values()[j];
+				key = "UP_" + measUnitPart + "_" + S_Parametr.values()[j];
 				sqlQuery += ("'"+values.get(key).get(freqs.get(i)).toString()+"'");
-				if (j != this.myElement.getSParamsCout() - 1) sqlQuery += ", ";
+				if (j != myElement.getSParamsCout() - 1) sqlQuery += ", ";
 			}				
 			sqlQuery += ")";
 			try {
@@ -111,8 +109,8 @@ public class ToleranceParametrs implements Includable<Element>, dbStorable {
 			} catch (SQLException sqlExp) {
 				throw new SavingException("Не удалось сохранить значения параметров на частоте\n ." +
 						freqs.get(i).toString() + " для " +
-						this.measUnitPart.getTableNamePart() + " S параметра при " +
-						this.timeType.getTableNamePart() + " поверке" );
+						measUnitPart.getTableNamePart() + " S параметра при " +
+						timeType.getTableNamePart() + " поверке" );
 			}
 		}			
 	 }
@@ -127,12 +125,14 @@ public class ToleranceParametrs implements Includable<Element>, dbStorable {
 	 }
 	 
 	 public void rewriteTableNames() throws SQLException {
-		 String addrStr = this.myElement.getMyOwner().getName() + " " +
-		 		  this.myElement.getMyOwner().getType() + " " +
-		 		  this.myElement.getMyOwner().getSerialNumber() + " " +
-		 		  this.myElement.getType() + " " + this.myElement.getSerialNumber();
-		 String newTableName = "Параметры допуска " + this.timeType.getTableNamePart() + " поверки " + this.measUnitPart.getTableNamePart() + " S параметров для " + addrStr;		  
-		 String sqlQuery = "ALTER TABLE " + this.tableName + " RENAME TO " + newTableName;
+		 String newTableName = "Параметры допуска " + timeType.getTableNamePart() + " поверки " + measUnitPart.getTableNamePart() + " S параметров для " + myElement.getMyOwner().getName() + " " +
+		 		  			   myElement.getMyOwner().getType() + " " + myElement.getMyOwner().getSerialNumber() + " " + myElement.getType() + " " + myElement.getSerialNumber();
+		 
+		 String elementsOfTableName = myElement.getMyOwner().getElementsTableName();
+		 String sqlQuery = "UPDATE [" + elementsOfTableName + "] SET " + getFieldInElementsOfTable() + "='" + newTableName + "' "
+		 				 + "WHERE ElementType='" + myElement.getType() + "' AND ElementSerNumber='" + myElement.getSerialNumber() + "'";
+		 DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
+		 sqlQuery = "ALTER TABLE [" + tableName + "] RENAME TO [" + newTableName + "]";
 		 DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
 		 tableName = newTableName;
 	 }
@@ -152,5 +152,22 @@ public class ToleranceParametrs implements Includable<Element>, dbStorable {
 	 }
 	 public boolean checkResult(MeasResult result) {
 		return this.strategy.checkResult(result, this);
+	 }
+	 
+	 
+	 private String getFieldInElementsOfTable() {
+		 String result = null;
+		 if (timeType.equals(TimeType.PRIMARY)) 
+			 result = "Primary";
+		 else
+			 result = "Periodic";
+		 
+		 if (measUnitPart.equals(MeasUnitPart.MODULE))
+			 result += "Module";
+		 else
+			 result += "Phase";
+		 
+		 result += "ParamTable";
+		 return result;
 	 }
 }

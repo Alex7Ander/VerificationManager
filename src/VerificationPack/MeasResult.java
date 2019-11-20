@@ -167,10 +167,7 @@ public class MeasResult implements Includable<Element>, dbStorable{
 	
 	@Override
 	public void deleteFromDB() throws SQLException {
-		String when = dateFormat.format(this.dateOfMeas);
-		String listOfVerificationsTable = myElement.getListOfVerificationsTable();
-		String what = myElement.getMyOwner().getName() + " " + myElement.getMyOwner().getType() + " " + myElement.getMyOwner().getSerialNumber() + " " + myElement.getType() + " " + myElement.getSerialNumber();
-		String resultsTableName = "Результаты поверки для " + what + " проведенной  " + when;		
+		String listOfVerificationsTable = myElement.getListOfVerificationsTable();				
 		String sqlQuery = "DELETE FROM ["+ listOfVerificationsTable +"] WHERE resultsTableName='" + tableName + "'";	
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);		
 		sqlQuery = "DROP TABLE [" + tableName + "]";
@@ -193,6 +190,7 @@ public class MeasResult implements Includable<Element>, dbStorable{
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
 		String strDateOfMeas = dateFormat.format(dateOfMeas);
 		sqlQuery = "UPDATE [" + listOfVerificationTable + "] SET nominalStauts = '+' WHERE dateOfVerification='" + strDateOfMeas + "'";
+		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
 	}
 	
 	public void rewriteTableNames() throws SQLException {
@@ -200,7 +198,10 @@ public class MeasResult implements Includable<Element>, dbStorable{
 		String newTableName = "Результаты поверки для " +
 				myElement.getMyOwner().getName() + " " + myElement.getMyOwner().getType() + " " + myElement.getMyOwner().getSerialNumber() + " " + myElement.getType() + " " + myElement.getSerialNumber() +
 				" проведенной " + strDateOfMeas;	
-		String sqlQuery = "ALTER TABLE " + tableName + " RENAME TO " + newTableName;
+		String sqlQuery = "UPDATE [" + myElement.getListOfVerificationsTable() + "] SET resultsTableName='" + newTableName + "' WHERE dateOfVerification='" + strDateOfMeas + "'";
+		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
+		//UPDATE [Проведенные поверки для Комплект поверочный TEST - 15 31351 Нагрузка согласованная 7-89] SET resultsTableName='Результаты поверки для Комплект поверочный TEST - 15 789523 Нагрузка согласованная 7-89 проведенной 20/11/2019 16:52:25' WHERE dateOfVerification='20/11/2019 16:52:25'
+		sqlQuery = "ALTER TABLE [" + tableName + "] RENAME TO [" + newTableName + "]";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
 	}
 }

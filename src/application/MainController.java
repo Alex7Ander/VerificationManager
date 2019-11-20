@@ -5,14 +5,10 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseEvent;
-
 import java.awt.Desktop;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-
 import AboutMessageForm.AboutMessageWindow;
 import DBEditForm.DBEditWindow;
 import NewDevicePack.NewDeviceWindow;

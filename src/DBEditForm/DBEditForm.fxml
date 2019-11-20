@@ -12,13 +12,13 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="895.0" prefWidth="1324.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="DBEditForm.DBEditController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="895.0" prefWidth="1528.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="DBEditForm.DBEditController">
    <children>
-      <HBox prefHeight="895.0" prefWidth="1324.0">
+      <HBox prefHeight="895.0" prefWidth="1528.0">
          <children>
-            <VBox prefHeight="839.0" prefWidth="369.0">
+            <VBox prefHeight="895.0" prefWidth="557.0">
                <children>
-                  <Button fx:id="searchDeviceBtn" mnemonicParsing="false" onAction="#searchDeviceBtnClick" prefHeight="40.0" prefWidth="358.0" stylesheets="@../../bin/application/commonButton.css" text="Выбрать СИ" textAlignment="CENTER">
+                  <Button fx:id="searchDeviceBtn" mnemonicParsing="false" onAction="#searchDeviceBtnClick" prefHeight="26.0" prefWidth="565.0" stylesheets="@../../bin/application/commonButton.css" text="Выбрать СИ" textAlignment="CENTER">
                      <VBox.margin>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                      </VBox.margin>
@@ -33,7 +33,7 @@
                               <HBox prefHeight="30.0" prefWidth="200.0">
                                  <children>
                                     <Label prefWidth="130.0" stylesheets="@../../bin/application/commonLabel.css" text="Наименование СИ:" />
-                                    <ComboBox fx:id="nameComboBox" prefHeight="26.0" prefWidth="214.0">
+                                    <ComboBox fx:id="nameComboBox" prefHeight="26.0" prefWidth="400.0">
                                        <HBox.margin>
                                           <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
                                        </HBox.margin></ComboBox>
@@ -42,7 +42,7 @@
                               <HBox prefHeight="30.0" prefWidth="200.0">
                                  <children>
                                     <Label prefWidth="130.0" stylesheets="@../../bin/application/commonLabel.css" text="Тип СИ:" />
-                                    <TextField fx:id="typeTextField" prefWidth="215.0">
+                                    <TextField fx:id="typeTextField" prefWidth="400.0">
                                        <HBox.margin>
                                           <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
                                        </HBox.margin></TextField>
@@ -51,7 +51,7 @@
                               <HBox prefHeight="30.0" prefWidth="200.0">
                                  <children>
                                     <Label prefWidth="130.0" stylesheets="@../../bin/application/commonLabel.css" text="Заводской номер:" />
-                                    <TextField fx:id="serNumTextField" prefWidth="215.0">
+                                    <TextField fx:id="serNumTextField" prefWidth="400.0">
                                        <HBox.margin>
                                           <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
                                        </HBox.margin></TextField>
@@ -60,7 +60,7 @@
                               <HBox prefHeight="30.0" prefWidth="200.0">
                                  <children>
                                     <Label prefWidth="130.0" stylesheets="@../../bin/application/commonLabel.css" text="Владелец:" />
-                                    <TextField fx:id="ownerTextField" prefWidth="215.0">
+                                    <TextField fx:id="ownerTextField" prefWidth="400.0">
                                        <HBox.margin>
                                           <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
                                        </HBox.margin></TextField>
@@ -69,12 +69,17 @@
                               <HBox prefHeight="30.0" prefWidth="200.0">
                                  <children>
                                     <Label prefHeight="16.0" prefWidth="130.0" stylesheets="@../../bin/application/commonLabel.css" text="Номер в Гос. Реестре:" />
-                                    <TextField fx:id="gosNumTextField" prefWidth="215.0">
+                                    <TextField fx:id="gosNumTextField" prefWidth="400.0">
                                        <HBox.margin>
                                           <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
                                        </HBox.margin></TextField>
                                  </children>
                               </HBox>
+                              <Button fx:id="saveDeviceModificationBtn" mnemonicParsing="false" onAction="#saveDeviceModificationBtnClick" prefHeight="26.0" prefWidth="531.0" stylesheets="@../../bin/application/commonButton.css" text="Сохранить изменения">
+                                 <VBox.margin>
+                                    <Insets bottom="1.0" left="2.0" right="2.0" top="5.0" />
+                                 </VBox.margin>
+                              </Button>
                            </children>
                         </VBox>
                      </content>
@@ -109,14 +114,9 @@
                         <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
                      </VBox.margin>
                   </ListView>
-                  <Button fx:id="saveDeviceModificationBtn" mnemonicParsing="false" onAction="#saveDeviceModificationBtnClick" prefHeight="30.0" prefWidth="363.0" stylesheets="@../../bin/application/commonButton.css" text="Сохранить изменения">
+                  <Button fx:id="deleteDeviceBtn" mnemonicParsing="false" onAction="#deleteDeviceBtnClick" prefHeight="26.0" prefWidth="553.0" stylesheets="@../../bin/application/commonButton.css" text="Удалить СИ">
                      <VBox.margin>
-                        <Insets bottom="5.0" left="2.0" right="2.0" top="2.0" />
-                     </VBox.margin>
-                  </Button>
-                  <Button fx:id="deleteDeviceBtn" mnemonicParsing="false" onAction="#deleteDeviceBtnClick" prefHeight="29.0" prefWidth="365.0" stylesheets="@../../bin/application/commonButton.css" text="Удалить СИ">
-                     <VBox.margin>
-                        <Insets bottom="5.0" left="2.0" right="2.0" top="2.0" />
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="2.0" />
                      </VBox.margin>
                   </Button>
                </children>
@@ -128,7 +128,7 @@
                         <Label layoutX="14.0" layoutY="14.0" stylesheets="@../application/commonLabel.css" text="Таблица результатов  измерений для " />
                      </children>
                   </AnchorPane>
-                  <ScrollPane fx:id="resultsScrollPane" prefHeight="857.0" prefWidth="952.0">
+                  <ScrollPane fx:id="resultsScrollPane" prefHeight="792.0" prefWidth="975.0">
                      <content>
                         <AnchorPane fx:id="resultsTablePane" minHeight="0.0" minWidth="0.0" prefHeight="155.0" prefWidth="474.0" />
                      </content>
@@ -138,7 +138,7 @@
                   </ScrollPane>
                   <HBox prefHeight="100.0" prefWidth="200.0">
                      <children>
-                        <Button fx:id="errorParamsBtn" disable="true" mnemonicParsing="false" onAction="#errorParamsBtnClick" opacity="0.05" prefHeight="26.0" prefWidth="37.0" stylesheets="@../../bin/application/commonButton.css" text="Параметры погрешности" />
+                        <Button disable="true" mnemonicParsing="false" opacity="0.05" prefHeight="26.0" prefWidth="37.0" stylesheets="@../../bin/application/commonButton.css" text="Параметры погрешности" />
                      </children>
                   </HBox>
                </children>

@@ -3,6 +3,8 @@ package DevicePack;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+
 import DataBasePack.DataBaseManager;
 import DataBasePack.dbStorable;
 import Exceptions.NoOwnerException;
@@ -114,7 +116,7 @@ public class Element implements Includable<Device>, dbStorable{
 	}	
 	@Override
 	public Device getMyOwner() {
-		return this.myDevice;
+		return myDevice;
 	}
 	@Override
 	public void onAdding(Device Owner) {
@@ -128,7 +130,7 @@ public class Element implements Includable<Device>, dbStorable{
 
 //DataBase
 	public Element(Device deviceOwner, int index) throws SQLException {		
-		this.myDevice = deviceOwner;
+		myDevice = deviceOwner;
 		String elementTableName = myDevice.getElementsTableName();
 		String sqlQuery = "SELECT ElementType, ElementSerNumber, PoleCount, MeasUnit, ModuleToleranceType, PhaseToleranceType, VerificationsTable, PrimaryModuleParamTable, PeriodicModuleParamTable, PrimaryPhaseParamTable, PeriodicPhaseParamTable, NominalIndex FROM [" + elementTableName + "] WHERE id='"+index+"'";
 		ArrayList<String> fieldName = new ArrayList<String>();
@@ -166,9 +168,9 @@ public class Element implements Includable<Device>, dbStorable{
 		arrayResults.clear();
 		fieldName.clear();
 		fieldName.add("resultsTableName");
-		sqlQuery = "SELECT resultsTableName FROM ["+ this.listOfVerificationsTable +"] WHERE id = "+Integer.toString(this.nominalIndex)+"";
+		sqlQuery = "SELECT resultsTableName FROM [" + listOfVerificationsTable + "] WHERE id = " + Integer.toString(nominalIndex) + "";
 		DataBaseManager.getDB().sqlQueryString(sqlQuery, fieldName, arrayResults);
-		this.nominalTable = arrayResults.get(0).get(0);		 
+		nominalTable = arrayResults.get(0).get(0);		 
 		if (measUnit.equals("vswr")) {
 			nominal = new VSWR_Result(this, nominalIndex);
 		}
@@ -306,33 +308,36 @@ public class Element implements Includable<Device>, dbStorable{
 	}
 	
 	public void rewriteTableNames() throws SQLException {
-		//First of all we must rewrite table names for results of measurements
-		String sqlQuery = "SELECT COUNT(*) FROM [" + listOfVerificationsTable + "]";
-		int countOfMeas = DataBaseManager.getDB().sqlQueryCount(sqlQuery);
-		for (int i = 0; i < countOfMeas; i++) {
-			MeasResult measRes = new MeasResult(this, i);
+		//First of all we must rewrite table names for results of measurements		
+		List<String> measIndices = new ArrayList<String>();
+		String sqlQuery = "SELECT id FROM [" + listOfVerificationsTable + "]";
+		DataBaseManager.getDB().sqlQueryString(sqlQuery, "id", measIndices);		
+		for (int i = 0; i < measIndices.size(); i++) {
+			MeasResult measRes = new MeasResult(this, Integer.parseInt(measIndices.get(i)));
 			measRes.rewriteTableNames();
 		}
 		//Now we are rewriting name of the table with the list of verifications
 		String newListOfVerificationsTable = "Проведенные поверки для " + myDevice.getName() + " " + myDevice.getType() + " " + myDevice.getSerialNumber() + " " + type + " " + serialNumber;
-		sqlQuery = "ALTER TABLE " + listOfVerificationsTable + " RENAME TO " + newListOfVerificationsTable;
+		sqlQuery = "ALTER TABLE [" + listOfVerificationsTable + "] RENAME TO [" + newListOfVerificationsTable + "]";
+		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
+		sqlQuery = "UPDATE [" + myDevice.getElementsTableName() + "] SET VerificationsTable='" + newListOfVerificationsTable + "'";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
 		// Field listOfVerificationsTable takes new value only after successful query to DB
 		listOfVerificationsTable = newListOfVerificationsTable;
-		//And finally we are rewriting tables names of tolerance parameters
-		this.primaryModuleToleranceParams.rewriteTableNames();
-		this.primaryPhaseToleranceParams.rewriteTableNames();
-		this.periodicModuleToleranceParams.rewriteTableNames();
-		this.periodicPhaseToleranceParams.rewriteTableNames();	
+		//And finally we are rewriting table names of tolerance parameters
+		primaryModuleToleranceParams.rewriteTableNames();
+		primaryPhaseToleranceParams.rewriteTableNames();
+		periodicModuleToleranceParams.rewriteTableNames();
+		periodicPhaseToleranceParams.rewriteTableNames();	
 	}
 	
 	public void rewriteParams(ToleranceParametrs newModulePrimaryParams, ToleranceParametrs newModulePeriodicParams,
 							  ToleranceParametrs newPhasePrimaryParams, ToleranceParametrs newPhasePeriodicparams, MeasResult newNominals) throws SQLException{
-		this.primaryModuleToleranceParams.deleteFromDB();
-		this.primaryPhaseToleranceParams.deleteFromDB();
-		this.periodicModuleToleranceParams.deleteFromDB();
-		this.periodicPhaseToleranceParams.deleteFromDB();
-		this.nominal.deleteFromDB();
+		primaryModuleToleranceParams.deleteFromDB();
+		primaryPhaseToleranceParams.deleteFromDB();
+		periodicModuleToleranceParams.deleteFromDB();
+		periodicPhaseToleranceParams.deleteFromDB();
+		nominal.deleteFromDB();
 		/*
 		newModulePrimaryParams.saveInDB();
 		newModulePeriodicParams.saveInDB();

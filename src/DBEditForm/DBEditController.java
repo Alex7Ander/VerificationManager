@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-
 import AboutMessageForm.AboutMessageWindow;
 import DataBasePack.DataBaseManager;
 import DevicePack.Device;

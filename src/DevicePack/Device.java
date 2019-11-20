@@ -143,41 +143,45 @@ public class Device implements dbStorable {
 			}
 			count++;
 		}
-		sqlQuery += "WHERE NameOfDevice='"+this.name+"' AND TypeOfDevice='"+this.type+"' AND SerialNumber='"+this.serialNumber+"'";
+		sqlQuery += "WHERE NameOfDevice='" + name + "' AND TypeOfDevice='" + type + "' AND SerialNumber='" + serialNumber + "'";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
 		
 		boolean tableNamesMustBeRewrited = false;
 		for (String field : editingValues.keySet()) {
 			if (field.equals("NameOfDevice")) {
-				this.name = editingValues.get(field);
+				name = editingValues.get(field);
 				tableNamesMustBeRewrited = true;
 			} 
 			else if (field.equals("TypeOfDevice")) {
-				this.type = editingValues.get(field);
+				type = editingValues.get(field);
 				tableNamesMustBeRewrited = true;
 			}
 			else if (field.equals("SerialNumber")) {
-				this.serialNumber = editingValues.get(field);
+				serialNumber = editingValues.get(field);
 				tableNamesMustBeRewrited = true;
 			}
 			else if(field.equals("Owner")) {
-				this.owner = editingValues.get(field);
+				owner = editingValues.get(field);
 			}
 			else if (field.equals("GosNumber")) {
-				this.gosNumber = editingValues.get(field);
+				gosNumber = editingValues.get(field);
 			}
 		}
 		
 		if (tableNamesMustBeRewrited) {
 			String oldElementsTableName = elementsTableName;
 			elementsTableName = "Ёлементы дл€ " + name + " " + type + " " + serialNumber;
+			sqlQuery = "SELECT SerialNumber FROM [Devices] WHERE NameOfDevice='" + name + "' AND TypeOfDevice='" + type + "' AND SerialNumber='" + serialNumber + "'";
+			List<String> arrayResults = new ArrayList<String>();
+			DataBaseManager.getDB().sqlQueryString(sqlQuery, "SerialNumber", arrayResults);
 			sqlQuery = "UPDATE Devices SET ElementsTable='" + elementsTableName + "' WHERE NameOfDevice='" + name + "' AND TypeOfDevice='" + type + "' AND SerialNumber='" + serialNumber + "'";
 			DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
-			sqlQuery = "ALTER TABLE " + oldElementsTableName + " RENAME TO "+ elementsTableName;			
+			sqlQuery = "ALTER TABLE [" + oldElementsTableName + "] RENAME TO ["+ elementsTableName + "]";	
+			DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
 			for (Element element : includedElements) {
 				element.rewriteTableNames();
 			}
-		}		
+		}
 	}
 		
 	public void addElement(Element element) {
