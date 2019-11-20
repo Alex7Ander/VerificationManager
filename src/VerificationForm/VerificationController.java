@@ -186,7 +186,7 @@ public class VerificationController implements InfoRequestable {
 		String psiFilePath = absPath + "\\measurement\\PSI.ini";
 		verificatedDevice.createIniFile(psiFilePath);
 		//Запуск программы measurement
-		File file =new File(absPath + "\\measurement\\Project1.exe");
+		File file = new File(absPath + "\\measurement\\Project1.exe");
 		Desktop.getDesktop().open(file);				
 	}
 		

@@ -3,7 +3,10 @@
 /measurment
 /MessageSender
 /Protocols
+/NMA
+/files
+/bin
 *.db
 *.exe
 *.jar
-/bin/
+

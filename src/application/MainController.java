@@ -5,6 +5,14 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseEvent;
+
+import java.awt.Desktop;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+
 import AboutMessageForm.AboutMessageWindow;
 import DBEditForm.DBEditWindow;
 import NewDevicePack.NewDeviceWindow;
@@ -29,6 +37,9 @@ public class MainController {
 	
 	@FXML
 	private Button searchOldDocBtn;
+	
+	@FXML
+	private Button imcButton;
 	
 	@FXML
 	private TextArea helpTextArea;
@@ -160,6 +171,51 @@ public class MainController {
 		catch (Exception exp) {
 			helpTextArea.setText(exp.getMessage());
 		}
+	}
+
+// IMC button
+	@FXML
+	private void mouseOnIMCBtn() {
+		helpTextArea.setText("Проведение независимой метрологической аттестации");
+		try {
+			imcButton.setOpacity(1.0);
+		}
+		catch(Exception exp) {
+			helpTextArea.setText(exp.getMessage());
+		}
+	}
+	@FXML
+	private void mouseOffIMCBtn() {
+		helpTextArea.setText("");
+		try {
+			imcButton.setOpacity(0.8);
+		}
+		catch(Exception exp) {
+			helpTextArea.setText(exp.getMessage());
+		}
+	}
+	@FXML
+	private void IMCBtnClick() {
+		String absPath = new File(".").getAbsolutePath();
+		String path = absPath;
+		try(FileReader reader =  new FileReader(absPath + "\\files\\imcexe.txt")){
+			int c;
+			while((c = reader.read()) != -1) {
+				path += (char)c;
+			}
+		}
+		catch (IOException ioExp) {
+			System.out.println("Отсутствует файл imcexe.txt");
+			path += "\\NMA\\Project1.exe";
+		}		
+		//Start program of independent meteorology certification
+		File imcExe = new File(path);
+		try {
+			Desktop.getDesktop().open(imcExe);
+		}
+		catch (IOException ioExp) {
+			System.out.println("Отсутствует файл " + path);
+		}		
 	}
 	
 //About button
