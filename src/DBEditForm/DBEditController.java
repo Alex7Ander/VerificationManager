@@ -10,10 +10,12 @@ import DataBasePack.DataBaseManager;
 import DevicePack.Device;
 import DevicePack.Element;
 import ErrorParamsPack.ErrorParamsWindow;
+import Exceptions.SavingException;
 import FileManagePack.FileManager;
 import GUIpack.InfoRequestable;
 import GUIpack.StringGridFXPack.ResultsStringGridFX;
 import GUIpack.StringGridFXPack.StringGridPosition;
+import NewElementPack.NewElementController;
 import NewElementPack.NewElementWindow;
 import SearchDevicePack.SearchDeviceWindow;
 import ToleranceParamPack.ParametrsPack.S_Parametr;
@@ -123,20 +125,23 @@ public class DBEditController implements InfoRequestable {
 		elemtnsListViewContextMenu = new ContextMenu();
 		MenuItem deleteElementItem = new MenuItem("Удалить");
 		MenuItem editElementItem = new MenuItem("Редактировать");
-		elemtnsListViewContextMenu.getItems().addAll(deleteElementItem, editElementItem);
+		MenuItem addElementItem = new MenuItem("Добавить");
+		elemtnsListViewContextMenu.getItems().addAll(deleteElementItem, editElementItem, addElementItem);
 		
+		//deleting element
 		deleteElementItem.setOnAction(event->{
 			int answer = YesNoWindow.createYesNoWindow("Удалить?", "Удалить выбранный элемент:\n" + 
-							this.elementsListView.getSelectionModel().getSelectedItem().toString()).showAndWait();
+							elementsListView.getSelectionModel().getSelectedItem().toString()).showAndWait();
 			if (answer == 0) {
-				int deletedElementIndex = this.elementsListView.getSelectionModel().getSelectedIndex();
+				int deletedElementIndex = elementsListView.getSelectionModel().getSelectedIndex();
 				deleteElement(deletedElementIndex);
 			}	
 		});
 		
+		//editing element
 		editElementItem.setOnAction(event->{
-			int index = this.elementsListView.getSelectionModel().getSelectedIndex();
-			Element elm = this.modDevice.includedElements.get(index);
+			int index = elementsListView.getSelectionModel().getSelectedIndex();
+			Element elm = modDevice.includedElements.get(index);
 			try {
 				NewElementWindow elementWin = new NewElementWindow(elm);
 				elementWin.show();
@@ -145,7 +150,35 @@ public class DBEditController implements InfoRequestable {
 			}
 		});
 		
-		this.elementsListView.setOnContextMenuRequested(event->{
+		//adding new element
+		addElementItem.setOnAction(event -> {
+			if (modDevice != null) {
+				try {
+					NewElementWindow elementWin = new NewElementWindow();
+					elementWin.showAndWait();	
+					NewElementController ctrl = (NewElementController)elementWin.getControllerClass();
+					Element newElement = new Element(ctrl);
+					modDevice.addElement(newElement);
+					newElement.saveInDB();
+					String item = newElement.getType() + " №" + newElement.getSerialNumber();
+					elementsList.add(item);
+					AboutMessageWindow.createWindow("Успешное сохранение", "Новый элемент успешно добавлен").show();
+				} 
+				catch (IOException e) {
+					e.printStackTrace();
+				} 
+				catch (SavingException sExp) {
+					AboutMessageWindow.createWindow("Ошибка сохранения", sExp.getMessage()).show();
+					sExp.printStackTrace();
+				} 
+				catch (SQLException sqlExp) {
+					AboutMessageWindow.createWindow("Ошибка сохранения", "База данных отсутсвует или повреждена").show();
+					sqlExp.printStackTrace();
+				}
+			}
+		});
+		
+		elementsListView.setOnContextMenuRequested(event->{
 			double x = event.getScreenX();
 			double y = event.getScreenY();
 			elemtnsListViewContextMenu.show(elementsListView, x, y);

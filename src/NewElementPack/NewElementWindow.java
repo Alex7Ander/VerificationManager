@@ -139,4 +139,9 @@ public class NewElementWindow extends guiWindow {
 	public void setTitle(String newTitle) {
 		title = newTitle;
 	}
+	
+	
+	public void showAndWait() {
+		stage.showAndWait();
+	}
 }
