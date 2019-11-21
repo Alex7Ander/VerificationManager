@@ -14,7 +14,7 @@ import java.util.List;
 
 public class FileManager {
 
-	public static int LinesToItems(String filePath, Collection<String> collection) throws FileNotFoundException, IOException {
+	public static int LinesToItems(String filePath, List<String> collection) throws FileNotFoundException, IOException {
 		collection.clear();
         BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), StandardCharsets.UTF_8));
         String item = null;
@@ -25,7 +25,7 @@ public class FileManager {
 		return collection.size();		
 	}	
 	
-	public static int LinesToItems(String filePath, int count, Collection<String> collection) throws FileNotFoundException, IOException {
+	public static int LinesToItems(String filePath, int count, List<String> collection) throws FileNotFoundException, IOException {
 		collection.clear();
         BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), StandardCharsets.UTF_8));
         String item = null;
@@ -37,7 +37,7 @@ public class FileManager {
 		return collection.size();		
 	}
 	
-	public static int LinesToDouble(String filePath, Collection<Double> collection) throws FileNotFoundException, IOException{
+	public static int LinesToDouble(String filePath, List<Double> collection) throws FileNotFoundException, IOException{
 		collection.clear();
         BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), StandardCharsets.UTF_8));
         String item = null;

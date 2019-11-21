@@ -4,10 +4,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-
 import FileManagePack.FileManager;
 import NewElementPack.NewElementController;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -21,6 +21,7 @@ public class FreqTablesController {
 	private Button exitBtn;
 	@FXML
 	private ComboBox<String> freqTableComboBox;
+	private ObservableList<String> freqTables;
 	
 	private NewElementController myOwner;
 	private ArrayList<Double> freqs;
@@ -32,9 +33,19 @@ public class FreqTablesController {
 	
 	
 	@FXML
-	private void initialize() {		
-		freqTableComboBox.setItems(FXCollections.observableArrayList(new String("5,2"),
-				new String("3,6"), new String("2,4"), new String("1,2")));
+	private void initialize() {	
+		freqTables = FXCollections.observableArrayList();
+		try {
+			String filePath = new File(".").getAbsolutePath() + "\\files\\freqTables.txt";
+			FileManager.LinesToItems(filePath, freqTables);
+		}
+		catch(IOException ioExp) {
+			freqTables.add("5,2");
+			freqTables.add("3,6");
+			freqTables.add("2,4");
+			freqTables.add("1,2");
+		}
+		freqTableComboBox.setItems(freqTables);
 		freqTableComboBox.setValue("5,2");
 	}
 		
@@ -57,17 +68,5 @@ public class FreqTablesController {
 	    stage.close();
 	    FreqTablesWindow.deleteFreqTablesWindow();
 	}
-/*
-	@Override
-	public NewElementController getMyOwner() {
-		return myOwner;
-	}
-*/
-/* implements Includable<NewElementController>
-	@Override
-	public void onAdding(NewElementController Owner) {
-		// TODO Auto-generated method stub
-		
-	}
-*/
+
 }

@@ -61,10 +61,8 @@ public class DBEditController implements InfoRequestable {
 	private ContextMenu elemtnsListViewContextMenu;
 	private ContextMenu verificationsDatesListViewContextMenu;
 	private ObservableList<String> elementsList;
-//---------------------------------------------
-
-//Правая часть окна
-	//------------------------------
+	
+	//Правая часть окна
 	//Просмотр результатов измерений
 	@FXML
 	private ListView<String> verificationDateListView;
@@ -99,8 +97,7 @@ public class DBEditController implements InfoRequestable {
 		resultsTable = new ResultsStringGridFX(position);		
 		elementsList = FXCollections.observableArrayList();
 		verificationDateList = FXCollections.observableArrayList();
-		measUnitsList = FXCollections.observableArrayList();
-		
+		measUnitsList = FXCollections.observableArrayList();		
 		devNamesList = FXCollections.observableArrayList();
 		try {
 			FileManager.LinesToItems(new File(".").getAbsolutePath() + "//files//sitypes.txt", devNamesList);
@@ -139,7 +136,7 @@ public class DBEditController implements InfoRequestable {
 		});
 		
 		//editing element
-		editElementItem.setOnAction(event->{
+		editElementItem.setOnAction(event -> {
 			int index = elementsListView.getSelectionModel().getSelectedIndex();
 			Element elm = modDevice.includedElements.get(index);
 			try {
@@ -164,8 +161,9 @@ public class DBEditController implements InfoRequestable {
 					elementsList.add(item);
 					AboutMessageWindow.createWindow("Успешное сохранение", "Новый элемент успешно добавлен").show();
 				} 
-				catch (IOException e) {
-					e.printStackTrace();
+				catch (IOException ioExp) {
+					AboutMessageWindow.createWindow("Ошибка открытия окна", "Ошибка открытия окна создания нового элемента.").show();
+					ioExp.printStackTrace();
 				} 
 				catch (SavingException sExp) {
 					AboutMessageWindow.createWindow("Ошибка сохранения", sExp.getMessage()).show();
@@ -178,7 +176,7 @@ public class DBEditController implements InfoRequestable {
 			}
 		});
 		
-		elementsListView.setOnContextMenuRequested(event->{
+		elementsListView.setOnContextMenuRequested(event -> {
 			double x = event.getScreenX();
 			double y = event.getScreenY();
 			elemtnsListViewContextMenu.show(elementsListView, x, y);
@@ -196,8 +194,9 @@ public class DBEditController implements InfoRequestable {
 			try {
 				deletedResult = new MeasResult(modDevice.includedElements.get(currentElementIndex), resIndex);
 				deletedResult.deleteFromDB();
+				AboutMessageWindow.createWindow("Успешно", "Результат измерения удален").show();
 			} catch (SQLException sqlExp) {
-				AboutMessageWindow.createWindow("Ошибка", "Ошибка доступа к БД\nпри попытке удаления").show();;	
+				AboutMessageWindow.createWindow("Ошибка", "Ошибка доступа к БД\nпри попытке удаления").show();
 			}
 		});
 		

@@ -21,9 +21,7 @@ import VerificationPack.VSWR_Result;
 
 public class Element implements Includable<Device>, dbStorable{
 
-	public Element() {
-		
-	}
+	public Element() {}
 	
 	private Device myDevice; 		
 	private MeasResult nominal;		
@@ -145,7 +143,7 @@ public class Element implements Includable<Device>, dbStorable{
 		fieldName.add("PeriodicModuleParamTable");	//8
 		fieldName.add("PrimaryPhaseParamTable");	//9
 		fieldName.add("PeriodicPhaseParamTable");	//10		
-		fieldName.add("NominalIndex");				//11
+		//fieldName.add("NominalIndex");				//11
 		ArrayList<ArrayList<String>> arrayResults = new ArrayList<ArrayList<String>>();
 		DataBaseManager.getDB().sqlQueryString(sqlQuery, fieldName, arrayResults);				
 		type = arrayResults.get(0).get(0);

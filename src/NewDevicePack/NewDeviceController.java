@@ -35,7 +35,7 @@ public class NewDeviceController  {
 	private Button addNameBtn;
 	
 	@FXML
-	private ComboBox<String>  namesComboBox;
+	private ComboBox<String> namesComboBox;
 	@FXML
 	private TextField typeTextField;
 	@FXML
@@ -66,7 +66,6 @@ public class NewDeviceController  {
 		listOfNames = FXCollections.observableArrayList();
 		elementsButton = new ArrayList<Button>();
 		elementsWindow = new ArrayList<NewElementWindow>();
-		//elements = new ArrayList<Element>();
 		setItemsOfNames();
 	}
 	
