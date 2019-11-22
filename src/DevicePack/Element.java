@@ -21,11 +21,9 @@ import VerificationPack.VSWR_Result;
 
 public class Element implements Includable<Device>, dbStorable{
 
-	public Element() {}
-	
 	private Device myDevice; 		
 	private MeasResult nominal;		
-	private ToleranceParametrs primaryModuleToleranceParams;	// 
+	private ToleranceParametrs primaryModuleToleranceParams;
 	private ToleranceParametrs periodicModuleToleranceParams;
 	private ToleranceParametrs primaryPhaseToleranceParams;
 	private ToleranceParametrs periodicPhaseToleranceParams;
@@ -85,6 +83,9 @@ public class Element implements Includable<Device>, dbStorable{
 		return measUnit;
 	}
 
+	public int getNominalIndex() {
+		return nominalIndex;
+	}
 	public MeasResult getNominal() {
 		return nominal;
 	}
@@ -143,7 +144,7 @@ public class Element implements Includable<Device>, dbStorable{
 		fieldName.add("PeriodicModuleParamTable");	//8
 		fieldName.add("PrimaryPhaseParamTable");	//9
 		fieldName.add("PeriodicPhaseParamTable");	//10		
-		//fieldName.add("NominalIndex");				//11
+		fieldName.add("NominalIndex");				//11
 		ArrayList<ArrayList<String>> arrayResults = new ArrayList<ArrayList<String>>();
 		DataBaseManager.getDB().sqlQueryString(sqlQuery, fieldName, arrayResults);				
 		type = arrayResults.get(0).get(0);
@@ -330,19 +331,22 @@ public class Element implements Includable<Device>, dbStorable{
 	}
 	
 	public void rewriteParams(ToleranceParametrs newModulePrimaryParams, ToleranceParametrs newModulePeriodicParams,
-							  ToleranceParametrs newPhasePrimaryParams, ToleranceParametrs newPhasePeriodicparams, MeasResult newNominals) throws SQLException{
+							  ToleranceParametrs newPhasePrimaryParams,  ToleranceParametrs newPhasePeriodicparams) throws SQLException, SavingException {
 		primaryModuleToleranceParams.deleteFromDB();
 		primaryPhaseToleranceParams.deleteFromDB();
 		periodicModuleToleranceParams.deleteFromDB();
 		periodicPhaseToleranceParams.deleteFromDB();
-		nominal.deleteFromDB();
-		/*
+		//nominal.deleteFromDB();
+		
+		newModulePrimaryParams.onAdding(this);
+		newModulePeriodicParams.onAdding(this);
+		newPhasePrimaryParams.onAdding(this);
+		newPhasePeriodicparams.onAdding(this);
+		
 		newModulePrimaryParams.saveInDB();
 		newModulePeriodicParams.saveInDB();
 		newPhasePrimaryParams.saveInDB();
 		newPhasePeriodicparams.saveInDB();
-		newNominals.saveInDB();
-		*/
 	}
 	
 	public ArrayList<ArrayList<String>> getListOfVerifications() throws SQLException {		

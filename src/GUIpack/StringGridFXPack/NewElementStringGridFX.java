@@ -36,7 +36,7 @@ public class NewElementStringGridFX extends StringGridFX {
 		tableHeads.add("Верхний допуск");
 	}
 	public NewElementStringGridFX(StringGridPosition position, TimeType timeType) {
-		super(7, 10, position, tableHeads);
+		super(7, 9, position, tableHeads);
 		myTimeType = timeType;
 		currentS = S_Parametr.S11;
 		values = new HashMap<String, ArrayList<String>>();
@@ -54,7 +54,11 @@ public class NewElementStringGridFX extends StringGridFX {
 		for (ObservableList<CellTextField> line: this.cells) {
 			for (CellTextField currentCell : line) {
 				currentCell.textProperty().addListener((observableValue, oldText, newText) -> {
-				     if (!newText.isEmpty()) {
+		    		 int lastIndex = newText.length() - 1;
+				     if (!newText.isEmpty() && !(newText.length() == 1 && newText.contains("-+")) && (newText.length() > 1 && (newText.charAt(lastIndex) != '.' || newText.charAt(lastIndex) != ','))) {
+			    		 if (newText.contains(",")) {
+			    			 newText = newText.replace(",",".");
+			    		 }
 				    	 try {
 				    		 @SuppressWarnings("unused")
 							 Double value = Double.parseDouble(newText);
@@ -89,10 +93,10 @@ public class NewElementStringGridFX extends StringGridFX {
 	}
 	public void changeSParametr(S_Parametr parametr) {		
 		saveInputedValues(); 	//Get values		
-		this.clear(); 			//Clear table		
+		clear(); 				//Clear table		
 		showParametr(parametr); //show other values
 		currentS = parametr;
-	}
+	}	
 	
 	public void setValuesFromElement(Element element) {		
 		for (Double freq : element.getNominal().freqs) {
@@ -114,9 +118,7 @@ public class NewElementStringGridFX extends StringGridFX {
 				}
 			}
 		}		
-	}
-	
-	
+	}	
 	public ArrayList<Double> getFreqs(){
 		ArrayList<Double> freqs = new ArrayList<Double>();
 		for (String strFreq : this.values.get("FREQS")) {
@@ -141,25 +143,24 @@ public class NewElementStringGridFX extends StringGridFX {
 			}			
 		}
 		return parametr;
-	}
-	
+	}	
 	public boolean isFull(int countOfControlledParams) {
-		int expectedCount = getRowCount();
 		String prefix[] = new String[] {"DOWN_", "", "UP_"};
 		for (int i = 0; i < countOfControlledParams; i++) {
 			for (int j = 0; j < MeasUnitPart.values().length; j++) {
 				for (String pref: prefix) {
 					String key = pref + MeasUnitPart.values()[j] + "_" + S_Parametr.values()[i];
 					int currentCount = values.get(key).size();
-					if (expectedCount != currentCount) {
-						return false;
+					for (int k = 0; k < currentCount; k++) {
+						if (values.get(key).get(k).equals("")) {
+							return false;
+						}
 					}
 				}
 			}
 		}
 		return true;
 	}
-
 	public void setRandomValues() {
 		Random rand = new Random();
 		for (String key : values.keySet()) {
@@ -171,6 +172,5 @@ public class NewElementStringGridFX extends StringGridFX {
 			}
 		}
 	}
-	
-	
+		
 }

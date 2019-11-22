@@ -145,6 +145,7 @@ public class ToleranceParametrs implements Includable<Element>, dbStorable {
 	 @Override
 	 public void onAdding(Element Owner) {
 	 	this.myElement = Owner;
+	 	setTableName();
 	 }
 	 private StrategyOfSuitability strategy;
 	 public void setStrategy(StrategyOfSuitability anyStrategy) {

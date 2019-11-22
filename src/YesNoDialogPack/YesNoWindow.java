@@ -4,7 +4,8 @@ import java.io.IOException;
 import GUIpack.guiWindow;
 
 public class YesNoWindow extends guiWindow {
-
+	//yes = 0
+	//no = 1
 	int result;
 	YesNoController ctrl;
 	

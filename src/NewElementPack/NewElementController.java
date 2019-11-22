@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
 import DevicePack.Element;
 import FileManagePack.FileManager;
 import FreqTablesPack.FreqTablesWindow;
@@ -14,7 +13,6 @@ import GUIpack.StringGridFXPack.StringGridPosition;
 import ToleranceParamPack.ParametrsPack.MeasUnitPart;
 import ToleranceParamPack.ParametrsPack.S_Parametr;
 import ToleranceParamPack.ParametrsPack.TimeType;
-import ToleranceParamPack.ParametrsPack.ToleranceParametrs;
 import VerificationPack.Gamma_Result;
 import VerificationPack.MeasResult;
 import VerificationPack.VSWR_Result;
@@ -82,8 +80,14 @@ public class NewElementController {
 	private RadioButton periodicVerificationRB;	
 	@FXML
 	private RadioButton twoPoleRB;
+	public RadioButton getTwoPoleRB() {
+		return twoPoleRB;
+	}
 	@FXML
 	private RadioButton fourPoleRB;
+	public RadioButton getFourPoleRB() {
+		return fourPoleRB;
+	}
 	@FXML
 	private RadioButton vswrRB;	
 	@FXML
@@ -119,8 +123,14 @@ public class NewElementController {
 	@FXML
 	private AnchorPane periodicTablePane;	
 	private NewElementStringGridFX primaryParamsTable;  // Table with parametrs for primary verification
+	public NewElementStringGridFX getPrimaryParamsTable() {
+		return primaryParamsTable;
+	}
 	private NewElementStringGridFX periodicParamsTable; // -//- for periodic verification
-	private NewElementStringGridFX visibleParamsTable; // reference to currently visible table 
+	public NewElementStringGridFX getPeriodicParamsTable() {
+		return periodicParamsTable;
+	}
+	private NewElementStringGridFX visibleParamsTable;  // reference to currently visible table 
 	
 	private ToggleGroup poleCountGroup;
 	private ToggleGroup measUnitGroup;
@@ -150,12 +160,8 @@ public class NewElementController {
 			}
 		}
 	}
-	//Метод инициализирующий элемент
-	/*public void initializeElement() {
-		this.currentElement = new Element(this);
-	}*/
 	public Element getElement() {
-		return this.currentElement;
+		return currentElement;
 	}
 //************************************************	
 		
@@ -180,9 +186,9 @@ public class NewElementController {
 		primaryParamsTable = new NewElementStringGridFX(primaryParamsTablePosition, TimeType.PRIMARY);
 		periodicParamsTable = new NewElementStringGridFX(periodicParamsTablePosition, TimeType.PERIODIC);
 		visibleParamsTable = primaryParamsTable;
-		this.periodicScrollPane.toBack();
+		periodicScrollPane.toBack();
 		
-		this.currentS = S_Parametr.S11;
+		currentS = S_Parametr.S11;
 		listOfParams = FXCollections.observableArrayList();
 		twoPoleTypesList = FXCollections.observableArrayList();
 		fourPoleTypesList = FXCollections.observableArrayList();
@@ -196,39 +202,39 @@ public class NewElementController {
 		} catch (Exception exp) {
 			fourPoleTypesList.add("Четырехполюсник");
 		}	
-		this.elemTypesComboBox.setItems(twoPoleTypesList);
+		elemTypesComboBox.setItems(twoPoleTypesList);
 		elemTypesComboBox.setValue(twoPoleTypesList.get(0));
 		
 		poleCountGroup = new ToggleGroup();
-		this.twoPoleRB.setSelected(true);
-		this.twoPoleRB.setToggleGroup(poleCountGroup);
-		this.fourPoleRB.setToggleGroup(poleCountGroup);
+		twoPoleRB.setSelected(true);
+		twoPoleRB.setToggleGroup(poleCountGroup);
+		fourPoleRB.setToggleGroup(poleCountGroup);
 		
 		measUnitGroup = new ToggleGroup();
-		this.vswrRB.setSelected(true);
-		this.vswrRB.setToggleGroup(measUnitGroup);
-		this.gammaRB.setToggleGroup(measUnitGroup);
+		vswrRB.setSelected(true);
+		vswrRB.setToggleGroup(measUnitGroup);
+		gammaRB.setToggleGroup(measUnitGroup);
 		
 		toleranceTypeGroup = new ToggleGroup();
-		this.percentToleranceRB.setSelected(true);
-		this.percentToleranceRB.setToggleGroup(toleranceTypeGroup);
-		this.upDownToleranceRB.setToggleGroup(toleranceTypeGroup);
+		percentToleranceRB.setSelected(true);
+		percentToleranceRB.setToggleGroup(toleranceTypeGroup);
+		upDownToleranceRB.setToggleGroup(toleranceTypeGroup);
 		
 		verificationTypeGroup = new ToggleGroup(); 
-		this.primaryVerificationRB.setSelected(true);
-		this.primaryVerificationRB.setToggleGroup(verificationTypeGroup);
-		this.periodicVerificationRB.setToggleGroup(verificationTypeGroup);
+		primaryVerificationRB.setSelected(true);
+		primaryVerificationRB.setToggleGroup(verificationTypeGroup);
+		periodicVerificationRB.setToggleGroup(verificationTypeGroup);
 		
 		phaseTolearnceTypeGroup = new ToggleGroup();
-		this.upDownPhaseToleranceRB.setSelected(true);
-		this.upDownPhaseToleranceRB.setToggleGroup(phaseTolearnceTypeGroup);
-		this.percentPhaseToleranceRB.setToggleGroup(phaseTolearnceTypeGroup);
+		upDownPhaseToleranceRB.setSelected(true);
+		upDownPhaseToleranceRB.setToggleGroup(phaseTolearnceTypeGroup);
+		percentPhaseToleranceRB.setToggleGroup(phaseTolearnceTypeGroup);
 		
 		currentCountOfParams = 1;
 		currentTypeOfParams = "vswr";		
 		setParams(currentTypeOfParams, currentCountOfParams);
-		this.paramsComboBox.setItems(listOfParams);
-		this.paramsComboBox.setValue(listOfParams.get(0));		
+		paramsComboBox.setItems(listOfParams);
+		paramsComboBox.setValue(listOfParams.get(0));		
 	}
 	
 	@FXML
@@ -375,9 +381,7 @@ public class NewElementController {
 //end @FXML methods	
 	private void setParams(String paramsIndex, int countOfParams) {
 		try {
-			String path = new File(".").getAbsolutePath() + "\\files\\" + paramsIndex + ".txt";
-			//if (paramsIndex.equals("vswr")) path += "\\files\\vswr.txt";
-			//else if (paramsIndex.equals("gamma")) path += "\\files\\gamma.txt";			
+			String path = new File(".").getAbsolutePath() + "\\files\\" + paramsIndex + ".txt";			
 			listOfParams.clear();
 			FileManager.LinesToItems(path, countOfParams, listOfParams);
 			this.paramsComboBox.setValue(listOfParams.get(this.currentS.ordinal()));
@@ -475,36 +479,11 @@ public class NewElementController {
 		}
 		return params;
 	}
-//-------------------------------------------------------------------------------------------------------------------------	
-	public int checkInputedValues() {
-		/*
-		int returnedvalue = 0;		
-		ArrayList<HashMap<String, ArrayList<String>>> hashMaps = new ArrayList<HashMap<String, ArrayList<String>>>();
-		hashMaps.add(d_m_s);
-		hashMaps.add(m_s);
-		hashMaps.add(u_m_s);
-		hashMaps.add(d_p_s);
-		hashMaps.add(p_s);
-		hashMaps.add(u_p_s);		
-		for (int i=0; i<hashMaps.size(); i++) {			
-			for (String key : keys) {
-				for (int j=0; j<this.strFreqs.size(); j++) {
-					String cValue = hashMaps.get(i).get(key).get(j);
-					if (cValue.length()==0) {
-						returnedvalue = -1;
-						break;
-					}
-				}
-			}
-		}		
-		*/
-		return 0;
-	}
 	
 //Действия по закрытию окна	
 	public void saveValues() {
-		this.periodicParamsTable.changeSParametr(this.currentS);
-		this.primaryParamsTable.changeSParametr(this.currentS);
+		periodicParamsTable.changeSParametr(this.currentS);
+		primaryParamsTable.changeSParametr(this.currentS);
 	}
 	private boolean checkTable(NewElementStringGridFX table) {
 		table.changeSParametr(this.currentS);
@@ -526,15 +505,7 @@ public class NewElementController {
 			return vr;
 		}
 	}
-	public ToleranceParametrs getPrimaryTP() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	public ToleranceParametrs getPeriodicTP() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+	
 	@FXML
 	private Button randomBtn;
 	@FXML

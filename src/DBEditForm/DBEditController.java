@@ -65,6 +65,8 @@ public class DBEditController implements InfoRequestable {
 	//Правая часть окна
 	//Просмотр результатов измерений
 	@FXML
+	private Label measInfoLabel;
+	@FXML
 	private ListView<String> verificationDateListView;
 	private ObservableList<String> verificationDateList;	
 	@FXML
@@ -190,6 +192,10 @@ public class DBEditController implements InfoRequestable {
 		
 		deleteResultItem.setOnAction(event -> {
 			int resIndex = Integer.parseInt(verifications.get(currentDateIndex).get(0));
+			if (resIndex == currentElement.getNominalIndex()) {
+				AboutMessageWindow.createWindow("Ошибка", "Значения, использующиеся в качестве\nноминальных не могут быть удалены из БД").show();
+				return;
+			}
 			MeasResult deletedResult;
 			try {
 				deletedResult = new MeasResult(modDevice.includedElements.get(currentElementIndex), resIndex);
@@ -332,9 +338,16 @@ public class DBEditController implements InfoRequestable {
 		currentElement = modDevice.includedElements.get(currentElementIndex);
 		
 		try {
-			verifications = currentElement.getListOfVerifications();			
+			verifications = currentElement.getListOfVerifications();	
+			int nominalIndex = currentElement.getNominalIndex();
 			for (int i = 0; i < verifications.size(); i++) {
-				verificationDateList.add(verifications.get(i).get(1));
+				String item = null;
+				int resIndex = Integer.parseInt(verifications.get(i).get(0));
+				if (resIndex != nominalIndex)
+					item = "Поверка, проведенная " + verifications.get(i).get(1);
+				else 
+					item = "Номиналыные занчение, полученные " + verifications.get(i).get(1);
+				verificationDateList.add(item);
 			}						
 			verificationDateListView.setItems(verificationDateList);			
 		}
@@ -388,6 +401,12 @@ public class DBEditController implements InfoRequestable {
 			int resIndex = Integer.parseInt(verifications.get(currentDateIndex).get(0));
 			currentResult = new MeasResult(modDevice.includedElements.get(currentElementIndex), resIndex);
 			resultsTable.showResult(currentResult, S_Parametr.values()[currentMeasUnitIndex]);
+			String date = currentResult.getDateOfMeasByString();
+			date = date.split(" ")[0];
+			String unit = currentMeasUnitListView.getSelectionModel().getSelectedItem();
+			measInfoLabel.setText("Результаты измерения " + unit + " проведенного " + date + " для \"" + currentResult.getMyOwner().getType() + " " +
+					currentResult.getMyOwner().getSerialNumber() + "\" из состава \"" + currentResult.getMyOwner().getMyOwner().getName() + " " +
+					currentResult.getMyOwner().getMyOwner().getType() + " №" + currentResult.getMyOwner().getMyOwner().getSerialNumber() + "\".");
 		}
 		catch(SQLException sqlExp) {
 			AboutMessageWindow.createWindow("Ошибка", "Ошибка доступа к БД\nпри получении результатов измерения").show();

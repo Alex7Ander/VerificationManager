@@ -179,20 +179,6 @@ public class MeasResult implements Includable<Element>, dbStorable{
 		// TODO Auto-generated method stub		
 	}
 	
-	public void setNominalStatus() throws SQLException {
-		String listOfVerificationTable = myElement.getListOfVerificationsTable();
-		String sqlQuery = "SELECT id FROM [" + listOfVerificationTable + "] WHERE nominalStauts = '+'";
-		int nominalId = DataBaseManager.getDB().sqlQueryCount(sqlQuery);
-		if (nominalId <= 0) {
-			return;
-		}
-		sqlQuery = "UPDATE [" + listOfVerificationTable + "] SET nominalStauts = '-' WHERE id = '" + Integer.toString(nominalId) + "'";
-		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
-		String strDateOfMeas = dateFormat.format(dateOfMeas);
-		sqlQuery = "UPDATE [" + listOfVerificationTable + "] SET nominalStauts = '+' WHERE dateOfVerification='" + strDateOfMeas + "'";
-		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
-	}
-	
 	public void rewriteTableNames() throws SQLException {
 		String strDateOfMeas = dateFormat.format(dateOfMeas);
 		String newTableName = "Результаты поверки для " +
@@ -200,8 +186,42 @@ public class MeasResult implements Includable<Element>, dbStorable{
 				" проведенной " + strDateOfMeas;	
 		String sqlQuery = "UPDATE [" + myElement.getListOfVerificationsTable() + "] SET resultsTableName='" + newTableName + "' WHERE dateOfVerification='" + strDateOfMeas + "'";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
-		//UPDATE [Проведенные поверки для Комплект поверочный TEST - 15 31351 Нагрузка согласованная 7-89] SET resultsTableName='Результаты поверки для Комплект поверочный TEST - 15 789523 Нагрузка согласованная 7-89 проведенной 20/11/2019 16:52:25' WHERE dateOfVerification='20/11/2019 16:52:25'
 		sqlQuery = "ALTER TABLE [" + tableName + "] RENAME TO [" + newTableName + "]";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
 	}
+	
+	public void setNominalStatus() throws SQLException {
+		if (myElement == null) {
+			return;
+		}
+		String strDateOfMeas = dateFormat.format(dateOfMeas);
+		String sqlQuery = "SELECT id FROM [" + myElement.getListOfVerificationsTable() + "] WHERE dateOfVerification = '" + strDateOfMeas + "'";
+		int myIndex = DataBaseManager.getDB().sqlQueryCount(sqlQuery);
+		sqlQuery = "UPDATE [" + myElement.getMyOwner().getElementsTableName() + "] SET NominalIndex='" + Integer.toString(myIndex) + "'";
+		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
+	}
+	
+	public boolean isNominal() {
+		if (myElement == null) {
+			return false;
+		}
+		try {
+			String strDateOfMeas = dateFormat.format(dateOfMeas);
+			String sqlQuery = "SELECT id FROM [" + myElement.getListOfVerificationsTable() + "] WHERE dateOfVerification = '" + strDateOfMeas + "'";
+			int myIndex = DataBaseManager.getDB().sqlQueryCount(sqlQuery);
+			sqlQuery = "SELECT NominalIndex FROM [" + myElement.getMyOwner().getElementsTableName() + "] WHERE ElementType='" + myElement.getType() + "' AND ElementSerNumber='" + myElement.getSerialNumber() + "'";
+			int nominalIndex = DataBaseManager.getDB().sqlQueryCount(sqlQuery);
+			if (myIndex == nominalIndex) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+		catch(SQLException sqlExp) {
+			System.out.println(sqlExp.getStackTrace());
+			return false;
+		}
+	}
+	
 }

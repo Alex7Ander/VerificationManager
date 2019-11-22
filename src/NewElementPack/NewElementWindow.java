@@ -5,7 +5,12 @@ import java.sql.SQLException;
 import AboutMessageForm.AboutMessageWindow;
 import DataBasePack.DataBaseManager;
 import DevicePack.Element;
+import Exceptions.SavingException;
 import GUIpack.guiWindow;
+import ToleranceParamPack.ParametrsPack.MeasUnitPart;
+import ToleranceParamPack.ParametrsPack.TimeType;
+import ToleranceParamPack.ParametrsPack.ToleranceParametrs;
+import VerificationPack.MeasResult;
 import YesNoDialogPack.YesNoWindow;
 
 public class NewElementWindow extends guiWindow {
@@ -15,39 +20,26 @@ public class NewElementWindow extends guiWindow {
 		NewElementController ctrl = (NewElementController) loader.getController();
 		//Установим действия по проверке введенных параметров перед закрытием
 		stage.setOnCloseRequest( event -> {
-			ctrl.saveValues();
-			/*
-			if (!ctrl.checkPrimaryTable()) {
-				try {
-					YesNoWindow  qWin = new YesNoWindow("Внимание", "Вы не полностью заполнили таблицу\nс параметрами первичной поверки.\nЖелаете продолжить редактирование?");
-					int answer = qWin.showAndWait();
-					if (answer == 1) {	
-						return;
-					}
-					else{
-						event.consume();
-					}
-				} catch (IOException e) {
-					e.printStackTrace();
+			
+			ctrl.saveValues();			
+			int countOfControlledParams = 0;
+			if (ctrl.getTwoPoleRB().isSelected())
+				countOfControlledParams = 1;
+			else 
+				countOfControlledParams = 4;
+			if (!ctrl.getPrimaryParamsTable().isFull(countOfControlledParams)) {
+				int answer = YesNoWindow.createYesNoWindow("Внимание", "Вы не полностью заполнили таблицу\nс параметрами первичной поверки.\nЖелаете продолжить редактирование?").showAndWait();
+				if (answer == 0) {
+					event.consume();					
+				}
+				return;
+			}				
+			if (!ctrl.getPeriodicParamsTable().isFull(countOfControlledParams)) {
+				int answer = YesNoWindow.createYesNoWindow("Внимание", "Вы не полностью заполнили таблицу\nс параметрами периодической поверки.\nЖелаете продолжить редактирование?").showAndWait();
+				if (answer == 0) {
+					event.consume();
 				}
 			}
-			else {
-				if (!ctrl.checkPeriodicTable()) {
-					try {
-						YesNoWindow  qWin = new YesNoWindow("Внимание", "Вы не полностью заполнили таблицу\nс параметрами периодической поверки.\nЖелаете продолжить редактирование?");
-						int answer = qWin.showAndWait();
-						if (answer == 1) {
-							return;
-						}
-						else{
-							event.consume();
-						}
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-			*/
 		});
 	}
 	
@@ -56,91 +48,39 @@ public class NewElementWindow extends guiWindow {
 		NewElementController ctrl = (NewElementController) loader.getController();
 		ctrl.setElement(elm);		
 		stage.setOnCloseRequest( event -> {
-			/*
-			ctrl.remeberTables();
-			int answer = 1;
-			try {
-				YesNoWindow qWin = new YesNoWindow("Сохранить изменения", "Сохранить внесенный вами изменения?");
-				answer = qWin.showAndWait();
-			} catch (IOException ioExp) {
-				ioExp.getStackTrace();
-			}
+			
+			ctrl.saveValues();
+			int answer = YesNoWindow.createYesNoWindow("Сохранить изменения", "Сохранить внесенный вами изменения?").showAndWait();
 			//Если изменения необходимо сохранить:
 			if (answer == 0) {
-				int checkParamsResult = checkParams();
-				if (checkParamsResult == 1) {
-					event.consume();
-				}	
-				else {
-					try {
-						DataBaseManager.getDB().BeginTransaction();
-						//ctrl.getElement().rewriteParams(ctrl.getPrimaryTP(), ctrl.getPeriodicTP(), ctrl.getNominals());
-						ctrl.getElement().rewriteParams();
-						DataBaseManager.getDB().Commit();
-						try {
-							AboutMessageWindow errorMsg = new AboutMessageWindow("Успешно", "Изменения успешно сохранены");
-							errorMsg.show();
-						} catch (IOException ioExp) {
-							ioExp.getStackTrace();
-						}		
-					} catch (SQLException sqlExp) {
-						DataBaseManager.getDB().RollBack();
-						try {
-							AboutMessageWindow errorMsg = new AboutMessageWindow("Ошибка", "Ошибка доступа к базе данных");
-							errorMsg.show();
-						} catch (IOException ioExp) {
-							ioExp.getStackTrace();
-						}											
-					}				
-				}				
-			}*/	
+				ToleranceParametrs newModulePrimaryTP = new ToleranceParametrs(TimeType.PRIMARY, MeasUnitPart.MODULE, ctrl, elm);
+				ToleranceParametrs newModulePeriodicTP = new ToleranceParametrs(TimeType.PERIODIC, MeasUnitPart.MODULE, ctrl, elm);
+				ToleranceParametrs newPhasePrimaryTP = new ToleranceParametrs(TimeType.PRIMARY, MeasUnitPart.PHASE, ctrl, elm);				
+				ToleranceParametrs newPhasePeriodicTP = new ToleranceParametrs(TimeType.PERIODIC, MeasUnitPart.PHASE, ctrl, elm);
+				MeasResult newNominals = new MeasResult(ctrl, elm);
+				try {
+					DataBaseManager.getDB().BeginTransaction();
+					elm.rewriteParams(newModulePrimaryTP, newModulePeriodicTP, newPhasePrimaryTP, newPhasePeriodicTP);
+					newNominals.saveInDB();
+					newNominals.setNominalStatus();
+					DataBaseManager.getDB().Commit();
+					AboutMessageWindow.createWindow("Успешно", "Изменения успешно сохранены").show();		
+				} 
+				catch (SQLException sqlExp) {
+					DataBaseManager.getDB().RollBack();
+					AboutMessageWindow.createWindow("Ошибка", "Ошибка доступа к базе данных").show();										
+				} catch (SavingException sExp) {
+					sExp.printStackTrace();
+					AboutMessageWindow.createWindow("Ошибка", sExp.getMessage()).show();
+				}								
+			}	
 		});		
 	}	
-/*
-	private int checkParams() {
-		NewElementController ctrl = (NewElementController) loader.getController();
-		//Проверим частоты
-		if (!ctrl.checkfreqTable()) {
-			try {
-				YesNoWindow qWin = new YesNoWindow("Некорректное значение частоты", "Одно из введенных вами значений частоты некорректно.\nЖелаете продолжить редактирование?");
-				int answer = qWin.showAndWait();
-				if (answer == 1) {
-					return 0;
-				}
-				else {
-					return 1;
-				}
-			} catch(IOException ioExp) {
-				ioExp.getStackTrace();
-				return 0;
-			}
-		}				
-		//Проверим прочие параметры
-		int errorsCount = ctrl.checkInfo();
-		if (errorsCount != 0) {
-			try {
-				YesNoWindow qWin2 = new YesNoWindow("Некорректное значение параметров", Integer.toString(errorsCount) + " значений введенных вами параметров некорректны.\n"
-						+ "Это может привести к неправльному определению\nпригодности поверяемго прибора.\nЖелаете продолжить редактирование?");
-				int answerParams = qWin2.showAndWait();
-				if (answerParams == 1) {
-					return 0;					
-				}
-				else {
-					return 1;
-				}
-			} catch(IOException ioExp) {
-				ioExp.getStackTrace();
-				return 0;
-			}
-		}
-		return 0;
-	}
-*/	
+	
 	public void setTitle(String newTitle) {
 		title = newTitle;
 	}
-	
-	
+		
 	public void showAndWait() {
 		stage.showAndWait();
 	}

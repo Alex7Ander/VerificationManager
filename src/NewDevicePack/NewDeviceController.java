@@ -147,7 +147,7 @@ public class NewDeviceController  {
 		//int notInitializedElementsCount = 0;
 		for (int i = 0; i < this.elementsWindow.size(); i++) {			
 			NewElementController ctrl = (NewElementController)this.elementsWindow.get(i).getControllerClass();
-			Element elm = new Element(ctrl); //ctrl.getElement();
+			Element elm = new Element(ctrl); 
 			newDevice.addElement(elm);	
 		}
 		//и наконец, пробуем сохранить все в БД
