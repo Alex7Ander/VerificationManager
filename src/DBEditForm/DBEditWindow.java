@@ -9,6 +9,7 @@ public class DBEditWindow extends guiWindow {
 	
 	private DBEditWindow() throws IOException {
 		super("ѕросмотр/редактирование базы данных", "DBEditForm.fxml");
+		stage.setResizable(true);
 	}
 
 	public static DBEditWindow getDBEditWindow() throws IOException{

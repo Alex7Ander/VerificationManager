@@ -18,12 +18,18 @@ import GUIpack.StringGridFXPack.StringGridPosition;
 import NewElementPack.NewElementController;
 import NewElementPack.NewElementWindow;
 import SearchDevicePack.SearchDeviceWindow;
+import ToleranceParamPack.ParametrsPack.MeasUnitPart;
 import ToleranceParamPack.ParametrsPack.S_Parametr;
 import VerificationPack.MeasResult;
 import YesNoDialogPack.YesNoWindow;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
+import javafx.scene.chart.XYChart.Data;
+import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
@@ -33,6 +39,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 
 public class DBEditController implements InfoRequestable {
 	
@@ -82,7 +89,18 @@ public class DBEditController implements InfoRequestable {
 	private Label measUnitLabel;
 	@FXML
 	private Label dateLabel;
-	
+	//Графики
+	@FXML
+	private HBox chartBox;
+	NumberAxis moduleX = new NumberAxis();
+	NumberAxis moduleY = new NumberAxis();
+	NumberAxis phaseX = new NumberAxis();
+	NumberAxis phaseY = new NumberAxis();
+	private LineChart<Number, Number> moduleChart = new LineChart<Number, Number>(moduleX, moduleY);
+	private LineChart<Number, Number> phaseChart = new LineChart<Number, Number>(phaseX, phaseY);	
+	private XYChart.Series moduleSeries = new XYChart.Series();
+	private XYChart.Series phaseSeries = new XYChart.Series();
+
 //---------------------------------------------	
 	private Device modDevice;  //Редактируемое средство измерения
 	private MeasResult currentResult;  //Отображаемый результат измерения
@@ -113,8 +131,13 @@ public class DBEditController implements InfoRequestable {
 		} 
 		nameComboBox.setItems(devNamesList);
 		
-		this.verificationDateListView.setItems(this.verificationDateList);				
-		this.currentMeasUnitListView.setItems(measUnitsList);
+		chartBox.getChildren().add(moduleChart);
+		chartBox.getChildren().add(phaseChart);
+		verificationDateListView.setItems(this.verificationDateList);				
+		currentMeasUnitListView.setItems(measUnitsList);
+				
+		moduleSeries.setName("значение");
+		phaseSeries.setName("значение");
 		
 		createElemtnsListViewContextMenu();		
 		createVerificationsDatesContextMenu();
@@ -331,6 +354,8 @@ public class DBEditController implements InfoRequestable {
 		resultsTable.clear();
 		verificationDateList.clear();
 		measUnitsList.clear();
+		//moduleChart.getData().clear();
+		//phaseChart.getData().clear();
 		
 		currentDateIndex = null;
 		currentMeasUnitIndex = null;		
@@ -404,6 +429,23 @@ public class DBEditController implements InfoRequestable {
 			String date = currentResult.getDateOfMeasByString();
 			date = date.split(" ")[0];
 			String unit = currentMeasUnitListView.getSelectionModel().getSelectedItem();
+			
+			ObservableList<Data> dataModule = FXCollections.observableArrayList();
+			ObservableList<Data> dataPhase = FXCollections.observableArrayList();
+			String key = MeasUnitPart.MODULE + "_" + S_Parametr.values()[currentMeasUnitIndex];
+			for (int i=0; i < currentResult.values.get(key).size(); i++) {
+				//size of Collection with module should has same size as with phase 
+				double cFreq = currentResult.freqs.get(i);
+				double cModule = currentResult.values.get(key).get(cFreq);
+				double cPhase = currentResult.values.get(MeasUnitPart.PHASE + "_" + S_Parametr.values()[currentMeasUnitIndex]).get(cFreq);
+				dataModule.add(new XYChart.Data(cFreq, cModule));
+				dataPhase.add(new XYChart.Data(cFreq, cPhase));
+			}
+			moduleSeries.setData(dataModule);
+			phaseSeries.setData(dataPhase);
+			moduleChart.getData().add(moduleSeries);
+			phaseChart.getData().add(phaseSeries);
+			
 			measInfoLabel.setText("Результаты измерения " + unit + " проведенного " + date + " для \"" + currentResult.getMyOwner().getType() + " " +
 					currentResult.getMyOwner().getSerialNumber() + "\" из состава \"" + currentResult.getMyOwner().getMyOwner().getName() + " " +
 					currentResult.getMyOwner().getMyOwner().getType() + " №" + currentResult.getMyOwner().getMyOwner().getSerialNumber() + "\".");

@@ -10,16 +10,16 @@ public class StringGridPosition {
 	private AnchorPane anchorContainer;
 	
 	public int getWidth() {
-		return this.width;
+		return width;
 	}
 	public int getHeight() {
-		return this.height;
+		return height;
 	}
 	public ScrollPane getScrollContainer() {
-		return this.scrollContainer;
+		return scrollContainer;
 	}
 	public AnchorPane getAnchorContainer() {
-		 return this.anchorContainer;
+		 return anchorContainer;
 	}
 	public StringGridPosition(int Width, int Height, ScrollPane ScrollContainer, AnchorPane AnchorContainer){
 		width = Width;
