@@ -197,7 +197,8 @@ public class MeasResult implements Includable<Element>, dbStorable{
 		String strDateOfMeas = dateFormat.format(dateOfMeas);
 		String sqlQuery = "SELECT id FROM [" + myElement.getListOfVerificationsTable() + "] WHERE dateOfVerification = '" + strDateOfMeas + "'";
 		int myIndex = DataBaseManager.getDB().sqlQueryCount(sqlQuery);
-		sqlQuery = "UPDATE [" + myElement.getMyOwner().getElementsTableName() + "] SET NominalIndex='" + Integer.toString(myIndex) + "'";
+		sqlQuery = "UPDATE [" + myElement.getMyOwner().getElementsTableName() + "] SET NominalIndex='" + Integer.toString(myIndex) + "' ";
+		sqlQuery += "WHERE ElementType='" + myElement.getType() + "' AND ElementSerNumber='" + myElement.getSerialNumber() + "'";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
 	}
 	

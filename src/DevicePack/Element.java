@@ -336,7 +336,6 @@ public class Element implements Includable<Device>, dbStorable{
 		primaryPhaseToleranceParams.deleteFromDB();
 		periodicModuleToleranceParams.deleteFromDB();
 		periodicPhaseToleranceParams.deleteFromDB();
-		//nominal.deleteFromDB();
 		
 		newModulePrimaryParams.onAdding(this);
 		newModulePeriodicParams.onAdding(this);
