@@ -146,6 +146,18 @@ public class Device implements dbStorable {
 		sqlQuery += "WHERE NameOfDevice='" + name + "' AND TypeOfDevice='" + type + "' AND SerialNumber='" + serialNumber + "'";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
 		
+		//rewrite info in table Verification
+		sqlQuery = "UPDATE [Verifications] SET ";
+		for (String str: editingValues.keySet()) {
+			if (str.equals("NameOfDevice") || str.equals("TypeOfDevice") || str.equals("SerialNumber")) {
+				sqlQuery += (str + "='"+editingValues.get(str)+"', ");
+			}
+		}
+		int lastCommaIndex = sqlQuery.lastIndexOf(",");
+		sqlQuery = sqlQuery.substring(0, lastCommaIndex);
+		sqlQuery += " WHERE NameOfDevice='" + name + "' AND TypeOfDevice='" + type + "' AND SerialNumber='" + serialNumber + "'";
+		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
+		
 		boolean tableNamesMustBeRewrited = false;
 		for (String field : editingValues.keySet()) {
 			if (field.equals("NameOfDevice")) {

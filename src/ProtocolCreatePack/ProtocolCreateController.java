@@ -236,7 +236,7 @@ public class ProtocolCreateController {
 		else {
 			docT = "Notice";
 		}
-		String sqlQuery = "INSERT INTO Verifications (data, deviceName, deviceType, deviceSerNum, pathOfDoc, pathOfProtocol, typeOFDoc) VALUES "
+		String sqlQuery = "INSERT INTO Verifications (Date, NameOfDevice, TypeOfDevice, SerialNumber, PathOfDoc, PathOfProtocol, TypeOfDoc) VALUES "
 											  + "('"+date+"','"+devName+"','"+devType+"','"+devSerN+"','"+pathToDocument+"','"+pathToProtocol+"','"+docT+"')";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
 	}

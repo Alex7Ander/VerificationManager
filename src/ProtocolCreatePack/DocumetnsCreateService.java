@@ -30,7 +30,6 @@ public class DocumetnsCreateService extends Service<Integer> {
 	private ArrayList<MeasResult> protocoledResult;
 	private String protocolName;
 	private String protoPathTo;
-	private String docPathTo;
 	//Книга
 	private Workbook wb;
 	//лист
@@ -86,7 +85,6 @@ public class DocumetnsCreateService extends Service<Integer> {
 			@Override
 			protected Integer call() throws Exception {
 				protoPathTo = new File(".").getAbsolutePath() + "\\Protocols\\" + protocolName;
-				docPathTo = new File(".").getAbsolutePath() + "";
 				try {					
 					if (protocoledResult != null) {
 						createProtocol();

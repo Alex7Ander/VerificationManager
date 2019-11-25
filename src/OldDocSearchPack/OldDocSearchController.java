@@ -156,23 +156,23 @@ public class OldDocSearchController implements InfoRequestable {
 		String addFilters = "";
 		ArrayList<String> fieldsNames = new ArrayList<String>();
 				
-		fieldsNames.add("data");
-		fieldsNames.add("pathOfDoc");
-		fieldsNames.add("pathOfProtocol");
+		fieldsNames.add("Date");
+		fieldsNames.add("PathOfDoc");
+		fieldsNames.add("PathOfProtocol");
 		if (checkDevice != null) {
-			addFilters = (" AND deviceName='" + checkDevice.getName() + "' AND deviceType='" + checkDevice.getType() +"' AND deviceSerNum='" + checkDevice.getSerialNumber() + "'");
+			addFilters = (" AND NameOfDevice='" + checkDevice.getName() + "' AND TypeOfDevice='" + checkDevice.getType() +"' AND SerialNumber='" + checkDevice.getSerialNumber() + "'");
 		}	
 		else {
-			fieldsNames.add("deviceName");
-			fieldsNames.add("deviceType");
-			fieldsNames.add("deviceSerNum");
+			fieldsNames.add("NameOfDevice");
+			fieldsNames.add("TypeOfDevice");
+			fieldsNames.add("SerialNumber");
 		}
 		String sqlQuery = "SELECT ";
 		for (int i=0; i<fieldsNames.size(); i++) {
 			sqlQuery += fieldsNames.get(i);
 			if (i != fieldsNames.size() - 1) { sqlQuery += ", ";}
 		}
-		sqlQuery += (" FROM Verifications WHERE typeOFDoc='" + typeOfDoc + "'" + addFilters);
+		sqlQuery += (" FROM [Verifications] WHERE TypeOfDoc='" + typeOfDoc + "'" + addFilters);
 		try {
 			DataBaseManager.getDB().sqlQueryString(sqlQuery, fieldsNames, resultOfSearch);
 			for (int i=0; i<resultOfSearch.size(); i++) {
