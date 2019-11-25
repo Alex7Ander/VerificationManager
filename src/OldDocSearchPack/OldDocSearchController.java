@@ -137,20 +137,20 @@ public class OldDocSearchController implements InfoRequestable {
 	private void setVerificationItems() {
 		listOfVerifications.clear();
 		
-		LocalDate lcFrom = this.fromDTP.getValue();
+		LocalDate lcFrom = fromDTP.getValue();
 		if (lcFrom != null) {
-			this.from = Date.from(lcFrom.atStartOfDay(ZoneId.systemDefault()).toInstant());
+			from = Date.from(lcFrom.atStartOfDay(ZoneId.systemDefault()).toInstant());
 		}
 		else {
-			this.from = new Date(1);
+			from = new Date(1);
 		}
 		
-		LocalDate lcTill = this.tillDTP.getValue();
+		LocalDate lcTill = tillDTP.getValue();
 		if (lcTill != null) { 
-			this.till = Date.from(lcTill.atStartOfDay(ZoneId.systemDefault()).toInstant());
+			till = Date.from(lcTill.atStartOfDay(ZoneId.systemDefault()).toInstant());
 		}
 		else {
-			this.till = new Date();
+			till = new Date();
 		}
 
 		String addFilters = "";

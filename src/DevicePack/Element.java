@@ -319,7 +319,8 @@ public class Element implements Includable<Device>, dbStorable{
 		String newListOfVerificationsTable = "Проведенные поверки для " + myDevice.getName() + " " + myDevice.getType() + " " + myDevice.getSerialNumber() + " " + type + " " + serialNumber;
 		sqlQuery = "ALTER TABLE [" + listOfVerificationsTable + "] RENAME TO [" + newListOfVerificationsTable + "]";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
-		sqlQuery = "UPDATE [" + myDevice.getElementsTableName() + "] SET VerificationsTable='" + newListOfVerificationsTable + "'";
+		sqlQuery = "UPDATE [" + myDevice.getElementsTableName() + "] SET VerificationsTable='" + newListOfVerificationsTable + "' ";
+		sqlQuery += "WHERE ElementType = '" + type + "' AND ElementSerNumber='" + serialNumber + "'";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
 		// Field listOfVerificationsTable takes new value only after successful query to DB
 		listOfVerificationsTable = newListOfVerificationsTable;
