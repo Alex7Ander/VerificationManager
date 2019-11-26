@@ -212,23 +212,29 @@ public class DBEditController implements InfoRequestable {
 		MenuItem deleteResultItem = new MenuItem("Удалить результат");
 		verificationsDatesListViewContextMenu.getItems().addAll(deleteResultItem);
 		
-		deleteResultItem.setOnAction(event -> {
+		deleteResultItem.setOnAction(event -> {						
 			int resIndex = Integer.parseInt(verifications.get(currentDateIndex).get(0));
 			if (resIndex == currentElement.getNominalIndex()) {
 				AboutMessageWindow.createWindow("Ошибка", "Значения, использующиеся в качестве\nноминальных не могут быть удалены из БД").show();
 				return;
 			}
-			MeasResult deletedResult;
+			int answer = YesNoWindow.createYesNoWindow("Удалить?", "Вы уверены, что хотите удалить результаты\nизмерений от " + verifications.get(currentDateIndex).get(1)).showAndWait();
+			if (answer == 1) {
+				return;
+			}
+			MeasResult deletedResult = null;
 			try {
 				deletedResult = new MeasResult(modDevice.includedElements.get(currentElementIndex), resIndex);
 				deletedResult.deleteFromDB();
 				AboutMessageWindow.createWindow("Успешно", "Результат измерения удален").show();
+				verifications.remove((int)currentDateIndex);
+				verificationDateList.remove((int)currentDateIndex);
 			} catch (SQLException sqlExp) {
 				AboutMessageWindow.createWindow("Ошибка", "Ошибка доступа к БД\nпри попытке удаления").show();
 			}
 		});
 		
-		this.verificationDateListView.setOnContextMenuRequested(event->{
+		verificationDateListView.setOnContextMenuRequested(event->{
 			double x = event.getScreenX();
 			double y = event.getScreenY();
 			verificationsDatesListViewContextMenu.show(verificationDateListView, x, y);

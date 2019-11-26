@@ -115,12 +115,12 @@ public class DocumetnsCreateService extends Service<Integer> {
 		try {
 			//String docName = verification.getDocType() + " для " + verification.getDeviceInfo() + " №" + verification.getDeviceSerNumber() +
 			//		" проведенной " + verification.getDateOfCreation() + ".doc";			
-			writer.write(documentName + "\n");										//1
-			writer.write(this.verification.getDocType() + "\n");				//2
+			writer.write(documentName + "\n");								//1
+			writer.write(this.verification.getDocType() + "\n");			//2
 			if (this.verification.isPrimary()) {
-				writer.write("первичной \n");									//3
+				writer.write("первичной \n");								//3
 			} else {
-				writer.write("периодической \n");								//3
+				writer.write("периодической \n");							//3
 			}
 			writer.write(verification.getMilitaryBasename() + "\n");		//4
 			writer.write(verification.getDocumentNumber() + "\n");			//5
