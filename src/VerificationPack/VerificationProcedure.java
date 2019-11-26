@@ -38,17 +38,17 @@ public class VerificationProcedure {
 	private String finishDate;
 
 	public String getTemperature() {
-		return this.strTemperature;
+		return strTemperature;
 	}
 	public String getAtmPreasure() {
-		return this.strAtmPreasure;
+		return strAtmPreasure;
 	}
 	public String getAirHumidity() {
-		return this.strAirHumidity;
+		return strAirHumidity;
 	}
 	
 	public String getDeviceInfo() {
-		return this.deviceMainInfo;
+		return deviceMainInfo;
 	}
 	public String getDeviceSerNumber() {
 		return deviceSerNumber;
@@ -58,47 +58,47 @@ public class VerificationProcedure {
 	}
 	
 	public String getWorkerName() {
-		return this.workerName;
+		return workerName;
 	}
 	public String getBossName() {
-		return this.bossName;
+		return bossName;
 	}
 	public String getBossStatus() {
-		return this.bossStatus;
+		return bossStatus;
 	}
 	public String getDecision() {
-		return this.decision;
+		return decision;
 	}
 	public String getProtocolNumber() {
-		return this.protocolNumber;
+		return protocolNumber;
 	}
 	public String getDocumentNumber() {
-		return this.documentNumber;
+		return documentNumber;
 	}
 	
 	public String getDocName() {
-		return this.docName;
+		return docName;
 	}
 	public String getDocType() {
-		return this.docType;
+		return docType;
 	}
 	public String getVerType() {
-		return this.verType;
+		return verType;
 	}
 	public String getMilitaryBasename() {
-		return this.militaryBaseName;
+		return militaryBaseName;
 	}
 	public String getEtalonString() {
-		return this.etalonString;
+		return etalonString;
 	}
 	public String getDeviceOwner() {
-		return this.deviceOwner;
+		return deviceOwner;
 	}
 	public String getDateOfCreation() {
-		return this.dateOfCreation;
+		return dateOfCreation;
 	}
 	public String getFinishDate() {
-		return this.finishDate;
+		return finishDate;
 	}
 
 	public boolean isPrimary(){
@@ -123,7 +123,7 @@ public class VerificationProcedure {
 		elementsMainInfo = new ArrayList<String>();
 		for (Element elm : device.includedElements) {
 			String item = elm.getType() + elm.getSerialNumber();
-			this.elementsMainInfo.add(item);
+			elementsMainInfo.add(item);
 		}
 		deviceOwner = device.getOwner();
 	}

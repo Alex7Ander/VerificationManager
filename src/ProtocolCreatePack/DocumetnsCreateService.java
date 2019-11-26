@@ -29,6 +29,7 @@ public class DocumetnsCreateService extends Service<Integer> {
 	private VerificationProcedure verification;
 	private ArrayList<MeasResult> protocoledResult;
 	private String protocolName;
+	private String documentName;
 	private String protoPathTo;
 	//Книга
 	private Workbook wb;
@@ -42,10 +43,11 @@ public class DocumetnsCreateService extends Service<Integer> {
 	private CellStyle ordinaryCellStyle;
 	private CellStyle boldCellStyle;
 	
-	public DocumetnsCreateService(String protocolFileName, ArrayList<MeasResult> result, VerificationProcedure verificationProc){
-		this.verification = verificationProc;
-		this.protocoledResult = result;
-		this.protocolName = protocolFileName;		
+	public DocumetnsCreateService(String protocolFileName, String documetFileName, ArrayList<MeasResult> result, VerificationProcedure verificationProc){
+		verification = verificationProc;
+		protocoledResult = result;
+		protocolName = protocolFileName;
+		documentName = documetFileName;
 		wb = new HSSFWorkbook();
 		String strDate = protocoledResult.get(0).getDateOfMeasByString();
 		sh = wb.createSheet(WorkbookUtil.createSafeSheetName(strDate));
@@ -111,26 +113,26 @@ public class DocumetnsCreateService extends Service<Integer> {
 	private void createDocument() throws IOException {
 		FileWriter writer = new FileWriter("proto.txt");
 		try {
-			String docName = this.verification.getDocType() + " для " + this.verification.getDeviceInfo() + " №" + this.verification.getDeviceSerNumber() +
-					" проведенной " + this.verification.getDateOfCreation() + ".doc";			
-			writer.write(docName + "\n");										//1
+			//String docName = verification.getDocType() + " для " + verification.getDeviceInfo() + " №" + verification.getDeviceSerNumber() +
+			//		" проведенной " + verification.getDateOfCreation() + ".doc";			
+			writer.write(documentName + "\n");										//1
 			writer.write(this.verification.getDocType() + "\n");				//2
 			if (this.verification.isPrimary()) {
 				writer.write("первичной \n");									//3
 			} else {
 				writer.write("периодической \n");								//3
 			}
-			writer.write(this.verification.getMilitaryBasename() + "\n");		//4
-			writer.write(this.verification.getDocumentNumber() + "\n");			//5
-			writer.write(this.verification.getDeviceInfo() + "\n");				//6
-			writer.write(this.verification.getEtalonString() + "\n");			//7
-			writer.write(this.verification.getDeviceSerNumber() + "\n");		//8
-			writer.write(this.verification.getDeviceOwner() + "\n");			//9
-			writer.write(this.verification.getWorkerName() + "\n");				//10
-			writer.write(this.verification.getBossStatus() + " " + this.verification.getBossName() + "\n");		//11
-			writer.write(this.verification.getDecision() + "\n");				//12
-			writer.write(this.verification.getDateOfCreation() + "\n");			//13
-			writer.write(this.verification.getFinishDate() + "\n");				//14
+			writer.write(verification.getMilitaryBasename() + "\n");		//4
+			writer.write(verification.getDocumentNumber() + "\n");			//5
+			writer.write(verification.getDeviceInfo() + "\n");				//6
+			writer.write(verification.getEtalonString() + "\n");			//7
+			writer.write(verification.getDeviceSerNumber() + "\n");			//8
+			writer.write(verification.getDeviceOwner() + "\n");				//9
+			writer.write(verification.getWorkerName() + "\n");				//10
+			writer.write(verification.getBossStatus() + " " + verification.getBossName() + "\n");		//11
+			writer.write(verification.getDecision() + "\n");				//12
+			writer.write(verification.getDateOfCreation() + "\n");			//13
+			writer.write(verification.getFinishDate() + "\n");				//14
 		} catch (IOException ioExp) {
 			ioExp.getStackTrace();
 		} finally {
@@ -138,7 +140,7 @@ public class DocumetnsCreateService extends Service<Integer> {
 		}	
 		String absPath = new File(".").getAbsolutePath();		
 		String scriptPath = null;
-		String doc = this.verification.getDocType();
+		String doc = verification.getDocType();
 		if (doc.equals("Cвидетельство о поверке")) {
 			scriptPath = absPath + "\\cert.exe";
 		} else {
@@ -157,19 +159,19 @@ public class DocumetnsCreateService extends Service<Integer> {
 		}
 		for (int i=0; i < countOfRows; i++) {
 			Row row = sh.createRow(i); 
-			this.rows.add(row);
+			rows.add(row);
 		}
 	}
 	
 	private void fillSheet() {
-		setCellValue(0, 0, "Протокол поверки № " + this.verification.getProtocolNumber(), headCellStyle);
-		setCellValue(1, 0, "к свидетельству о поверке (извещению о непригодности) № " + this.verification.getDocumentNumber(), headCellStyle);		
-		setCellValue(2, 0, "Средство измерений: " + this.verification.getDeviceInfo(), ordinaryCellStyle);
-		setCellValue(4, 0, "Заводской номер (номера): " + this.verification.getDeviceSerNumber(), ordinaryCellStyle);
+		setCellValue(0, 0, "Протокол поверки № " + verification.getProtocolNumber(), headCellStyle);
+		setCellValue(1, 0, "к свидетельству о поверке (извещению о непригодности) № " + verification.getDocumentNumber(), headCellStyle);		
+		setCellValue(2, 0, "Средство измерений: " + verification.getDeviceInfo(), ordinaryCellStyle);
+		setCellValue(4, 0, "Заводской номер (номера): " + verification.getDeviceSerNumber(), ordinaryCellStyle);
 		setCellValue(6, 0, "Поверка проведена при следующих значениях влияющих факторов:", boldCellStyle);
-		setCellValue(7, 0, "температура окружающего воздуха " + this.verification.getTemperature() + " град. С", ordinaryCellStyle);
-		setCellValue(8, 0, "относительная   влажность " + this.verification.getAirHumidity() + " %", ordinaryCellStyle);
-		setCellValue(9, 0, "атмосферное давление " + this.verification.getAtmPreasure() + " мм рт. ст.", ordinaryCellStyle);
+		setCellValue(7, 0, "температура окружающего воздуха " + verification.getTemperature() + " град. С", ordinaryCellStyle);
+		setCellValue(8, 0, "относительная   влажность " + verification.getAirHumidity() + " %", ordinaryCellStyle);
+		setCellValue(9, 0, "атмосферное давление " + verification.getAtmPreasure() + " мм рт. ст.", ordinaryCellStyle);
 		String s = null;
 		if (this.verification.isPrimary()) {
 			s = "первичной";
@@ -177,7 +179,7 @@ public class DocumetnsCreateService extends Service<Integer> {
 		else {
 			s = "перодической";
 		}
-		setCellValue(11, 0, "И на основании результатов " + s + " поверки признано " + this.verification.getDecision(), ordinaryCellStyle);
+		setCellValue(11, 0, "И на основании результатов " + s + " поверки признано " + verification.getDecision(), ordinaryCellStyle);
 		setCellValue(12, 0, "1. Внешний осмотр: ", boldCellStyle);
 		setCellValue(13, 0, "Исправность средства измерений (внешний осмотр): Исправен.", ordinaryCellStyle);
 		setCellValue(14, 0, "на эксплуатационные и метрологические характеристики: не обнаружено.", ordinaryCellStyle);
@@ -216,8 +218,7 @@ public class DocumetnsCreateService extends Service<Integer> {
 			
 			for (int j = 0; j < currentRes.getCountOfFreq(); j++) {
 				Double cFreq = currentRes.freqs.get(j);
-				setCellValue(dRow, 0, cFreq.toString(), borderCellStyle);
-				
+				setCellValue(dRow, 0, cFreq.toString(), borderCellStyle);				
 				for (int k = 0; k < paramsCount; k++) {
 					String key = keys[k];					
 					String text = currentRes.values.get(key).get(cFreq).toString();					
@@ -280,12 +281,12 @@ public class DocumetnsCreateService extends Service<Integer> {
 	
 	private void topCellsMerging() {
 		for (int i=0; i<19; i++) {
-			this.sh.addMergedRegion(new CellRangeAddress(i, i, 0, 7));
+			sh.addMergedRegion(new CellRangeAddress(i, i, 0, 7));
 		}
 	}
 	
 	private void rowMerging(int row, int from, int to) {
-		this.sh.addMergedRegion(new CellRangeAddress(row, row, from, to));
+		sh.addMergedRegion(new CellRangeAddress(row, row, from, to));
 	}
 	
 	private void writeSheet() throws IOException {		

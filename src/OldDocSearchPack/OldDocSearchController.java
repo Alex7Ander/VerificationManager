@@ -180,7 +180,7 @@ public class OldDocSearchController implements InfoRequestable {
 				Date dateOfVer;
 				String strDateOfVer = resultOfSearch.get(i).get(0);
 				try {
-					dateOfVer = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(strDateOfVer); //dd-MM-yyyy dd/MM/yyyy HH:mm:ss
+					dateOfVer = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(strDateOfVer); 
 				}
 				catch(ParseException pExp) {
 					dateOfVer = Calendar.getInstance().getTime();

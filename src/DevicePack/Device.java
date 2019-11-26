@@ -146,7 +146,7 @@ public class Device implements dbStorable {
 		sqlQuery += "WHERE NameOfDevice='" + name + "' AND TypeOfDevice='" + type + "' AND SerialNumber='" + serialNumber + "'";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
 		
-		//rewrite info in table Verification
+		//Rewriting info in table Verification
 		sqlQuery = "UPDATE [Verifications] SET ";
 		for (String str: editingValues.keySet()) {
 			if (str.equals("NameOfDevice") || str.equals("TypeOfDevice") || str.equals("SerialNumber")) {

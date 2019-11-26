@@ -114,16 +114,16 @@ public class ProtocolCreateController {
 			militaryRanks.add("Подполковник");
 			militaryRanks.add("Майор");
 		}
-		this.militaryStatusComboBox.setItems(militaryRanks);
+		militaryStatusComboBox.setItems(militaryRanks);
 		
 		docTypes = FXCollections.observableArrayList();	
-		this.reasonTextArea.setVisible(false);
-		this.decisionLabel.setVisible(false);
+		reasonTextArea.setVisible(false);
+		decisionLabel.setVisible(false);
 		
 		Device device = VerificationWindow.getVerificationWindow().getController().verificatedDevice;
-		this.devNameLabel.setText(device.getName() + " " + device.getType());
-		this.devSerNLabel.setText(device.getSerialNumber());
-		this.devOwnerLabel.setText(device.getOwner());
+		devNameLabel.setText(device.getName() + " " + device.getType());
+		devSerNLabel.setText(device.getSerialNumber());
+		devOwnerLabel.setText(device.getOwner());
 		
 		siGroup = new ToggleGroup();
 		etalonRB.setToggleGroup(siGroup);
@@ -133,16 +133,16 @@ public class ProtocolCreateController {
 	
 	@FXML
 	private void docTypeComboBoxChange() {
-		if (!this.decisionLabel.isVisible()) {
-			this.decisionLabel.setVisible(true);
+		if (!decisionLabel.isVisible()) {
+			decisionLabel.setVisible(true);
 		}
 		if (docTypeComboBox.getSelectionModel().getSelectedItem().toString().equals("Cвидетельство о поверке")) {
-			this.decisionLabel.setText("признан пригодным к применению");
-			this.reasonTextArea.setVisible(false);
+			decisionLabel.setText("признан пригодным к применению");
+			reasonTextArea.setVisible(false);
 		}
 		else {
-			this.decisionLabel.setText("признан не пригодным к применению по следующим причинам");
-			this.reasonTextArea.setVisible(true);
+			decisionLabel.setText("признан не пригодным к применению по следующим причинам");
+			reasonTextArea.setVisible(true);
 		}
 	}
 	
@@ -153,7 +153,7 @@ public class ProtocolCreateController {
 			return;
 		}		
 		Date dt = protocoledResult.get(0).getDateOfMeas();
-		String strDt = new SimpleDateFormat("dd-MM-yyyy HH-mm-ss").format(dt);
+		String strDt = new SimpleDateFormat("dd-MM-yyyy HH-mm-ss").format(dt); //
 		String addStr = protocoledResult.get(0).getMyOwner().getMyOwner().getName() + " " +
 				   		protocoledResult.get(0).getMyOwner().getMyOwner().getType() + " " +
 				   		protocoledResult.get(0).getMyOwner().getMyOwner().getSerialNumber() + " от " + strDt;
@@ -163,14 +163,14 @@ public class ProtocolCreateController {
 		infoBox.toBack();
 		infoBox.setOpacity(0.1);
 		progressPane.setVisible(true);	
-		this.verification.setFinallyInformation(this);
+		verification.setFinallyInformation(this);
 		//Создаем документы
 		creteDocuments();	
 	}
 	
 	private void creteDocuments() {
 		//Создаем поток создания протокола
-		DocumetnsCreateService docService = new DocumetnsCreateService(this.newProtocolName, protocoledResult, verification);
+		DocumetnsCreateService docService = new DocumetnsCreateService(newProtocolName, newDocumentName, protocoledResult, verification);
 		//Устанавливаем действие при успешном завершении
 		docService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 			@Override
@@ -247,11 +247,11 @@ public class ProtocolCreateController {
 	}
 	
 	public void setResults(ArrayList<MeasResult> results) {
-		this.protocoledResult = results;
+		protocoledResult = results;
 	}
 	
 	private boolean checkDocType() {
-		if (this.docTypeComboBox.getSelectionModel().getSelectedIndex() < 0) {
+		if (docTypeComboBox.getSelectionModel().getSelectedIndex() < 0) {
 			return false;
 		}
 		else {
@@ -260,22 +260,22 @@ public class ProtocolCreateController {
 	}
 	
 	public void setVerificationProcedure(VerificationProcedure verificationProc) {
-		this.verification = verificationProc;
+		verification = verificationProc;
 	}
 	
-	public String getWorkerName() {return this.workerNameTextField.getText();}
-	public String getBossName() {return this.bossNameTextFiled.getText();}
+	public String getWorkerName() {return workerNameTextField.getText();}
+	public String getBossName() {return bossNameTextFiled.getText();}
 	public String getBossStatus() {
 		String status = null;
 		try {
-			status = this.militaryStatusComboBox.getSelectionModel().getSelectedItem().toString();
+			status = militaryStatusComboBox.getSelectionModel().getSelectedItem().toString();
 		} catch (NullPointerException npExp) {
 			status = "Генерал-завхоз";
 		}
 		return status;
 	}
 	public String getResultDecision() {
-		if (this.docTypeComboBox.getSelectionModel().getSelectedItem().toString().equals("Cвидетельство о поверке")) {
+		if (docTypeComboBox.getSelectionModel().getSelectedItem().toString().equals("Cвидетельство о поверке")) {
 			return "годным";
 		}
 		else {
@@ -283,19 +283,21 @@ public class ProtocolCreateController {
 		}
 	}
 	public String getProtocolNumber() {
-		return this.docNumberTextField.getText();
+		return docNumberTextField.getText();
 	}
 	public String getDocumentNumber() {
-		return this.docNumberTextField.getText();
+		return docNumberTextField.getText();
 	}
 	public String getEtalonString() { 
-		if (this.etalonRB.isSelected()) {
+		if (etalonRB.isSelected()) {
 			return "Эталон";
 		} else {
 			return "Средство измерения ";
 		}
 	}
-	public String getDocType() { return this.docTypeComboBox.getSelectionModel().getSelectedItem().toString();}
+	public String getDocType() { 
+		return docTypeComboBox.getSelectionModel().getSelectedItem().toString();
+	}
 	public String getDateOfCreation() {		
 		Date dt = new Date();
 		String strDate = new SimpleDateFormat("dd-MM-yyyy").format(dt);
@@ -316,6 +318,6 @@ public class ProtocolCreateController {
 		return strDate;
 	}
 	public String getMilitryBaseName() {
-		return this.militaryBaseName.getText();
+		return militaryBaseName.getText();
 	}
 }

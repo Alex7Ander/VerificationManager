@@ -34,7 +34,7 @@ public class MeasResult implements Includable<Element>, dbStorable{
 	public int getCountOfParams() {return this.countOfParams;}
 	public Date getDateOfMeas() {return this.dateOfMeas;}
 	public String getDateOfMeasByString() {
-		return new SimpleDateFormat(datePattern).format(this.dateOfMeas);
+		return new SimpleDateFormat(datePattern).format(dateOfMeas);
 	}
 	public Map<String, Map<Double, Double>> values;
 	public HashMap<String, HashMap<Double, String>> suitabilityDecision;
