@@ -225,4 +225,32 @@ public class MeasResult implements Includable<Element>, dbStorable{
 		}
 	}
 	
+	@Override
+	public boolean equals(Object obj) {
+		MeasResult otherResult = null;
+		try {
+			otherResult = (MeasResult)obj;
+		}
+		catch(ClassCastException cExp) {
+			return false;
+		}
+		if (otherResult == this) return true;
+		if (otherResult.freqs.size() != this.freqs.size()) return false;
+		for (int i = 0; i < otherResult.freqs.size(); i++) {
+			double f1 = otherResult.freqs.get(i);
+			double f2 = this.freqs.get(i);
+			if (f1 != f2) {
+				return false;
+			}
+		}
+		if(!otherResult.values.keySet().equals(this.values.keySet())){
+			return false;
+		}
+		for (String key : otherResult.values.keySet()) {
+			if (!otherResult.values.get(key).equals(this.values.get(key))) {
+				return false;
+			}
+		}		
+		return true;		
+	}
 }

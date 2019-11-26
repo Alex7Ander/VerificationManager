@@ -113,7 +113,7 @@ public class StringGridFX {
 	public void addRow() {
 		HBox line = new HBox();
 		ObservableList<CellTextField> cellsOfCurrentLine = FXCollections.observableArrayList();
-		for (int j=0; j<this.colCount; j++) {				
+		for (int j = 0; j < this.colCount; j++) {				
 			CellTextField cell = new CellTextField(cells.size(), j);
 			cell.setPrefWidth(celWidth-1);
 			cell.setStyle("-fx-background-radius:0; "

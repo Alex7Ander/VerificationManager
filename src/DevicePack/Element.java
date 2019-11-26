@@ -360,5 +360,4 @@ public class Element implements Includable<Device>, dbStorable{
 		return arrayResults;
 	}
 	
-	
 }

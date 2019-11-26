@@ -180,7 +180,21 @@ public class DBEditController implements InfoRequestable {
 			try {
 				NewElementWindow elementWin = new NewElementWindow(elm);
 				elementWin.showAndWait();
+				
 				modDevice = new Device(modDevice.getName(), modDevice.getType(), modDevice.getSerialNumber());
+				
+				verificationDateList.clear();
+				verifications = currentElement.getListOfVerifications();	
+				int nominalIndex = currentElement.getNominalIndex();
+				for (int i = 0; i < verifications.size(); i++) {
+					String item = null;
+					int resIndex = Integer.parseInt(verifications.get(i).get(0));
+					if (resIndex != nominalIndex)
+						item = "Поверка, проведенная " + verifications.get(i).get(1);
+					else 
+						item = "Номиналыные занчение, полученные " + verifications.get(i).get(1);
+					verificationDateList.add(item);
+				}				
 			} catch (IOException ioExp) {
 				ioExp.printStackTrace();
 			} catch (SQLException sqlExp) {
@@ -360,12 +374,7 @@ public class DBEditController implements InfoRequestable {
 //Поиск
 	@FXML
 	private void searchDeviceBtnClick() {
-		try {
-			SearchDeviceWindow.getSearchDeviceWindow(modDevice, this).show();
-		}
-		catch(IOException ioExp) {
-			System.out.println("Ошибка при создании окна поиска прибора. " + ioExp.getStackTrace());
-		}
+		SearchDeviceWindow.getSearchDeviceWindow(modDevice, this).show();
 	}
 			
 	@FXML
@@ -376,8 +385,6 @@ public class DBEditController implements InfoRequestable {
 		resultsTable.clear();
 		verificationDateList.clear();
 		measUnitsList.clear();
-		//moduleChart.getData().clear();
-		//phaseChart.getData().clear();
 		
 		currentDateIndex = null;
 		currentMeasUnitIndex = null;		

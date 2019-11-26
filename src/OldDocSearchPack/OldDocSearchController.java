@@ -79,12 +79,7 @@ public class OldDocSearchController implements InfoRequestable {
 			deviceSearchTB.setText("Выбор средства измерения");
 		}
 		else {
-			try {
-				SearchDeviceWindow.getSearchDeviceWindow(checkDevice, this).show();
-			}
-			catch(IOException exp) {
-				//
-			}
+			SearchDeviceWindow.getSearchDeviceWindow(checkDevice, this).show();
 		}
 	}
 	

@@ -61,8 +61,11 @@ public class NewElementWindow extends guiWindow {
 				try {
 					DataBaseManager.getDB().BeginTransaction();
 					elm.rewriteParams(newModulePrimaryTP, newModulePeriodicTP, newPhasePrimaryTP, newPhasePeriodicTP);
-					newNominals.saveInDB();
-					newNominals.setNominalStatus();
+					if (!elm.getNominal().equals(newNominals)) {
+						elm.getNominal().deleteFromDB();
+						newNominals.saveInDB();
+						newNominals.setNominalStatus();
+					}
 					DataBaseManager.getDB().Commit();
 					AboutMessageWindow.createWindow("Успешно", "Изменения успешно сохранены").show();		
 				} 

@@ -51,26 +51,40 @@ public class NewElementStringGridFX extends StringGridFX {
 				values.put(key, new ArrayList<String>());
 			}
 		}		
-		for (ObservableList<CellTextField> line: this.cells) {
+		for (ObservableList<CellTextField> line: cells) {
 			for (CellTextField currentCell : line) {
 				currentCell.textProperty().addListener((observableValue, oldText, newText) -> {
-		    		 int lastIndex = newText.length() - 1;
-				     if (!newText.isEmpty() && !(newText.length() == 1 && newText.contains("-+")) && (newText.length() > 1 && (newText.charAt(lastIndex) != '.' || newText.charAt(lastIndex) != ','))) {
-			    		 if (newText.contains(",")) {
-			    			 newText = newText.replace(",",".");
-			    		 }
-				    	 try {
-				    		 @SuppressWarnings("unused")
-							 Double value = Double.parseDouble(newText);
-				             currentCell.setText(newText);
-				         } 
-				    	 catch (NumberFormatException nfExp) {
-				        	 currentCell.setText(oldText);
-				         }
-				     }
+					corretValues(currentCell, oldText, newText);
 				 });
 			}//end for (TextField currentCell : line)
 		} //end for (ObservableList<TextField> line: this.cells)
+	}
+	
+	@Override
+	public void addRow() {
+		super.addRow();
+		int i = getRowCount() - 1;
+		for (CellTextField currentCell : cells.get(i)) {
+			currentCell.textProperty().addListener((observableValue, oldText, newText) -> {
+				corretValues(currentCell, oldText, newText);
+			});
+		}
+	}
+	private void corretValues(CellTextField currentCell, String oldText, String newText) {
+		 int lastIndex = newText.length() - 1;
+	     if (!newText.isEmpty() && !(newText.length() == 1 && newText.contains("-+")) && (newText.length() > 1 && (newText.charAt(lastIndex) != '.' || newText.charAt(lastIndex) != ','))) {
+    		 if (newText.contains(",")) {
+    			 newText = newText.replace(",",".");
+    		 }
+	    	 try {
+	    		 @SuppressWarnings("unused")
+				 Double value = Double.parseDouble(newText);
+	             currentCell.setText(newText);
+	         } 
+	    	 catch (NumberFormatException nfExp) {
+	        	 currentCell.setText(oldText);
+	         }
+	     }
 	}
 	
 	public void saveInputedValues() {
