@@ -60,10 +60,10 @@ public class Device implements dbStorable {
 		ArrayList<ArrayList<String>> arrayResults = new ArrayList<ArrayList<String>>();					
 		DataBaseManager.getDB().sqlQueryString(sqlQuery, fieldName, arrayResults);	
 		if (arrayResults.size() > 0) {
-			this.owner = arrayResults.get(0).get(0);
-			this.gosNumber = arrayResults.get(0).get(1);						
-			this.elementsTableName = arrayResults.get(0).get(3);			
-			this.countOfElements = 0;			
+			owner = arrayResults.get(0).get(0);
+			gosNumber = arrayResults.get(0).get(1);						
+			elementsTableName = arrayResults.get(0).get(3);			
+			countOfElements = 0;			
 			List<String> indices = new ArrayList<String>();
 			sqlQuery = "SELECT id FROM [" + elementsTableName + "]";
 			DataBaseManager.getDB().sqlQueryString(sqlQuery, "id", indices);
@@ -78,12 +78,12 @@ public class Device implements dbStorable {
 	//Конструктор перед сохранение в БД
 	public Device(String Name, String Type, String SerialNumber, String Owner, String GosNumber){
 		includedElements = new ArrayList<Element>();
-		this.name = Name;
-		this.type = Type;
-		this.serialNumber = SerialNumber;
-		this.owner = Owner;
-		this.gosNumber = GosNumber;
-		this.elementsTableName = "";
+		name = Name;
+		type = Type;
+		serialNumber = SerialNumber;
+		owner = Owner;
+		gosNumber = GosNumber;
+		elementsTableName = "";
 	}
 	
 	public boolean isExist() throws SQLException {

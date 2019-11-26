@@ -155,8 +155,22 @@ public class DBEditController implements InfoRequestable {
 							elementsListView.getSelectionModel().getSelectedItem().toString()).showAndWait();
 			if (answer == 0) {
 				int deletedElementIndex = elementsListView.getSelectionModel().getSelectedIndex();
-				deleteElement(deletedElementIndex);
+				if (deletedElementIndex < 0) return;
+				try {
+					DataBaseManager.getDB().BeginTransaction();
+					modDevice.includedElements.get(deletedElementIndex).deleteFromDB();
+					modDevice = new Device(modDevice.getName(), modDevice.getType(), modDevice.getSerialNumber());
+					DataBaseManager.getDB().Commit();
+					modDevice.removeElement(deletedElementIndex);
+					elementsList.remove(deletedElementIndex);
+				}
+				catch(SQLException sqlExp) {
+					DataBaseManager.getDB().RollBack();
+					AboutMessageWindow.createWindow("Ошибка", "Ошибка доступа к БД\nпри попытке удаления").show();
+				}
+				//deleteElement(deletedElementIndex);				
 			}	
+			
 		});
 		
 		//editing element
@@ -165,9 +179,12 @@ public class DBEditController implements InfoRequestable {
 			Element elm = modDevice.includedElements.get(index);
 			try {
 				NewElementWindow elementWin = new NewElementWindow(elm);
-				elementWin.show();
-			} catch (IOException e) {
-				e.printStackTrace();
+				elementWin.showAndWait();
+				modDevice = new Device(modDevice.getName(), modDevice.getType(), modDevice.getSerialNumber());
+			} catch (IOException ioExp) {
+				ioExp.printStackTrace();
+			} catch (SQLException sqlExp) {
+				sqlExp.printStackTrace();
 			}
 		});
 		

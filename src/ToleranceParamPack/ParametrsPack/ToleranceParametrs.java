@@ -66,10 +66,10 @@ public class ToleranceParametrs implements Includable<Element>, dbStorable {
 			if (i != stop - 1) sqlQuery += ", ";
 		}
 		sqlQuery += " FROM [" + this.tableName +"]";
-		DataBaseManager.getDB().sqlQueryMapOfDouble(sqlQuery, fieldsNames, this.values);
+		DataBaseManager.getDB().sqlQueryMapOfDouble(sqlQuery, fieldsNames, values);
 		
 		sqlQuery = "SELECT freq FROM [" + this.tableName + "]";
-		DataBaseManager.getDB().sqlQueryDouble(sqlQuery, "freq", this.freqs);		
+		DataBaseManager.getDB().sqlQueryDouble(sqlQuery, "freq", freqs);		
 	}
 //interface dbStorable		    
 	 @Override
