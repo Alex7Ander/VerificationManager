@@ -505,15 +505,5 @@ public class NewElementController {
 			return vr;
 		}
 	}
-	
-	@FXML
-	private Button randomBtn;
-	@FXML
-	public void randomBtnClick() {
-		periodicParamsTable.setRandomValues();
-		periodicParamsTable.showParametr(currentS);
-		primaryParamsTable.setRandomValues();
-		primaryParamsTable.showParametr(currentS);
-	}
 
 }

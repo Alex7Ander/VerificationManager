@@ -57,7 +57,7 @@
             <HBox prefHeight="248.0" prefWidth="869.0">
                <children>
                   <Pane prefHeight="250.0" prefWidth="96.0" />
-                  <ImageView fitHeight="250.0" fitWidth="287.0" pickOnBounds="true" preserveRatio="true">
+                  <ImageView fx:id="logoView" fitHeight="250.0" fitWidth="287.0" pickOnBounds="true" preserveRatio="true">
                      <image>
                         <Image url="@../../bin/application/logo.png" />
                      </image></ImageView>

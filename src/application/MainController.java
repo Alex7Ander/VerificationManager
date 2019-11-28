@@ -4,6 +4,8 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import java.awt.Desktop;
 import java.io.File;
@@ -39,7 +41,10 @@ public class MainController {
 	
 	@FXML
 	private TextArea helpTextArea;
-				
+			
+	@FXML
+	private ImageView logoView;
+	
 //Verification button
 	@FXML
 	public void mouseOnVerificationBtn(MouseEvent event) {

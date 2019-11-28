@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+
 import AboutMessageForm.AboutMessageWindow;
 import DataBasePack.DataBaseManager;
 import DevicePack.Device;
@@ -97,8 +98,8 @@ public class DBEditController implements InfoRequestable {
 	NumberAxis phaseY = new NumberAxis();
 	private LineChart<Number, Number> moduleChart = new LineChart<Number, Number>(moduleX, moduleY);
 	private LineChart<Number, Number> phaseChart = new LineChart<Number, Number>(phaseX, phaseY);	
-	private XYChart.Series moduleSeries = new XYChart.Series();
-	private XYChart.Series phaseSeries = new XYChart.Series();
+	private XYChart.Series<Number, Number> moduleSeries = new XYChart.Series<Number, Number>();
+	private XYChart.Series<Number, Number> phaseSeries = new XYChart.Series<Number, Number>();
 
 //---------------------------------------------	
 	private Device modDevice;  //Редактируемое средство измерения
@@ -134,9 +135,13 @@ public class DBEditController implements InfoRequestable {
 		chartBox.getChildren().add(phaseChart);
 		verificationDateListView.setItems(this.verificationDateList);				
 		currentMeasUnitListView.setItems(measUnitsList);
-				
-		moduleSeries.setName("значение");
-		phaseSeries.setName("значение");
+		moduleX.setAutoRanging(false);
+		phaseX.setAutoRanging(false);
+		
+		moduleChart.setTitle("|Sxx|(f)");
+		phaseChart.setTitle("фаза Sxx(f)");
+		moduleSeries.setName("Значения модуля");
+		phaseSeries.setName("Значение фазы");
 		
 		createElemtnsListViewContextMenu();		
 		createVerificationsDatesContextMenu();
@@ -167,8 +172,7 @@ public class DBEditController implements InfoRequestable {
 				catch(SQLException sqlExp) {
 					DataBaseManager.getDB().RollBack();
 					AboutMessageWindow.createWindow("Ошибка", "Ошибка доступа к БД\nпри попытке удаления").show();
-				}
-				//deleteElement(deletedElementIndex);				
+				}				
 			}	
 			
 		});
@@ -271,21 +275,6 @@ public class DBEditController implements InfoRequestable {
 			verificationsDatesListViewContextMenu.show(verificationDateListView, x, y);
 		});
 	}
-//--------------------Удаление элемента--------------------
-	private void deleteElement(int index) {
-		if (index < 0) return;
-		try {
-			DataBaseManager.getDB().BeginTransaction();
-			modDevice.includedElements.get(index).deleteFromDB();
-			DataBaseManager.getDB().Commit();
-			modDevice.removeElement(index);
-			elementsList.remove(index);
-		}
-		catch(SQLException sqlExp) {
-			DataBaseManager.getDB().RollBack();
-			AboutMessageWindow.createWindow("Ошибка", "Ошибка доступа к БД\nпри попытке удаления").show();
-		}
-	}	
 //InfoRequestable
 	@Override
 	public void setDevice(Device device) {
@@ -459,21 +448,29 @@ public class DBEditController implements InfoRequestable {
 			date = date.split(" ")[0];
 			String unit = currentMeasUnitListView.getSelectionModel().getSelectedItem();
 			
-			ObservableList<Data> dataModule = FXCollections.observableArrayList();
-			ObservableList<Data> dataPhase = FXCollections.observableArrayList();
+			ObservableList<Data<Number, Number>> dataModule = FXCollections.observableArrayList();
+			ObservableList<Data<Number, Number>> dataPhase = FXCollections.observableArrayList();
 			String key = MeasUnitPart.MODULE + "_" + S_Parametr.values()[currentMeasUnitIndex];
 			for (int i=0; i < currentResult.values.get(key).size(); i++) {
 				//size of Collection with module should has same size as with phase 
 				double cFreq = currentResult.freqs.get(i);
 				double cModule = currentResult.values.get(key).get(cFreq);
 				double cPhase = currentResult.values.get(MeasUnitPart.PHASE + "_" + S_Parametr.values()[currentMeasUnitIndex]).get(cFreq);
-				dataModule.add(new XYChart.Data(cFreq, cModule));
-				dataPhase.add(new XYChart.Data(cFreq, cPhase));
+				dataModule.add(new XYChart.Data<Number, Number>(cFreq, cModule));
+				dataPhase.add(new XYChart.Data<Number, Number>(cFreq, cPhase));
 			}
+						
 			moduleSeries.setData(dataModule);
 			phaseSeries.setData(dataPhase);
 			moduleChart.getData().add(moduleSeries);
 			phaseChart.getData().add(phaseSeries);
+			
+			double upFreq = currentResult.freqs.get(currentResult.freqs.size() - 1);
+			double downFreq = currentResult.freqs.get(0);
+			moduleX.setUpperBound(upFreq);
+			phaseX.setUpperBound(upFreq);
+			moduleX.setLowerBound(downFreq);
+			phaseX.setLowerBound(downFreq);
 			
 			measInfoLabel.setText("Результаты измерения " + unit + " проведенного " + date + " для \"" + currentResult.getMyOwner().getType() + " " +
 					currentResult.getMyOwner().getSerialNumber() + "\" из состава \"" + currentResult.getMyOwner().getMyOwner().getName() + " " +

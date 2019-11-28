@@ -139,7 +139,7 @@ public class NewDeviceController  {
 			}
 		}
 		catch (SQLException sqlExp) {
-			AboutMessageWindow.createWindow("Ошибка", "База данных отсутствует или повреждена").show();
+			AboutMessageWindow.createWindow("Ошибка", "Не удалось проверить наличие подобного Си в БД.\nВозможно, база данных отсутствует или повреждена").show();
 			return;
 		}
 		
