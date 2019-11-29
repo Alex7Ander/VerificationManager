@@ -18,7 +18,7 @@ public class ResultsStringGridFX extends StringGridFX {
 		tableHeads.add("Частота, ГГц");
 		tableHeads.add("Изм. знач. модуля");
 		tableHeads.add("Погрешность");
-		tableHeads.add("Изм. знач. фазы");
+		tableHeads.add("Изм. знач. фазы, \u00B0");
 		tableHeads.add("Погрешность");
 	}
 	

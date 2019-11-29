@@ -464,6 +464,8 @@ public class DBEditController implements InfoRequestable {
 			phaseSeries.setData(dataPhase);
 			moduleChart.getData().add(moduleSeries);
 			phaseChart.getData().add(phaseSeries);
+			moduleChart.setTitle("Модуль " + currentMeasUnitListView.getSelectionModel().getSelectedItem() + "(f)");
+			phaseChart.setTitle("Фаза " + currentMeasUnitListView.getSelectionModel().getSelectedItem() + "(f)");
 			
 			double upFreq = currentResult.freqs.get(currentResult.freqs.size() - 1);
 			double downFreq = currentResult.freqs.get(0);
