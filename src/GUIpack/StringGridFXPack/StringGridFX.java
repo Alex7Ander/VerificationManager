@@ -3,6 +3,8 @@ package GUIpack.StringGridFXPack;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import GUIpack.Tables.Table;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
@@ -13,7 +15,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-public class StringGridFX {
+public class StringGridFX implements Table {
 
 	private int colCount;
 	private int rowCount;
@@ -42,7 +44,7 @@ public class StringGridFX {
 		cells = FXCollections.observableArrayList();
 		
 		HBox headLine = new HBox();
-		for (int h=0; h<ColCount; h++) {
+		for (int h = 0; h < ColCount; h++) {
 			Label hLabel = new Label("-");
 			hLabel.setPrefWidth(celWidth-1);
 			hLabel.setStyle("-fx-text-fill: black;" + 
