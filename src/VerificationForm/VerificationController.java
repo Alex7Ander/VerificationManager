@@ -11,8 +11,8 @@ import DevicePack.Device;
 import DevicePack.Element;
 import FileManagePack.FileManager;
 import GUIpack.InfoRequestable;
-import GUIpack.StringGridFXPack.StringGridPosition;
-import GUIpack.StringGridFXPack.VerificationStringGridFX;
+import GUIpack.Tables.Table;
+import GUIpack.Tables.VerificationTable;
 import ProtocolCreatePack.ProtocolCreateWindow;
 import SearchDevicePack.SearchDeviceWindow;
 import StartVerificationPack.StartVerificationController;
@@ -62,7 +62,7 @@ public class VerificationController implements InfoRequestable {
 	private ScrollPane scrollPane;
 	@FXML
 	private AnchorPane tablePane;
-	private VerificationStringGridFX resultTable;
+	private Table resultTable;
 
 //Процедура поверки
 	VerificationProcedure verification;
@@ -80,8 +80,9 @@ public class VerificationController implements InfoRequestable {
 		verificationResult = new ArrayList<MeasResult>();
 		currentElementIndex = 0;
 		currentParamIndex = 0;		   		
-		StringGridPosition position = new StringGridPosition(1110, 100, scrollPane, tablePane);
-		resultTable = new VerificationStringGridFX( position);		 
+		//StringGridPosition position = new StringGridPosition(1110, 100, scrollPane, tablePane);
+		//resultTable = new VerificationStringGridFX(position);	
+		resultTable = new VerificationTable(tablePane);
 	}
 	
 	@FXML

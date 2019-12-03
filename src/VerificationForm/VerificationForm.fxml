@@ -41,7 +41,7 @@
             <Separator prefHeight="20.0" prefWidth="200.0" />
             <ScrollPane fx:id="scrollPane" prefHeight="513.0" prefWidth="1115.0">
               <content>
-                <AnchorPane fx:id="tablePane" minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0" />
+                <AnchorPane fx:id="tablePane" minHeight="0.0" minWidth="0.0" prefHeight="514.0" prefWidth="1100.0" />
               </content>
             </ScrollPane>
             <HBox prefHeight="32.0" prefWidth="1115.0">

@@ -2,6 +2,8 @@ package GUIpack.Tables;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -12,7 +14,8 @@ import javafx.scene.layout.Pane;
 
 public class VisualTable implements Table {
 		
-	protected List<String> heads = new ArrayList<String>();
+	protected List<String> headLabels = new ArrayList<String>();
+	protected List<String> headKeys = new ArrayList<String>();
 	
 	protected TableView<Line> table = new TableView<Line>();
 	protected ObservableList<Line> lines = FXCollections.observableArrayList();
@@ -20,12 +23,13 @@ public class VisualTable implements Table {
 	
 	protected Pane pane;
 	
-	public VisualTable(List<String> heads, Pane pane){	
-		this.heads = heads;
-		for (int i = 0; i < heads.size(); i++) {
+	public VisualTable(List<String> headLabels, Pane pane){	
+		this.headLabels = headLabels;
+		for (int i = 0; i < headLabels.size(); i++) {
 			TableColumn<Line, String> column = new TableColumn<Line, String>();
 			final int index = i;
 			column.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().values.get(index)));
+			column.setText(headLabels.get(i));
 			columns.add(column);
 		}
 		table.getColumns().addAll(columns);	
@@ -48,7 +52,7 @@ public class VisualTable implements Table {
 
 	@Override
 	public void addRow() {
-		Line line = new Line(heads);
+		Line line = new Line(headLabels.size());
 		lines.add(line);		
 		table.refresh();
 	}
@@ -62,7 +66,7 @@ public class VisualTable implements Table {
 	@Override
 	public void clear() {
 		lines.clear();
-		Line line = new Line(heads);
+		Line line = new Line(headLabels.size());
 		lines.add(line);
 		table.refresh();
 	}
@@ -77,62 +81,103 @@ public class VisualTable implements Table {
 
 	@Override
 	public String getHead(int index) {
-		// TODO Auto-generated method stub
-		return null;
+		return headLabels.get(index);
 	}
 
 	@Override
 	public void setHead(int index, String text) {
-		// TODO Auto-generated method stub
-		
+		columns.get(index).setText(text);		
 	}
 
 	@Override
 	public String getCellValue(int col, int row) {
-		// TODO Auto-generated method stub
-		return null;
+		Set keys = (TreeSet) lines.get(row).values.keySet();
+		String key = keys.toArray()[col].toString();
+		String result = lines.get(row).values.get(key);
+		return result;
 	}
 
 	@Override
 	public void setCellValue(int col, int row, String text) {
-		// TODO Auto-generated method stub
-		
+		lines.get(row).values.keySet();
+		Set keys = lines.get(row).values.keySet();
+		int key = (int) keys.toArray()[col];
+		lines.get(row).values.remove(key);
+		lines.get(row).values.put(key, text);
+		table.refresh();
 	}
 
 	@Override
-	public void getColumn(int index, ArrayList<String> columnValues) {
-		// TODO Auto-generated method stub
-		
+	public void getColumn(int index, List<String> columnValues) {
+		columnValues.clear();
+		if (lines.isEmpty()) {
+			return;
+		}
+		Set keys = (TreeSet) lines.get(0).values.keySet();
+		String key = keys.toArray()[index].toString();
+		for (Line line : lines) {
+			columnValues.add(line.values.get(key));
+		}		
 	}
 
 	@Override
-	public void getColumnToDouble(int index, ArrayList<Double> columnValues) {
-		// TODO Auto-generated method stub
-		
+	public void getColumnToDouble(int index, List<Double> columnValues) {
+		columnValues.clear();
+		if (lines.isEmpty()) {
+			return;
+		}
+		Set keys = (TreeSet) lines.get(0).values.keySet();
+		String key = keys.toArray()[index].toString();
+		for (Line line : lines) {
+			try {
+				columnValues.add(Double.parseDouble(line.values.get(key)));
+			}
+			catch (NumberFormatException nfExp) {
+				//
+			}
+		}		
 	}
 
 	@Override
 	public void setColumn(int index, List<String> columnValues) {
-		// TODO Auto-generated method stub
-		
+		int stopIndex = 0;
+		if (columnValues.size() > lines.size()) {
+			stopIndex = columnValues.size();
+		} 
+		else {
+			stopIndex = lines.size();
+		}
+		for (int i = 0; i < stopIndex; i++) {
+			String text = columnValues.get(i);
+			setCellValue(index, i, text);
+		}		
 	}
 
 	@Override
 	public void setColumnFromDouble(int index, List<Double> columnValues) {
-		// TODO Auto-generated method stub
-		
+		int stopIndex = 0;
+		if (columnValues.size() > lines.size()) {
+			stopIndex = columnValues.size();
+		} 
+		else {
+			stopIndex = lines.size();
+		}
+		for (int i = 0; i < stopIndex; i++) {
+			String text = columnValues.get(i).toString();
+			setCellValue(index, i, text);
+		}		
 	}
 
 	@Override
 	public void delete() {
-		// TODO Auto-generated method stub
-		
+		for (int i = 0; i < pane.getChildren().size(); i++) {
+			pane.getChildren().remove(i);
+		}		
 	}
 
 	@Override
 	public void setVisible(boolean visibleStatus) {
-		// TODO Auto-generated method stub
-		
+		table.setVisible(visibleStatus);		
 	}
 
 	

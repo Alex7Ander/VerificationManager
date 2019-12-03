@@ -1,6 +1,5 @@
 package GUIpack.Tables;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public interface Table {
@@ -18,8 +17,8 @@ public interface Table {
 	String getCellValue(int col, int row);	
 	void setCellValue(int col, int row, String text);
 	
-	void getColumn(int index, ArrayList<String> columnValues);	
-	void getColumnToDouble(int index, ArrayList<Double> columnValues);
+	void getColumn(int index, List<String> columnValues);	
+	void getColumnToDouble(int index, List<Double> columnValues);
 	
 	void setColumn(int index, List<String> columnValues);	
 	void setColumnFromDouble(int index, List<Double> columnValues);

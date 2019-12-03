@@ -36,7 +36,7 @@
                                        <children>
                                           <HBox prefHeight="30.0" prefWidth="200.0">
                                              <children>
-                                                <Label prefWidth="130.0" stylesheets="@../../bin/application/commonLabel.css" text="Наименование СИ:" />
+                                                <Label minWidth="130.0" prefWidth="130.0" stylesheets="@../../bin/application/commonLabel.css" text="Наименование СИ:" />
                                                 <ComboBox fx:id="nameComboBox" prefHeight="26.0" prefWidth="400.0">
                                                    <HBox.margin>
                                                       <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
@@ -46,7 +46,7 @@
                                           </HBox>
                                           <HBox prefHeight="30.0" prefWidth="200.0">
                                              <children>
-                                                <Label prefWidth="130.0" stylesheets="@../../bin/application/commonLabel.css" text="Тип СИ:" />
+                                                <Label minWidth="130.0" prefWidth="130.0" stylesheets="@../../bin/application/commonLabel.css" text="Тип СИ:" />
                                                 <TextField fx:id="typeTextField" prefWidth="400.0">
                                                    <HBox.margin>
                                                       <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
@@ -56,7 +56,7 @@
                                           </HBox>
                                           <HBox prefHeight="30.0" prefWidth="200.0">
                                              <children>
-                                                <Label prefWidth="130.0" stylesheets="@../../bin/application/commonLabel.css" text="Заводской номер:" />
+                                                <Label minWidth="130.0" prefWidth="130.0" stylesheets="@../../bin/application/commonLabel.css" text="Заводской номер:" />
                                                 <TextField fx:id="serNumTextField" prefWidth="400.0">
                                                    <HBox.margin>
                                                       <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
@@ -66,7 +66,7 @@
                                           </HBox>
                                           <HBox prefHeight="30.0" prefWidth="200.0">
                                              <children>
-                                                <Label prefWidth="130.0" stylesheets="@../../bin/application/commonLabel.css" text="Владелец:" />
+                                                <Label minWidth="130.0" prefWidth="130.0" stylesheets="@../../bin/application/commonLabel.css" text="Владелец:" />
                                                 <TextField fx:id="ownerTextField" prefWidth="400.0">
                                                    <HBox.margin>
                                                       <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
@@ -76,7 +76,7 @@
                                           </HBox>
                                           <HBox prefHeight="30.0" prefWidth="200.0">
                                              <children>
-                                                <Label prefHeight="16.0" prefWidth="130.0" stylesheets="@../../bin/application/commonLabel.css" text="Номер в Гос. Реестре:" />
+                                                <Label minWidth="130.0" prefHeight="16.0" prefWidth="130.0" stylesheets="@../../bin/application/commonLabel.css" text="Номер в Гос. Реестре:" />
                                                 <TextField fx:id="gosNumTextField" prefWidth="400.0">
                                                    <HBox.margin>
                                                       <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
@@ -135,22 +135,19 @@
                               <AnchorPane prefHeight="113.0" prefWidth="803.0">
                                  <children>
                                     <Label fx:id="measInfoLabel" layoutX="14.0" layoutY="14.0" stylesheets="@../application/commonLabel.css" text="Таблица результатов  измерений для " />
+                                    <Label fx:id="measInfoLabel2" layoutX="14.0" layoutY="42.0" stylesheets="@../../bin/application/commonLabel.css" text="___" />
                                  </children>
                               </AnchorPane>
                               <ScrollPane fx:id="resultsScrollPane" prefHeight="486.0" prefWidth="953.0">
                                  <content>
-                                    <AnchorPane fx:id="resultsTablePane" minHeight="0.0" minWidth="0.0" prefHeight="155.0" prefWidth="474.0" />
+                                    <AnchorPane fx:id="resultsTablePane" minHeight="0.0" minWidth="0.0" prefHeight="474.0" prefWidth="782.0" />
                                  </content>
                                  <VBox.margin>
                                     <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
                                  </VBox.margin>
                               </ScrollPane>
                               <HBox fx:id="chartBox" prefHeight="283.0" prefWidth="679.0" />
-                              <HBox prefHeight="60.0" prefWidth="957.0">
-                                 <children>
-                                    <Button disable="true" mnemonicParsing="false" opacity="0.05" prefHeight="26.0" prefWidth="37.0" stylesheets="@../../bin/application/commonButton.css" text="Параметры погрешности" />
-                                 </children>
-                              </HBox>
+                              <HBox prefHeight="60.0" prefWidth="957.0" />
                            </children>
                         </VBox>
                      </children>

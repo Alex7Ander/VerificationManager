@@ -10,12 +10,11 @@ import AboutMessageForm.AboutMessageWindow;
 import DataBasePack.DataBaseManager;
 import DevicePack.Device;
 import DevicePack.Element;
-import ErrorParamsPack.ErrorParamsWindow;
 import Exceptions.SavingException;
 import FileManagePack.FileManager;
 import GUIpack.InfoRequestable;
-import GUIpack.StringGridFXPack.ResultsStringGridFX;
-import GUIpack.StringGridFXPack.StringGridPosition;
+import GUIpack.Tables.ResultsRepresentable;
+import GUIpack.Tables.ResultsTable;
 import NewElementPack.NewElementController;
 import NewElementPack.NewElementWindow;
 import SearchDevicePack.SearchDeviceWindow;
@@ -45,8 +44,6 @@ public class DBEditController implements InfoRequestable {
 	
 //Левая часть окна
 	@FXML
-	private Button errorParamsBtn;	
-	@FXML
 	private Button searchDeviceBtn;
 	@FXML
 	private ComboBox<String> nameComboBox;
@@ -74,6 +71,8 @@ public class DBEditController implements InfoRequestable {
 	@FXML
 	private Label measInfoLabel;
 	@FXML
+	private Label measInfoLabel2;
+	@FXML
 	private ListView<String> verificationDateListView;
 	private ObservableList<String> verificationDateList;	
 	@FXML
@@ -84,7 +83,7 @@ public class DBEditController implements InfoRequestable {
 	private ScrollPane resultsScrollPane;
 	@FXML
 	private AnchorPane resultsTablePane;
-	private ResultsStringGridFX resultsTable;
+	private ResultsTable resultsTable;
 	@FXML
 	private Label measUnitLabel;
 	@FXML
@@ -112,9 +111,8 @@ public class DBEditController implements InfoRequestable {
 	
 //---------------------------------------------------------
 	@FXML
-	private void initialize() {				
-		StringGridPosition position = new StringGridPosition(800, 100, resultsScrollPane, resultsTablePane); 
-		resultsTable = new ResultsStringGridFX(position);		
+	private void initialize() {						
+		resultsTable = new ResultsTable(resultsTablePane);		
 		elementsList = FXCollections.observableArrayList();
 		verificationDateList = FXCollections.observableArrayList();
 		measUnitsList = FXCollections.observableArrayList();		
@@ -312,11 +310,6 @@ public class DBEditController implements InfoRequestable {
 		measUnitsList.clear();
 		resultsTable.clear();
 	}
-//---------------------------------------------------------
-	@FXML
-	private void errorParamsBtnClick() throws IOException {
-		ErrorParamsWindow.getErrorParamsWindow().show();
-	}	
 	
 //---Работа с устройством---
 //Сохранение изменений в устройство
@@ -443,7 +436,8 @@ public class DBEditController implements InfoRequestable {
 		try {
 			int resIndex = Integer.parseInt(verifications.get(currentDateIndex).get(0));
 			currentResult = new MeasResult(modDevice.includedElements.get(currentElementIndex), resIndex);
-			resultsTable.showResult(currentResult, S_Parametr.values()[currentMeasUnitIndex]);
+			ResultsRepresentable t = (ResultsRepresentable)resultsTable;
+			t.showResult(currentResult, S_Parametr.values()[currentMeasUnitIndex]);
 			String date = currentResult.getDateOfMeasByString();
 			date = date.split(" ")[0];
 			String unit = currentMeasUnitListView.getSelectionModel().getSelectedItem();
@@ -475,7 +469,8 @@ public class DBEditController implements InfoRequestable {
 			phaseX.setLowerBound(downFreq);
 			
 			measInfoLabel.setText("Результаты измерения " + unit + " проведенного " + date + " для \"" + currentResult.getMyOwner().getType() + " " +
-					currentResult.getMyOwner().getSerialNumber() + "\" из состава \"" + currentResult.getMyOwner().getMyOwner().getName() + " " +
+					currentResult.getMyOwner().getSerialNumber() + "\" ");
+			measInfoLabel2.setText("из состава \"" + currentResult.getMyOwner().getMyOwner().getName() + " " +
 					currentResult.getMyOwner().getMyOwner().getType() + " №" + currentResult.getMyOwner().getMyOwner().getSerialNumber() + "\".");
 		}
 		catch(SQLException sqlExp) {

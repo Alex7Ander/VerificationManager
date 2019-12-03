@@ -91,7 +91,7 @@ public class StringGridFX implements Table {
 	public StringGridFX(int ColCount, int RowCount, StringGridPosition position, ArrayList<String> values) {
 		this(ColCount, RowCount, position);		
 		for (int i = 0; i < ColCount; i++) {
-			this.heads.get(i).setText(values.get(i));
+			heads.get(i).setText(values.get(i));
 		}
 	}
 	
@@ -103,15 +103,18 @@ public class StringGridFX implements Table {
 		this(ColCount, RowCount, position);
 		this.setVisible(VisibleStatus);
 	}
-		
+	
+	@Override
 	public int getColCount() {
 		return this.colCount;
 	}
 	
+	@Override
 	public int getRowCount() {
 		return this.rowCount;
 	}
 	
+	@Override
 	public void addRow() {
 		HBox line = new HBox();
 		ObservableList<CellTextField> cellsOfCurrentLine = FXCollections.observableArrayList();
@@ -139,11 +142,12 @@ public class StringGridFX implements Table {
 		line.getChildren().addAll(cellsOfCurrentLine);
 		lines.add(line);
 		vBox.getChildren().add(line);
-		this.rowCount++;
+		rowCount++;
 		height = 27 * this.rowCount + 20;
 		myPosition.getAnchorContainer().setPrefHeight(height);
 	}
 	
+	@Override
 	public void deleteRow(int index) {
 		if (index > 0) {	
 			vBox.getChildren().remove(index);
@@ -156,71 +160,79 @@ public class StringGridFX implements Table {
 				}
 			}
 			cellsIt.remove();				
-			this.rowCount = cells.size();
+			rowCount = cells.size();
 			
 			height = 27 * this.rowCount + 20;
 			myPosition.getAnchorContainer().setPrefHeight(height);
 		}				
 	}
 
+	@Override
 	public void clear() {
 		for (int i=0; i<this.colCount; i++) {
 			for (int j=0; j<this.rowCount; j++) {
-				this.cells.get(j).get(i).setText("");
+				cells.get(j).get(i).setText("");
 			}
 		}
 	}
 	
+	@Override
 	public void clearColumn(int columnIndex) {
 		for (int i=0; i<this.rowCount; i++) {
-			this.cells.get(i).get(columnIndex).setText("");
+			cells.get(i).get(columnIndex).setText("");
 		}
 	}
 	
+	@Override
 	public String getHead(int index) {
 		try {			
-			return this.heads.get(index).getText();
+			return heads.get(index).getText();
 		}
 		catch(Exception exp) {
 			return null;
 		}
 	}
 	
+	@Override
 	public void setHead(int index, String text) {
 		try {
-			this.heads.get(index).setText(text);
+			heads.get(index).setText(text);
 		}
 		catch(Exception exp) {
 			//
 		}
 	}
 	
+	@Override
 	public String getCellValue(int col, int row) {
 		try {
-			return this.cells.get(row).get(col).getText();
+			return cells.get(row).get(col).getText();
 		}
 		catch(Exception exp) {
 			return null;
 		}
 	}
 	
+	@Override
 	public void setCellValue(int col, int row, String text) {
 		try {
-			this.cells.get(row).get(col).setText(text);
+			cells.get(row).get(col).setText(text);
 		}
 		catch(Exception exp) {
 			//
 		}
 	}
 	
-	public void getColumn(int index, ArrayList<String> columnValues) {
+	@Override
+	public void getColumn(int index, List<String> columnValues) {
 		columnValues.clear();
 		for (int i = 0; i < this.rowCount; i++) {
 			columnValues.add(this.cells.get(i).get(index).getText());
 		}
 	}
 	
-	public void getColumnToDouble(int index, ArrayList<Double> columnValues) {
+	@Override
+	public void getColumnToDouble(int index, List<Double> columnValues) {
 		columnValues.clear();
 		for (int i = 0; i < this.rowCount; i++) {
 			try {
@@ -231,6 +243,7 @@ public class StringGridFX implements Table {
 		}		
 	}
 	
+	@Override
 	public void setColumn(int index, List<String> columnValues) {
 		if (columnValues.size() > rowCount) {
 			while (columnValues.size() != rowCount) {
@@ -239,13 +252,14 @@ public class StringGridFX implements Table {
 		}	
 		for (int i=0; i<columnValues.size(); i++) { 
 			try {
-				this.cells.get(i).get(index).setText(columnValues.get(i));
+				cells.get(i).get(index).setText(columnValues.get(i));
 			} catch(Exception exp) {
 				break;
 			} 
 		}
 	}
 	
+	@Override
 	public void setColumnFromDouble(int index, List<Double> columnValues) {
 		if (columnValues.size() > rowCount) {
 			while (columnValues.size() != rowCount) {
@@ -254,20 +268,22 @@ public class StringGridFX implements Table {
 		}	
 		for (int i=0; i < this.rowCount; i++) {
 			try {
-				this.cells.get(i).get(index).setText(columnValues.get(i).toString());
+				cells.get(i).get(index).setText(columnValues.get(i).toString());
 			} catch(Exception exp) {
 				break;
 			}
 		}
 	}
 	
+	@Override
 	public void setVisible(boolean visibleStatus) {
-		this.myPosition.getAnchorContainer().setVisible(visibleStatus);
+		myPosition.getAnchorContainer().setVisible(visibleStatus);
 	}
 
+	@Override
 	public void delete() {
 		for (HBox line : lines) {
-			this.myPosition.getAnchorContainer().getChildren().remove(line);
+			myPosition.getAnchorContainer().getChildren().remove(line);
 		}				
 	}
 
