@@ -21,6 +21,7 @@ import ToleranceParamPack.ParametrsPack.MeasUnitPart;
 import ToleranceParamPack.ParametrsPack.S_Parametr;
 import VerificationPack.MeasResult;
 import VerificationPack.VerificationProcedure;
+import YesNoDialogPack.YesNoWindow;
 import _tempHelpers.Adapter;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -56,7 +57,12 @@ public class VerificationController implements InfoRequestable {
 	@FXML
 	private ComboBox<String> parametrComboBox;
 	private ObservableList<String> listOfParametrs;
+	private boolean resultSaved;
+	private Stage myStage;
 	
+	public void setStage(Stage stage) {
+		myStage = stage;
+	}
 //Таблица с результатами	
 	@FXML
 	private ScrollPane scrollPane;
@@ -80,9 +86,9 @@ public class VerificationController implements InfoRequestable {
 		verificationResult = new ArrayList<MeasResult>();
 		currentElementIndex = 0;
 		currentParamIndex = 0;		   		
-		//StringGridPosition position = new StringGridPosition(1110, 100, scrollPane, tablePane);
-		//resultTable = new VerificationStringGridFX(position);	
 		resultTable = new VerificationTable(tablePane);
+		resultSaved = false;
+		saveBtn.setDisable(true);
 	}
 	
 	@FXML
@@ -110,13 +116,18 @@ public class VerificationController implements InfoRequestable {
 					verificationResult.get(i).saveInDB();
 				}
 				AboutMessageWindow.createWindow("Успешно", "Результаты поверки сохранены в БД").show();
+				resultSaved = true;
 			}
 			catch(SQLException sqlExp) {
 				AboutMessageWindow.createWindow("Ошибка", "Не удалось сохранить результаты в БД");
+				resultSaved = false;
 			}
 		}
 		else {
 			AboutMessageWindow.createWindow("Ошибка","Процедура поверки еще не закончена").show();
+		}
+		if(resultSaved) {
+			saveBtn.setDisable(true);
 		}
 	}
 	
@@ -276,6 +287,7 @@ public class VerificationController implements InfoRequestable {
 				elementComboBox.setValue(listOfElements.get(0));
 				parametrComboBox.setValue(listOfParametrs.get(0));
 			}
+			saveBtn.setDisable(false);
 		}
 		catch(IOException ioExp) {
 			AboutMessageWindow.createWindow("Ошибка", "Отсутствует или поврежден файл\n с результатами измерений").show();
@@ -315,9 +327,14 @@ public class VerificationController implements InfoRequestable {
 		
 	//Закрыть	
 	@FXML
-	private void closeBtnClick(ActionEvent event) {
-		Stage stage = (Stage) closeBtn.getScene().getWindow();
-		stage.close();
+	private void closeBtnClick(ActionEvent event) {			
+		if (!resultIsSaved()) {
+			int answer = YesNoWindow.createYesNoWindow("Результаты поверки не сохранены", "Результаты поверки не сохранениы в БД.\nВы уверены что хотите завершить поверку\nбез сохранения результатов?").showAndWait();
+			if (answer == 1) {
+				return;
+			}
+		}	
+		myStage.close();
 	}
 		
 	public void waitResults(){		
@@ -333,5 +350,9 @@ public class VerificationController implements InfoRequestable {
 			e.printStackTrace();
 		}				
 	}	
+	
+	public boolean resultIsSaved() {
+		return this.resultSaved;
+	}
 	
 }
