@@ -91,7 +91,7 @@ public class VisualTable implements Table {
 
 	@Override
 	public String getCellValue(int col, int row) {
-		Set keys = (TreeSet) lines.get(row).values.keySet();
+		Set<Integer> keys = lines.get(row).values.keySet();
 		String key = keys.toArray()[col].toString();
 		String result = lines.get(row).values.get(key);
 		return result;
@@ -99,8 +99,7 @@ public class VisualTable implements Table {
 
 	@Override
 	public void setCellValue(int col, int row, String text) {
-		lines.get(row).values.keySet();
-		Set keys = lines.get(row).values.keySet();
+		Set<Integer> keys = lines.get(row).values.keySet();
 		int key = (int) keys.toArray()[col];
 		lines.get(row).values.remove(key);
 		lines.get(row).values.put(key, text);

@@ -13,7 +13,6 @@ import DevicePack.Element;
 import Exceptions.SavingException;
 import FileManagePack.FileManager;
 import GUIpack.InfoRequestable;
-import GUIpack.Tables.ResultsRepresentable;
 import GUIpack.Tables.ResultsTable;
 import NewElementPack.NewElementController;
 import NewElementPack.NewElementWindow;
@@ -436,8 +435,26 @@ public class DBEditController implements InfoRequestable {
 		try {
 			int resIndex = Integer.parseInt(verifications.get(currentDateIndex).get(0));
 			currentResult = new MeasResult(modDevice.includedElements.get(currentElementIndex), resIndex);
-			ResultsRepresentable t = (ResultsRepresentable)resultsTable;
-			t.showResult(currentResult, S_Parametr.values()[currentMeasUnitIndex]);
+			resultsTable.showResult(currentResult, S_Parametr.values()[currentMeasUnitIndex]);
+			//set table column headers
+			String newPhaseErrorHeader = null;
+			if (modDevice.includedElements.get(currentElementIndex).getPhaseToleranceType().equals("percent")) {
+				newPhaseErrorHeader = "Погрешность, %";
+			} 
+			else {
+				newPhaseErrorHeader = "Погрешность, \u00B0";
+			}
+			resultsTable.setHead(4, newPhaseErrorHeader);
+			
+			String newModuleErrorHeader = null;
+			if (modDevice.includedElements.get(currentElementIndex).getModuleToleranceType().equals("percent")) {
+				newModuleErrorHeader = "Погрешность, %";
+			} 
+			else {
+				newModuleErrorHeader = "Погрешность";
+			}
+			resultsTable.setHead(2, newModuleErrorHeader);
+			
 			String date = currentResult.getDateOfMeasByString();
 			date = date.split(" ")[0];
 			String unit = currentMeasUnitListView.getSelectionModel().getSelectedItem();

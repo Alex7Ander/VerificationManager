@@ -7,7 +7,7 @@ import VerificationPack.MeasResult;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 
-public class ResultsTable extends VisualTable implements ResultsRepresentable {
+public class ResultsTable extends VisualTable {
 
 	private static ArrayList<String> localTableHeads;
 	private final int colCount = 5;
@@ -37,7 +37,6 @@ public class ResultsTable extends VisualTable implements ResultsRepresentable {
 		return colCount;
 	}
 	
-	@Override
 	public void showResult(MeasResult result, S_Parametr sParam) {
 		this.clear();
 		if (result.freqs.size() > getRowCount()) {

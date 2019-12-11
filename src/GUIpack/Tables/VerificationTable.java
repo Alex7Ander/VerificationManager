@@ -31,5 +31,10 @@ public class VerificationTable extends VisualTable {
 		localTableHeads.add("Погрешность");	
 		localTableHeads.add("Годен/не годен");
 	}
+	
+	@Override
+	public int getColCount() {
+		return colCount;
+	}
 
 }

@@ -162,17 +162,17 @@ public class VerificationController implements InfoRequestable {
 			listOfParametrs.add("S21");
 			listOfParametrs.add("S22");
 		}
-		this.parametrComboBox.setItems(listOfParametrs);
+		parametrComboBox.setItems(listOfParametrs);
 		//Установим индекс отображаемого параметра в 0 
 		currentParamIndex = 0;
 		//И программно выберем параметром под индексом 0
-		this.parametrComboBox.getSelectionModel().select(currentParamIndex);
+		parametrComboBox.getSelectionModel().select(currentParamIndex);
 		//Это приведет к вызову функции parametrComboBoxChange()  //fillTable();
 	}
 //Изменить значение в комбобоксе с параметрами	
 	@FXML
 	private void parametrComboBoxChange() {
-		currentParamIndex = this.parametrComboBox.getSelectionModel().getSelectedIndex(); 
+		currentParamIndex = parametrComboBox.getSelectionModel().getSelectedIndex(); 
 		if (currentParamIndex != -1) {
 			fillTable();			
 		}
@@ -201,48 +201,70 @@ public class VerificationController implements InfoRequestable {
 			}
 		}
 
-		ArrayList<Double> fr = this.verificationResult.get(currentElementIndex).freqs;
+		ArrayList<Double> fr = verificationResult.get(currentElementIndex).freqs;
 		int countOfFreq = fr.size();
-		if (this.resultTable.getRowCount() < countOfFreq) {
-			while (this.resultTable.getRowCount() != countOfFreq) 
-				this.resultTable.addRow();
+		if (resultTable.getRowCount() < countOfFreq) {
+			while (resultTable.getRowCount() != countOfFreq) 
+				resultTable.addRow();
 		}
-		else if (this.resultTable.getRowCount() > countOfFreq) {
-			while (this.resultTable.getRowCount() != countOfFreq) 
-				this.resultTable.deleteRow(this.resultTable.getRowCount());
+		else if (resultTable.getRowCount() > countOfFreq) {
+			while (resultTable.getRowCount() != countOfFreq) 
+				resultTable.deleteRow(this.resultTable.getRowCount());
 		}
 
-		this.resultTable.setColumnFromDouble(0, fr);
+		resultTable.setColumnFromDouble(0, fr);
 		List<Double> column1 = Adapter.MapToArrayList(this.verificationResult.get(currentElementIndex).values.get(keys.get(currentParamIndex*4)));
-		this.resultTable.setColumnFromDouble(1, column1);
+		resultTable.setColumnFromDouble(1, column1);
 		List<Double> column2 = Adapter.MapToArrayList(this.verificationResult.get(currentElementIndex).values.get(keys.get(1 + currentParamIndex*4)));
-		this.resultTable.setColumnFromDouble(2, column2);
+		resultTable.setColumnFromDouble(2, column2);
 		List<Double> column4 = Adapter.MapToArrayList(this.verificationResult.get(currentElementIndex).values.get(keys.get(2 + currentParamIndex*4)));
-		this.resultTable.setColumnFromDouble(4, column4);
+		resultTable.setColumnFromDouble(4, column4);
 		List<Double> column5 = Adapter.MapToArrayList(this.verificationResult.get(currentElementIndex).values.get(keys.get(3 + currentParamIndex*4)));
-		this.resultTable.setColumnFromDouble(5, column5);
+		resultTable.setColumnFromDouble(5, column5);
 		List<String> column3 = Adapter.MapToArrayList(this.verificationResult.get(currentElementIndex).suitabilityDecision.get(keys.get(currentParamIndex)));
-		this.resultTable.setColumn(3, column3);
+		resultTable.setColumn(3, column3);
 		List<String> column6 = Adapter.MapToArrayList(this.verificationResult.get(currentElementIndex).suitabilityDecision.get(keys.get(2 + currentParamIndex)));
-		this.resultTable.setColumn(6, column6);
+		resultTable.setColumn(6, column6);
+		
+		//set table column headers
+		String newPhaseErrorHeader = null;
+		if (verificatedDevice.includedElements.get(currentElementIndex).getPhaseToleranceType().equals("percent")) {
+			newPhaseErrorHeader = "Погрешность, %";
+		} 
+		else {
+			newPhaseErrorHeader = "Погрешность, \u00B0";
+		}
+		resultTable.setHead(5, newPhaseErrorHeader);
+		
+		String newModuleErrorHeader = null;
+		if (verificatedDevice.includedElements.get(currentElementIndex).getModuleToleranceType().equals("percent")) {
+			newModuleErrorHeader = "Погрешность, %";
+		} 
+		else {
+			newModuleErrorHeader = "Погрешность";
+		}
+		resultTable.setHead(2, newModuleErrorHeader);
+		
+		String newModuleResHeader = parametrComboBox.getSelectionModel().getSelectedItem();
+		resultTable.setHead(1, newModuleResHeader);
 	}	
 //---------------------------	
 	@FXML
 	private Button fileReadBtn;
 	@FXML
 	public void fileReadBtnClick() {
-		if (this.verification == null) {
+		if (verification == null) {
 			return;
 		}
 		this.verificationResult.clear();
 		try {
-			for (int i=0; i < this.verificatedDevice.getCountOfElements(); i++) {
+			for (int i=0; i < verificatedDevice.getCountOfElements(); i++) {
 				String absPath = new File(".").getAbsolutePath();
 				String resFilePath = absPath + "\\measurement\\protokol.ini";
 				MeasResult rs = new MeasResult(resFilePath, i+1, this.verificatedDevice.includedElements.get(i));				
-				this.verificationResult.add(rs);
+				verificationResult.add(rs);
 				//Verificating results
-				if (this.verification.isPrimary()) {
+				if (verification.isPrimary()) {
 					verificatedDevice.includedElements.get(i).getPrimaryModuleToleranceParams().checkResult(rs);
 					verificatedDevice.includedElements.get(i).getPrimaryPhaseToleranceParams().checkResult(rs);
 				}
@@ -250,7 +272,9 @@ public class VerificationController implements InfoRequestable {
 					verificatedDevice.includedElements.get(i).getPeriodicModuleToleranceParams().checkResult(rs);
 					verificatedDevice.includedElements.get(i).getPeriodicPhaseToleranceParams().checkResult(rs);
 				}
-				fillTable();
+				
+				elementComboBox.setValue(listOfElements.get(0));
+				parametrComboBox.setValue(listOfParametrs.get(0));
 			}
 		}
 		catch(IOException ioExp) {
@@ -260,19 +284,19 @@ public class VerificationController implements InfoRequestable {
 //----------------------------------------	
 	@Override
 	public void representRequestedInfo() {
-		this.nameLabel.setText(this.verificatedDevice.getName());
-		this.typeLabel.setText(this.verificatedDevice.getType());
-		this.serNumLabel.setText(this.verificatedDevice.getSerialNumber());
-		int countOfElements = this.verificatedDevice.getCountOfElements();	
+		nameLabel.setText(verificatedDevice.getName());
+		typeLabel.setText(verificatedDevice.getType());
+		serNumLabel.setText(verificatedDevice.getSerialNumber());
+		int countOfElements = verificatedDevice.getCountOfElements();	
 		try {
 			if (countOfElements > 0) {
 				listOfElements.clear();
-				for(int i = 0; i < this.verificatedDevice.getCountOfElements(); i++) {
-					Element currentEl = this.verificatedDevice.includedElements.get(i);
+				for(int i = 0; i < verificatedDevice.getCountOfElements(); i++) {
+					Element currentEl = verificatedDevice.includedElements.get(i);
 					String elementItem = currentEl.getType() + " " + currentEl.getSerialNumber();
 					listOfElements.add(elementItem);
 				}
-				this.elementComboBox.setItems(listOfElements);
+				elementComboBox.setItems(listOfElements);
 			}
 			else {
 				AboutMessageWindow.createWindow("Внимание", "Не удалось найти составные элементы для данного прибора.\nПроведение поверки не возможно").show();
