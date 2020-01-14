@@ -129,7 +129,7 @@ public class Element implements Includable<Device>, dbStorable{
 
 //DataBase
 	public Element(Device deviceOwner, int index) throws SQLException {		
-		myDevice = deviceOwner;
+		this.myDevice = deviceOwner;
 		String elementTableName = myDevice.getElementsTableName();
 		String sqlQuery = "SELECT ElementType, ElementSerNumber, PoleCount, MeasUnit, ModuleToleranceType, PhaseToleranceType, VerificationsTable, PrimaryModuleParamTable, PeriodicModuleParamTable, PrimaryPhaseParamTable, PeriodicPhaseParamTable, NominalIndex FROM [" + elementTableName + "] WHERE id='"+index+"'";
 		ArrayList<String> fieldName = new ArrayList<String>();
@@ -155,99 +155,99 @@ public class Element implements Includable<Device>, dbStorable{
 		} else {
 			sParamsCount = 4;
 		}
-		measUnit = arrayResults.get(0).get(3);
-		moduleToleranceType = arrayResults.get(0).get(4);
-		phaseToleranceType = arrayResults.get(0).get(5);		
-		listOfVerificationsTable = arrayResults.get(0).get(6);
-		primaryModuleParamTable = arrayResults.get(0).get(7);
-		periodicModuleParamTable = arrayResults.get(0).get(8);
-		primaryPhaseParamTable = arrayResults.get(0).get(9);
-		periodicPhaseParamTable = arrayResults.get(0).get(10);
-		nominalIndex = Integer.parseInt(arrayResults.get(0).get(11));			
+		this.measUnit = arrayResults.get(0).get(3);
+		this.moduleToleranceType = arrayResults.get(0).get(4);
+		this.phaseToleranceType = arrayResults.get(0).get(5);		
+		this.listOfVerificationsTable = arrayResults.get(0).get(6);
+		this.primaryModuleParamTable = arrayResults.get(0).get(7);
+		this.periodicModuleParamTable = arrayResults.get(0).get(8);
+		this.primaryPhaseParamTable = arrayResults.get(0).get(9);
+		this.periodicPhaseParamTable = arrayResults.get(0).get(10);
+		this.nominalIndex = Integer.parseInt(arrayResults.get(0).get(11));			
 		arrayResults.clear();
 		fieldName.clear();
 		fieldName.add("resultsTableName");
 		sqlQuery = "SELECT resultsTableName FROM [" + listOfVerificationsTable + "] WHERE id = " + Integer.toString(nominalIndex) + "";
 		DataBaseManager.getDB().sqlQueryString(sqlQuery, fieldName, arrayResults);
-		nominalTable = arrayResults.get(0).get(0);		 
+		this.nominalTable = arrayResults.get(0).get(0);		 
 		if (measUnit.equals("vswr")) {
-			nominal = new VSWR_Result(this, nominalIndex);
+			this.nominal = new VSWR_Result(this, nominalIndex);
 		}
 		else {
-			nominal = new Gamma_Result(this, nominalIndex);
+			this.nominal = new Gamma_Result(this, nominalIndex);
 		}		 
-		primaryModuleToleranceParams = new ToleranceParametrs(TimeType.PRIMARY,  MeasUnitPart.MODULE, this);
-		periodicModuleToleranceParams = new ToleranceParametrs(TimeType.PERIODIC, MeasUnitPart.MODULE, this);
-		primaryPhaseToleranceParams = new ToleranceParametrs(TimeType.PRIMARY, MeasUnitPart.PHASE, this);
-		periodicPhaseToleranceParams = new ToleranceParametrs(TimeType.PERIODIC, MeasUnitPart.PHASE, this); 
+		this.primaryModuleToleranceParams = new ToleranceParametrs(TimeType.PRIMARY,  MeasUnitPart.MODULE, this);
+		this.periodicModuleToleranceParams = new ToleranceParametrs(TimeType.PERIODIC, MeasUnitPart.MODULE, this);
+		this.primaryPhaseToleranceParams = new ToleranceParametrs(TimeType.PRIMARY, MeasUnitPart.PHASE, this);
+		this.periodicPhaseToleranceParams = new ToleranceParametrs(TimeType.PERIODIC, MeasUnitPart.PHASE, this); 
 		//Set strategies for suitability counting
 		percentStrategy percent = new percentStrategy();
 		upDownStrategy upDown = new upDownStrategy();
-		if (moduleToleranceType.equals("percent")) {
-			primaryModuleToleranceParams.setStrategy(percent);
-			periodicModuleToleranceParams.setStrategy(percent);
+		if (this.moduleToleranceType.equals("percent")) {
+			this.primaryModuleToleranceParams.setStrategy(percent);
+			this.periodicModuleToleranceParams.setStrategy(percent);
 		} else {
-			primaryModuleToleranceParams.setStrategy(upDown);
-			periodicModuleToleranceParams.setStrategy(upDown);
+			this.primaryModuleToleranceParams.setStrategy(upDown);
+			this.periodicModuleToleranceParams.setStrategy(upDown);
 		}
-		if (phaseToleranceType.equals("percent")) {
-			primaryPhaseToleranceParams.setStrategy(percent);
-			periodicPhaseToleranceParams.setStrategy(percent);			
+		if (this.phaseToleranceType.equals("percent")) {
+			this.primaryPhaseToleranceParams.setStrategy(percent);
+			this.periodicPhaseToleranceParams.setStrategy(percent);			
 		} else {
-			primaryPhaseToleranceParams.setStrategy(upDown);
-			periodicPhaseToleranceParams.setStrategy(upDown);
+			this.primaryPhaseToleranceParams.setStrategy(upDown);
+			this.periodicPhaseToleranceParams.setStrategy(upDown);
 		}
 	}
 	
 //GUI	
 	public Element(NewElementController elCtrl) {			
-		type = elCtrl.getType();
-		serialNumber = elCtrl.getSerNum();
-		poleCount = elCtrl.getPoleCount();
+		this.type = elCtrl.getType();
+		this.serialNumber = elCtrl.getSerNum();
+		this.poleCount = elCtrl.getPoleCount();
 		if (poleCount == 2) {
-			sParamsCount = 1;
+			this.sParamsCount = 1;
 		} else {
-			sParamsCount = 4;
+			this.sParamsCount = 4;
 		}
-		measUnit = elCtrl.getMeasUnit();
-		moduleToleranceType = elCtrl.getModuleToleranceType();
-		phaseToleranceType = elCtrl.getPhaseToleranceType();
-		nominalIndex = 1;
+		this.measUnit = elCtrl.getMeasUnit();
+		this.moduleToleranceType = elCtrl.getModuleToleranceType();
+		this.phaseToleranceType = elCtrl.getPhaseToleranceType();
+		this.nominalIndex = 1;
 		
-		if (measUnit.equals("vswr")) {
-			nominal = new VSWR_Result(elCtrl, this);
+		if (this.measUnit.equals("vswr")) {
+			this.nominal = new VSWR_Result(elCtrl, this);
 		}
 		else {
-			nominal = new Gamma_Result(elCtrl, this);
+			this.nominal = new Gamma_Result(elCtrl, this);
 		}
-		primaryModuleToleranceParams = new ToleranceParametrs(TimeType.PRIMARY, MeasUnitPart.MODULE, elCtrl, this);
-		primaryPhaseToleranceParams = new ToleranceParametrs(TimeType.PRIMARY, MeasUnitPart.PHASE, elCtrl, this);		
-		periodicModuleToleranceParams = new ToleranceParametrs(TimeType.PERIODIC, MeasUnitPart.MODULE, elCtrl, this);
-		periodicPhaseToleranceParams = new ToleranceParametrs(TimeType.PERIODIC, MeasUnitPart.PHASE, elCtrl, this);		
+		this.primaryModuleToleranceParams = new ToleranceParametrs(TimeType.PRIMARY, MeasUnitPart.MODULE, elCtrl, this);
+		this.primaryPhaseToleranceParams = new ToleranceParametrs(TimeType.PRIMARY, MeasUnitPart.PHASE, elCtrl, this);		
+		this.periodicModuleToleranceParams = new ToleranceParametrs(TimeType.PERIODIC, MeasUnitPart.MODULE, elCtrl, this);
+		this.periodicPhaseToleranceParams = new ToleranceParametrs(TimeType.PERIODIC, MeasUnitPart.PHASE, elCtrl, this);		
 		percentStrategy percentStr = new percentStrategy();
 		upDownStrategy udStr = new upDownStrategy();
-		if (moduleToleranceType.equals("updown")) {
-			primaryModuleToleranceParams.setStrategy(udStr);
-			periodicModuleToleranceParams.setStrategy(udStr);
+		if (this.moduleToleranceType.equals("updown")) {
+			this.primaryModuleToleranceParams.setStrategy(udStr);
+			this.periodicModuleToleranceParams.setStrategy(udStr);
 		}
 		else {
-			primaryModuleToleranceParams.setStrategy(percentStr);
-			periodicModuleToleranceParams.setStrategy(percentStr);
+			this.primaryModuleToleranceParams.setStrategy(percentStr);
+			this.periodicModuleToleranceParams.setStrategy(percentStr);
 		}
-		if (phaseToleranceType.equals("updown")) {
-			primaryPhaseToleranceParams.setStrategy(udStr);
-			periodicPhaseToleranceParams.setStrategy(udStr);
+		if (this.phaseToleranceType.equals("updown")) {
+			this.primaryPhaseToleranceParams.setStrategy(udStr);
+			this.periodicPhaseToleranceParams.setStrategy(udStr);
 		}
 		else {
-			primaryPhaseToleranceParams.setStrategy(percentStr);
-			periodicPhaseToleranceParams.setStrategy(percentStr);
+			this.primaryPhaseToleranceParams.setStrategy(percentStr);
+			this.periodicPhaseToleranceParams.setStrategy(percentStr);
 		}
 	}
 	
 //dbStorable		
 	@Override
 	public void saveInDB() throws SQLException, SavingException {
-		if (myDevice == null) {
+		if (this.myDevice == null) {
 			throw new NoOwnerException(this);
 		}
 		String sqlQuery = "INSERT INTO ["+ myDevice.getElementsTableName() +"] (ElementType, ElementSerNumber, PoleCount, MeasUnit, ModuleToleranceType, PhaseToleranceType, " +
@@ -262,20 +262,20 @@ public class Element implements Includable<Device>, dbStorable{
 		} catch (SQLException sqlExp) {
 			throw new SavingException("Не удалось создать таблицу\nсо списком проведенных поверок.");
 		}
-		primaryModuleToleranceParams.saveInDB();	
-		primaryPhaseToleranceParams.saveInDB();
-		periodicModuleToleranceParams.saveInDB();	
-		periodicPhaseToleranceParams.saveInDB();
-		nominal.saveInDB();	
+		this.primaryModuleToleranceParams.saveInDB();	
+		this.primaryPhaseToleranceParams.saveInDB();
+		this.periodicModuleToleranceParams.saveInDB();	
+		this.periodicPhaseToleranceParams.saveInDB();
+		this.nominal.saveInDB();	
 	}
 	
 	@Override
 	public void deleteFromDB() throws SQLException {					
-		nominal.deleteFromDB();
-		primaryModuleToleranceParams.deleteFromDB();
-		primaryPhaseToleranceParams.deleteFromDB();
-		periodicModuleToleranceParams.deleteFromDB();
-		periodicPhaseToleranceParams.deleteFromDB();		
+		this.nominal.deleteFromDB();
+		this.primaryModuleToleranceParams.deleteFromDB();
+		this.primaryPhaseToleranceParams.deleteFromDB();
+		this.periodicModuleToleranceParams.deleteFromDB();
+		this.periodicPhaseToleranceParams.deleteFromDB();		
 		String sqlString = "DROP TABLE [" + listOfVerificationsTable + "]";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlString);
 		sqlString = "DELETE FROM [" + myDevice.getElementsTableName() + "] WHERE ElementType='" + type + "' AND ElementSerNumber='" + serialNumber + "'";
@@ -289,7 +289,7 @@ public class Element implements Includable<Device>, dbStorable{
 	
 	@Override
 	public void editInfoInDB(HashMap<String, String> editingValues) throws SQLException {
-		String tableName = myDevice.getElementsTableName();
+		String tableName = this.myDevice.getElementsTableName();
 		String sqlQuery = "UPDATE " + tableName + " SET ";
 		int count = 1;
 		for (String str: editingValues.keySet()) {

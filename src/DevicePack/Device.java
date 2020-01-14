@@ -46,12 +46,12 @@ public class Device implements dbStorable {
 	}
 		
 	//Конструктор для извлечения из БД
-	public Device(String Name, String Type, String SerialNumber) throws SQLException {		
-		includedElements = new ArrayList<Element>();		
-		name = Name;
-		type = Type;
-		serialNumber = SerialNumber;
-		String sqlQuery = "SELECT Owner, GosNumber, CountOfElements, ElementsTable FROM Devices WHERE TypeOfDevice='"+ Type +"' AND NameOfDevice='"+ Name +"' AND SerialNumber='"+ SerialNumber +"'";		
+	public Device(String name, String type, String serialNumber) throws SQLException {		
+		this.includedElements = new ArrayList<Element>();		
+		this.name = name;
+		this.type = type;
+		this.serialNumber = serialNumber;
+		String sqlQuery = "SELECT Owner, GosNumber, CountOfElements, ElementsTable FROM Devices WHERE NameOfDevice='"+ name +"' AND TypeOfDevice='"+ type +"' AND SerialNumber='"+ serialNumber +"'";		
 		ArrayList<String> fieldName = new ArrayList<String>();
 		fieldName.add("Owner"); 
 		fieldName.add("GosNumber");
@@ -60,35 +60,34 @@ public class Device implements dbStorable {
 		ArrayList<ArrayList<String>> arrayResults = new ArrayList<ArrayList<String>>();					
 		DataBaseManager.getDB().sqlQueryString(sqlQuery, fieldName, arrayResults);	
 		if (arrayResults.size() > 0) {
-			owner = arrayResults.get(0).get(0);
-			gosNumber = arrayResults.get(0).get(1);						
-			elementsTableName = arrayResults.get(0).get(3);			
-			countOfElements = 0;			
+			this.owner = arrayResults.get(0).get(0);
+			this.gosNumber = arrayResults.get(0).get(1);						
+			this.elementsTableName = arrayResults.get(0).get(3);			
+			this.countOfElements = 0;			
 			List<String> indices = new ArrayList<String>();
 			sqlQuery = "SELECT id FROM [" + elementsTableName + "]";
 			DataBaseManager.getDB().sqlQueryString(sqlQuery, "id", indices);
 			for (int i = 0; i < indices.size(); i++) {
 				Element element = new Element(this, Integer.parseInt(indices.get(i)));
-				includedElements.add(element);
-				countOfElements++;		
+				this.includedElements.add(element);
+				this.countOfElements++;		
 			}
 		}
 	}
 	
 	//Конструктор перед сохранение в БД
-	public Device(String Name, String Type, String SerialNumber, String Owner, String GosNumber){
-		includedElements = new ArrayList<Element>();
-		name = Name;
-		type = Type;
-		serialNumber = SerialNumber;
-		owner = Owner;
-		gosNumber = GosNumber;
-		elementsTableName = "";
+	public Device(String name, String type, String serialNumber, String owner, String gosNumber){
+		this.includedElements = new ArrayList<Element>();
+		this.name = name;
+		this.type = type;
+		this.serialNumber = serialNumber;
+		this.owner = owner;
+		this.gosNumber = gosNumber;
+		this.elementsTableName = "";
 	}
 	
 	public boolean isExist() throws SQLException {
-		String sqlString = null;
-		sqlString = "SELECT COUNT(*) FROM Devices WHERE TypeOfDevice='" + this.type + "' AND NameOfDevice='" + this.name + "' AND SerialNumber='" + this.serialNumber + "'";
+		String sqlString = "SELECT COUNT(*) FROM Devices WHERE TypeOfDevice='" + this.type + "' AND NameOfDevice='" + this.name + "' AND SerialNumber='" + this.serialNumber + "'";
 		int isExist = DataBaseManager.getDB().sqlQueryCount(sqlString);
 		if (isExist == 0) {
 			return false;

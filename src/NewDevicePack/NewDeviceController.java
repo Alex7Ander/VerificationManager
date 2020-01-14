@@ -133,8 +133,8 @@ public class NewDeviceController  {
 		//Проверим, не существует ли аналогичное в БД
 		try {
 			if (newDevice.isExist()) {
-				AboutMessageWindow.createWindow("Ошибка", "Прибор данного типа с аналогичным серийным номером\n"
-						+ "зарегистрированна в базе данных!").show();
+				AboutMessageWindow.createWindow("Ошибка", "Прибор данного типа с аналогичным\n"
+						+ "серийным номером зарегистрированн\nв базе данных!").show();
 				return;
 			}
 		}

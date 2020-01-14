@@ -131,15 +131,14 @@ public class OldDocSearchController implements InfoRequestable {
 	
 	private void setVerificationItems() {
 		listOfVerifications.clear();
-		
 		LocalDate lcFrom = fromDTP.getValue();
 		if (lcFrom != null) {
-			from = Date.from(lcFrom.atStartOfDay(ZoneId.systemDefault()).toInstant());
+			from = Date.from(lcFrom.atStartOfDay(ZoneId.systemDefault()).toInstant());	
 		}
 		else {
 			from = new Date(1);
 		}
-		
+				 
 		LocalDate lcTill = tillDTP.getValue();
 		if (lcTill != null) { 
 			till = Date.from(lcTill.atStartOfDay(ZoneId.systemDefault()).toInstant());
@@ -147,7 +146,11 @@ public class OldDocSearchController implements InfoRequestable {
 		else {
 			till = new Date();
 		}
-
+		Calendar calendarInstance = Calendar.getInstance();
+		calendarInstance.setTime(till); 
+		calendarInstance.add(Calendar.DAY_OF_MONTH, 1);
+		till = calendarInstance.getTime();
+		
 		String addFilters = "";
 		ArrayList<String> fieldsNames = new ArrayList<String>();
 				
@@ -170,26 +173,35 @@ public class OldDocSearchController implements InfoRequestable {
 		sqlQuery += (" FROM [Verifications] WHERE TypeOfDoc='" + typeOfDoc + "'" + addFilters);
 		try {
 			DataBaseManager.getDB().sqlQueryString(sqlQuery, fieldsNames, resultOfSearch);
-			for (int i=0; i<resultOfSearch.size(); i++) {
-				
+			
+			int next = 0;
+			int stop = resultOfSearch.size();
+			for (int i = 0; i < stop; i++) {
+				//This object will be deleted from resultOfSerach if date of verification
+				//will not be between data "from" and "till"
+				ArrayList<String> currentResultOfSerach = resultOfSearch.get(next);				
 				Date dateOfVer;
-				String strDateOfVer = resultOfSearch.get(i).get(0);
+				String strDateOfVer = currentResultOfSerach.get(0);
 				try {
 					dateOfVer = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(strDateOfVer); 
 				}
 				catch(ParseException pExp) {
 					dateOfVer = Calendar.getInstance().getTime();
 				}
-				
-				if (dateOfVer.after(this.from) && dateOfVer.before(this.till)) {
-					String item = resultOfSearch.get(i).get(0) + " ";
+				if (dateOfVer.after(this.from) && dateOfVer.before(this.till)) { 
+					String item = currentResultOfSerach.get(0) + " ";
+					
 					if (checkDevice != null) {
 						item += (checkDevice.getName() + " " + checkDevice.getType() + " " + checkDevice.getSerialNumber());				
 					}
 					else {
-						item += (resultOfSearch.get(i).get(3) + " " + resultOfSearch.get(i).get(4) + " " + resultOfSearch.get(i).get(5));
+						item += (currentResultOfSerach.get(3) + " " + currentResultOfSerach.get(4) + " " + currentResultOfSerach.get(5));
 					}
 					listOfVerifications.add(item);	
+					next++;
+				}
+				else {
+					resultOfSearch.remove(currentResultOfSerach);
 				}
 			}
 			this.verificationListView.setItems(listOfVerifications);

@@ -5,7 +5,6 @@ import GUIpack.guiWindow;
 import javafx.event.EventHandler;
 import javafx.stage.WindowEvent;
 
-
 public class OldDocSearchWindow extends guiWindow {
 
 	private static OldDocSearchWindow instanceOldDocSearchWindow;

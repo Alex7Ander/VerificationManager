@@ -20,15 +20,14 @@ public class MeasResult implements Includable<Element>, dbStorable{
 	private static String keys[] = {"MODULE_S11", "ERROR_MODULE_S11", "PHASE_S11", "ERROR_PHASE_S11",
 			 					    "MODULE_S12", "ERROR_MODULE_S12", "PHASE_S12", "ERROR_PHASE_S12",
 			 					    "MODULE_S21", "ERROR_MODULE_S21", "PHASE_S21", "ERROR_PHASE_S21", 
-			 					    "MODULE_S22", "ERROR_MODULE_S22", "PHASE_S22", "ERROR_PHASE_S22"};
-	
+			 					    "MODULE_S22", "ERROR_MODULE_S22", "PHASE_S22", "ERROR_PHASE_S22"};	
 	protected int countOfFreq;
 	protected int countOfParams;
 	
 	//Date
 	protected DateFormat dateFormat;
 	protected Date dateOfMeas;
-	protected String datePattern = "dd/MM/yyyy HH:mm:ss";
+	protected String datePattern = "dd/MM/yyyy HH:mm:ss"; //"dd/MM/yyyy HH:mm:ss" YYYY-MM-DD HH:MM:ss.SSS
 	
 	public int getCountOfFreq() {return this.countOfFreq;}
 	public int getCountOfParams() {return this.countOfParams;}

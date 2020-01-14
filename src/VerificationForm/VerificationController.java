@@ -87,7 +87,7 @@ public class VerificationController implements InfoRequestable {
 		currentElementIndex = 0;
 		currentParamIndex = 0;		   		
 		resultTable = new VerificationTable(tablePane);
-		resultSaved = false;
+		resultSaved = true;
 		saveBtn.setDisable(true);
 	}
 	
@@ -267,7 +267,7 @@ public class VerificationController implements InfoRequestable {
 		if (verification == null) {
 			return;
 		}
-		this.verificationResult.clear();
+		verificationResult.clear();
 		try {
 			for (int i=0; i < verificatedDevice.getCountOfElements(); i++) {
 				String absPath = new File(".").getAbsolutePath();
@@ -288,6 +288,7 @@ public class VerificationController implements InfoRequestable {
 				parametrComboBox.setValue(listOfParametrs.get(0));
 			}
 			saveBtn.setDisable(false);
+			resultSaved = false;
 		}
 		catch(IOException ioExp) {
 			AboutMessageWindow.createWindow("Ошибка", "Отсутствует или поврежден файл\n с результатами измерений").show();
@@ -352,7 +353,7 @@ public class VerificationController implements InfoRequestable {
 	}	
 	
 	public boolean resultIsSaved() {
-		return this.resultSaved;
+		return resultSaved;
 	}
 	
 }

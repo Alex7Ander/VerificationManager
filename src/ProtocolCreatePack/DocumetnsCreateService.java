@@ -233,34 +233,34 @@ public class DocumetnsCreateService extends Service<Integer> {
 		ArrayList<String> tableHeads = new ArrayList<String>();
 		//Частота
 		tableHeads.add("Частота");
-		//S11
+		String columnS11Head = null;
+		String columnS22Head = null;
 		if (currentRes.getMyOwner().getMeasUnit().equals("vswr")) {
-			tableHeads.add("|КСВН| 1-го порта");
+			columnS11Head = "|КСВН| 1-го порта";
+			columnS22Head = "|КСВН| 2-го порта";
+			
 		}
 		else {
-			tableHeads.add("|Г|");
+			columnS22Head = columnS11Head = "|Г|";
 		}
-		tableHeads.add("Погрешность");
+		//S11
+		tableHeads.add(columnS11Head);
+		tableHeads.add("Погрешность " + columnS11Head);
 		tableHeads.add("Фаза");
-		tableHeads.add("Погрешность");
+		tableHeads.add("Погрешность фазы");
 		//S12
 		tableHeads.add("Коэф. отр. S12");
-		tableHeads.add("Погрешность");
+		tableHeads.add("Погрешность S12");
 		tableHeads.add("Фаза");
-		tableHeads.add("Погрешность");
+		tableHeads.add("Погрешность фазы");
 		//S21
 		tableHeads.add("Коэф. отр. S21");
-		tableHeads.add("Погрешность");
+		tableHeads.add("Погрешность S21");
 		tableHeads.add("Фаза");
 		tableHeads.add("Погрешность");
 		//S22
-		if (currentRes.getMyOwner().getMeasUnit().equals("vswr")) {
-			tableHeads.add("|КСВН| 2-го порта");
-		}
-		else {
-			tableHeads.add("|Г|");
-		}
-		tableHeads.add("Погрешность");
+		tableHeads.add(columnS22Head);
+		tableHeads.add("Погрешность " + columnS22Head);
 		tableHeads.add("Фаза");
 		tableHeads.add("Погрешность");
 		return tableHeads;		
