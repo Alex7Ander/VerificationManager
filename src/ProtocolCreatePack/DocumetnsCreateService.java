@@ -112,9 +112,7 @@ public class DocumetnsCreateService extends Service<Integer> {
 	
 	private void createDocument() throws IOException {
 		FileWriter writer = new FileWriter("proto.txt");
-		try {
-			//String docName = verification.getDocType() + " для " + verification.getDeviceInfo() + " №" + verification.getDeviceSerNumber() +
-			//		" проведенной " + verification.getDateOfCreation() + ".doc";			
+		try {			
 			writer.write(documentName + "\n");								//1
 			writer.write(this.verification.getDocType() + "\n");			//2
 			if (this.verification.isPrimary()) {
@@ -221,7 +219,10 @@ public class DocumetnsCreateService extends Service<Integer> {
 				setCellValue(dRow, 0, cFreq.toString(), borderCellStyle);				
 				for (int k = 0; k < paramsCount; k++) {
 					String key = keys[k];					
-					String text = currentRes.values.get(key).get(cFreq).toString();					
+					String text = currentRes.values.get(key).get(cFreq).toString();	
+					System.out.print(text + " replaced to ");
+					text = text.replace('.', ',');
+					System.out.println(text);
 					setCellValue(dRow, k+1, text, borderCellStyle);
 				} //end k
 				dRow++;
@@ -237,8 +238,7 @@ public class DocumetnsCreateService extends Service<Integer> {
 		String columnS22Head = null;
 		if (currentRes.getMyOwner().getMeasUnit().equals("vswr")) {
 			columnS11Head = "|КСВН| 1-го порта";
-			columnS22Head = "|КСВН| 2-го порта";
-			
+			columnS22Head = "|КСВН| 2-го порта";			
 		}
 		else {
 			columnS22Head = columnS11Head = "|Г|";
