@@ -47,8 +47,7 @@ public class NewElementWindow extends guiWindow {
 		super(elm.getType(), "NewElementForm.fxml");
 		NewElementController ctrl = (NewElementController) loader.getController();
 		ctrl.setElement(elm);		
-		stage.setOnCloseRequest( event -> {
-			
+		stage.setOnCloseRequest( event -> {			
 			ctrl.saveValues();
 			int answer = YesNoWindow.createYesNoWindow("Сохранить изменения", "Сохранить внесенный вами изменения?").showAndWait();
 			//Если изменения необходимо сохранить:

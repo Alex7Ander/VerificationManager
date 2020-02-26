@@ -1,17 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.text.*?>
-<?import javafx.scene.control.*?>
-<?import java.lang.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="476.0" prefWidth="781.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SearchDevicePack.SearchDeviceController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="476.0" prefWidth="887.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SearchDevicePack.SearchDeviceController">
    <children>
       <HBox layoutX="331.0" layoutY="100.0" prefHeight="100.0" prefWidth="200.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
          <children>
-            <ListView fx:id="devicesListView" prefHeight="380.0" prefWidth="406.0" style="-fx-font-family: Arial Narrow;" />
-            <Separator orientation="VERTICAL" prefHeight="200.0" />
+            <ListView fx:id="devicesListView" prefHeight="456.0" prefWidth="505.0" style="-fx-font-family: Arial Narrow;">
+               <HBox.margin>
+                  <Insets bottom="2.0" left="2.0" right="4.0" top="2.0" />
+               </HBox.margin></ListView>
             <VBox prefHeight="380.0" prefWidth="356.0">
                <children>
                   <Label fx:id="headLabel" stylesheets="@../../bin/application/commonLabel.css" text="Фильтры поиска" />
@@ -20,10 +28,16 @@
                     <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
-                              <ComboBox fx:id="nameComboBox" layoutY="10.0" onAction="#nameComboBoxChange" prefHeight="25.0" prefWidth="350.0" />
+                              <ComboBox fx:id="nameComboBox" layoutY="10.0" onAction="#nameComboBoxChange" prefHeight="25.0" prefWidth="350.0">
+                                 <padding>
+                                    <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                 </padding></ComboBox>
                            </children>
                         </AnchorPane>
                     </content>
+                     <VBox.margin>
+                        <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                     </VBox.margin>
                   </TitledPane>
                   <TitledPane animated="false" prefHeight="70.0" style="-fx-font-family: Arial Narrow; -fx-font-size: 12;" text="Обозначение типа СИ">
                     <content>
@@ -33,6 +47,9 @@
                            </children>
                         </AnchorPane>
                     </content>
+                     <VBox.margin>
+                        <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                     </VBox.margin>
                   </TitledPane>
                   <TitledPane animated="false" prefHeight="70.0" style="-fx-font-family: Arial Narrow;" text="Заводской номер СИ">
                     <content>
@@ -42,6 +59,9 @@
                            </children>
                         </AnchorPane>
                     </content>
+                     <VBox.margin>
+                        <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                     </VBox.margin>
                   </TitledPane>
                   <TitledPane animated="false" prefHeight="70.0" style="-fx-font-family: Arial Narrow;" text="Владелец поверяемого СИ">
                     <content>
@@ -51,6 +71,9 @@
                            </children>
                         </AnchorPane>
                     </content>
+                     <VBox.margin>
+                        <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                     </VBox.margin>
                   </TitledPane>
                   <TitledPane animated="false" prefHeight="70.0" style="-fx-font-family: Arial Narrow;" text="Номер в Гос Реестре">
                     <content>
@@ -60,9 +83,15 @@
                            </children>
                         </AnchorPane>
                     </content>
+                     <VBox.margin>
+                        <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                     </VBox.margin>
                   </TitledPane>
                   <Separator prefHeight="15.0" prefWidth="356.0" />
-                  <Button fx:id="chooseBtn" mnemonicParsing="false" onAction="#chooseBtnClick" prefHeight="57.0" prefWidth="356.0" stylesheets="@../../bin/application/commonButton.css" text="Выбрать" />
+                  <Button fx:id="chooseBtn" mnemonicParsing="false" onAction="#chooseBtnClick" prefHeight="57.0" prefWidth="356.0" stylesheets="@../../bin/application/commonButton.css" text="Выбрать">
+                     <VBox.margin>
+                        <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                     </VBox.margin></Button>
                </children>
             </VBox>
          </children>

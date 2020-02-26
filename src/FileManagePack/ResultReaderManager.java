@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import _tempHelpers.Adapter;
@@ -24,7 +25,7 @@ public class ResultReaderManager {
 		}
 	}
 	
-	private void findResult(int numberOfResult, ArrayList<String> resStrings) throws IOException{
+	private void findResult(int numberOfResult, List<String> resStrings) throws IOException{
 		String str = "";	
 		//Если файл не был пуст, то обрабатываем прочитанные строки
 		int stringNumber = 0;
@@ -50,7 +51,7 @@ public class ResultReaderManager {
 		}//end while
 	}
 	
-	private void parseResult(ArrayList<String> res, ArrayList<Double> freqs, Map<String, Map<Double, Double>> values) {
+	private void parseResult(List<String> res, List<Double> freqs, Map<String, Map<Double, Double>> values) {
 
 		//Узнать, сколько параметров измеренно
 		String firstStr = res.get(0);
@@ -94,8 +95,8 @@ public class ResultReaderManager {
 		
 	}
 
-	public void readResult(int numberOfResult, ArrayList<Double> freqs, Map<String, Map<Double, Double>> values) throws IOException{
-		ArrayList<String> res = new ArrayList<String>();
+	public void readResult(int numberOfResult, List<Double> freqs, Map<String, Map<Double, Double>> values) throws IOException{
+		List<String> res = new ArrayList<String>();
 		findResult(numberOfResult, res);
 		parseResult(res, freqs, values);
 	}

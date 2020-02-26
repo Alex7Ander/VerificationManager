@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
+
 import AboutMessageForm.AboutMessageWindow;
 import AddNewDeviceNameForm.AddNewDeviceNameWindow;
 import DataBasePack.DataBaseManager;
@@ -55,8 +57,8 @@ public class NewDeviceController  {
 	//Составные элементы данного прибора
 	//private ArrayList<Element> elements;
 	
-	public ArrayList<NewElementWindow> elementsWindow;
-	public ArrayList<Button> elementsButton;
+	public List<NewElementWindow> elementsWindow;
+	public List<Button> elementsButton;
 	
 	private ObservableList<String> listOfNames;
 	int countOfElements;
@@ -144,16 +146,18 @@ public class NewDeviceController  {
 		}
 		
 		//Create elements
-		//int notInitializedElementsCount = 0;
+		int notInitializedElementsCount = 0;		
 		for (int i = 0; i < this.elementsWindow.size(); i++) {			
 			NewElementController ctrl = (NewElementController)this.elementsWindow.get(i).getControllerClass();
 			Element elm = new Element(ctrl); 
 			newDevice.addElement(elm);	
-		}
+		}		
 		//и наконец, пробуем сохранить все в БД
 		try{
 			DataBaseManager.getDB().BeginTransaction();
 			newDevice.saveInDB();
+			//Сохраняем элементы
+			//------------------
 			DataBaseManager.getDB().Commit();
 			AboutMessageWindow.createWindow("Успешно", "Успешное сохранение").show();
 			Stage stage = (Stage) saveBtn.getScene().getWindow();
@@ -161,6 +165,7 @@ public class NewDeviceController  {
 			NewDeviceWindow.deleteNewDeviceWindow();
 		}
 		catch(SQLException sqlExp){
+			System.out.println(sqlExp.getStackTrace());
 			DataBaseManager.getDB().RollBack();
 			AboutMessageWindow.createWindow("Ошибка", "Ошибка: " + sqlExp.getMessage()).show();
 		}

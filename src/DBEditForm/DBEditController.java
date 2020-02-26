@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import AboutMessageForm.AboutMessageWindow;
 import DataBasePack.DataBaseManager;
@@ -106,7 +107,7 @@ public class DBEditController implements InfoRequestable {
 	private Integer currentDateIndex = null;
 	private Integer currentMeasUnitIndex = null;	
 	private Element currentElement = null;
-	private ArrayList<ArrayList<String>> verifications;
+	private List<List<String>> verifications;
 	
 //---------------------------------------------------------
 	@FXML
@@ -145,26 +146,29 @@ public class DBEditController implements InfoRequestable {
 	}
 	
 	private void createElemtnsListViewContextMenu() {
-		elemtnsListViewContextMenu = new ContextMenu();
+		this.elemtnsListViewContextMenu = new ContextMenu();
 		MenuItem deleteElementItem = new MenuItem("Удалить");
 		MenuItem editElementItem = new MenuItem("Редактировать");
 		MenuItem addElementItem = new MenuItem("Добавить");
-		elemtnsListViewContextMenu.getItems().addAll(deleteElementItem, editElementItem, addElementItem);
+		this.elemtnsListViewContextMenu.getItems().addAll(deleteElementItem, editElementItem, addElementItem);
 		
 		//deleting element
 		deleteElementItem.setOnAction(event->{
 			int answer = YesNoWindow.createYesNoWindow("Удалить?", "Удалить выбранный элемент:\n" + 
-							elementsListView.getSelectionModel().getSelectedItem().toString()).showAndWait();
+					this.elementsListView.getSelectionModel().getSelectedItem().toString()).showAndWait();
 			if (answer == 0) {
-				int deletedElementIndex = elementsListView.getSelectionModel().getSelectedIndex();
+				int deletedElementIndex = this.elementsListView.getSelectionModel().getSelectedIndex();
 				if (deletedElementIndex < 0) return;
 				try {
 					DataBaseManager.getDB().BeginTransaction();
-					modDevice.includedElements.get(deletedElementIndex).deleteFromDB();
-					modDevice = new Device(modDevice.getName(), modDevice.getType(), modDevice.getSerialNumber());
+					this.modDevice.includedElements.get(deletedElementIndex).deleteFromDB();
+					int currentModdeviceId = this.modDevice.getId();
+					this.modDevice = new Device(currentModdeviceId);
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+					
 					DataBaseManager.getDB().Commit();
-					modDevice.removeElement(deletedElementIndex);
-					elementsList.remove(deletedElementIndex);
+					this.modDevice.removeElement(deletedElementIndex);
+					this.elementsList.remove(deletedElementIndex);
 				}
 				catch(SQLException sqlExp) {
 					DataBaseManager.getDB().RollBack();
@@ -176,24 +180,24 @@ public class DBEditController implements InfoRequestable {
 		
 		//editing element
 		editElementItem.setOnAction(event -> {
-			int index = elementsListView.getSelectionModel().getSelectedIndex();
-			Element elm = modDevice.includedElements.get(index);
+			int index = this.elementsListView.getSelectionModel().getSelectedIndex();
+			Element elm = this.modDevice.includedElements.get(index);
 			try {
 				NewElementWindow elementWin = new NewElementWindow(elm);
 				elementWin.showAndWait();
-				
-				modDevice = new Device(modDevice.getName(), modDevice.getType(), modDevice.getSerialNumber());
-				
-				verificationDateList.clear();
-				verifications = currentElement.getListOfVerifications();	
-				int nominalIndex = currentElement.getNominalIndex();
-				for (int i = 0; i < verifications.size(); i++) {
+				int currentModdeviceId = this.modDevice.getId();
+				this.modDevice = new Device(currentModdeviceId);
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!							
+				this.verificationDateList.clear();
+				this.verifications = currentElement.getListOfVerifications();	
+				int nominalIndex = this.currentElement.getNominalId();
+				for (int i = 0; i < this.verifications.size(); i++) {
 					String item = null;
-					int resIndex = Integer.parseInt(verifications.get(i).get(0));
+					int resIndex = Integer.parseInt(this.verifications.get(i).get(0));
 					if (resIndex != nominalIndex)
-						item = "Поверка, проведенная " + verifications.get(i).get(1);
+						item = "Поверка, проведенная " + this.verifications.get(i).get(1);
 					else 
-						item = "Номиналыные занчение, полученные " + verifications.get(i).get(1);
+						item = "Номиналыные занчение, полученные " + this.verifications.get(i).get(1);
 					verificationDateList.add(item);
 				}				
 			} catch (IOException ioExp) {
@@ -246,7 +250,7 @@ public class DBEditController implements InfoRequestable {
 		
 		deleteResultItem.setOnAction(event -> {						
 			int resIndex = Integer.parseInt(verifications.get(currentDateIndex).get(0));
-			if (resIndex == currentElement.getNominalIndex()) {
+			if (resIndex == currentElement.getNominalId()) {
 				AboutMessageWindow.createWindow("Ошибка", "Значения, использующиеся в качестве\nноминальных не могут быть удалены из БД").show();
 				return;
 			}
@@ -360,31 +364,31 @@ public class DBEditController implements InfoRequestable {
 			
 	@FXML
 	private void elementsListViewClick() {
-		if (modDevice == null) {
+		if (this.modDevice == null) {
 			return;
 		}		
-		resultsTable.clear();
-		verificationDateList.clear();
-		measUnitsList.clear();
+		this.resultsTable.clear();
+		this.verificationDateList.clear();
+		this.measUnitsList.clear();
 		
-		currentDateIndex = null;
-		currentMeasUnitIndex = null;		
-		currentElementIndex = elementsListView.getSelectionModel().getSelectedIndex();
-		currentElement = modDevice.includedElements.get(currentElementIndex);
+		this.currentDateIndex = null;
+		this.currentMeasUnitIndex = null;		
+		this.currentElementIndex = this.elementsListView.getSelectionModel().getSelectedIndex();
+		this.currentElement = this.modDevice.includedElements.get(currentElementIndex);
 		
 		try {
-			verifications = currentElement.getListOfVerifications();	
-			int nominalIndex = currentElement.getNominalIndex();
-			for (int i = 0; i < verifications.size(); i++) {
+			this.verifications = this.currentElement.getListOfVerifications();	
+			int nominalIndex = this.currentElement.getNominalId();
+			for (int i = 0; i < this.verifications.size(); i++) {
 				String item = null;
-				int resIndex = Integer.parseInt(verifications.get(i).get(0));
+				int resIndex = Integer.parseInt(this.verifications.get(i).get(0));
 				if (resIndex != nominalIndex)
-					item = "Поверка, проведенная " + verifications.get(i).get(1);
+					item = "Поверка, проведенная " + this.verifications.get(i).get(1);
 				else 
-					item = "Номиналыные занчение, полученные " + verifications.get(i).get(1);
-				verificationDateList.add(item);
+					item = "Номиналыные занчение, полученные " + this.verifications.get(i).get(1);
+				this.verificationDateList.add(item);
 			}						
-			verificationDateListView.setItems(verificationDateList);			
+			this.verificationDateListView.setItems(this.verificationDateList);			
 		}
 		catch(SQLException exp) {
 			AboutMessageWindow.createWindow("Ошибка", "Ошибка доступа к БД\nпри получении списка проведенных поверок").show();

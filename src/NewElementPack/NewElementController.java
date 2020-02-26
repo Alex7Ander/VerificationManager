@@ -137,6 +137,14 @@ public class NewElementController {
 	private ToggleGroup toleranceTypeGroup;
 	private ToggleGroup verificationTypeGroup;
 	private ToggleGroup phaseTolearnceTypeGroup;
+//************************************************
+	@FXML
+	private Button randomValuesBtn;
+	@FXML
+	private void setRandomValues() {
+		visibleParamsTable.setRandomValues();
+		visibleParamsTable.showParametr(currentS);
+	}
 //************************************************	
 	//представляемый элемент	
 	private Element currentElement;
@@ -480,7 +488,7 @@ public class NewElementController {
 		return params;
 	}
 	
-//Действия по закрытию окна	
+	//Действия по закрытию окна	
 	public void saveValues() {
 		periodicParamsTable.changeSParametr(this.currentS);
 		primaryParamsTable.changeSParametr(this.currentS);

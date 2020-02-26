@@ -212,7 +212,7 @@ public class VerificationController implements InfoRequestable {
 			}
 		}
 
-		ArrayList<Double> fr = verificationResult.get(currentElementIndex).freqs;
+		List<Double> fr = verificationResult.get(currentElementIndex).freqs;
 		int countOfFreq = fr.size();
 		if (resultTable.getRowCount() < countOfFreq) {
 			while (resultTable.getRowCount() != countOfFreq) 

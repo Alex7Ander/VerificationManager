@@ -55,7 +55,10 @@
                   </AnchorPane>
                   <HBox prefHeight="35.0" prefWidth="869.0">
                      <children>
-                        <VBox prefHeight="200.0" prefWidth="120.0" />
+                        <VBox prefHeight="200.0" prefWidth="120.0">
+                           <children>
+                              <Button fx:id="randomValuesBtn" mnemonicParsing="false" onAction="#setRandomValues" prefHeight="25.0" prefWidth="122.0" text="Button" />
+                           </children></VBox>
                         <VBox prefHeight="200.0" prefWidth="117.0">
                            <children>
                               <TextField fx:id="downModuleTextField" prefWidth="122.0">

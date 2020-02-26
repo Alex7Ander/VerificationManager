@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import DataBasePack.DataBaseManager;
 import DataBasePack.dbStorable;
 import Exceptions.SavingException;
@@ -13,6 +15,9 @@ import FileManagePack.FileManager;
 
 public class Device implements dbStorable {
 	
+	private static final Logger logger = Logger.getLogger(Device.class);
+	
+	private int id;
 	private String name;
 	private String type;
 	private String serialNumber;
@@ -23,6 +28,9 @@ public class Device implements dbStorable {
 	
 	public ArrayList<Element> includedElements;
 	
+	public int getId() {
+		return this.id;
+	}
 	public String getType() {
 		return type;
 	}
@@ -46,33 +54,38 @@ public class Device implements dbStorable {
 	}
 		
 	//Конструктор для извлечения из БД
-	public Device(String name, String type, String serialNumber) throws SQLException {		
+	public Device(int id) throws SQLException {	
+		System.out.println("Начинаем получение данных на устройство с id=" + id);
+		this.id = id;
 		this.includedElements = new ArrayList<Element>();		
-		this.name = name;
-		this.type = type;
-		this.serialNumber = serialNumber;
-		String sqlQuery = "SELECT Owner, GosNumber, CountOfElements, ElementsTable FROM Devices WHERE NameOfDevice='"+ name +"' AND TypeOfDevice='"+ type +"' AND SerialNumber='"+ serialNumber +"'";		
+		String sqlQuery = "SELECT NameOfDevice, TypeOfDevice, SerialNumber, Owner, GosNumber FROM Devices WHERE id="+ Integer.toString(id) +"";		
 		ArrayList<String> fieldName = new ArrayList<String>();
+		fieldName.add("NameOfDevice");
+		fieldName.add("TypeOfDevice");
+		fieldName.add("SerialNumber");
 		fieldName.add("Owner"); 
-		fieldName.add("GosNumber");
-		fieldName.add("CountOfElements");
-		fieldName.add("ElementsTable");		
-		ArrayList<ArrayList<String>> arrayResults = new ArrayList<ArrayList<String>>();					
+		fieldName.add("GosNumber");	
+		List<List<String>> arrayResults = new ArrayList<List<String>>();	
+		System.out.println("Получаем основную информацию на устройство запросом: " + sqlQuery);
 		DataBaseManager.getDB().sqlQueryString(sqlQuery, fieldName, arrayResults);	
 		if (arrayResults.size() > 0) {
-			this.owner = arrayResults.get(0).get(0);
-			this.gosNumber = arrayResults.get(0).get(1);						
-			this.elementsTableName = arrayResults.get(0).get(3);			
+			this.name = arrayResults.get(0).get(0);
+			this.type = arrayResults.get(0).get(1);
+			this.serialNumber = arrayResults.get(0).get(2);
+			this.owner = arrayResults.get(0).get(3);
+			this.gosNumber = arrayResults.get(0).get(4);									
 			this.countOfElements = 0;			
-			List<String> indices = new ArrayList<String>();
-			sqlQuery = "SELECT id FROM [" + elementsTableName + "]";
-			DataBaseManager.getDB().sqlQueryString(sqlQuery, "id", indices);
+			List<Integer> indices = new ArrayList<Integer>();
+			sqlQuery = "SELECT (id) FROM [Elements] WHERE DeviceId='" + this.id + "'";
+			DataBaseManager.getDB().sqlQueryInteger(sqlQuery, "id", indices);
+			System.out.println("Для устройства с id = " + this.id + " найдено " + indices.size() + " составных элемента");
 			for (int i = 0; i < indices.size(); i++) {
-				Element element = new Element(this, Integer.parseInt(indices.get(i)));
+				Element element = new Element(this, indices.get(i));
 				this.includedElements.add(element);
 				this.countOfElements++;		
 			}
 		}
+		System.out.println("\nПроцедура получения информации успешно завершена");
 	}
 	
 	//Конструктор перед сохранение в БД
@@ -83,7 +96,6 @@ public class Device implements dbStorable {
 		this.serialNumber = serialNumber;
 		this.owner = owner;
 		this.gosNumber = gosNumber;
-		this.elementsTableName = "";
 	}
 	
 	public boolean isExist() throws SQLException {
@@ -99,21 +111,18 @@ public class Device implements dbStorable {
 //dbStorable	
 	@Override
 	public void saveInDB() throws SQLException, SavingException{
-		String sqlString = null;
-		String addStr = name + " " + type + " " + serialNumber;
-		elementsTableName = "Элементы для " + addStr;		
-		sqlString = "INSERT INTO [Devices] (NameOfDevice, TypeOfDevice, SerialNumber, Owner, GosNumber, CountOfElements, ElementsTable) values ('"+name+"','"+type+"','"+serialNumber+"','"+owner+"','"+gosNumber+"','"+Integer.toString(this.countOfElements)+"','"+elementsTableName+"')";
+		String sqlString = "INSERT INTO [Devices] (NameOfDevice, TypeOfDevice, SerialNumber, Owner, GosNumber) values ('"+name+"','"+type+"','"+serialNumber+"','"+owner+"','"+gosNumber+"')";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlString);
+		System.out.println("Начато сохранение устройства "+name+", тип "+type+", № "+serialNumber+", владелец "+owner+", № по ФИФ "+gosNumber);
 		System.out.println("Внесена запись о новом приборе в таблицу Devices");
-		//Создание таблицы со списком включенных элементов
-		sqlString = "CREATE TABLE [" + elementsTableName + "] (id INTEGER PRIMARY KEY AUTOINCREMENT, ElementType VARCHAR(256), ElementSerNumber VARCHAR(256), PoleCount VARCHAR(256), MeasUnit VARCHAR(256), ModuleToleranceType VARCHAR(256), PhaseToleranceType VARCHAR(256), VerificationsTable VARCHAR(256), PrimaryModuleParamTable VARCHAR(256), PeriodicModuleParamTable VARCHAR(256), PrimaryPhaseParamTable VARCHAR(256), PeriodicPhaseParamTable VARCHAR(256), NominalIndex VARCHAR(10))";
-		DataBaseManager.getDB().sqlQueryUpdate(sqlString);
-		System.out.println("Создана таблица со списком элементов данного устройства");
+		sqlString = "SELECT id FROM [Devices] WHERE NameOfDevice='" + name + "' AND TypeOfDevice='" + type + "' AND SerialNumber='" + serialNumber + "'";
+		this.id = DataBaseManager.getDB().sqlQueryCount(sqlString);
+		System.out.println("Получен id под которым сохранен прибор: " + this.id);
 		for (int i=0; i < this.countOfElements; i++){
 			System.out.println("Начато сохранение элемента №" + i + ": ");
 			//Сохранение в БД данных о составных элементах
 			includedElements.get(i).saveInDB(); 		
-		}
+		}		
 	}
 	
 	@Override
@@ -122,9 +131,9 @@ public class Device implements dbStorable {
 			elm.deleteFromDB();
 		}
 		this.includedElements.clear();
-		String sqlQuery = "DROP TABLE [" + elementsTableName + "]";
-		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
-		sqlQuery = "DELETE FROM [Devices] WHERE NameOfDevice='"+this.name+"' AND TypeOfDevice='"+this.type+"' AND SerialNumber='"+this.serialNumber+"'";
+		//String sqlQuery = "DROP TABLE [" + elementsTableName + "]";
+		//DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
+		String sqlQuery = "DELETE FROM [Devices] WHERE NameOfDevice='"+this.name+"' AND TypeOfDevice='"+this.type+"' AND SerialNumber='"+this.serialNumber+"'";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
 	}
 	
@@ -178,7 +187,7 @@ public class Device implements dbStorable {
 				gosNumber = editingValues.get(field);
 			}
 		}
-		
+		/*
 		if (tableNamesMustBeRewrited) {
 			String oldElementsTableName = elementsTableName;
 			elementsTableName = "Элементы для " + name + " " + type + " " + serialNumber;
@@ -192,7 +201,7 @@ public class Device implements dbStorable {
 			for (Element element : includedElements) {
 				element.rewriteTableNames();
 			}
-		}
+		}*/
 	}
 		
 	public void addElement(Element element) {

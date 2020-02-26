@@ -96,14 +96,14 @@ public class DataBaseManager {
     } 
     
     //отправка запроса с получением result set в виде массива String - подходит для запроса Select
-    public void sqlQueryInteger(String sqlString, String fieldName, ArrayList<Integer> arrayResults) throws SQLException{
+    public void sqlQueryInteger(String sqlString, String fieldName, List<Integer> arrayResults) throws SQLException{
     	ResultSet rSet = this.state.executeQuery(sqlString);
     	while(rSet.next()) {
     		arrayResults.add(rSet.getInt(fieldName));
     	}
     }
     
-    public void sqlQueryDouble(String sqlString, String fieldName, ArrayList<Double> arrayResults) throws SQLException{
+    public void sqlQueryDouble(String sqlString, String fieldName, List<Double> arrayResults) throws SQLException{
     	ResultSet rSet = this.state.executeQuery(sqlString);
     	while(rSet.next()) {
     		arrayResults.add(rSet.getDouble(fieldName));
@@ -117,11 +117,11 @@ public class DataBaseManager {
     	}
     }
     
-    public void sqlQueryString(String sqlString, ArrayList<String> fieldName, ArrayList<ArrayList<String>> arrayResults) throws SQLException{
+    public void sqlQueryString(String sqlString, List<String> fieldName, List<List<String>> arrayResults) throws SQLException{
     	ResultSet rSet = this.state.executeQuery(sqlString);
     	arrayResults.clear();
     	while(rSet.next()) {
-    		ArrayList<String> tempArray = new ArrayList<String>();
+    	List<String> tempArray = new ArrayList<String>();
     		for (int i=0; i<fieldName.size(); i++) {
     			tempArray.add(rSet.getString(fieldName.get(i)));
     		}
@@ -129,11 +129,11 @@ public class DataBaseManager {
     	}
     }
     
-    public void sqlQueryDouble(String sqlString, ArrayList<String> fieldName, ArrayList<ArrayList<Double>> arrayResults) throws SQLException{
+    public void sqlQueryDouble(String sqlString, List<String> fieldName, List<List<Double>> arrayResults) throws SQLException{
     	ResultSet rSet = this.state.executeQuery(sqlString);
     	arrayResults.clear();
     	while(rSet.next()) {
-    		ArrayList<Double> tempArray = new ArrayList<Double>();
+    		List<Double> tempArray = new ArrayList<Double>();
     		for (int i=0; i<fieldName.size(); i++) {
     			tempArray.add((double) rSet.getFloat(fieldName.get(i)));
     		}
@@ -141,10 +141,10 @@ public class DataBaseManager {
     	}
     }
       
-    public void sqlQueryMapOfDouble(String sqlString, ArrayList<String> paramsNames, Map<String, Map<Double, Double>> mapResults) throws SQLException{
+    public void sqlQueryMapOfDouble(String sqlString, List<String> paramsNames, Map<String, Map<Double, Double>> mapResults) throws SQLException{
     	ResultSet rSet = this.state.executeQuery(sqlString);
     	int countOfParams = paramsNames.size();
-    	ArrayList<Double[]> values = new ArrayList<Double[]>();  	
+    	List<Double[]> values = new ArrayList<Double[]>();  	
     	while(rSet.next()) {
     		Double[] params = new Double[countOfParams];
     		for (int i=0; i < countOfParams; i++) {
@@ -154,7 +154,7 @@ public class DataBaseManager {
     	}
     	int freqCount = values.size();
     	for (int i=1; i < paramsNames.size(); i++) {
-    		LinkedHashMap<Double, Double> tempMap = new LinkedHashMap<Double, Double>();
+    		Map<Double, Double> tempMap = new LinkedHashMap<Double, Double>();
     		for (int j=0; j < freqCount; j++) {
     			double freq = values.get(j)[0];
     			double value = values.get(j)[i];

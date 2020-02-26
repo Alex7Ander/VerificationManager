@@ -11,6 +11,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import AboutMessageForm.AboutMessageWindow;
 import DataBasePack.DataBaseManager;
@@ -53,7 +54,7 @@ public class OldDocSearchController implements InfoRequestable {
 
 	private Device checkDevice;
 	private ObservableList<String> listOfVerifications;
-	ArrayList<ArrayList<String>> resultOfSearch; 
+	List<List<String>> resultOfSearch; 
 	
 	private String typeOfDoc;
 	private Date from;
@@ -68,7 +69,7 @@ public class OldDocSearchController implements InfoRequestable {
 		bDocBtn.setToggleGroup(docTypeGroup);
 		typeOfDoc = "Certificate";		
 		listOfVerifications = FXCollections.observableArrayList();
-		resultOfSearch = new ArrayList<ArrayList<String>>();		
+		resultOfSearch = new ArrayList<List<String>>();		
 		setVerificationItems();
 	}
 	
@@ -152,7 +153,7 @@ public class OldDocSearchController implements InfoRequestable {
 		till = calendarInstance.getTime();
 		
 		String addFilters = "";
-		ArrayList<String> fieldsNames = new ArrayList<String>();
+		List<String> fieldsNames = new ArrayList<String>();
 				
 		fieldsNames.add("Date");
 		fieldsNames.add("PathOfDoc");
@@ -179,7 +180,7 @@ public class OldDocSearchController implements InfoRequestable {
 			for (int i = 0; i < stop; i++) {
 				//This object will be deleted from resultOfSerach if date of verification
 				//will not be between data "from" and "till"
-				ArrayList<String> currentResultOfSerach = resultOfSearch.get(next);				
+				List<String> currentResultOfSerach = resultOfSearch.get(next);				
 				Date dateOfVer;
 				String strDateOfVer = currentResultOfSerach.get(0);
 				try {

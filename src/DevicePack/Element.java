@@ -2,6 +2,7 @@ package DevicePack;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -21,6 +22,7 @@ import VerificationPack.VSWR_Result;
 
 public class Element implements Includable<Device>, dbStorable{
 
+	private int id;
 	private Device myDevice; 		
 	private MeasResult nominal;		
 	private ToleranceParametrs primaryModuleToleranceParams;
@@ -32,7 +34,7 @@ public class Element implements Includable<Device>, dbStorable{
 	private int poleCount;
 	private int sParamsCount;
 	private String measUnit;
-	private int nominalIndex;
+	private int nominalId;
 	
 	private String periodicModuleParamTable;
 	private String primaryModuleParamTable;
@@ -43,6 +45,9 @@ public class Element implements Includable<Device>, dbStorable{
 	private String listOfVerificationsTable;
 	private String moduleToleranceType;
 	private String phaseToleranceType;
+	public int getId() {
+		return this.id;
+	}
 	public String getModuleToleranceType() {
 		return moduleToleranceType;
 	}
@@ -82,9 +87,8 @@ public class Element implements Includable<Device>, dbStorable{
 	public String getMeasUnit() {
 		return measUnit;
 	}
-
-	public int getNominalIndex() {
-		return nominalIndex;
+	public int getNominalId() {
+		return nominalId;
 	}
 	public MeasResult getNominal() {
 		return nominal;
@@ -128,54 +132,48 @@ public class Element implements Includable<Device>, dbStorable{
 	}
 
 //DataBase
-	public Element(Device deviceOwner, int index) throws SQLException {		
+	public Element(Device deviceOwner, int index) throws SQLException {	
+		System.out.println("\nБерем информацию на элемент с id = " + index);
+		this.id = index;
 		this.myDevice = deviceOwner;
 		String elementTableName = myDevice.getElementsTableName();
-		String sqlQuery = "SELECT ElementType, ElementSerNumber, PoleCount, MeasUnit, ModuleToleranceType, PhaseToleranceType, VerificationsTable, PrimaryModuleParamTable, PeriodicModuleParamTable, PrimaryPhaseParamTable, PeriodicPhaseParamTable, NominalIndex FROM [" + elementTableName + "] WHERE id='"+index+"'";
+		String sqlQuery = "SELECT ElementType, ElementSerNumber, PoleCount, MeasUnit, ModuleToleranceType, PhaseToleranceType, NominalId FROM [Elements] WHERE id='"+index+"'";
 		ArrayList<String> fieldName = new ArrayList<String>();
-		fieldName.add("ElementType");				//0
-		fieldName.add("ElementSerNumber");			//1
-		fieldName.add("PoleCount");					//2
-		fieldName.add("MeasUnit");					//3
-		fieldName.add("ModuleToleranceType");		//4
-		fieldName.add("PhaseToleranceType");		//5
-		fieldName.add("VerificationsTable");		//6		
-		fieldName.add("PrimaryModuleParamTable");	//7
-		fieldName.add("PeriodicModuleParamTable");	//8
-		fieldName.add("PrimaryPhaseParamTable");	//9
-		fieldName.add("PeriodicPhaseParamTable");	//10		
-		fieldName.add("NominalIndex");				//11
-		ArrayList<ArrayList<String>> arrayResults = new ArrayList<ArrayList<String>>();
-		DataBaseManager.getDB().sqlQueryString(sqlQuery, fieldName, arrayResults);				
-		type = arrayResults.get(0).get(0);
-		serialNumber = arrayResults.get(0).get(1);
-		poleCount = Integer.parseInt(arrayResults.get(0).get(2));
-		if (poleCount == 2) {
-			sParamsCount = 1;
-		} else {
-			sParamsCount = 4;
+		fieldName.add("ElementType");				
+		fieldName.add("ElementSerNumber");			
+		fieldName.add("PoleCount");					
+		fieldName.add("MeasUnit");					
+		fieldName.add("ModuleToleranceType");		
+		fieldName.add("PhaseToleranceType");		
+		fieldName.add("NominalId");
+		List<List<String>> arrayResults = new ArrayList<List<String>>();
+		System.out.println(sqlQuery);
+		DataBaseManager.getDB().sqlQueryString(sqlQuery, fieldName, arrayResults);
+		
+		this.type = arrayResults.get(0).get(0);
+		this.serialNumber = arrayResults.get(0).get(1);
+		this.poleCount = Integer.parseInt(arrayResults.get(0).get(2));
+		if (this.poleCount == 2) {
+			this.sParamsCount = 1;
+		} 
+		else {
+			this.sParamsCount = 4;
 		}
 		this.measUnit = arrayResults.get(0).get(3);
 		this.moduleToleranceType = arrayResults.get(0).get(4);
 		this.phaseToleranceType = arrayResults.get(0).get(5);		
-		this.listOfVerificationsTable = arrayResults.get(0).get(6);
-		this.primaryModuleParamTable = arrayResults.get(0).get(7);
-		this.periodicModuleParamTable = arrayResults.get(0).get(8);
-		this.primaryPhaseParamTable = arrayResults.get(0).get(9);
-		this.periodicPhaseParamTable = arrayResults.get(0).get(10);
-		this.nominalIndex = Integer.parseInt(arrayResults.get(0).get(11));			
-		arrayResults.clear();
-		fieldName.clear();
-		fieldName.add("resultsTableName");
-		sqlQuery = "SELECT resultsTableName FROM [" + listOfVerificationsTable + "] WHERE id = " + Integer.toString(nominalIndex) + "";
-		DataBaseManager.getDB().sqlQueryString(sqlQuery, fieldName, arrayResults);
-		this.nominalTable = arrayResults.get(0).get(0);		 
+		this.nominalId = Integer.parseInt(arrayResults.get(0).get(6));			
+		
+		//Let's take nominals from data base
+		System.out.println("Полуим номинальные значения его характеристик для данного элемента\n(они хранятся как результаты измерений)");
 		if (measUnit.equals("vswr")) {
-			this.nominal = new VSWR_Result(this, nominalIndex);
+			this.nominal = new VSWR_Result(this, nominalId);
 		}
 		else {
-			this.nominal = new Gamma_Result(this, nominalIndex);
-		}		 
+			this.nominal = new Gamma_Result(this, nominalId);
+		}	
+			
+		//And now it's time for tolerance parametrs
 		this.primaryModuleToleranceParams = new ToleranceParametrs(TimeType.PRIMARY,  MeasUnitPart.MODULE, this);
 		this.periodicModuleToleranceParams = new ToleranceParametrs(TimeType.PERIODIC, MeasUnitPart.MODULE, this);
 		this.primaryPhaseToleranceParams = new ToleranceParametrs(TimeType.PRIMARY, MeasUnitPart.PHASE, this);
@@ -212,7 +210,7 @@ public class Element implements Includable<Device>, dbStorable{
 		this.measUnit = elCtrl.getMeasUnit();
 		this.moduleToleranceType = elCtrl.getModuleToleranceType();
 		this.phaseToleranceType = elCtrl.getPhaseToleranceType();
-		this.nominalIndex = 1;
+		this.nominalId = 1;
 		
 		if (this.measUnit.equals("vswr")) {
 			this.nominal = new VSWR_Result(elCtrl, this);
@@ -249,28 +247,56 @@ public class Element implements Includable<Device>, dbStorable{
 	public void saveInDB() throws SQLException, SavingException {
 		if (this.myDevice == null) {
 			throw new NoOwnerException(this);
-		}
-		String sqlQuery = "INSERT INTO ["+ myDevice.getElementsTableName() +"] (ElementType, ElementSerNumber, PoleCount, MeasUnit, ModuleToleranceType, PhaseToleranceType, " +
-				"VerificationsTable, PrimaryModuleParamTable, PeriodicModuleParamTable, PrimaryPhaseParamTable, PeriodicPhaseParamTable, NominalIndex) values "
-				+ "('" + type + "','" + serialNumber + "','" + poleCount + "','" + measUnit+"','" + moduleToleranceType + "','" + phaseToleranceType + "','" + listOfVerificationsTable + "','"
-				+ primaryModuleToleranceParams.getTableName() + "','" + periodicModuleToleranceParams.getTableName() + "','"
-				+ primaryPhaseToleranceParams.getTableName() + "','" + periodicPhaseToleranceParams.getTableName() + "','" + Integer.toString(nominalIndex) + "')";
+		}	
+		
+		String sqlQuery = "INSERT INTO [Elements] (DeviceId, "
+				+ "ElementType, " 				
+				+ "ElementSerNumber, "  	
+				+ "PoleCount, "					
+				+ "MeasUnit, "					
+				+ "ModuleToleranceType, "		
+				+ "PhaseToleranceType) VALUES ("		
+					+ this.myDevice.getId() + ",'"
+					+ type + "','" 												
+					+ serialNumber + "','" 										
+					+ poleCount + "','" 										
+					+ measUnit + "','" 											
+					+ moduleToleranceType + "','" 								
+					+ phaseToleranceType + "')";	
+		System.out.println("Вносим запись в таблицу elements о сохраняемом элементе\n" + sqlQuery);
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
-		sqlQuery = "CREATE TABLE [" + listOfVerificationsTable + "] (id INTEGER PRIMARY KEY AUTOINCREMENT, dateOfVerification VARCHAR(60), resultsTableName VARCHAR(512))";
-		try {
-			DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
-		} catch (SQLException sqlExp) {
-			throw new SavingException("Не удалось создать таблицу\nсо списком проведенных поверок.");
-		}
-		this.primaryModuleToleranceParams.saveInDB();	
+		
+		//Getting id
+		sqlQuery = "SELECT id FROM [Elements] WHERE ElementType='" + type + "' AND  ElementSerNumber=" + serialNumber + " AND DeviceId='" + this.myDevice.getId() + "'";
+		System.out.println("Получаем id сохраненного элемента запросом:\n" + sqlQuery);
+		this.id = DataBaseManager.getDB().sqlQueryCount(sqlQuery);
+		System.out.println("id = " + this.id);
+		
+		String identStr = id + "_" + (new Date().toString());
+		sqlQuery = "INSERT INTO [Tolerance_params] (ElementId) VALUES (" + this.id + ")";
+		System.out.println("Вносим информацию о таблицах, в которых будут содаржаться критерии пригодности запросом:\n" + sqlQuery);
+		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
+		
+		//Nominal saving
+		System.out.println("\nНачинаем сохранение номиналов");
+		this.nominal.saveInDB();
+		System.out.println("\nУстанавливаем статус номинала");
+		this.nominal.setNominalStatus();
+		
+		//Tolerance parametrs saving
+		System.out.println("\nНачинаем сохранение критериев пригодности");
+		this.primaryModuleToleranceParams.saveInDB();		
 		this.primaryPhaseToleranceParams.saveInDB();
 		this.periodicModuleToleranceParams.saveInDB();	
-		this.periodicPhaseToleranceParams.saveInDB();
-		this.nominal.saveInDB();	
+		this.periodicPhaseToleranceParams.saveInDB();			
 	}
 	
 	@Override
-	public void deleteFromDB() throws SQLException {					
+	public void deleteFromDB() throws SQLException {
+		String sqlString = "DELETE FROM [Elements] WHERE id=" + this.id + "";
+		DataBaseManager.getDB().sqlQueryUpdate(sqlString);
+		
+		/*
 		this.nominal.deleteFromDB();
 		this.primaryModuleToleranceParams.deleteFromDB();
 		this.primaryPhaseToleranceParams.deleteFromDB();
@@ -284,7 +310,8 @@ public class Element implements Includable<Device>, dbStorable{
 		--val;
 		sqlString = "UPDATE [Devices] SET CountOfElements = '" + Integer.toString(val) + "' WHERE NameOfDevice='" + myDevice.getName()
 		+"' AND TypeOfDevice='" + myDevice.getType() + "' AND SerialNumber='" + myDevice.getSerialNumber() + "'";
-		DataBaseManager.getDB().sqlQueryUpdate(sqlString);		
+		DataBaseManager.getDB().sqlQueryUpdate(sqlString);	
+		*/	
 	}
 	
 	@Override
@@ -349,15 +376,16 @@ public class Element implements Includable<Device>, dbStorable{
 		newPhasePeriodicparams.saveInDB();
 	}
 	
-	public ArrayList<ArrayList<String>> getListOfVerifications() throws SQLException {		
-		String sqlString = "SELECT id, dateOfVerification, resultsTableName FROM [" + listOfVerificationsTable + "]";		
+	public List<List<String>> getListOfVerifications() throws SQLException {		
+		String sqlString = "SELECT id, MeasDate, ValuesTable FROM [Results] WHERE ElementId=" + this.id + "";		
 		ArrayList<String> fieldName = new ArrayList<String>();
 		fieldName.add("id");
-		fieldName.add("dateOfVerification");
-		fieldName.add("resultsTableName");
-		ArrayList<ArrayList<String>> arrayResults = new ArrayList<ArrayList<String>>();		
+		fieldName.add("MeasDate");
+		fieldName.add("ValuesTable");
+		List<List<String>> arrayResults = new ArrayList<List<String>>();		
 		DataBaseManager.getDB().sqlQueryString(sqlString, fieldName, arrayResults);			
 		return arrayResults;
 	}
+
 	
 }

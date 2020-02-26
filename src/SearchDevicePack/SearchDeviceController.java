@@ -3,6 +3,9 @@ package SearchDevicePack;
 import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import AboutMessageForm.AboutMessageWindow;
 import DataBasePack.DataBaseManager;
 import DevicePack.Device;
@@ -39,7 +42,7 @@ public class SearchDeviceController {
 	@FXML
 	private Label headLabel;
 	
-	ArrayList<ArrayList<String>> listOfDevicesInfo;
+	List<List<String>> listOfDevicesInfo;
 	private String filterName;
 	private String filterType;
 	private String filterSerNum;
@@ -58,7 +61,7 @@ public class SearchDeviceController {
 	
 	@FXML
 	private void initialize(){
-		listOfDevicesInfo = new ArrayList<ArrayList<String>>();
+		listOfDevicesInfo = new ArrayList<List<String>>();
 		filterName = "";
 		filterType = "";
 		filterSerNum = "";
@@ -97,14 +100,15 @@ public class SearchDeviceController {
 	
 	@FXML
 	private void chooseBtnClick() {		
-		int index =  this.devicesListView.getSelectionModel().getSelectedIndex();
+		int index = this.devicesListView.getSelectionModel().getSelectedIndex();
 		String cName = listOfDevicesInfo.get(index).get(0);
 		String cType = listOfDevicesInfo.get(index).get(1);
 		String cSerNum = listOfDevicesInfo.get(index).get(2);
 		String text = cName + " " + cType + " " + cSerNum;	
 		this.headLabel.setText(text);
-		try {		
-			foundedDevice = new Device(cName, cType, cSerNum);
+		try {	
+			int currentId = Integer.parseInt(listOfDevicesInfo.get(index).get(0));
+			foundedDevice = new Device(currentId);
 			this.myRequester.setDevice(foundedDevice);
 			this.myRequester.representRequestedInfo();									
 		}
@@ -116,8 +120,9 @@ public class SearchDeviceController {
 	}
 		
 	private void setDeviceItems(){
-		String sqlQuery = "SELECT NameOfDevice, TypeOfDevice,  SerialNumber, Owner FROM Devices" + addFilters();// WHERE "+filterString+"";
-		ArrayList<String> fieldName = new ArrayList<>();
+		String sqlQuery = "SELECT id, NameOfDevice, TypeOfDevice,  SerialNumber, Owner FROM [Devices]" + addFilters();
+		List<String> fieldName = new ArrayList<>();
+		fieldName.add("id");
 		fieldName.add("NameOfDevice");
 		fieldName.add("TypeOfDevice");
 		fieldName.add("SerialNumber");
@@ -125,9 +130,8 @@ public class SearchDeviceController {
 		ObservableList<String> items = FXCollections.observableArrayList();
 		try {
 			DataBaseManager.getDB().sqlQueryString(sqlQuery, fieldName, listOfDevicesInfo);
-			System.out.println(listOfDevicesInfo.size());
 			for (int i=0; i<listOfDevicesInfo.size(); i++) {
-				String item = listOfDevicesInfo.get(i).get(0) + " " + listOfDevicesInfo.get(i).get(1) + " №" + listOfDevicesInfo.get(i).get(2) + ", принадлежащий: " + listOfDevicesInfo.get(i).get(3);				
+				String item = listOfDevicesInfo.get(i).get(1) + " " + listOfDevicesInfo.get(i).get(2) + " №" + listOfDevicesInfo.get(i).get(3) + ", принадлежащий: " + listOfDevicesInfo.get(i).get(4);				
 				items.add(item);
 			}			
 			devicesListView.setItems(items);			
@@ -137,7 +141,7 @@ public class SearchDeviceController {
 		}
 		catch(NullPointerException npExp) {
 			System.out.println("Ошибка: " + npExp.getMessage());
-			AboutMessageWindow.createWindow("Непредвиденная ошибка", "Место ошибки: \nБлок catch(Exception exp) \n Метод setDeviceItems() \nКласса SearchDeviceCintroller").show();
+			AboutMessageWindow.createWindow("Непредвиденная ошибка", "Место ошибки: \nБлок catch(Exception exp) \n Метод setDeviceItems() \nКласса SearchDeviceController").show();
 		}
 	}
 	
