@@ -28,10 +28,11 @@ public class MeasResult implements Includable<Element>, dbStorable{
 	protected int countOfParams;
 	
 	//Date
-	protected DateFormat dateFormat;
+	protected String datePattern = "dd/MM/yyyy HH:mm:ss"; //"dd/MM/yyyy HH:mm:ss" YYYY-MM-DD HH:MM:ss.SSS
+	protected DateFormat dateFormat = new SimpleDateFormat(datePattern);
 	protected Date dateOfMeas;
 	protected String dateOfMeasByString;
-	protected String datePattern = "dd/MM/yyyy HH:mm:ss"; //"dd/MM/yyyy HH:mm:ss" YYYY-MM-DD HH:MM:ss.SSS
+	
 	
 	public int getCountOfFreq() {return this.countOfFreq;}
 	public int getCountOfParams() {return this.countOfParams;}
@@ -47,32 +48,30 @@ public class MeasResult implements Includable<Element>, dbStorable{
 	
 //Constructors
 //FILE
-	public MeasResult(String fileWithResults, int resultNumber, Element ownerElement) throws IOException{		
-		myElement = ownerElement;
-		freqs = new ArrayList<Double>();
-		values = new LinkedHashMap<String, Map<Double, Double>>();
-		suitabilityDecision = new HashMap<String, Map<Double, String>>();		
+	public MeasResult(String fileWithResults, int resultNumber, Element ownerElement) throws IOException {		
+		this.myElement = ownerElement;
+		this.freqs = new ArrayList<Double>();
+		this.values = new LinkedHashMap<String, Map<Double, Double>>();
+		this.suitabilityDecision = new HashMap<String, Map<Double, String>>();		
 		ResultReaderManager resReader = new ResultReaderManager(fileWithResults);			
 		resReader.readResult(resultNumber, freqs, values);				
-		countOfParams = values.size();
-		countOfFreq = freqs.size();		
-		dateOfMeas = Calendar.getInstance().getTime();
-		dateFormat = new SimpleDateFormat(datePattern);
-		dateOfMeasByString = dateFormat.format(dateOfMeas);
+		this.countOfParams = values.size();
+		this.countOfFreq = freqs.size();		
+		this.dateOfMeas = Calendar.getInstance().getTime();
+		this.dateOfMeasByString = this.dateFormat.format(dateOfMeas);
 	}
 	
 //GUI
 	public MeasResult(NewElementController elCtrl, Element ownerElement){		
-		myElement = ownerElement;	
-		freqs = new ArrayList<Double>();
-		values = new HashMap<String, Map<Double, Double>>();
-		freqs = elCtrl.getFreqsValues();
-		values = elCtrl.getNominalValues();
-		countOfParams = values.size();
-		countOfFreq = freqs.size();
-		dateOfMeas = Calendar.getInstance().getTime();
-		dateFormat = new SimpleDateFormat(datePattern);
-		dateOfMeasByString = dateFormat.format(dateOfMeas);
+		this.myElement = ownerElement;	
+		//this.freqs = new ArrayList<Double>();
+		//this.values = new HashMap<String, Map<Double, Double>>();
+		this.freqs = elCtrl.getFreqsValues();
+		this.values = elCtrl.getNominalValues();
+		this.countOfParams = values.size();
+		this.countOfFreq = freqs.size();
+		this.dateOfMeas = Calendar.getInstance().getTime();
+		this.dateOfMeasByString = dateFormat.format(dateOfMeas);
 	}	
 //DB
 	public MeasResult(Element ownerElement, int index) throws SQLException {	
@@ -83,19 +82,25 @@ public class MeasResult implements Includable<Element>, dbStorable{
 		this.myElement = ownerElement;		
 		List<List<String>> results = new ArrayList<List<String>>();
 		List<String> fieldsNames = new ArrayList<String>();		
-		String sqlQuery = "SELECT MeasDate, ValuesTable  FROM [Results] WHERE id='" + index + "'";
+		String sqlQuery = "SELECT MeasDate FROM [Results] WHERE id='" + index + "'";
 		fieldsNames.add("MeasDate");
-		fieldsNames.add("ValuesTable");
 		System.out.println(sqlQuery);
-		DataBaseManager.getDB().sqlQueryString(sqlQuery, fieldsNames, results);
-		tableName =  results.get(0).get(1);
-		sqlQuery = "SELECT freq FROM [" + tableName + "]";
+		DataBaseManager.getDB().sqlQueryString(sqlQuery, fieldsNames, results);				
+		this.dateOfMeasByString = results.get(0).get(0);
+		try {
+			this.dateOfMeas = dateFormat.parse(this.dateOfMeasByString);
+		}
+		catch(ParseException pExp) {
+			this.dateOfMeas = Calendar.getInstance().getTime();
+		}	
+		
+		sqlQuery = "SELECT freq FROM [Results_values] WHERE ResultId="+this.id+"";
 		System.out.println(sqlQuery);
 		DataBaseManager.getDB().sqlQueryDouble(sqlQuery, "freq", this.freqs);
 		this.countOfFreq = this.freqs.size();
 		for (String key : keys) {
 			try {
-				sqlQuery = "SELECT " + key + " FROM [" + tableName + "]";
+				sqlQuery = "SELECT " + key + " FROM [Results_values] WHERE ResultId="+this.id+"";
 				ArrayList<Double> arrayResults = new ArrayList<Double>();
 				System.out.println(sqlQuery);
 				DataBaseManager.getDB().sqlQueryDouble(sqlQuery, key, arrayResults);				
@@ -110,15 +115,8 @@ public class MeasResult implements Includable<Element>, dbStorable{
 				continue;
 			}
 		}
-		dateFormat = new SimpleDateFormat(datePattern);
-		String strDate = results.get(0).get(0);
-		try {
-			this.dateOfMeas = dateFormat.parse(strDate);
-		}
-		catch(ParseException pExp) {
-			this.dateOfMeas = Calendar.getInstance().getTime();
-		}	
-		dateOfMeasByString = dateFormat.format(dateOfMeas);
+		
+
 	}
 		
 //Includable<Element>
@@ -147,37 +145,31 @@ public class MeasResult implements Includable<Element>, dbStorable{
 			}
 		}
 		String ValuesTable = "Results_" + this.myElement.getId() + "_" + this.getDateOfMeasByString();
-		String sqlQuery = "INSERT INTO [Results] (ElementId, MeasDate, ValuesTable) VALUES (" + this.myElement.getId() + ", '" + this.getDateOfMeasByString() + "', '" + ValuesTable + "')";
+		String sqlQuery = "INSERT INTO [Results] (ElementId, MeasDate) VALUES (" + this.myElement.getId() + ", '" + this.getDateOfMeasByString() + "')";
+		System.out.println("Вносим информацию в табл. Results:\n" + sqlQuery);
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
-		
+		System.out.println("Успешно");
 		//get id
 		sqlQuery = "SELECT id FROM [Results] WHERE ElementId=" + this.myElement.getId() + " AND MeasDate='" + this.getDateOfMeasByString() + "'";
+		System.out.println("Получаем id для результата измерения запросом:\n" + sqlQuery);
 		this.id = DataBaseManager.getDB().sqlQueryCount(sqlQuery);
-		
-		//creating table
-		sqlQuery = "CREATE TABLE [" + ValuesTable + "] (id INTEGER PRIMARY KEY AUTOINCREMENT, freq REAL, ";
-		for (int i = 0; i < currentKeys.size(); i++) {
-			sqlQuery += (currentKeys.get(i) + " REAL");
-			if (i != currentKeys.size() - 1) sqlQuery += ", ";
-		}
-		sqlQuery += ")";		
-		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
-		
-		//
+		System.out.println("id = " + this.id);
+
 		for (int i = 0; i < countOfFreq; i++) {				
-			sqlQuery = "INSERT INTO [" + ValuesTable + "] (freq, ";			
+			sqlQuery = "INSERT INTO [Results_values] (ResultId, freq, ";				
 			for (int j = 0; j < currentKeys.size(); j++) {
 				sqlQuery += (currentKeys.get(j));
 				if (j != currentKeys.size() - 1) sqlQuery += ", ";
 			}			
-			sqlQuery += ") values ("+freqs.get(i)+", ";			
+			sqlQuery += ") values (" + this.id + ", " + freqs.get(i)+ ", ";			
 			for (int j = 0; j < currentKeys.size(); j++) {
 				sqlQuery += (values.get(currentKeys.get(j)).get(freqs.get(i)).toString());
 				if (j != currentKeys.size() - 1) sqlQuery += ", ";
 			}			
-			sqlQuery += ")";			
+			sqlQuery += ")";	
+			System.out.print(sqlQuery);
 			DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
-			System.out.println(sqlQuery);
+			System.out.println("\t - Успешно");
 		}
 	}
 	
@@ -211,7 +203,9 @@ public class MeasResult implements Includable<Element>, dbStorable{
 			return;
 		}
 		String sqlQuery = "UPDATE [Elements] SET NominalId='" + Integer.toString(this.id) + "' WHERE id=" + this.myElement.getId();
+		System.out.print(sqlQuery);
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
+		System.out.println("\t - Успешно");
 	}
 	
 	public boolean isNominal() {

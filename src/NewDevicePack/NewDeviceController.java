@@ -165,7 +165,7 @@ public class NewDeviceController  {
 			NewDeviceWindow.deleteNewDeviceWindow();
 		}
 		catch(SQLException sqlExp){
-			System.out.println(sqlExp.getStackTrace());
+			System.out.println(sqlExp.getCause());
 			DataBaseManager.getDB().RollBack();
 			AboutMessageWindow.createWindow("Ошибка", "Ошибка: " + sqlExp.getMessage()).show();
 		}

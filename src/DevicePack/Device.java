@@ -113,10 +113,12 @@ public class Device implements dbStorable {
 	public void saveInDB() throws SQLException, SavingException{
 		String sqlString = "INSERT INTO [Devices] (NameOfDevice, TypeOfDevice, SerialNumber, Owner, GosNumber) values ('"+name+"','"+type+"','"+serialNumber+"','"+owner+"','"+gosNumber+"')";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlString);
+		System.out.println(sqlString);
 		System.out.println("Начато сохранение устройства "+name+", тип "+type+", № "+serialNumber+", владелец "+owner+", № по ФИФ "+gosNumber);
 		System.out.println("Внесена запись о новом приборе в таблицу Devices");
 		sqlString = "SELECT id FROM [Devices] WHERE NameOfDevice='" + name + "' AND TypeOfDevice='" + type + "' AND SerialNumber='" + serialNumber + "'";
 		this.id = DataBaseManager.getDB().sqlQueryCount(sqlString);
+		System.out.println(sqlString);
 		System.out.println("Получен id под которым сохранен прибор: " + this.id);
 		for (int i=0; i < this.countOfElements; i++){
 			System.out.println("Начато сохранение элемента №" + i + ": ");

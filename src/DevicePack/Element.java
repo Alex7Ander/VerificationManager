@@ -247,8 +247,7 @@ public class Element implements Includable<Device>, dbStorable{
 	public void saveInDB() throws SQLException, SavingException {
 		if (this.myDevice == null) {
 			throw new NoOwnerException(this);
-		}	
-		
+		}			
 		String sqlQuery = "INSERT INTO [Elements] (DeviceId, "
 				+ "ElementType, " 				
 				+ "ElementSerNumber, "  	
@@ -267,16 +266,16 @@ public class Element implements Includable<Device>, dbStorable{
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
 		
 		//Getting id
-		sqlQuery = "SELECT id FROM [Elements] WHERE ElementType='" + type + "' AND  ElementSerNumber=" + serialNumber + " AND DeviceId='" + this.myDevice.getId() + "'";
+		sqlQuery = "SELECT id FROM [Elements] WHERE ElementType='" + type + "' AND  ElementSerNumber='" + serialNumber + "' AND DeviceId='" + this.myDevice.getId() + "'";
 		System.out.println("Получаем id сохраненного элемента запросом:\n" + sqlQuery);
 		this.id = DataBaseManager.getDB().sqlQueryCount(sqlQuery);
 		System.out.println("id = " + this.id);
-		
+		/*
 		String identStr = id + "_" + (new Date().toString());
 		sqlQuery = "INSERT INTO [Tolerance_params] (ElementId) VALUES (" + this.id + ")";
 		System.out.println("Вносим информацию о таблицах, в которых будут содаржаться критерии пригодности запросом:\n" + sqlQuery);
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
-		
+		*/
 		//Nominal saving
 		System.out.println("\nНачинаем сохранение номиналов");
 		this.nominal.saveInDB();
@@ -377,11 +376,10 @@ public class Element implements Includable<Device>, dbStorable{
 	}
 	
 	public List<List<String>> getListOfVerifications() throws SQLException {		
-		String sqlString = "SELECT id, MeasDate, ValuesTable FROM [Results] WHERE ElementId=" + this.id + "";		
+		String sqlString = "SELECT id, MeasDate FROM [Results] WHERE ElementId=" + this.id + "";		
 		ArrayList<String> fieldName = new ArrayList<String>();
 		fieldName.add("id");
 		fieldName.add("MeasDate");
-		fieldName.add("ValuesTable");
 		List<List<String>> arrayResults = new ArrayList<List<String>>();		
 		DataBaseManager.getDB().sqlQueryString(sqlString, fieldName, arrayResults);			
 		return arrayResults;
