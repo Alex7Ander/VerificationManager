@@ -6,14 +6,15 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import AboutMessageForm.AboutMessageWindow;
 import DataBasePack.DataBaseManager;
 import DevicePack.Device;
 import FileManagePack.FileManager;
+import ToleranceParamPack.ParametrsPack.ToleranceParametrs;
 import VerificationForm.VerificationWindow;
 import VerificationPack.MeasResult;
 import VerificationPack.VerificationProcedure;
@@ -67,6 +68,8 @@ public class ProtocolCreateController {
 	private Label verTypeLabel;
 	@FXML
 	private Label decisionLabel;
+	@FXML
+	private Label workTillLabel;
 	
 	@FXML
 	private RadioButton etalonRB;
@@ -96,53 +99,60 @@ public class ProtocolCreateController {
 	private ObservableList<String> docTypes;
 	private String newProtocolName;
 	private String newDocumentName;
-	private ArrayList<MeasResult> protocoledResult;
+	private List<MeasResult> protocoledResult;
+	private List<MeasResult> nominals;
+	private List<ToleranceParametrs> protocoledModuleToleranceParams;
+	private List<ToleranceParametrs> protocoledPhaseToleranceParams;
 	private VerificationProcedure verification;
 	
 	@FXML
 	private void initialize() throws IOException {
-		infoBox.toFront();
-		infoBox.setOpacity(1.0);
-		progressPane.setVisible(false);
+		this.infoBox.toFront();
+		this.infoBox.setOpacity(1.0);
+		this.progressPane.setVisible(false);
 		
-		militaryRanks = FXCollections.observableArrayList();
+		this.militaryRanks = FXCollections.observableArrayList();
 		try {
 			FileManager.LinesToItems(new File(".").getAbsolutePath() + "//files//ranks.txt", militaryRanks);
 		}
 		catch(IOException ioExp) {
-			militaryRanks.add("Полковник");
-			militaryRanks.add("Подполковник");
-			militaryRanks.add("Майор");
+			this.militaryRanks.add("Полковник");
+			this.militaryRanks.add("Подполковник");
+			this.militaryRanks.add("Майор");
 		}
-		militaryStatusComboBox.setItems(militaryRanks);
+		this.militaryStatusComboBox.setItems(militaryRanks);
 		
-		docTypes = FXCollections.observableArrayList();	
-		reasonTextArea.setVisible(false);
-		decisionLabel.setVisible(false);
+		this.docTypes = FXCollections.observableArrayList();	
+		this.reasonTextArea.setVisible(false);
+		this.decisionLabel.setVisible(false);
 		
 		Device device = VerificationWindow.getVerificationWindow().getController().verificatedDevice;
-		devNameLabel.setText(device.getName() + " " + device.getType());
-		devSerNLabel.setText(device.getSerialNumber());
-		devOwnerLabel.setText(device.getOwner());
+		this.devNameLabel.setText(device.getName() + " " + device.getType());
+		this.devSerNLabel.setText(device.getSerialNumber());
+		this.devOwnerLabel.setText(device.getOwner());
 		
-		siGroup = new ToggleGroup();
-		etalonRB.setToggleGroup(siGroup);
-		siRB.setToggleGroup(siGroup);
-		siRB.setSelected(true);
+		this.siGroup = new ToggleGroup();
+		this.etalonRB.setToggleGroup(siGroup);
+		this.siRB.setToggleGroup(siGroup);
+		this.siRB.setSelected(true);
 	}
 	
 	@FXML
 	private void docTypeComboBoxChange() {
-		if (!decisionLabel.isVisible()) {
-			decisionLabel.setVisible(true);
+		if (!this.decisionLabel.isVisible()) {
+			this.decisionLabel.setVisible(true);
 		}
-		if (docTypeComboBox.getSelectionModel().getSelectedItem().toString().equals("Cвидетельство о поверке")) {
-			decisionLabel.setText("признан пригодным к применению");
-			reasonTextArea.setVisible(false);
+		if (this.docTypeComboBox.getSelectionModel().getSelectedItem().toString().equals("Cвидетельство о поверке")) {
+			this.decisionLabel.setText("признан пригодным к применению");
+			this.reasonTextArea.setVisible(false);
+			this.verificationDate.setVisible(true);
+			this.workTillLabel.setVisible(true);
 		}
 		else {
-			decisionLabel.setText("признан не пригодным к применению по следующим причинам");
-			reasonTextArea.setVisible(true);
+			this.decisionLabel.setText("признан не пригодным к применению по следующим причинам");
+			this.reasonTextArea.setVisible(true);
+			this.verificationDate.setVisible(false);
+			this.workTillLabel.setVisible(false);
 		}
 	}
 	
@@ -152,25 +162,31 @@ public class ProtocolCreateController {
 			AboutMessageWindow.createWindow("Ошибка", "Вы не выбрали тип создаваемого документа").show();
 			return;
 		}		
-		Date dt = protocoledResult.get(0).getDateOfMeas();
+		Date dt = this.protocoledResult.get(0).getDateOfMeas();
 		String strDt = new SimpleDateFormat("dd-MM-yyyy HH-mm-ss").format(dt); //
-		String addStr = protocoledResult.get(0).getMyOwner().getMyOwner().getName() + " " +
-				   		protocoledResult.get(0).getMyOwner().getMyOwner().getType() + " " +
-				   		protocoledResult.get(0).getMyOwner().getMyOwner().getSerialNumber() + " от " + strDt;
-		newProtocolName = "Протокол поверки для " + addStr + ".xls";
-		newDocumentName = docTypeComboBox.getSelectionModel().getSelectedItem().toString() + " " + addStr + ".doc";		
+		String addStr = this.protocoledResult.get(0).getMyOwner().getMyOwner().getName() + " " +
+				this.protocoledResult.get(0).getMyOwner().getMyOwner().getType() + " " +
+				this.protocoledResult.get(0).getMyOwner().getMyOwner().getSerialNumber() + " от " + strDt;
+		this.newProtocolName = "Протокол поверки для " + addStr + ".xls";
+		this.newDocumentName = docTypeComboBox.getSelectionModel().getSelectedItem().toString() + " " + addStr + ".doc";		
 		//Скрываем информационные поля и показываем прогресс индикатор
-		infoBox.toBack();
-		infoBox.setOpacity(0.1);
-		progressPane.setVisible(true);	
-		verification.setFinallyInformation(this);
+		this.infoBox.toBack();
+		this.infoBox.setOpacity(0.1);
+		this.progressPane.setVisible(true);	
+		this.verification.setFinallyInformation(this);
 		//Создаем документы
 		creteDocuments();	
 	}
 	
 	private void creteDocuments() {
 		//Создаем поток создания протокола
-		DocumetnsCreateService docService = new DocumetnsCreateService(newProtocolName, newDocumentName, protocoledResult, verification);
+		DocumetnsCreateService docService = new DocumetnsCreateService(this.newProtocolName, 
+																		this.newDocumentName, 
+																		this.protocoledResult, 
+																		this.nominals, 
+																		this.protocoledModuleToleranceParams,
+																		this.protocoledPhaseToleranceParams,
+																		this.verification);
 		//Устанавливаем действие при успешном завершении
 		docService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 			@Override
@@ -184,7 +200,7 @@ public class ProtocolCreateController {
 						makeRecordInDB();
 					}
 					catch(SQLException sqlExp) {
-						AboutMessageWindow.createWindow("Ошибка", "Ошибка внесения данных о созданном протоколе в БД").show();
+						AboutMessageWindow.createWindow("Ошибка", "Данные о созданном протоколе\n в БД не внесены.\n").show();
 					}
 					//Открываем созданный файл, если требуется
 					if (printRB.isSelected()) {
@@ -214,19 +230,17 @@ public class ProtocolCreateController {
 				infoBox.toFront();
 				infoBox.setOpacity(1.0);
 				progressPane.setVisible(false);  
-				AboutMessageWindow.createWindow("Ошибка", "Произошла ошибка при создании протокола.\nПовторите попытку.").show();
+				AboutMessageWindow.createWindow("Ошибка", "Произошла ошибка при\nсоздании протокола.\nПовторите попытку.").show();
 				return;
-			}				
+			}
 		});
 		//Запускаем поток создания документов
 		docService.start();
 	}
 	
 	private void makeRecordInDB() throws SQLException {
-		String date = protocoledResult.get(0).getDateOfMeasByString();
-		String devName = protocoledResult.get(0).getMyOwner().getMyOwner().getName();
-		String devType = protocoledResult.get(0).getMyOwner().getMyOwner().getType();
-		String devSerN = protocoledResult.get(0).getMyOwner().getMyOwner().getSerialNumber();
+		String date = this.protocoledResult.get(0).getDateOfMeasByString();
+		String devId = Integer.toString(protocoledResult.get(0).getMyOwner().getMyOwner().getId());
 		String pathToProtocol = "//Protocols//" + newProtocolName;
 		String pathToDocument = "//Documents//" + newDocumentName;
 		String docT = docTypeComboBox.getSelectionModel().getSelectedItem().toString();
@@ -235,23 +249,35 @@ public class ProtocolCreateController {
 		}
 		else {
 			docT = "Notice";
-		}
-		String sqlQuery = "INSERT INTO Verifications (Date, NameOfDevice, TypeOfDevice, SerialNumber, PathOfDoc, PathOfProtocol, TypeOfDoc) VALUES "
-											  + "('"+date+"','"+devName+"','"+devType+"','"+devSerN+"','"+pathToDocument+"','"+pathToProtocol+"','"+docT+"')";
+		}		
+		String sqlQuery = "INSERT INTO Verifications (DeviceId, VerificationDate, PathOfDoc, PathOfProtocol, TypeOfDoc) VALUES "
+		+ "('"+devId+"','"+date+"','"+pathToDocument+"','"+pathToProtocol+"','"+docT+"')";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
 	}
 	
 	public void setDocTypes(String[] types) {
 		for (String str : types) docTypes.add(str);
-		docTypeComboBox.setItems(docTypes);
+		this.docTypeComboBox.setItems(docTypes);
 	}
 	
-	public void setResults(ArrayList<MeasResult> results) {
-		protocoledResult = results;
+	public void setResults(List<MeasResult> results) {
+		this.protocoledResult = results;
+	}
+	
+	public void setNominals(List<MeasResult> nominals) {
+		this.nominals = nominals;
+	}
+	
+	public void setModuleToleranceParams(List<ToleranceParametrs> protocoledModuleToleranceParams) {
+		this.protocoledModuleToleranceParams = protocoledModuleToleranceParams;		
+	}
+	
+	public void setPhaseToleranceParams(List<ToleranceParametrs> protocoledPhaseToleranceParams) {
+		this.protocoledPhaseToleranceParams = protocoledPhaseToleranceParams;
 	}
 	
 	private boolean checkDocType() {
-		if (docTypeComboBox.getSelectionModel().getSelectedIndex() < 0) {
+		if (this.docTypeComboBox.getSelectionModel().getSelectedIndex() < 0) {
 			return false;
 		}
 		else {
@@ -260,17 +286,22 @@ public class ProtocolCreateController {
 	}
 	
 	public void setVerificationProcedure(VerificationProcedure verificationProc) {
-		verification = verificationProc;
+		this.verification = verificationProc;
 	}
 	
-	public String getWorkerName() {return workerNameTextField.getText();}
-	public String getBossName() {return bossNameTextFiled.getText();}
+	public String getWorkerName() {
+		return this.workerNameTextField.getText();
+	}
+	public String getBossName() {
+		return this.bossNameTextFiled.getText();
+	}
 	public String getBossStatus() {
 		String status = null;
 		try {
-			status = militaryStatusComboBox.getSelectionModel().getSelectedItem().toString();
-		} catch (NullPointerException npExp) {
-			status = "Генерал-завхоз";
+			status = this.militaryStatusComboBox.getSelectionModel().getSelectedItem().toString();
+		}
+		catch (NullPointerException npExp) {
+			status = "Полковник ";
 		}
 		return status;
 	}
@@ -296,7 +327,7 @@ public class ProtocolCreateController {
 		}
 	}
 	public String getDocType() { 
-		return docTypeComboBox.getSelectionModel().getSelectedItem().toString();
+		return this.docTypeComboBox.getSelectionModel().getSelectedItem().toString();
 	}
 	public String getDateOfCreation() {		
 		Date dt = new Date();
@@ -309,15 +340,18 @@ public class ProtocolCreateController {
 		Calendar calend = Calendar.getInstance();
 		try {
 			calend.setTime(new SimpleDateFormat("dd-MM-yyyy").parse(sdt));
-		} catch (ParseException pExp) {
+		}
+		catch (ParseException pExp) {
 			pExp.getStackTrace();
 			calend.setTime(new Date());
-		}		
+		}
 		calend.add(Calendar.YEAR, 1);
 		String strDate = new SimpleDateFormat("dd-MM-yyyy").format(calend.getTime());		
 		return strDate;
 	}
 	public String getMilitryBaseName() {
-		return militaryBaseName.getText();
+		return this.militaryBaseName.getText();
 	}
+
+
 }

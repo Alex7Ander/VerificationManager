@@ -72,7 +72,7 @@
                      <HBox.margin>
                         <Insets bottom="2.0" left="2.0" right="132.0" top="2.0" />
                      </HBox.margin></Button>
-                  <Button fx:id="closeBtn" mnemonicParsing="false" onAction="#closeBtnClick" prefWidth="150.0" stylesheets="@../../bin/application/commonButton.css" text="Выход">
+                  <Button fx:id="closeBtn" mnemonicParsing="false" onAction="#closeBtnClick" prefWidth="150.0" stylesheets="@../../bin/application/commonButton.css" text="Скрыть">
                      <HBox.margin>
                         <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
                      </HBox.margin></Button>

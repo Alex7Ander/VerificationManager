@@ -64,8 +64,6 @@ public class MeasResult implements Includable<Element>, dbStorable{
 //GUI
 	public MeasResult(NewElementController elCtrl, Element ownerElement){		
 		this.myElement = ownerElement;	
-		//this.freqs = new ArrayList<Double>();
-		//this.values = new HashMap<String, Map<Double, Double>>();
 		this.freqs = elCtrl.getFreqsValues();
 		this.values = elCtrl.getNominalValues();
 		this.countOfParams = values.size();
@@ -83,7 +81,7 @@ public class MeasResult implements Includable<Element>, dbStorable{
 		List<List<String>> results = new ArrayList<List<String>>();
 		List<String> fieldsNames = new ArrayList<String>();		
 		String sqlQuery = "SELECT MeasDate FROM [Results] WHERE id='" + index + "'";
-		fieldsNames.add("MeasDate");
+		fieldsNames.add("measDate");
 		System.out.println(sqlQuery);
 		DataBaseManager.getDB().sqlQueryString(sqlQuery, fieldsNames, results);				
 		this.dateOfMeasByString = results.get(0).get(0);
@@ -92,15 +90,14 @@ public class MeasResult implements Includable<Element>, dbStorable{
 		}
 		catch(ParseException pExp) {
 			this.dateOfMeas = Calendar.getInstance().getTime();
-		}	
-		
-		sqlQuery = "SELECT freq FROM [Results_values] WHERE ResultId="+this.id+"";
+		}			
+		sqlQuery = "SELECT freq FROM [Results_values] WHERE ResultId="+this.id;
 		System.out.println(sqlQuery);
 		DataBaseManager.getDB().sqlQueryDouble(sqlQuery, "freq", this.freqs);
 		this.countOfFreq = this.freqs.size();
 		for (String key : keys) {
 			try {
-				sqlQuery = "SELECT " + key + " FROM [Results_values] WHERE ResultId="+this.id+"";
+				sqlQuery = "SELECT " + key + " FROM [Results_values] WHERE ResultId=" + this.id;
 				ArrayList<Double> arrayResults = new ArrayList<Double>();
 				System.out.println(sqlQuery);
 				DataBaseManager.getDB().sqlQueryDouble(sqlQuery, key, arrayResults);				
@@ -115,8 +112,6 @@ public class MeasResult implements Includable<Element>, dbStorable{
 				continue;
 			}
 		}
-		
-
 	}
 		
 //Includable<Element>
@@ -144,19 +139,19 @@ public class MeasResult implements Includable<Element>, dbStorable{
 				//
 			}
 		}
-		String ValuesTable = "Results_" + this.myElement.getId() + "_" + this.getDateOfMeasByString();
-		String sqlQuery = "INSERT INTO [Results] (ElementId, MeasDate) VALUES (" + this.myElement.getId() + ", '" + this.getDateOfMeasByString() + "')";
+		//String ValuesTable = "Results_" + this.myElement.getId() + "_" + this.getDateOfMeasByString();
+		String sqlQuery = "INSERT INTO [Results] (elementId, measDate) VALUES (" + this.myElement.getId() + ", '" + this.getDateOfMeasByString() + "')";
 		System.out.println("Вносим информацию в табл. Results:\n" + sqlQuery);
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
 		System.out.println("Успешно");
 		//get id
-		sqlQuery = "SELECT id FROM [Results] WHERE ElementId=" + this.myElement.getId() + " AND MeasDate='" + this.getDateOfMeasByString() + "'";
+		sqlQuery = "SELECT id FROM [Results] WHERE elementId=" + this.myElement.getId() + " AND measDate='" + this.getDateOfMeasByString() + "'";
 		System.out.println("Получаем id для результата измерения запросом:\n" + sqlQuery);
 		this.id = DataBaseManager.getDB().sqlQueryCount(sqlQuery);
 		System.out.println("id = " + this.id);
 
 		for (int i = 0; i < countOfFreq; i++) {				
-			sqlQuery = "INSERT INTO [Results_values] (ResultId, freq, ";				
+			sqlQuery = "INSERT INTO [Results_values] (resultId, freq, ";				
 			for (int j = 0; j < currentKeys.size(); j++) {
 				sqlQuery += (currentKeys.get(j));
 				if (j != currentKeys.size() - 1) sqlQuery += ", ";
@@ -174,12 +169,9 @@ public class MeasResult implements Includable<Element>, dbStorable{
 	}
 	
 	@Override
-	public void deleteFromDB() throws SQLException {
-		String listOfVerificationsTable = myElement.getListOfVerificationsTable();				
-		String sqlQuery = "DELETE FROM ["+ listOfVerificationsTable +"] WHERE resultsTableName='" + tableName + "'";	
+	public void deleteFromDB() throws SQLException {				
+		String sqlQuery = "DELETE FROM Results WHERE id=" + this.id;	
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);		
-		sqlQuery = "DROP TABLE [" + tableName + "]";
-		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
 	}
 	
 	@Override
@@ -187,7 +179,8 @@ public class MeasResult implements Includable<Element>, dbStorable{
 		// TODO Auto-generated method stub		
 	}
 	
-	public void rewriteTableNames() throws SQLException {
+	/*
+	public void rewriteTableNames() throws SQLException {		
 		String strDateOfMeas = dateFormat.format(dateOfMeas);
 		String newTableName = "Результаты поверки для " +
 				myElement.getMyOwner().getName() + " " + myElement.getMyOwner().getType() + " " + myElement.getMyOwner().getSerialNumber() + " " + myElement.getType() + " " + myElement.getSerialNumber() +
@@ -197,28 +190,30 @@ public class MeasResult implements Includable<Element>, dbStorable{
 		sqlQuery = "ALTER TABLE [" + tableName + "] RENAME TO [" + newTableName + "]";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
 	}
+	*/
 	
 	public void setNominalStatus() throws SQLException {
-		if (myElement == null) {
+		if (this.myElement == null) {
 			return;
 		}
-		String sqlQuery = "UPDATE [Elements] SET NominalId='" + Integer.toString(this.id) + "' WHERE id=" + this.myElement.getId();
+		System.out.print("Устанавливаем статус номинала для результат измерений с id = " + this.id);
+		String sqlQuery = "UPDATE [Elements] SET nominalId='" + Integer.toString(this.id) + "' WHERE id=" + this.myElement.getId();
 		System.out.print(sqlQuery);
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
 		System.out.println("\t - Успешно");
 	}
 	
 	public boolean isNominal() {
-		if (myElement == null) {
+		if (this.myElement == null) {
 			return false;
 		}
 		try {
 			String strDateOfMeas = dateFormat.format(dateOfMeas);
-			String sqlQuery = "SELECT id FROM [" + myElement.getListOfVerificationsTable() + "] WHERE dateOfVerification = '" + strDateOfMeas + "'";
-			int myIndex = DataBaseManager.getDB().sqlQueryCount(sqlQuery);
-			sqlQuery = "SELECT NominalIndex FROM [" + myElement.getMyOwner().getElementsTableName() + "] WHERE ElementType='" + myElement.getType() + "' AND ElementSerNumber='" + myElement.getSerialNumber() + "'";
-			int nominalIndex = DataBaseManager.getDB().sqlQueryCount(sqlQuery);
-			if (myIndex == nominalIndex) {
+			String sqlQuery = "SELECT id FROM [Results] WHERE dateOfVerification = '" + strDateOfMeas + "' AND elementId='" + myElement.getId() + "'";
+			int currentResultId = DataBaseManager.getDB().sqlQueryCount(sqlQuery);
+			sqlQuery = "SELECT nominalId FROM [Elements] WHERE id='" + myElement.getId() + "'";
+			int nominalId = DataBaseManager.getDB().sqlQueryCount(sqlQuery);
+			if (currentResultId == nominalId) {
 				return true;
 			}
 			else {

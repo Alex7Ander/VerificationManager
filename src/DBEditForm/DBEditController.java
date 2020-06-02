@@ -1,11 +1,15 @@
 package DBEditForm;
 
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import AboutMessageForm.AboutMessageWindow;
 import DataBasePack.DataBaseManager;
@@ -22,6 +26,7 @@ import ToleranceParamPack.ParametrsPack.MeasUnitPart;
 import ToleranceParamPack.ParametrsPack.S_Parametr;
 import VerificationPack.MeasResult;
 import YesNoDialogPack.YesNoWindow;
+import _tempHelpers.Adapter;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -42,6 +47,8 @@ import javafx.scene.layout.HBox;
 
 public class DBEditController implements InfoRequestable {
 	
+	@FXML
+	private AnchorPane mainAnchorPane;
 //Левая часть окна
 	@FXML
 	private Button searchDeviceBtn;
@@ -97,9 +104,6 @@ public class DBEditController implements InfoRequestable {
 	NumberAxis phaseY = new NumberAxis();
 	private LineChart<Number, Number> moduleChart = new LineChart<Number, Number>(moduleX, moduleY);
 	private LineChart<Number, Number> phaseChart = new LineChart<Number, Number>(phaseX, phaseY);	
-	private XYChart.Series<Number, Number> moduleSeries = new XYChart.Series<Number, Number>();
-	private XYChart.Series<Number, Number> phaseSeries = new XYChart.Series<Number, Number>();
-
 //---------------------------------------------	
 	private Device modDevice;  //Редактируемое средство измерения
 	private MeasResult currentResult;  //Отображаемый результат измерения
@@ -112,37 +116,39 @@ public class DBEditController implements InfoRequestable {
 //---------------------------------------------------------
 	@FXML
 	private void initialize() {						
-		resultsTable = new ResultsTable(resultsTablePane);		
-		elementsList = FXCollections.observableArrayList();
-		verificationDateList = FXCollections.observableArrayList();
-		measUnitsList = FXCollections.observableArrayList();		
-		devNamesList = FXCollections.observableArrayList();
+		this.resultsTable = new ResultsTable(resultsTablePane);		
+		this.elementsList = FXCollections.observableArrayList();
+		this.verificationDateList = FXCollections.observableArrayList();
+		this.measUnitsList = FXCollections.observableArrayList();		
+		this.devNamesList = FXCollections.observableArrayList();
 		try {
-			FileManager.LinesToItems(new File(".").getAbsolutePath() + "//files//sitypes.txt", devNamesList);
+			FileManager.LinesToItems(new File(".").getAbsolutePath() + "//files//sitypes.txt", this.devNamesList);
 		} catch (Exception exp) {
-			devNamesList.add("Рабочий эталон ККПиО");
-			devNamesList.add("Набор нагрузок волноводных");
-			devNamesList.add("Нагрузки волноводные согласованные");
-			devNamesList.add("Комплект поверочный");
-			devNamesList.add("Калибровочный и поверочный комплекты мер");
-			devNamesList.add("Нагрузки волноводные КЗ подвижные");
+			this.devNamesList.add("Рабочий эталон ККПиО");
+			this.devNamesList.add("Набор нагрузок волноводных");
+			this.devNamesList.add("Нагрузки волноводные согласованные");
+			this.devNamesList.add("Комплект поверочный");
+			this.devNamesList.add("Калибровочный и поверочный комплекты мер");
+			this.devNamesList.add("Нагрузки волноводные КЗ подвижные");
 		} 
-		nameComboBox.setItems(devNamesList);
+		this.nameComboBox.setItems(devNamesList);
 		
-		chartBox.getChildren().add(moduleChart);
-		chartBox.getChildren().add(phaseChart);
-		verificationDateListView.setItems(this.verificationDateList);				
-		currentMeasUnitListView.setItems(measUnitsList);
-		moduleX.setAutoRanging(false);
-		phaseX.setAutoRanging(false);
+		this.chartBox.getChildren().add(moduleChart);
+		this.chartBox.getChildren().add(phaseChart);
+		this.verificationDateListView.setItems(this.verificationDateList);				
+		this.currentMeasUnitListView.setItems(measUnitsList);
+		this.moduleX.setAutoRanging(false);
+		this.phaseX.setAutoRanging(false);
 		
-		moduleChart.setTitle("|Sxx|(f)");
-		phaseChart.setTitle("фаза Sxx(f)");
-		moduleSeries.setName("Значения модуля");
-		phaseSeries.setName("Значение фазы");
-		
+		this.moduleChart.setTitle("|Sxx|(f)");
+		this.phaseChart.setTitle("фаза Sxx(f)");
+
 		createElemtnsListViewContextMenu();		
 		createVerificationsDatesContextMenu();
+		
+		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+		this.mainAnchorPane.setMaxHeight(dim.height);
+		this.mainAnchorPane.setMaxWidth(dim.width);
 	}
 	
 	private void createElemtnsListViewContextMenu() {
@@ -163,11 +169,9 @@ public class DBEditController implements InfoRequestable {
 					DataBaseManager.getDB().BeginTransaction();
 					this.modDevice.includedElements.get(deletedElementIndex).deleteFromDB();
 					int currentModdeviceId = this.modDevice.getId();
-					this.modDevice = new Device(currentModdeviceId);
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-					
+					//refresh this device 
+					this.modDevice = new Device(currentModdeviceId);					
 					DataBaseManager.getDB().Commit();
-					this.modDevice.removeElement(deletedElementIndex);
 					this.elementsList.remove(deletedElementIndex);
 				}
 				catch(SQLException sqlExp) {
@@ -186,8 +190,7 @@ public class DBEditController implements InfoRequestable {
 				NewElementWindow elementWin = new NewElementWindow(elm);
 				elementWin.showAndWait();
 				int currentModdeviceId = this.modDevice.getId();
-				this.modDevice = new Device(currentModdeviceId);
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!							
+				this.modDevice = new Device(currentModdeviceId);							
 				this.verificationDateList.clear();
 				this.verifications = currentElement.getListOfVerifications();	
 				int nominalIndex = this.currentElement.getNominalId();
@@ -246,7 +249,9 @@ public class DBEditController implements InfoRequestable {
 	private void createVerificationsDatesContextMenu() {
 		verificationsDatesListViewContextMenu = new ContextMenu();
 		MenuItem deleteResultItem = new MenuItem("Удалить результат");
+		MenuItem setAsNominalResultItem = new MenuItem("Установить как номинал");
 		verificationsDatesListViewContextMenu.getItems().addAll(deleteResultItem);
+		verificationsDatesListViewContextMenu.getItems().addAll(setAsNominalResultItem);
 		
 		deleteResultItem.setOnAction(event -> {						
 			int resIndex = Integer.parseInt(verifications.get(currentDateIndex).get(0));
@@ -266,7 +271,29 @@ public class DBEditController implements InfoRequestable {
 				verifications.remove((int)currentDateIndex);
 				verificationDateList.remove((int)currentDateIndex);
 			} catch (SQLException sqlExp) {
+				sqlExp.printStackTrace();
 				AboutMessageWindow.createWindow("Ошибка", "Ошибка доступа к БД\nпри попытке удаления").show();
+			}
+		});
+		
+		setAsNominalResultItem.setOnAction(event -> {
+			int resIndex = Integer.parseInt(verifications.get(currentDateIndex).get(0));
+			if (resIndex == currentElement.getNominalId()) {
+				AboutMessageWindow.createWindow("Предупреждение", "Данные значения уже используются\nв качетве номинала").show();
+				return;
+			}
+			int answer = YesNoWindow.createYesNoWindow("Подтверждение", "Вы уверены, что хотите установить \nзначения измерений от\n" + verifications.get(currentDateIndex).get(1) + "\nв качестве номинальных?").showAndWait();
+			if (answer == 1) {
+				return;
+			}
+			MeasResult newNominal = null;
+			try {
+				newNominal = new MeasResult(modDevice.includedElements.get(currentElementIndex), resIndex);
+				newNominal.setNominalStatus();
+			} 
+			catch(SQLException sqlExp) {
+				sqlExp.printStackTrace();
+				AboutMessageWindow.createWindow("Ошибка", "Ошибка доступа к БД\nпри изменения номинала").show();
 			}
 		});
 		
@@ -319,11 +346,11 @@ public class DBEditController implements InfoRequestable {
 	@FXML
 	private void saveDeviceModificationBtnClick() {
 		HashMap<String, String> editingValues = new HashMap<String, String>();
-		editingValues.put("NameOfDevice", nameComboBox.getSelectionModel().getSelectedItem().toString()); 
-		editingValues.put("TypeOfDevice", typeTextField.getText());
-		editingValues.put("SerialNumber", serNumTextField.getText());
-		editingValues.put("Owner", ownerTextField.getText());
-		editingValues.put("GosNumber", gosNumTextField.getText());
+		editingValues.put("name", nameComboBox.getSelectionModel().getSelectedItem().toString()); 
+		editingValues.put("type", typeTextField.getText());
+		editingValues.put("serialNumber", serNumTextField.getText());
+		editingValues.put("owner", ownerTextField.getText());
+		editingValues.put("gosNumber", gosNumTextField.getText());
 		try {
 			DataBaseManager.getDB().BeginTransaction();
 			modDevice.editInfoInDB(editingValues);
@@ -402,7 +429,7 @@ public class DBEditController implements InfoRequestable {
 		}
 		currentDateIndex = verificationDateListView.getSelectionModel().getSelectedIndex();
 		try {
-			ArrayList<String> items = new ArrayList<String>();
+			List<String> items = new ArrayList<String>();
 			String path = new File(".").getAbsolutePath();
 			path += "\\files\\" + currentElement.getMeasUnit() + ".txt";
 			FileManager.LinesToItems(path, items);			
@@ -419,10 +446,6 @@ public class DBEditController implements InfoRequestable {
 				measUnitsList.add("S22");
 			}	
 			this.currentMeasUnitListView.setItems(measUnitsList);
-		}
-		
-		if (currentMeasUnitIndex != null) {
-			showResult();
 		}
 	}		
 	
@@ -474,28 +497,37 @@ public class DBEditController implements InfoRequestable {
 				dataModule.add(new XYChart.Data<Number, Number>(cFreq, cModule));
 				dataPhase.add(new XYChart.Data<Number, Number>(cFreq, cPhase));
 			}
-						
-			moduleSeries.setData(dataModule);
-			phaseSeries.setData(dataPhase);
-			moduleChart.getData().add(moduleSeries);
-			phaseChart.getData().add(phaseSeries);
-			moduleChart.setTitle("Модуль " + currentMeasUnitListView.getSelectionModel().getSelectedItem() + "(f)");
-			phaseChart.setTitle("Фаза " + currentMeasUnitListView.getSelectionModel().getSelectedItem() + "(f)");
-			
-			double upFreq = currentResult.freqs.get(currentResult.freqs.size() - 1);
-			double downFreq = currentResult.freqs.get(0);
-			moduleX.setUpperBound(upFreq);
-			phaseX.setUpperBound(upFreq);
-			moduleX.setLowerBound(downFreq);
-			phaseX.setLowerBound(downFreq);
-			
-			measInfoLabel.setText("Результаты измерения " + unit + " проведенного " + date + " для \"" + currentResult.getMyOwner().getType() + " " +
+			this.paintGraph(dataModule, dataPhase);		
+			this.measInfoLabel.setText("Результаты измерения " + unit + " проведенного " + date + " для \"" + currentResult.getMyOwner().getType() + " " +
 					currentResult.getMyOwner().getSerialNumber() + "\" ");
-			measInfoLabel2.setText("из состава \"" + currentResult.getMyOwner().getMyOwner().getName() + " " +
+			this.measInfoLabel2.setText("из состава \"" + currentResult.getMyOwner().getMyOwner().getName() + " " +
 					currentResult.getMyOwner().getMyOwner().getType() + " №" + currentResult.getMyOwner().getMyOwner().getSerialNumber() + "\".");
 		}
 		catch(SQLException sqlExp) {
 			AboutMessageWindow.createWindow("Ошибка", "Ошибка доступа к БД\nпри получении результатов измерения").show();
 		}
+	}
+	
+	private void paintGraph(ObservableList<Data<Number, Number>> dataModule, ObservableList<Data<Number, Number>> dataPhase) {
+		XYChart.Series<Number, Number> moduleSeries = new XYChart.Series<Number, Number>();
+		XYChart.Series<Number, Number> phaseSeries = new XYChart.Series<Number, Number>();
+		moduleSeries.setName("Значения модуля");
+		phaseSeries.setName("Значение фазы");
+
+		this.moduleChart.getData().clear();
+		this.phaseChart.getData().clear();
+		moduleSeries.setData(dataModule);
+		phaseSeries.setData(dataPhase);
+		this.moduleChart.getData().add(moduleSeries);
+		this.phaseChart.getData().add(phaseSeries);
+		this.moduleChart.setTitle("Модуль " + currentMeasUnitListView.getSelectionModel().getSelectedItem() + "(f)");
+		this.phaseChart.setTitle("Фаза " + currentMeasUnitListView.getSelectionModel().getSelectedItem() + "(f)");
+		
+		double upFreq = currentResult.freqs.get(currentResult.freqs.size() - 1);
+		double downFreq = currentResult.freqs.get(0);
+		this.moduleX.setUpperBound(upFreq);
+		this.phaseX.setUpperBound(upFreq);
+		this.moduleX.setLowerBound(downFreq);
+		this.phaseX.setLowerBound(downFreq);
 	}
 }

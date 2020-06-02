@@ -120,13 +120,13 @@ public class SearchDeviceController {
 	}
 		
 	private void setDeviceItems(){
-		String sqlQuery = "SELECT id, NameOfDevice, TypeOfDevice,  SerialNumber, Owner FROM [Devices]" + addFilters();
+		String sqlQuery = "SELECT id, name, type,  serialNumber, owner FROM [Devices]" + addFilters();
 		List<String> fieldName = new ArrayList<>();
 		fieldName.add("id");
-		fieldName.add("NameOfDevice");
-		fieldName.add("TypeOfDevice");
-		fieldName.add("SerialNumber");
-		fieldName.add("Owner");
+		fieldName.add("name");
+		fieldName.add("type");
+		fieldName.add("serialNumber");
+		fieldName.add("owner");
 		ObservableList<String> items = FXCollections.observableArrayList();
 		try {
 			DataBaseManager.getDB().sqlQueryString(sqlQuery, fieldName, listOfDevicesInfo);
@@ -167,10 +167,10 @@ public class SearchDeviceController {
 	}
 	
 	private void setTypesItems(){
-		String sqlQuery = "SELECT DISTINCT TypeOfDevice FROM Devices";
+		String sqlQuery = "SELECT DISTINCT type FROM Devices";
 		ObservableList<String> listOfTypes = FXCollections.observableArrayList();
 		try {
-			DataBaseManager.getDB().sqlQueryString(sqlQuery, "TypeOfDevice", listOfTypes);
+			DataBaseManager.getDB().sqlQueryString(sqlQuery, "type", listOfTypes);
 			listOfTypes.add("");
 			typeComboBox.setItems(listOfTypes);			
 		}
@@ -184,27 +184,16 @@ public class SearchDeviceController {
 		if (this.filterType.length()!=0 || this.filterName.length()!=0 || this.filterSerNum.length()!=0 || 
 				this.filterOwner.length()!=0 || this.filterGosNum.length()!=0) {
 			filterString += " WHERE";
-			if (this.filterType.length()!=0) filterString += " TypeOfDevice LIKE '%" + filterType + "%' AND";
-			if (this.filterName.length()!=0) filterString += " NameOfDevice LIKE '%" + filterName + "%' AND";
-			if (this.filterSerNum.length()!=0) filterString += " SerialNumber LIKE '%" + filterSerNum + "%' AND";
-			if (this.filterOwner.length()!=0) filterString += " Owner LIKE '%" + filterOwner + "%' AND";
-			if (this.filterGosNum.length()!=0) filterString += " GosNumber LIKE '%" + filterGosNum + "%' AND";
+			if (this.filterType.length()!=0) filterString += " type LIKE '%" + filterType + "%' AND";
+			if (this.filterName.length()!=0) filterString += " name LIKE '%" + filterName + "%' AND";
+			if (this.filterSerNum.length()!=0) filterString += " serialNumber LIKE '%" + filterSerNum + "%' AND";
+			if (this.filterOwner.length()!=0) filterString += " owner LIKE '%" + filterOwner + "%' AND";
+			if (this.filterGosNum.length()!=0) filterString += " gosNumber LIKE '%" + filterGosNum + "%' AND";
 			int lastAnd = filterString.lastIndexOf("AND");
 			filterString = filterString.substring(0, lastAnd);
 			filterString.trim();
 		}
 		return filterString;
 	}
-/*	
-    private javafx.event.EventHandler<WindowEvent> closeEventHandler = new javafx.event.EventHandler<WindowEvent>() {
-        @Override
-        public void handle(WindowEvent event) {
-        	SearchDeviceWindow.deleteWindow();
-        }
-    };
-
-    public javafx.event.EventHandler<WindowEvent> getCloseEventHandler(){
-    	return closeEventHandler;
-    }
-*/		
+		
 }

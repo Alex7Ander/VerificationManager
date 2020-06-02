@@ -19,6 +19,7 @@ import StartVerificationPack.StartVerificationController;
 import StartVerificationPack.StartVerificationWindow;
 import ToleranceParamPack.ParametrsPack.MeasUnitPart;
 import ToleranceParamPack.ParametrsPack.S_Parametr;
+import ToleranceParamPack.ParametrsPack.ToleranceParametrs;
 import VerificationPack.MeasResult;
 import VerificationPack.VerificationProcedure;
 import YesNoDialogPack.YesNoWindow;
@@ -81,14 +82,14 @@ public class VerificationController implements InfoRequestable {
 	
 	@FXML
 	private void initialize(){			
-		listOfElements = FXCollections.observableArrayList();
-		listOfParametrs = FXCollections.observableArrayList();		
-		verificationResult = new ArrayList<MeasResult>();
-		currentElementIndex = 0;
-		currentParamIndex = 0;		   		
-		resultTable = new VerificationTable(tablePane);
-		resultSaved = true;
-		saveBtn.setDisable(true);
+		this.listOfElements = FXCollections.observableArrayList();
+		this.listOfParametrs = FXCollections.observableArrayList();		
+		this.verificationResult = new ArrayList<MeasResult>();
+		this.currentElementIndex = 0;
+		this.currentParamIndex = 0;		   		
+		this.resultTable = new VerificationTable(tablePane);
+		this.resultSaved = true;
+		this.saveBtn.setDisable(true);
 	}
 	
 	@FXML
@@ -144,12 +145,37 @@ public class VerificationController implements InfoRequestable {
 	}
 	public void createProtocol(String[] docTypes) throws IOException {
 		this.verification.setDeviceInformation(this.verificatedDevice);
-		ProtocolCreateWindow.getProtocolCreateWindow(docTypes, verificationResult, this.verification).show();
-	}
-//Изменить занчение в комбобоксе со списком элементов	
-	@FXML
-	private void elementComboBoxChange() {
 		
+		List<MeasResult> nominals = new ArrayList<>();
+		List<ToleranceParametrs> protocoledModuleToleranceParams = new ArrayList<>(); //Вносимые в протокол параметры пригодности
+		List<ToleranceParametrs> protocoledPhaseToleranceParams = new ArrayList<>();
+		for (Element elm : this.verificatedDevice.includedElements) {
+			nominals.add(elm.getNominal());
+			if (this.verification.isPrimary()) {
+				protocoledModuleToleranceParams.add(
+						this.verificationResult.get(this.currentElementIndex).getMyOwner().getPrimaryModuleToleranceParams());
+				protocoledPhaseToleranceParams.add(
+						this.verificationResult.get(this.currentElementIndex).getMyOwner().getPrimaryPhaseToleranceParams());	
+			}
+			else {
+				protocoledModuleToleranceParams.add(
+						this.verificationResult.get(this.currentElementIndex).getMyOwner().getPeriodicModuleToleranceParams());
+				protocoledPhaseToleranceParams.add(
+						this.verificationResult.get(this.currentElementIndex).getMyOwner().getPeriodicPhaseToleranceParams());
+			}
+		}
+
+		ProtocolCreateWindow.getProtocolCreateWindow(docTypes, 
+													this.verificationResult, 
+													nominals, 
+													protocoledModuleToleranceParams, 
+													protocoledPhaseToleranceParams,
+													this.verification).show();
+	}
+	
+	//Изменить занчение в комбобоксе со списком элементов	
+	@FXML
+	private void elementComboBoxChange() {		
 		//Получим индекс отображаемого элемента
 		currentElementIndex = this.elementComboBox.getSelectionModel().getSelectedIndex();
 		
@@ -183,8 +209,8 @@ public class VerificationController implements InfoRequestable {
 //Изменить значение в комбобоксе с параметрами	
 	@FXML
 	private void parametrComboBoxChange() {
-		currentParamIndex = parametrComboBox.getSelectionModel().getSelectedIndex(); 
-		if (currentParamIndex != -1) {
+		this.currentParamIndex = this.parametrComboBox.getSelectionModel().getSelectedIndex(); 
+		if (this.currentParamIndex != -1) {
 			fillTable();			
 		}
 	}
@@ -192,11 +218,11 @@ public class VerificationController implements InfoRequestable {
 	public void StartVerification() throws IOException {
 		String absPath = new File(".").getAbsolutePath();
 		//Получение информации об окружающей среде
-		verification = new VerificationProcedure();
-		verification.setPrimaryInformation((StartVerificationController)StartVerificationWindow.getStartVerificationWindow().getControllerClass());
+		this.verification = new VerificationProcedure();
+		this.verification.setPrimaryInformation((StartVerificationController)StartVerificationWindow.getStartVerificationWindow().getControllerClass());
 		//Создание файла psi.ini
 		String psiFilePath = absPath + "\\measurement\\PSI.ini";
-		verificatedDevice.createIniFile(psiFilePath);
+		this.verificatedDevice.createIniFile(psiFilePath);
 		//Запуск программы measurement
 		File file = new File(absPath + "\\measurement\\Project1.exe");
 		Desktop.getDesktop().open(file);				
@@ -212,52 +238,134 @@ public class VerificationController implements InfoRequestable {
 			}
 		}
 
-		List<Double> fr = verificationResult.get(currentElementIndex).freqs;
+		List<Double> fr = this.verificationResult.get(this.currentElementIndex).freqs;
 		int countOfFreq = fr.size();
-		if (resultTable.getRowCount() < countOfFreq) {
-			while (resultTable.getRowCount() != countOfFreq) 
-				resultTable.addRow();
+		if (this.resultTable.getRowCount() < countOfFreq) {
+			while (this.resultTable.getRowCount() != countOfFreq) 
+				this.resultTable.addRow();
 		}
-		else if (resultTable.getRowCount() > countOfFreq) {
-			while (resultTable.getRowCount() != countOfFreq) 
-				resultTable.deleteRow(this.resultTable.getRowCount());
+		else if (this.resultTable.getRowCount() > countOfFreq) {
+			while (this.resultTable.getRowCount() != countOfFreq) 
+				this.resultTable.deleteRow(this.resultTable.getRowCount());
 		}
 
-		resultTable.setColumnFromDouble(0, fr);
-		List<Double> column1 = Adapter.MapToArrayList(this.verificationResult.get(currentElementIndex).values.get(keys.get(currentParamIndex*4)));
-		resultTable.setColumnFromDouble(1, column1);
-		List<Double> column2 = Adapter.MapToArrayList(this.verificationResult.get(currentElementIndex).values.get(keys.get(1 + currentParamIndex*4)));
-		resultTable.setColumnFromDouble(2, column2);
-		List<Double> column4 = Adapter.MapToArrayList(this.verificationResult.get(currentElementIndex).values.get(keys.get(2 + currentParamIndex*4)));
-		resultTable.setColumnFromDouble(4, column4);
-		List<Double> column5 = Adapter.MapToArrayList(this.verificationResult.get(currentElementIndex).values.get(keys.get(3 + currentParamIndex*4)));
-		resultTable.setColumnFromDouble(5, column5);
-		List<String> column3 = Adapter.MapToArrayList(this.verificationResult.get(currentElementIndex).suitabilityDecision.get(keys.get(currentParamIndex)));
-		resultTable.setColumn(3, column3);
-		List<String> column6 = Adapter.MapToArrayList(this.verificationResult.get(currentElementIndex).suitabilityDecision.get(keys.get(2 + currentParamIndex)));
-		resultTable.setColumn(6, column6);
-		
-		//set table column headers
-		String newPhaseErrorHeader = null;
-		if (verificatedDevice.includedElements.get(currentElementIndex).getPhaseToleranceType().equals("percent")) {
-			newPhaseErrorHeader = "Погрешность, %";
-		} 
-		else {
-			newPhaseErrorHeader = "Погрешность, \u00B0";
+		//Параметры годности прибора, который будут указываться в таблице
+		MeasResult nominals = this.verificationResult.get(this.currentElementIndex).getMyOwner().getNominal();
+		ToleranceParametrs representableModuleToleranceParams = null;
+		ToleranceParametrs representablePhaseToleranceParams = null;
+		if (this.verification.isPrimary()) {
+			representableModuleToleranceParams = this.verificationResult.get(this.currentElementIndex).getMyOwner().getPrimaryModuleToleranceParams();
+			representablePhaseToleranceParams = this.verificationResult.get(this.currentElementIndex).getMyOwner().getPrimaryPhaseToleranceParams();	
 		}
-		resultTable.setHead(5, newPhaseErrorHeader);
-		
-		String newModuleErrorHeader = null;
-		if (verificatedDevice.includedElements.get(currentElementIndex).getModuleToleranceType().equals("percent")) {
-			newModuleErrorHeader = "Погрешность, %";
-		} 
 		else {
-			newModuleErrorHeader = "Погрешность";
+			representableModuleToleranceParams = this.verificationResult.get(this.currentElementIndex).getMyOwner().getPeriodicModuleToleranceParams();
+			representablePhaseToleranceParams = this.verificationResult.get(this.currentElementIndex).getMyOwner().getPeriodicPhaseToleranceParams();
 		}
-		resultTable.setHead(2, newModuleErrorHeader);
 		
+		//Вносим частоты в таблицу
+		this.resultTable.setColumnFromDouble(0, fr);
+		
+		//Измеренный значения модуля
+		List<Double> column1 = Adapter.MapToArrayList(
+				this.verificationResult.get(this.currentElementIndex).values.get(keys.get(this.currentParamIndex*4)));
+		this.resultTable.setColumnFromDouble(1, column1);
+		
+		//Значения предыдущей поверки
+		List<String> column2 = new ArrayList<>();
+		for (double currentFreq : this.verificationResult.get(currentElementIndex).freqs) {
+			String currentKey = keys.get(this.currentParamIndex*4); 
+			String text = Double.toString(nominals.values.get(currentKey).get(currentFreq));
+			column2.add(text);
+		}		
+		this.resultTable.setColumn(2, column2);
+		
+		//Допуск на КСВН/Г
+		List<String> column3 = new ArrayList<>();
+		for (double currentFreq : this.verificationResult.get(currentElementIndex).freqs) {
+			String currentKey = keys.get(this.currentParamIndex*4); 
+			String text = Double.toString(
+					representableModuleToleranceParams.values.get("DOWN_" + currentKey).get(currentFreq));
+			text += "/";
+			text += representableModuleToleranceParams.values.get("UP_" +  currentKey).get(currentFreq);
+			column3.add(text);
+		}
+		this.resultTable.setColumn(3, column3);
+		
+		//Погрешность измерения модуля
+		List<Double> column4 = Adapter.MapToArrayList(
+				this.verificationResult.get(this.currentElementIndex).values.get(keys.get(1 + this.currentParamIndex*4)));
+		this.resultTable.setColumnFromDouble(4, column4);
+		
+		//Решение годности по модолю
+		List<String> column5 = Adapter.MapToArrayList(
+				this.verificationResult.get(this.currentElementIndex).suitabilityDecision.get(keys.get(this.currentParamIndex)));
+		this.resultTable.setColumn(5, column5);
+						
+		//Измеренные значения фазы
+		List<Double> column6 = Adapter.MapToArrayList(
+				this.verificationResult.get(this.currentElementIndex).values.get(keys.get(2 + this.currentParamIndex*4)));
+		this.resultTable.setColumnFromDouble(6, column6);
+		
+		//Значения предыдущей поверки
+		List<String> column7 = new ArrayList<>();
+		for (double currentFreq : this.verificationResult.get(currentElementIndex).freqs) {
+			String currentKey = keys.get(2 + this.currentParamIndex*4);
+			String text = Double.toString(nominals.values.get(currentKey).get(currentFreq));
+			column7.add(text);
+		}
+		this.resultTable.setColumn(7, column7);
+		
+		//Допуск по фазе
+		List<String> column8 = new ArrayList<>();
+		for (double currentFreq : this.verificationResult.get(currentElementIndex).freqs) {
+			String currentKey = keys.get(2 + this.currentParamIndex*4);
+			String text = Double.toString(
+					representablePhaseToleranceParams.values.get("DOWN_" + currentKey).get(currentFreq));
+			text += "/";
+			text += representablePhaseToleranceParams.values.get("UP_" + currentKey).get(currentFreq);
+			column8.add(text);
+		}
+		this.resultTable.setColumn(8, column8);
+		
+		//Погрешность измерения фазы
+		List<Double> column9 = Adapter.MapToArrayList(
+				this.verificationResult.get(this.currentElementIndex).values.get(keys.get(3 + this.currentParamIndex*4)));
+		this.resultTable.setColumnFromDouble(9, column9);
+				
+		//Решения годности по фазе
+		List<String> column10 = Adapter.MapToArrayList(
+				this.verificationResult.get(this.currentElementIndex).suitabilityDecision.get(keys.get(2 + this.currentParamIndex)));
+		this.resultTable.setColumn(10, column10);
+		
+		//Переписываем заголовки у таблицы для столбцов с допуском и погрешностью измерения
+		//для модуля
 		String newModuleResHeader = parametrComboBox.getSelectionModel().getSelectedItem();
-		resultTable.setHead(1, newModuleResHeader);
+				
+		String newModuleToleranceHeader = null;
+		String newModuleErrorHeader = null;	
+		
+		if (this.verificatedDevice.includedElements.get(currentElementIndex).getModuleToleranceType().equals("percent"))
+			newModuleToleranceHeader = "Допуск, %";					 
+		else 
+			newModuleToleranceHeader = "Допуск";			
+		
+		if(newModuleResHeader.contains("КСВН")) 
+			newModuleErrorHeader = "Погрешность, %";
+		else 
+			newModuleErrorHeader = "Погрешность";
+		
+		this.resultTable.setHead(1, newModuleResHeader);
+		this.resultTable.setHead(2, "Пред. пов.\n" + newModuleResHeader);
+		this.resultTable.setHead(3, newModuleToleranceHeader);
+		this.resultTable.setHead(4, newModuleErrorHeader);
+		//а теперь для фазы		
+		String newPhaseToleranceHeader = null;
+		if (this.verificatedDevice.includedElements.get(this.currentElementIndex).getPhaseToleranceType().equals("percent"))
+			newPhaseToleranceHeader = "Допуск, % (номинал)";
+		else
+			newPhaseToleranceHeader = "Допуск, \u00B0";
+		this.resultTable.setHead(8, newPhaseToleranceHeader);
+		this.resultTable.setHead(9, "Погрешность, \u00B0");
 	}	
 //---------------------------	
 	@FXML
@@ -282,8 +390,7 @@ public class VerificationController implements InfoRequestable {
 				else {
 					verificatedDevice.includedElements.get(i).getPeriodicModuleToleranceParams().checkResult(rs);
 					verificatedDevice.includedElements.get(i).getPeriodicPhaseToleranceParams().checkResult(rs);
-				}
-				
+				}				
 				elementComboBox.setValue(listOfElements.get(0));
 				parametrComboBox.setValue(listOfParametrs.get(0));
 			}
@@ -328,13 +435,15 @@ public class VerificationController implements InfoRequestable {
 		
 	//Закрыть	
 	@FXML
-	private void closeBtnClick(ActionEvent event) {			
+	private void closeBtnClick(ActionEvent event) {		
+		/*
 		if (!resultIsSaved()) {
 			int answer = YesNoWindow.createYesNoWindow("Результаты поверки не сохранены", "Результаты поверки не сохранениы в БД.\nВы уверены что хотите завершить поверку\nбез сохранения результатов?").showAndWait();
 			if (answer == 1) {
 				return;
 			}
 		}	
+		*/
 		myStage.close();
 	}
 		

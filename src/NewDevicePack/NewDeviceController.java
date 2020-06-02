@@ -54,9 +54,7 @@ public class NewDeviceController  {
 	
 	//Сохраняемыый прибор
 	private Device newDevice;
-	//Составные элементы данного прибора
-	//private ArrayList<Element> elements;
-	
+
 	public List<NewElementWindow> elementsWindow;
 	public List<Button> elementsButton;
 	
@@ -141,17 +139,31 @@ public class NewDeviceController  {
 			}
 		}
 		catch (SQLException sqlExp) {
-			AboutMessageWindow.createWindow("Ошибка", "Не удалось проверить наличие подобного Си в БД.\nВозможно, база данных отсутствует или повреждена").show();
+			AboutMessageWindow.createWindow("Ошибка", "Не удалось проверить наличие Си в БД.\nВозможно, база данных отсутствует\nили повреждена").show();
 			return;
 		}
 		
-		//Create elements
-		int notInitializedElementsCount = 0;		
+		//Создаем элементы (нагрузки) для данного прибора		
 		for (int i = 0; i < this.elementsWindow.size(); i++) {			
 			NewElementController ctrl = (NewElementController)this.elementsWindow.get(i).getControllerClass();
 			Element elm = new Element(ctrl); 
 			newDevice.addElement(elm);	
-		}		
+		}			
+		//проверяем серийный номера у нагрузок
+		for (int i=0; i<newDevice.includedElements.size(); i++) {
+			Element elm = newDevice.includedElements.get(i);
+			for(int j=i+1; j<newDevice.includedElements.size(); j++) {
+				Element otherElm = newDevice.includedElements.get(j);
+				if(elm.getSerialNumber().equals(otherElm.getSerialNumber())) {
+					AboutMessageWindow.createWindow("Ошибка", "У 2-х или более составных элементов\n"
+																+ "одинаковые серийный номера.\n"
+																+ "Проверьте указанные Вами данные\n"
+																+ "и повторите попытку.").show();
+					return;
+				}
+			}
+		}
+		
 		//и наконец, пробуем сохранить все в БД
 		try{
 			DataBaseManager.getDB().BeginTransaction();

@@ -18,6 +18,18 @@ public class VerificationWindow extends guiWindow{
 				if (answer == 1) {
 					event.consume();
 				}
+				else {
+					delete();
+				}
+			}
+			else {
+				int answer = YesNoWindow.createYesNoWindow("Завершить?", "Завершить процедуру поверки?").showAndWait();
+				if (answer == 1) {
+					event.consume();
+				}
+				else {
+					delete();
+				}
 			}
 		});
 	}
@@ -31,6 +43,10 @@ public class VerificationWindow extends guiWindow{
 	
 	public VerificationController getController() {
 		return this.loader.getController();
+	}
+	
+	public void delete() {
+		instanceVerificationWindow = null;
 	}
 	
 }

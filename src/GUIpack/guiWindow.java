@@ -17,28 +17,27 @@ public class guiWindow {
 	protected FXMLLoader loader;
 	
 	protected guiWindow(String titleText, String FXMLFile) throws IOException {
-		title = titleText; 
-		fxmlFile = FXMLFile;
-		loader = new FXMLLoader(getClass().getResource(fxmlFile));	
-		root = loader.load();
-		scene = new Scene(root);
-		stage = new Stage();
-		stage.setScene(scene);
-		stage.setResizable(false);
-		stage.setTitle(title);		
+		this.title = titleText; 
+		this.fxmlFile = FXMLFile;
+		this.loader = new FXMLLoader(getClass().getResource(fxmlFile));	
+		this.root = loader.load();
+		this.scene = new Scene(root);
+		this.stage = new Stage();
+		this.stage.setScene(scene);
+		this.stage.setResizable(false);
+		this.stage.setTitle(title);		
 	}
 	
 	public void show() {
-		stage.show();
+		this.stage.show();
 	}
 	
 	public void close() {
-		stage.close();
+		this.stage.close();
 	}
 	
 	public Object getControllerClass() {
 		return this.loader.getController();
 	}
 	
-
 }

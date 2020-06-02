@@ -14,6 +14,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="666.0" prefWidth="1209.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="NewElementPack.NewElementController">
    <children>
@@ -57,7 +58,7 @@
                      <children>
                         <VBox prefHeight="200.0" prefWidth="120.0">
                            <children>
-                              <Button fx:id="randomValuesBtn" mnemonicParsing="false" onAction="#setRandomValues" prefHeight="25.0" prefWidth="122.0" text="Button" />
+                              <Button fx:id="randomValuesBtn" disable="true" mnemonicParsing="false" onAction="#setRandomValues" opacity="0.26" prefHeight="56.0" prefWidth="120.0" />
                            </children></VBox>
                         <VBox prefHeight="200.0" prefWidth="117.0">
                            <children>
@@ -133,6 +134,18 @@
                         </VBox>
                      </children>
                   </HBox>
+                  <AnchorPane prefHeight="45.0" prefWidth="875.0">
+                     <children>
+                        <Label text="ВНИМАНИЕ! Значения нижнего допуска вносятся с учетом знака" underline="true">
+                           <font>
+                              <Font name="System Bold Italic" size="16.0" />
+                           </font>
+                           <opaqueInsets>
+                              <Insets left="5.0" />
+                           </opaqueInsets>
+                        </Label>
+                     </children>
+                  </AnchorPane>
                   <StackPane fx:id="tablesStack" prefHeight="517.0" prefWidth="873.0">
                      <children>
                         <ScrollPane fx:id="primaryScrollPane" prefHeight="514.0" prefWidth="869.0">

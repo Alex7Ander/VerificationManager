@@ -18,6 +18,7 @@ public class VerificationProcedure {
 //Device Information
 	private String deviceMainInfo;
 	private String deviceSerNumber;
+	private int deviceId;
 	private ArrayList<String> elementsMainInfo;
 	
 //Finally information:
@@ -52,6 +53,9 @@ public class VerificationProcedure {
 	}
 	public String getDeviceSerNumber() {
 		return deviceSerNumber;
+	}
+	public int getDeviceId() {
+		return deviceId;
 	}
 	public String getElementInfo(int index) {
 		return elementsMainInfo.get(index);
@@ -111,35 +115,36 @@ public class VerificationProcedure {
 	}
 
 	public void setPrimaryInformation(StartVerificationController verCtrl) {
-		verificationTimeType = verCtrl.getVerificationiTimeType();
-		strTemperature = verCtrl.getStrTemperatur();
-		strAirHumidity = verCtrl.getStrAirHumidity();
-		strAtmPreasure = verCtrl.getStrAtmPreasure();
+		this.verificationTimeType = verCtrl.getVerificationiTimeType();
+		this.strTemperature = verCtrl.getStrTemperatur();
+		this.strAirHumidity = verCtrl.getStrAirHumidity();
+		this.strAtmPreasure = verCtrl.getStrAtmPreasure();
 	}
 	
 	public void setDeviceInformation(Device device) {
-		deviceMainInfo = device.getName() + " " + device.getType();
-		deviceSerNumber = device.getSerialNumber();
-		elementsMainInfo = new ArrayList<String>();
+		this.deviceId = device.getId();
+		this.deviceMainInfo = device.getName() + " " + device.getType();
+		this.deviceSerNumber = device.getSerialNumber();
+		this.elementsMainInfo = new ArrayList<String>();
 		for (Element elm : device.includedElements) {
 			String item = elm.getType() + elm.getSerialNumber();
-			elementsMainInfo.add(item);
+			this.elementsMainInfo.add(item);
 		}
-		deviceOwner = device.getOwner();
+		this.deviceOwner = device.getOwner();
 	}
 	
 	public void setFinallyInformation(ProtocolCreateController prtCreateCtrl) {
-		bossName   = prtCreateCtrl.getBossName();
-		bossStatus = prtCreateCtrl.getBossStatus();
-		workerName = prtCreateCtrl.getWorkerName();
-		decision   = prtCreateCtrl.getResultDecision();	
-		protocolNumber = prtCreateCtrl.getProtocolNumber();
-		documentNumber = prtCreateCtrl.getDocumentNumber();	
-		etalonString = prtCreateCtrl.getEtalonString();
-		docType = prtCreateCtrl.getDocType();
-		dateOfCreation = prtCreateCtrl.getDateOfCreation();
-		finishDate = "Годен до " + prtCreateCtrl.getFinishDate();
-		militaryBaseName = prtCreateCtrl.getMilitryBaseName();
+		this.bossName   = prtCreateCtrl.getBossName();
+		this.bossStatus = prtCreateCtrl.getBossStatus();
+		this.workerName = prtCreateCtrl.getWorkerName();
+		this.decision   = prtCreateCtrl.getResultDecision();	
+		this.protocolNumber = prtCreateCtrl.getProtocolNumber();
+		this.documentNumber = prtCreateCtrl.getDocumentNumber();	
+		this.etalonString = prtCreateCtrl.getEtalonString();
+		this.docType = prtCreateCtrl.getDocType();
+		this.dateOfCreation = prtCreateCtrl.getDateOfCreation();
+		this.finishDate = "Годен до " + prtCreateCtrl.getFinishDate();
+		this.militaryBaseName = prtCreateCtrl.getMilitryBaseName();
 	}
 	
 }

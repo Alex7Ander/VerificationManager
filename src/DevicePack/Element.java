@@ -2,7 +2,6 @@ package DevicePack;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -136,16 +135,15 @@ public class Element implements Includable<Device>, dbStorable{
 		System.out.println("\nБерем информацию на элемент с id = " + index);
 		this.id = index;
 		this.myDevice = deviceOwner;
-		String elementTableName = myDevice.getElementsTableName();
-		String sqlQuery = "SELECT ElementType, ElementSerNumber, PoleCount, MeasUnit, ModuleToleranceType, PhaseToleranceType, NominalId FROM [Elements] WHERE id='"+index+"'";
+		String sqlQuery = "SELECT type, serNumber, poleCount, measUnit, moduleToleranceType, phaseToleranceType, nominalId FROM [Elements] WHERE id='"+index+"'";
 		ArrayList<String> fieldName = new ArrayList<String>();
-		fieldName.add("ElementType");				
-		fieldName.add("ElementSerNumber");			
-		fieldName.add("PoleCount");					
-		fieldName.add("MeasUnit");					
-		fieldName.add("ModuleToleranceType");		
-		fieldName.add("PhaseToleranceType");		
-		fieldName.add("NominalId");
+		fieldName.add("type");				
+		fieldName.add("serNumber");			
+		fieldName.add("poleCount");					
+		fieldName.add("measUnit");					
+		fieldName.add("moduleToleranceType");		
+		fieldName.add("phaseToleranceType");		
+		fieldName.add("nominalId");
 		List<List<String>> arrayResults = new ArrayList<List<String>>();
 		System.out.println(sqlQuery);
 		DataBaseManager.getDB().sqlQueryString(sqlQuery, fieldName, arrayResults);
@@ -249,12 +247,12 @@ public class Element implements Includable<Device>, dbStorable{
 			throw new NoOwnerException(this);
 		}			
 		String sqlQuery = "INSERT INTO [Elements] (DeviceId, "
-				+ "ElementType, " 				
-				+ "ElementSerNumber, "  	
-				+ "PoleCount, "					
-				+ "MeasUnit, "					
-				+ "ModuleToleranceType, "		
-				+ "PhaseToleranceType) VALUES ("		
+				+ "type, " 				
+				+ "serNumber, "  	
+				+ "poleCount, "					
+				+ "measUnit, "					
+				+ "moduleToleranceType, "		
+				+ "phaseToleranceType) VALUES ("		
 					+ this.myDevice.getId() + ",'"
 					+ type + "','" 												
 					+ serialNumber + "','" 										
@@ -266,16 +264,11 @@ public class Element implements Includable<Device>, dbStorable{
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
 		
 		//Getting id
-		sqlQuery = "SELECT id FROM [Elements] WHERE ElementType='" + type + "' AND  ElementSerNumber='" + serialNumber + "' AND DeviceId='" + this.myDevice.getId() + "'";
+		sqlQuery = "SELECT id FROM [Elements] WHERE type='" + type + "' AND  serNumber='" + serialNumber + "' AND deviceId='" + this.myDevice.getId() + "'";
 		System.out.println("Получаем id сохраненного элемента запросом:\n" + sqlQuery);
 		this.id = DataBaseManager.getDB().sqlQueryCount(sqlQuery);
 		System.out.println("id = " + this.id);
-		/*
-		String identStr = id + "_" + (new Date().toString());
-		sqlQuery = "INSERT INTO [Tolerance_params] (ElementId) VALUES (" + this.id + ")";
-		System.out.println("Вносим информацию о таблицах, в которых будут содаржаться критерии пригодности запросом:\n" + sqlQuery);
-		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
-		*/
+
 		//Nominal saving
 		System.out.println("\nНачинаем сохранение номиналов");
 		this.nominal.saveInDB();
@@ -294,27 +287,12 @@ public class Element implements Includable<Device>, dbStorable{
 	public void deleteFromDB() throws SQLException {
 		String sqlString = "DELETE FROM [Elements] WHERE id=" + this.id + "";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlString);
-		
-		/*
-		this.nominal.deleteFromDB();
-		this.primaryModuleToleranceParams.deleteFromDB();
-		this.primaryPhaseToleranceParams.deleteFromDB();
-		this.periodicModuleToleranceParams.deleteFromDB();
-		this.periodicPhaseToleranceParams.deleteFromDB();		
-		String sqlString = "DROP TABLE [" + listOfVerificationsTable + "]";
-		DataBaseManager.getDB().sqlQueryUpdate(sqlString);
-		sqlString = "DELETE FROM [" + myDevice.getElementsTableName() + "] WHERE ElementType='" + type + "' AND ElementSerNumber='" + serialNumber + "'";
-		DataBaseManager.getDB().sqlQueryUpdate(sqlString);
-		int val = myDevice.getCountOfElements();
-		--val;
-		sqlString = "UPDATE [Devices] SET CountOfElements = '" + Integer.toString(val) + "' WHERE NameOfDevice='" + myDevice.getName()
-		+"' AND TypeOfDevice='" + myDevice.getType() + "' AND SerialNumber='" + myDevice.getSerialNumber() + "'";
-		DataBaseManager.getDB().sqlQueryUpdate(sqlString);	
-		*/	
+		this.myDevice.removeElement(this);
 	}
 	
 	@Override
 	public void editInfoInDB(HashMap<String, String> editingValues) throws SQLException {
+		/*
 		String tableName = this.myDevice.getElementsTableName();
 		String sqlQuery = "UPDATE " + tableName + " SET ";
 		int count = 1;
@@ -330,9 +308,11 @@ public class Element implements Includable<Device>, dbStorable{
 		}
 		sqlQuery += "WHERE ElementType='"+this.type+"' AND ElementSerNumber='"+this.serialNumber+"'";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);	
+		*/
 	}
 	
 	public void rewriteTableNames() throws SQLException {
+		/*
 		//First of all we must rewrite table names for results of measurements		
 		List<String> measIndices = new ArrayList<String>();
 		String sqlQuery = "SELECT id FROM [" + listOfVerificationsTable + "]";
@@ -355,6 +335,7 @@ public class Element implements Includable<Device>, dbStorable{
 		primaryPhaseToleranceParams.rewriteTableNames();
 		periodicModuleToleranceParams.rewriteTableNames();
 		periodicPhaseToleranceParams.rewriteTableNames();	
+		*/
 	}
 	
 	public void rewriteParams(ToleranceParametrs newModulePrimaryParams, ToleranceParametrs newModulePeriodicParams,

@@ -1,0 +1,14 @@
+fileName
+docType
+verificationType
+militaryBaseName
+number
+deviceName
+textEtalon
+deviceSerNumber
+deviceOwnerName
+workerName
+bossName
+reason
+dateOfCreation
+finishDate

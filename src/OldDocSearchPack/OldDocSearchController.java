@@ -62,22 +62,22 @@ public class OldDocSearchController implements InfoRequestable {
 	
 	@FXML
 	private void initialize() {	
-		checkDevice = null;		
-		docTypeGroup = new ToggleGroup();
-		gDocRB.setSelected(true);
-		gDocRB.setToggleGroup(docTypeGroup);
-		bDocBtn.setToggleGroup(docTypeGroup);
-		typeOfDoc = "Certificate";		
-		listOfVerifications = FXCollections.observableArrayList();
-		resultOfSearch = new ArrayList<List<String>>();		
+		this.checkDevice = null;		
+		this.docTypeGroup = new ToggleGroup();
+		this.gDocRB.setSelected(true);
+		this.gDocRB.setToggleGroup(docTypeGroup);
+		this.bDocBtn.setToggleGroup(docTypeGroup);
+		this.typeOfDoc = "Certificate";		
+		this.listOfVerifications = FXCollections.observableArrayList();
+		this.resultOfSearch = new ArrayList<List<String>>();		
 		setVerificationItems();
 	}
 	
 	@FXML
 	private void deviceSearchTBClick() {
 		if(!deviceSearchTB.isSelected()) {
-			checkDevice = null;
-			deviceSearchTB.setText("Выбор средства измерения");
+			this.checkDevice = null;
+			this.deviceSearchTB.setText("Выбор средства измерения");
 		}
 		else {
 			SearchDeviceWindow.getSearchDeviceWindow(checkDevice, this).show();
@@ -86,12 +86,12 @@ public class OldDocSearchController implements InfoRequestable {
 	
 	@FXML
 	private void gDocRBClick() {
-		 typeOfDoc = "Certificate";
+		this.typeOfDoc = "Certificate";
 	}
 	
 	@FXML
 	private void bDocRBClick() {
-		typeOfDoc = "Notice";
+		this.typeOfDoc = "Notice";
 	}
 	
 	@FXML
@@ -119,59 +119,55 @@ public class OldDocSearchController implements InfoRequestable {
 //InfoRequestable
 	@Override
 	public void setDevice(Device device) {
-		checkDevice = device;	
+		this.checkDevice = device;	
 		if (checkDevice == null) {
-			deviceSearchTB.setSelected(false);
+			this.deviceSearchTB.setSelected(false);
 		}
 	}
 	@Override
 	public void representRequestedInfo() {
 		String caption = checkDevice.getName() + " " + checkDevice.getType() + " пїЅ" + checkDevice.getSerialNumber();
-		deviceSearchTB.setText(caption);		
+		this.deviceSearchTB.setText(caption);		
 	}
 	
 	private void setVerificationItems() {
-		listOfVerifications.clear();
+		this.listOfVerifications.clear();
 		LocalDate lcFrom = fromDTP.getValue();
 		if (lcFrom != null) {
-			from = Date.from(lcFrom.atStartOfDay(ZoneId.systemDefault()).toInstant());	
+			this.from = Date.from(lcFrom.atStartOfDay(ZoneId.systemDefault()).toInstant());
 		}
 		else {
-			from = new Date(1);
+			this.from = new Date(1);
 		}
 				 
-		LocalDate lcTill = tillDTP.getValue();
+		LocalDate lcTill = this.tillDTP.getValue();
 		if (lcTill != null) { 
-			till = Date.from(lcTill.atStartOfDay(ZoneId.systemDefault()).toInstant());
+			this.till = Date.from(lcTill.atStartOfDay(ZoneId.systemDefault()).toInstant());
 		}
 		else {
-			till = new Date();
+			this.till = new Date();
 		}
 		Calendar calendarInstance = Calendar.getInstance();
-		calendarInstance.setTime(till); 
+		calendarInstance.setTime(this.till); 
 		calendarInstance.add(Calendar.DAY_OF_MONTH, 1);
-		till = calendarInstance.getTime();
+		this.till = calendarInstance.getTime();
 		
 		String addFilters = "";
 		List<String> fieldsNames = new ArrayList<String>();
 				
-		fieldsNames.add("Date");
-		fieldsNames.add("PathOfDoc");
-		fieldsNames.add("PathOfProtocol");
+		fieldsNames.add("verificationDate");
+		fieldsNames.add("pathOfDoc");
+		fieldsNames.add("pathOfProtocol");				
 		if (checkDevice != null) {
-			addFilters = (" AND NameOfDevice='" + checkDevice.getName() + "' AND TypeOfDevice='" + checkDevice.getType() +"' AND SerialNumber='" + checkDevice.getSerialNumber() + "'");
+			addFilters = (" AND DeviceId='" + checkDevice.getId() + "'");
 		}	
 		else {
-			fieldsNames.add("NameOfDevice");
-			fieldsNames.add("TypeOfDevice");
-			fieldsNames.add("SerialNumber");
+			fieldsNames.add("name");
+			fieldsNames.add("type");
+			fieldsNames.add("serialNumber");
 		}
-		String sqlQuery = "SELECT ";
-		for (int i=0; i<fieldsNames.size(); i++) {
-			sqlQuery += fieldsNames.get(i);
-			if (i != fieldsNames.size() - 1) { sqlQuery += ", ";}
-		}
-		sqlQuery += (" FROM [Verifications] WHERE TypeOfDoc='" + typeOfDoc + "'" + addFilters);
+		String sqlQuery = "SELECT Verifications.verificationDate, Verifications.pathOfDoc, Verifications.pathOfProtocol, Devices.name, Devices.type, Devices.serialNumber";
+		sqlQuery += (" FROM Verifications INNER JOIN Devices ON Verifications.DeviceId = Devices.id WHERE Verifications.typeOfDoc='" + typeOfDoc + "'"); 
 		try {
 			DataBaseManager.getDB().sqlQueryString(sqlQuery, fieldsNames, resultOfSearch);
 			
@@ -190,12 +186,11 @@ public class OldDocSearchController implements InfoRequestable {
 					dateOfVer = Calendar.getInstance().getTime();
 				}
 				if (dateOfVer.after(this.from) && dateOfVer.before(this.till)) { 
-					String item = currentResultOfSerach.get(0) + " ";
-					
+					String item = currentResultOfSerach.get(0) + " ";					
 					if (checkDevice != null) {
 						item += (checkDevice.getName() + " " + checkDevice.getType() + " " + checkDevice.getSerialNumber());				
 					}
-					else {
+					else {				
 						item += (currentResultOfSerach.get(3) + " " + currentResultOfSerach.get(4) + " " + currentResultOfSerach.get(5));
 					}
 					listOfVerifications.add(item);	
@@ -208,9 +203,8 @@ public class OldDocSearchController implements InfoRequestable {
 			this.verificationListView.setItems(listOfVerifications);
 		}
 		catch(SQLException sqlExp) {
+			System.out.println(sqlExp.getMessage() + "\n\n" + sqlExp.getStackTrace());
 			AboutMessageWindow.createWindow("Ошибка", "База данных отсутствует или повреждена").show();
 		}		
-	}
-	
-	
+	}	
 }

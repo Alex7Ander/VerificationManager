@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.BorderStyle;
@@ -19,6 +20,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.WorkbookUtil;
 
+import ToleranceParamPack.ParametrsPack.ToleranceParametrs;
 import VerificationPack.MeasResult;
 import VerificationPack.VerificationProcedure;
 import javafx.concurrent.Service;
@@ -27,7 +29,11 @@ import javafx.concurrent.Task;
 public class DocumetnsCreateService extends Service<Integer> {
 
 	private VerificationProcedure verification;
-	private ArrayList<MeasResult> protocoledResult;
+	private List<MeasResult> protocoledResult;
+	private List<MeasResult> nominals;
+	private List<ToleranceParametrs> protocoledModuleToleranceParams;
+	private List<ToleranceParametrs> protocoledPhaseToleranceParams;
+		
 	private String protocolName;
 	private String documentName;
 	private String protoPathTo;
@@ -43,42 +49,52 @@ public class DocumetnsCreateService extends Service<Integer> {
 	private CellStyle ordinaryCellStyle;
 	private CellStyle boldCellStyle;
 	
-	public DocumetnsCreateService(String protocolFileName, String documetFileName, ArrayList<MeasResult> result, VerificationProcedure verificationProc){
-		verification = verificationProc;
-		protocoledResult = result;
-		protocolName = protocolFileName;
-		documentName = documetFileName;
-		wb = new HSSFWorkbook();
+	public DocumetnsCreateService(String protocolFileName, 
+								String documetFileName, 
+								List<MeasResult> result, 
+								List<MeasResult> nominals, 
+								List<ToleranceParametrs> protocoledModuleToleranceParams,
+								List<ToleranceParametrs> protocoledPhaseToleranceParams,
+								VerificationProcedure verificationProc){
+		this.verification = verificationProc;
+		this.protocoledResult = result;
+		this.nominals = nominals;
+		this.protocoledModuleToleranceParams = protocoledModuleToleranceParams;
+		this.protocoledPhaseToleranceParams = protocoledPhaseToleranceParams;
+		
+		this.protocolName = protocolFileName;
+		this.documentName = documetFileName;
+		this.wb = new HSSFWorkbook();
 		String strDate = protocoledResult.get(0).getDateOfMeasByString();
-		sh = wb.createSheet(WorkbookUtil.createSafeSheetName(strDate));
-		rows = new ArrayList<Row>();
+		this.sh = wb.createSheet(WorkbookUtil.createSafeSheetName(strDate));
+		this.rows = new ArrayList<Row>();
 		//Создадим стиль "граница ячеек"
-		borderCellStyle = wb.createCellStyle();
-		borderCellStyle.setBorderBottom(BorderStyle.THIN);
-		borderCellStyle.setBorderLeft(BorderStyle.THIN);
-		borderCellStyle.setBorderRight(BorderStyle.THIN);
-		borderCellStyle.setBorderTop(BorderStyle.THIN);
+		this.borderCellStyle = wb.createCellStyle();
+		this.borderCellStyle.setBorderBottom(BorderStyle.THIN);
+		this.borderCellStyle.setBorderLeft(BorderStyle.THIN);
+		this.borderCellStyle.setBorderRight(BorderStyle.THIN);
+		this.borderCellStyle.setBorderTop(BorderStyle.THIN);
 		Font ordinaryfont = wb.createFont();
 		ordinaryfont.setFontName("Times New Roman");
 		ordinaryfont.setFontHeightInPoints((short)12);
-		borderCellStyle.setFont(ordinaryfont);				
+		this.borderCellStyle.setFont(ordinaryfont);				
 		//Стиль заголовок документа
-		headCellStyle = wb.createCellStyle();
-		Font headFont = wb.createFont();
+		this.headCellStyle = this.wb.createCellStyle();
+		Font headFont = this.wb.createFont();
 		headFont.setFontName("Times New Roman");
 		headFont.setFontHeightInPoints((short)14);
 		headFont.setBold(true);
-		headCellStyle.setFont(headFont);
-		headCellStyle.setAlignment(HorizontalAlignment.CENTER);		
+		this.headCellStyle.setFont(headFont);
+		this.headCellStyle.setAlignment(HorizontalAlignment.CENTER);		
 		//Простой стиль
-		ordinaryCellStyle = wb.createCellStyle();
-		ordinaryCellStyle.setFont(ordinaryfont);		
+		this.ordinaryCellStyle = this.wb.createCellStyle();
+		this.ordinaryCellStyle.setFont(ordinaryfont);		
 		//Стиль - Жирный шрифт
-		boldCellStyle = wb.createCellStyle(); 
-		Font boldFont = wb.createFont();
+		this.boldCellStyle = this.wb.createCellStyle(); 
+		Font boldFont = this.wb.createFont();
 		boldFont.setFontName("Times New Roman");
 		boldFont.setFontHeightInPoints((short)12);
-		boldCellStyle.setFont(boldFont);
+		this.boldCellStyle.setFont(boldFont);
 	}
 	
 	@Override
@@ -189,80 +205,116 @@ public class DocumetnsCreateService extends Service<Integer> {
 		int dRow = 19;
 		int countOfRes = protocoledResult.size();
 		for (int i = 0; i < countOfRes; i++) {
-			//Текущий результат
-			MeasResult currentRes = protocoledResult.get(i);
-			//Текущее количество параметров
-			int paramsCount = currentRes.getCountOfParams();
+			//Вносимые данные
+			MeasResult currentRes = this.protocoledResult.get(i);
+			MeasResult currentNominal = this.nominals.get(i);
+			ToleranceParametrs currentModuleTolerance = this.protocoledModuleToleranceParams.get(i);
+			ToleranceParametrs currentPhaseTolerance = this.protocoledPhaseToleranceParams.get(i);
 			
 			//Строка про элемент
 			String head = currentRes.getMyOwner().getType() + " " + currentRes.getMyOwner().getSerialNumber();
 			setCellValue(dRow, 0, head, headCellStyle);
-			rowMerging(dRow, 0, 3);
-			dRow++;
-			
-			//Шапка для таблицы
-			ArrayList<String> tableHeads = createtableHeads(currentRes);				
-			for (int j = 0; j < paramsCount + 1 ; j++) { // +1 поскольку частота не относится к параметрам
-				String value = tableHeads.get(j);
-				setCellValue(dRow, j, value, borderCellStyle);
-			}
+			rowMerging(dRow, 0, 10);
 			dRow++;
 			
 			//Заполнение таблицы
-			 String keys[] = {"MODULE_S11", "ERROR_MODULE_S11", "PHASE_S11", "ERROR_PHASE_S11",
-					"MODULE_S12", "ERROR_MODULE_S12", "PHASE_S12", "ERROR_PHASE_S12",
-					"MODULE_S21", "ERROR_MODULE_S21", "PHASE_S21", "ERROR_PHASE_S21",
-					"MODULE_S22", "ERROR_MODULE_S22", "PHASE_S22", "ERROR_PHASE_S22"};
-			
-			for (int j = 0; j < currentRes.getCountOfFreq(); j++) {
-				Double cFreq = currentRes.freqs.get(j);
-				setCellValue(dRow, 0, cFreq.toString(), borderCellStyle);				
-				for (int k = 0; k < paramsCount; k++) {
-					String key = keys[k];					
-					String text = currentRes.values.get(key).get(cFreq).toString();	
-					System.out.print(text + " replaced to ");
-					text = text.replace('.', ',');
-					System.out.println(text);
-					setCellValue(dRow, k+1, text, borderCellStyle);
-				} //end k
+			String keys[] = {"S11", "S12", "S21", "S22"};
+			int stop = 1;
+			if (currentRes.getMyOwner().getPoleCount()==4) stop = 4;
+			for(int k = 0; k < stop; k++) {				
+				//Шапка для таблицы
+				String resType = currentRes.getMyOwner().getMeasUnit();
+				List<String> tableHeads = createtableHeads(resType, keys[k]);
+				for (int j = 0; j < tableHeads.size(); j++)
+					setCellValue(dRow, j, tableHeads.get(j), borderCellStyle);
 				dRow++;
-			} //end j		
+				
+				for (int j = 0; j < currentRes.getCountOfFreq(); j++) {
+					//Частота
+					Double cFreq = currentRes.freqs.get(j);
+					setCellValue(dRow, 0, cFreq.toString(), borderCellStyle);
+					
+					//КСВН/Г
+					String vswr = currentRes.values.get("MODULE_" + keys[k]).get(cFreq).toString();
+					setCellValue(dRow, 1, vswr.replace('.', ','), borderCellStyle);
+					
+					//Номинал КСВН/Г
+					String vswrNominal = currentNominal.values.get("MODULE_" + keys[k]).get(cFreq).toString();
+					setCellValue(dRow, 2, vswrNominal.replace('.', ','), borderCellStyle);
+					
+					//Допуск КСВН/Г
+					String vswrTolerance = currentModuleTolerance.values.get("DOWN_MODULE_" + keys[k]).get(cFreq).toString();
+					vswrTolerance += ("/" + currentModuleTolerance.values.get("UP_MODULE_" + keys[k]).get(cFreq).toString());
+					setCellValue(dRow, 3, vswrTolerance, borderCellStyle);
+					
+					//Погрешность КСВН/Г
+					String vswrError = currentRes.values.get("ERROR_MODULE_" + keys[k]).get(cFreq).toString();
+					setCellValue(dRow, 4, vswrError.replace('.', ','), borderCellStyle);
+					
+					//Годен/не годен по КСВН
+					String moduleDecision = currentRes.suitabilityDecision.get("MODULE_" + keys[k]).get(cFreq);
+					setCellValue(dRow, 5, moduleDecision, borderCellStyle);
+					
+					//Фаза
+					String phase = currentRes.values.get("PHASE_" + keys[k]).get(cFreq).toString();
+					setCellValue(dRow, 6, phase.replace('.', ','), borderCellStyle);
+					
+					//Номинал Фазы
+					String phaseNominal = currentNominal.values.get("PHASE_" + keys[k]).get(cFreq).toString();
+					setCellValue(dRow, 7, phaseNominal.replace('.', ','), borderCellStyle);
+					
+					//Допуск Фазы
+					String phaseTolerance = currentPhaseTolerance.values.get("DOWN_PHASE_" + keys[k]).get(cFreq).toString();
+					phaseTolerance += ("/" + currentPhaseTolerance.values.get("UP_PHASE_" + keys[k]).get(cFreq).toString());
+					setCellValue(dRow, 8, phaseTolerance, borderCellStyle);
+					
+					//Погрешность Фазы
+					String phaseError = currentRes.values.get("ERROR_PHASE_" + keys[k]).get(cFreq).toString();
+					setCellValue(dRow, 9, phaseError.replace('.', ','), borderCellStyle);
+
+					//Годен/не годен по фазе
+					String phaseDecision = currentRes.suitabilityDecision.get("PHASE_" + keys[k]).get(cFreq);
+					setCellValue(dRow, 10, phaseDecision, borderCellStyle);
+					
+					dRow++;
+				}//end j			 
+			} //end k		
 		}//end i
 	}
 	
-	private ArrayList<String> createtableHeads(MeasResult currentRes) {
-		ArrayList<String> tableHeads = new ArrayList<String>();
-		//Частота
-		tableHeads.add("Частота");
-		String columnS11Head = null;
-		String columnS22Head = null;
-		if (currentRes.getMyOwner().getMeasUnit().equals("vswr")) {
-			columnS11Head = "|КСВН| 1-го порта";
-			columnS22Head = "|КСВН| 2-го порта";			
+	private List<String> createtableHeads(String resType, String key) {
+		List<String> tableHeads = new ArrayList<>();
+		tableHeads.add("F, ГГц");
+		if(key.equals("S11")){
+			if (resType.equals("vswr")) {
+				tableHeads.add("КСВН 1-го порта");
+			} else {
+				tableHeads.add("|Г| 1-го порта");
+			}
 		}
-		else {
-			columnS22Head = columnS11Head = "|Г|";
+		else if(key.equals("S12")) {
+			tableHeads.add("Коэф. перед. S12");
 		}
-		//S11
-		tableHeads.add(columnS11Head);
-		tableHeads.add("Погрешность " + columnS11Head);
-		tableHeads.add("Фаза");
-		tableHeads.add("Погрешность фазы");
-		//S12
-		tableHeads.add("Коэф. отр. S12");
-		tableHeads.add("Погрешность S12");
-		tableHeads.add("Фаза");
-		tableHeads.add("Погрешность фазы");
-		//S21
-		tableHeads.add("Коэф. отр. S21");
-		tableHeads.add("Погрешность S21");
-		tableHeads.add("Фаза");
+		else if(key.equals("S21")) {
+			tableHeads.add("Коэф. перед. S21");
+		}
+		else if(key.equals("S22")) {
+			if (resType.equals("vswr")) {
+				tableHeads.add("КСВН 2-го порта");
+			} else {
+				tableHeads.add("|Г| 2-го порта");
+			}
+		}
+		tableHeads.add("Пред.пов.");
+		tableHeads.add("Допуск");
 		tableHeads.add("Погрешность");
-		//S22
-		tableHeads.add(columnS22Head);
-		tableHeads.add("Погрешность " + columnS22Head);
-		tableHeads.add("Фаза");
+		tableHeads.add("Соответсвие НТД");
+		
+		tableHeads.add("Фаза, \u00B0");
+		tableHeads.add("Пред.пов.");
+		tableHeads.add("Допуск");
 		tableHeads.add("Погрешность");
+		tableHeads.add("Соответсвие НТД");
 		return tableHeads;		
 	}
 	

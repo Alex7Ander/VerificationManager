@@ -3,6 +3,8 @@ package StartVerificationPack;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+
+import AboutMessageForm.AboutMessageWindow;
 import FileManagePack.FileManager;
 import ToleranceParamPack.ParametrsPack.TimeType;
 import VerificationForm.VerificationController;
@@ -91,8 +93,16 @@ public class StartVerificationController {
 	}
 	
 	@FXML
-	private void startBtnClick() throws IOException {
-		if (!chekEnvironment()) {
+	private void startBtnClick() throws IOException {		
+		boolean envStatus;
+		try {
+			envStatus = chekEnvironment(); 
+		}
+		catch(NumberFormatException nfExp) {
+			AboutMessageWindow.createWindow("ќшибка", nfExp.getMessage()).show();
+			return;
+		}
+		if (!envStatus) {
 			int answer = YesNoWindow.createYesNoWindow("¬нимание", envStatusString + "\n∆елаете продолжить?").showAndWait();
 			if (answer == 1) {
 				return;
@@ -152,31 +162,38 @@ public class StartVerificationController {
 		}
 	}
 	
-	private boolean chekEnvironment() {
-		envStatusString = "ѕараметры окружающей среды вне допуска:\n";		
+	private boolean chekEnvironment() throws NumberFormatException {
+		//replacing ',' to '.' in text fields
+		this.temperatureTextField.setText(this.temperatureTextField.getText().replace(',', '.'));
+		this.atmPreasureTextField.setText(this.atmPreasureTextField.getText().replace(',', '.'));
+		this.airHumidityTextField.setText(this.airHumidityTextField.getText().replace(',', '.'));
+		
+		this.envStatusString = "ѕараметры окружающей среды вне допуска:\n";	
 		try {
-			currentTemparature = Double.parseDouble(this.temperatureTextField.getText());
-			currentAtmPreasure = Double.parseDouble(this.atmPreasureTextField.getText());
-			currentAirHumidity = Double.parseDouble(this.airHumidityTextField.getText());
-			if (currentTemparature > upTemperature || currentTemparature < downTemperature) {
-				if (currentTemparature > upTemperature) envStatusString += "температура выше нормы\n";
-				else envStatusString += "температура ниже нормы\n";
+			this.currentTemparature = Double.parseDouble(this.temperatureTextField.getText());
+			this.currentAtmPreasure = Double.parseDouble(this.atmPreasureTextField.getText());
+			this.currentAirHumidity = Double.parseDouble(this.airHumidityTextField.getText());
+			
+			if (this.currentTemparature > this.upTemperature || this.currentTemparature < this.downTemperature) {
+				if (this.currentTemparature > this.upTemperature) this.envStatusString += "температура выше нормы\n";
+				else this.envStatusString += "температура ниже нормы\n";
 				return false;
 			}
-			if (currentAtmPreasure > upAtmPreasure || currentAtmPreasure < downAtmPreasure) {
-				if (currentAtmPreasure > upAtmPreasure) envStatusString += "атмосферное давление выше нормы\n";
-				else envStatusString += "атмосферное давление ниже нормы\n";
+			if (this.currentAtmPreasure > this.upAtmPreasure || this.currentAtmPreasure < this.downAtmPreasure) {
+				if (this.currentAtmPreasure > this.upAtmPreasure) this.envStatusString += "атмосферное давление выше нормы\n";
+				else this.envStatusString += "атмосферное давление ниже нормы\n";
 				return false;
 			}
-			if (currentAirHumidity > upAirHumidity || currentAirHumidity < downAirHumidity) {
-				if (currentAirHumidity > upAirHumidity) envStatusString += "влажность выше нормы\n";
-				else envStatusString += "влажность ниже нормы\n";
+			if (this.currentAirHumidity > this.upAirHumidity || this.currentAirHumidity < this.downAirHumidity) {
+				if (this.currentAirHumidity > this.upAirHumidity) this.envStatusString += "влажность выше нормы\n";
+				else this.envStatusString += "влажность ниже нормы\n";
 				return false;
 			}
 		}
 		catch(NumberFormatException nfExp) {
-			envStatusString = "¬веденные ¬ами значени€ параметров\nокружающей среды не €вл€ютс€ действительными числами.";
-			return false;
+			throw new NumberFormatException("¬веденные ¬ами значени€ параметров\nокружающей среды не €вл€ютс€ числами.");
+			//this.envStatusString = "¬веденные ¬ами значени€ параметров\nокружающей среды не €вл€ютс€ действительными числами.";
+			//return false;
 		}
 		return true;
 	}

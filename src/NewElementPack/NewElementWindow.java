@@ -49,7 +49,7 @@ public class NewElementWindow extends guiWindow {
 		ctrl.setElement(elm);		
 		stage.setOnCloseRequest( event -> {			
 			ctrl.saveValues();
-			int answer = YesNoWindow.createYesNoWindow("Сохранить изменения", "Сохранить внесенный вами изменения?").showAndWait();
+			int answer = YesNoWindow.createYesNoWindow("Сохранить изменения", "Сохранить внесенные вами изменения?").showAndWait();
 			//Если изменения необходимо сохранить:
 			if (answer == 0) {
 				ToleranceParametrs newModulePrimaryTP = new ToleranceParametrs(TimeType.PRIMARY, MeasUnitPart.MODULE, ctrl, elm);

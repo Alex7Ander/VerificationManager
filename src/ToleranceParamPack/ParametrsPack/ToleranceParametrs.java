@@ -17,32 +17,32 @@ import ToleranceParamPack.StrategyPack.StrategyOfSuitability;
 import VerificationPack.MeasResult;
 
 public class ToleranceParametrs implements Includable<Element>, dbStorable {
-	 private int id;
-	 public int getId() {
-		 return this.id;
-	 }
-	 public Map<String, Map<Double, Double>> values;
-	 public ArrayList<Double> freqs;
-	 private String tableName;
-	 public String getTableName(){
-		 return this.tableName;
-	 }
+	private int id;
+	public int getId() {
+		return this.id;
+	}
+	public Map<String, Map<Double, Double>> values;
+	public ArrayList<Double> freqs;
+	private String tableName;
+	public String getTableName(){
+		return this.tableName;
+	}
 	 
-	 public void setTableName(){
+	public void setTableName(){
 		 String addrStr = myElement.getMyOwner().getName() + " " +
-				 		  myElement.getMyOwner().getType() + " " +
-				 		  myElement.getMyOwner().getSerialNumber() + " " +
-				 		  myElement.getType() + " " + myElement.getSerialNumber();
-		 tableName = "Параметры допуска " + timeType.getTableNamePart() + " поверки " + measUnitPart.getTableNamePart() + " S параметров для " + addrStr;
-	 }
+						myElement.getMyOwner().getType() + " " +
+						myElement.getMyOwner().getSerialNumber() + " " +
+						myElement.getType() + " " + myElement.getSerialNumber();
+		tableName = "Параметры допуска " + timeType.getTableNamePart() + " поверки " + measUnitPart.getTableNamePart() + " S параметров для " + addrStr;
+	}
 	 
-	 public TimeType timeType;
-	 public MeasUnitPart measUnitPart;
+	public TimeType timeType;
+	public MeasUnitPart measUnitPart;
 //Constructors
-	 ToleranceParametrs(){
-		 this.values = new LinkedHashMap<String, Map<Double, Double>>();
-		 this.freqs = new ArrayList<Double>();
-	 }	 
+	ToleranceParametrs(){
+		this.values = new LinkedHashMap<String, Map<Double, Double>>();
+		this.freqs = new ArrayList<Double>();
+	}	 
 //GUI
 	public ToleranceParametrs(TimeType currentTimeType, MeasUnitPart currentUnitPart, NewElementController elCtrl, Element ownerElement){		
 		this();
@@ -89,19 +89,19 @@ public class ToleranceParametrs implements Includable<Element>, dbStorable {
 //interface dbStorable		    
 	 @Override
 	 public void saveInDB() throws SQLException, SavingException {
-		 String type = this.timeType + "_" + this.measUnitPart;
-		 String sqlQuery = "INSERT INTO [Tolerance_params] (ElementId, Type) VALUES (" + this.myElement.getId() + ", '" + type + "')";
-		 System.out.print(sqlQuery);
-		 DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
-		 System.out.println("\t - Успешно");		 
-		 sqlQuery = "SELECT id FROM [Tolerance_params] WHERE ElementId=" + this.myElement.getId() + " AND type='" + type + "'";
-		 System.out.println("Получаем id запросом:\n" + sqlQuery);
-		 this.id = DataBaseManager.getDB().sqlQueryCount(sqlQuery);
-		 System.out.println("id = " + this.id);
+		String type = this.timeType + "_" + this.measUnitPart;
+		String sqlQuery = "INSERT INTO [Tolerance_params] (elementId, type) VALUES (" + this.myElement.getId() + ", '" + type + "')";
+		System.out.print(sqlQuery);
+		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
+		System.out.println("\t - Успешно");		 
+		sqlQuery = "SELECT id FROM [Tolerance_params] WHERE elementId=" + this.myElement.getId() + " AND type='" + type + "'";
+		System.out.println("Получаем id запросом:\n" + sqlQuery);
+		this.id = DataBaseManager.getDB().sqlQueryCount(sqlQuery);
+		System.out.println("id = " + this.id);
 
-		 //Inserting values of parametrs
-		 for (int i = 0; i < freqs.size(); i++) {			
-			sqlQuery = "INSERT INTO [Tolerance_params_values] (ToleranceParamsId, freq,  ";				//+ this.tableName +		
+		//Inserting values of parametrs
+		for (int i = 0; i < freqs.size(); i++) {			
+			sqlQuery = "INSERT INTO [Tolerance_params_values] (toleranceParamsId, freq,  ";		
 			for (int j = 0; j < myElement.getSParamsCout(); j++) {
 				sqlQuery += ("DOWN_" + measUnitPart + "_" + S_Parametr.values()[j] + ", ");
 				sqlQuery += ("UP_" + measUnitPart + "_" + S_Parametr.values()[j]);
@@ -127,63 +127,65 @@ public class ToleranceParametrs implements Includable<Element>, dbStorable {
 					measUnitPart.getTableNamePart() + " S параметра при " +
 					timeType.getTableNamePart() + " поверке" );
 			}
-		 }		
-	 }
-	 	 
-	 @Override
-	 public void deleteFromDB() throws SQLException {
-		String sqlQuery = "DROP TABLE [" + this.tableName + "]";
+		}		
+	}
+		 
+	@Override
+	public void deleteFromDB() throws SQLException {
+		String sqlQuery = "DELETE FROM Tolerance_params WHERE id=" + this.id;
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
-	 }
-	 @Override
-	 public void editInfoInDB(HashMap<String, String> editingValues) throws SQLException {
+	}
+	@Override
+	public void editInfoInDB(HashMap<String, String> editingValues) throws SQLException {
 		 // TODO Auto-generated method stub
-	 }
-	 
-	 public void rewriteTableNames() throws SQLException {
-		 String newTableName = "Параметры допуска " + timeType.getTableNamePart() + " поверки " + measUnitPart.getTableNamePart() + " S параметров для " + myElement.getMyOwner().getName() + " " +
-		 		  			   myElement.getMyOwner().getType() + " " + myElement.getMyOwner().getSerialNumber() + " " + myElement.getType() + " " + myElement.getSerialNumber();
-		 
-		 String elementsOfTableName = myElement.getMyOwner().getElementsTableName();
-		 String sqlQuery = "UPDATE [" + elementsOfTableName + "] SET " + getFieldInElementsOfTable() + "='" + newTableName + "' "
-		 				 + "WHERE ElementType='" + myElement.getType() + "' AND ElementSerNumber='" + myElement.getSerialNumber() + "'";
-		 DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
-		 sqlQuery = "ALTER TABLE [" + tableName + "] RENAME TO [" + newTableName + "]";
-		 DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
-		 tableName = newTableName;
-	 }
-	 
-	 private Element myElement; 
-	 @Override
-	 public Element getMyOwner() {
-	 	return myElement;
-	 }
-	 @Override
-	 public void onAdding(Element Owner) {
-	 	this.myElement = Owner;
-	 	setTableName();
-	 }
-	 private StrategyOfSuitability strategy;
-	 public void setStrategy(StrategyOfSuitability anyStrategy) {
+	}
+	
+	public void rewriteTableNames() throws SQLException {
+		/*
+		String newTableName = "Параметры допуска " + timeType.getTableNamePart() + " поверки " + measUnitPart.getTableNamePart() + " S параметров для " + myElement.getMyOwner().getName() + " " +
+				  			   myElement.getMyOwner().getType() + " " + myElement.getMyOwner().getSerialNumber() + " " + myElement.getType() + " " + myElement.getSerialNumber();
+		
+		String elementsOfTableName = myElement.getMyOwner().getElementsTableName();
+		String sqlQuery = "UPDATE [" + elementsOfTableName + "] SET " + getFieldInElementsOfTable() + "='" + newTableName + "' "
+						 + "WHERE ElementType='" + myElement.getType() + "' AND ElementSerNumber='" + myElement.getSerialNumber() + "'";
+		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
+		sqlQuery = "ALTER TABLE [" + tableName + "] RENAME TO [" + newTableName + "]";
+		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
+		tableName = newTableName;
+		*/
+	}
+	
+	private Element myElement; 
+	@Override
+	public Element getMyOwner() {
+		return myElement;
+	}
+	@Override
+	public void onAdding(Element Owner) {
+		this.myElement = Owner;
+		setTableName();
+	}
+	private StrategyOfSuitability strategy;
+	public void setStrategy(StrategyOfSuitability anyStrategy) {
 		this.strategy = anyStrategy;
-	 }
-	 public boolean checkResult(MeasResult result) {
-		return this.strategy.checkResult(result, this);
-	 }
-	 	 
-	 private String getFieldInElementsOfTable() {
-		 String result = null;
-		 if (timeType.equals(TimeType.PRIMARY)) 
+	}
+	public boolean checkResult(MeasResult result) {
+		 return this.strategy.checkResult(result, this);
+	}
+		 
+	private String getFieldInElementsOfTable() {
+		String result = null;
+		if (timeType.equals(TimeType.PRIMARY)) 
 			 result = "Primary";
-		 else
+		else
 			 result = "Periodic";
-		 
-		 if (measUnitPart.equals(MeasUnitPart.MODULE))
+		
+		if (measUnitPart.equals(MeasUnitPart.MODULE))
 			 result += "Module";
-		 else
+		else
 			 result += "Phase";
-		 
-		 result += "ParamTable";
-		 return result;
-	 }
+		
+		result += "ParamTable";
+		return result;
+	}
 }

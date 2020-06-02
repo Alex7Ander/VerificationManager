@@ -53,7 +53,7 @@ public class DataBaseManager {
 //TCL	
 	public int BeginTransaction() {
 		try {
-			sqlQueryUpdate("BEGIN TRANSACTION");
+			dbConnection.setAutoCommit(false);
 			return 0;
 		}
 		catch(SQLException exp) {
@@ -63,7 +63,8 @@ public class DataBaseManager {
 	
 	public int RollBack() {
 		try {
-			sqlQueryUpdate("ROLLBACK");
+			dbConnection.rollback();
+			dbConnection.setAutoCommit(true);
 			return 0;
 		}
 		catch(SQLException exp) {
@@ -73,12 +74,17 @@ public class DataBaseManager {
 	
 	public int Commit() {
 		try {
-			sqlQueryUpdate("COMMIT");
+			dbConnection.commit();
+			dbConnection.setAutoCommit(true);
 			return 0;
 		}
 		catch(SQLException exp) {
 			return -1;
 		}
+	}
+	
+	public boolean getAutoCommit() throws SQLException {
+		return dbConnection.getAutoCommit();
 	}
 	
 	//Общие методы работы с БД Требуют написания SQl запроса

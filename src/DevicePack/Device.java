@@ -1,12 +1,12 @@
 package DevicePack;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
-
-import org.apache.log4j.Logger;
 
 import DataBasePack.DataBaseManager;
 import DataBasePack.dbStorable;
@@ -15,8 +15,6 @@ import FileManagePack.FileManager;
 
 public class Device implements dbStorable {
 	
-	private static final Logger logger = Logger.getLogger(Device.class);
-	
 	private int id;
 	private String name;
 	private String type;
@@ -24,7 +22,7 @@ public class Device implements dbStorable {
 	private String owner;
 	private String gosNumber;	
 	private int countOfElements;
-	private String elementsTableName;
+	//private String elementsTableName;
 	
 	public ArrayList<Element> includedElements;
 	
@@ -46,9 +44,9 @@ public class Device implements dbStorable {
 	public String getGosNumber() {
 		return gosNumber;
 	}
-	public String getElementsTableName() { 
+	/*public String getElementsTableName() { 
 		return elementsTableName;
-	}
+	}*/
 	public int getCountOfElements() {
 		return countOfElements;
 	}
@@ -58,13 +56,13 @@ public class Device implements dbStorable {
 		System.out.println("Начинаем получение данных на устройство с id=" + id);
 		this.id = id;
 		this.includedElements = new ArrayList<Element>();		
-		String sqlQuery = "SELECT NameOfDevice, TypeOfDevice, SerialNumber, Owner, GosNumber FROM Devices WHERE id="+ Integer.toString(id) +"";		
+		String sqlQuery = "SELECT name, type, serialNumber, owner, gosNumber FROM Devices WHERE id="+ Integer.toString(id) +"";		
 		ArrayList<String> fieldName = new ArrayList<String>();
-		fieldName.add("NameOfDevice");
-		fieldName.add("TypeOfDevice");
-		fieldName.add("SerialNumber");
-		fieldName.add("Owner"); 
-		fieldName.add("GosNumber");	
+		fieldName.add("name");
+		fieldName.add("type");
+		fieldName.add("serialNumber");
+		fieldName.add("owner"); 
+		fieldName.add("gosNumber");	
 		List<List<String>> arrayResults = new ArrayList<List<String>>();	
 		System.out.println("Получаем основную информацию на устройство запросом: " + sqlQuery);
 		DataBaseManager.getDB().sqlQueryString(sqlQuery, fieldName, arrayResults);	
@@ -99,7 +97,7 @@ public class Device implements dbStorable {
 	}
 	
 	public boolean isExist() throws SQLException {
-		String sqlString = "SELECT COUNT(*) FROM Devices WHERE TypeOfDevice='" + this.type + "' AND NameOfDevice='" + this.name + "' AND SerialNumber='" + this.serialNumber + "'";
+		String sqlString = "SELECT COUNT(*) FROM Devices WHERE type='" + this.type + "' AND name='" + this.name + "' AND serialNumber='" + this.serialNumber + "'";
 		int isExist = DataBaseManager.getDB().sqlQueryCount(sqlString);
 		if (isExist == 0) {
 			return false;
@@ -111,12 +109,12 @@ public class Device implements dbStorable {
 //dbStorable	
 	@Override
 	public void saveInDB() throws SQLException, SavingException{
-		String sqlString = "INSERT INTO [Devices] (NameOfDevice, TypeOfDevice, SerialNumber, Owner, GosNumber) values ('"+name+"','"+type+"','"+serialNumber+"','"+owner+"','"+gosNumber+"')";
+		String sqlString = "INSERT INTO [Devices] (name, type, serialNumber, owner, gosNumber) values ('"+name+"','"+type+"','"+serialNumber+"','"+owner+"','"+gosNumber+"')";
 		DataBaseManager.getDB().sqlQueryUpdate(sqlString);
 		System.out.println(sqlString);
 		System.out.println("Начато сохранение устройства "+name+", тип "+type+", № "+serialNumber+", владелец "+owner+", № по ФИФ "+gosNumber);
 		System.out.println("Внесена запись о новом приборе в таблицу Devices");
-		sqlString = "SELECT id FROM [Devices] WHERE NameOfDevice='" + name + "' AND TypeOfDevice='" + type + "' AND SerialNumber='" + serialNumber + "'";
+		sqlString = "SELECT id FROM [Devices] WHERE name='" + name + "' AND type='" + type + "' AND serialNumber='" + serialNumber + "'";
 		this.id = DataBaseManager.getDB().sqlQueryCount(sqlString);
 		System.out.println(sqlString);
 		System.out.println("Получен id под которым сохранен прибор: " + this.id);
@@ -128,93 +126,50 @@ public class Device implements dbStorable {
 	}
 	
 	@Override
-	public void deleteFromDB() throws SQLException {
-		for (Element elm : this.includedElements) {
-			elm.deleteFromDB();
-		}
-		this.includedElements.clear();
-		//String sqlQuery = "DROP TABLE [" + elementsTableName + "]";
-		//DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
-		String sqlQuery = "DELETE FROM [Devices] WHERE NameOfDevice='"+this.name+"' AND TypeOfDevice='"+this.type+"' AND SerialNumber='"+this.serialNumber+"'";
+	public void deleteFromDB() throws SQLException {	
+		String sqlQuery = "DELETE FROM [Devices] WHERE id="+this.id;
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
+		this.includedElements.clear();
 	}
 	
 	@Override
 	public void editInfoInDB(HashMap<String, String> editingValues) throws SQLException {
 		String sqlQuery = "UPDATE Devices SET ";
-		int count = 1;
-		for (String str: editingValues.keySet()) {
-			sqlQuery += (str + "='"+editingValues.get(str)+"'");
-			if (count != editingValues.size()) {
-				sqlQuery += ", ";
-			} 
-			else {
-				sqlQuery += " ";
+		Class<? extends Device> deviceClass = this.getClass();		
+		Iterator<String> it = editingValues.keySet().iterator();
+		do {
+			String fieldName = it.next();
+			try {
+				Field anyField = deviceClass.getDeclaredField(fieldName);
+				String oldAnyFieldValue = (String) anyField.get(this);
+				String newAnyFieldValue = editingValues.get(fieldName);
+				if(!oldAnyFieldValue.equals(newAnyFieldValue)) {
+					sqlQuery += (fieldName + "='"+newAnyFieldValue+"', ");
+				}
+			} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException exp) {
+				exp.printStackTrace();
 			}
-			count++;
-		}
-		sqlQuery += "WHERE NameOfDevice='" + name + "' AND TypeOfDevice='" + type + "' AND SerialNumber='" + serialNumber + "'";
-		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
-		
-		//Rewriting info in table Verification
-		sqlQuery = "UPDATE [Verifications] SET ";
-		for (String str: editingValues.keySet()) {
-			if (str.equals("NameOfDevice") || str.equals("TypeOfDevice") || str.equals("SerialNumber")) {
-				sqlQuery += (str + "='"+editingValues.get(str)+"', ");
-			}
-		}
-		int lastCommaIndex = sqlQuery.lastIndexOf(",");
-		sqlQuery = sqlQuery.substring(0, lastCommaIndex);
-		sqlQuery += " WHERE NameOfDevice='" + name + "' AND TypeOfDevice='" + type + "' AND SerialNumber='" + serialNumber + "'";
-		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
-		
-		boolean tableNamesMustBeRewrited = false;
-		for (String field : editingValues.keySet()) {
-			if (field.equals("NameOfDevice")) {
-				name = editingValues.get(field);
-				tableNamesMustBeRewrited = true;
-			} 
-			else if (field.equals("TypeOfDevice")) {
-				type = editingValues.get(field);
-				tableNamesMustBeRewrited = true;
-			}
-			else if (field.equals("SerialNumber")) {
-				serialNumber = editingValues.get(field);
-				tableNamesMustBeRewrited = true;
-			}
-			else if(field.equals("Owner")) {
-				owner = editingValues.get(field);
-			}
-			else if (field.equals("GosNumber")) {
-				gosNumber = editingValues.get(field);
-			}
-		}
-		/*
-		if (tableNamesMustBeRewrited) {
-			String oldElementsTableName = elementsTableName;
-			elementsTableName = "Элементы для " + name + " " + type + " " + serialNumber;
-			sqlQuery = "SELECT SerialNumber FROM [Devices] WHERE NameOfDevice='" + name + "' AND TypeOfDevice='" + type + "' AND SerialNumber='" + serialNumber + "'";
-			List<String> arrayResults = new ArrayList<String>();
-			DataBaseManager.getDB().sqlQueryString(sqlQuery, "SerialNumber", arrayResults);
-			sqlQuery = "UPDATE Devices SET ElementsTable='" + elementsTableName + "' WHERE NameOfDevice='" + name + "' AND TypeOfDevice='" + type + "' AND SerialNumber='" + serialNumber + "'";
-			DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
-			sqlQuery = "ALTER TABLE [" + oldElementsTableName + "] RENAME TO ["+ elementsTableName + "]";	
-			DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
-			for (Element element : includedElements) {
-				element.rewriteTableNames();
-			}
-		}*/
+		} while(it.hasNext());
+		sqlQuery = sqlQuery.substring(0, sqlQuery.length()-2);
+		sqlQuery += " WHERE id=" + this.id;
+		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);		
 	}
 		
 	public void addElement(Element element) {
-		includedElements.add(element);
+		this.includedElements.add(element);
 		element.onAdding(this);
-		countOfElements = includedElements.size();	
+		this.countOfElements = this.includedElements.size();	
 	}
 	
 	public void removeElement(int index) {
-		includedElements.remove(index);
-		countOfElements--;	
+		this.includedElements.remove(index);
+		this.countOfElements--;	
+	}
+	
+	public void removeElement(Element element) {
+		int elementIndex = this.includedElements.indexOf(element);
+		this.includedElements.remove(elementIndex);
+		this.countOfElements--;
 	}
 	
 	public void createIniFile(String psiFilePath) throws IOException {

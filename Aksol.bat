@@ -1,1 +1,1 @@
-start java -jar Aksol.jar
+start java -jar --module-path "C:\Users\Alex\Desktop\Аксоли\Aksol_J5\javafx-sdk-11.0.2\lib" --add-modules javafx.controls,javafx.fxml Aksol.jar
