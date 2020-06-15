@@ -8,7 +8,7 @@ import javafx.scene.layout.Pane;
 public class VerificationTable extends VisualTable {
 
 	private static ArrayList<String> localTableHeads;
-	private final int colCount = 11;
+	private final int colCount = 13;
 	
 	public VerificationTable(Pane pane) {
 		super(localTableHeads, pane);
@@ -25,17 +25,19 @@ public class VerificationTable extends VisualTable {
 	
 	static {
 		localTableHeads = new ArrayList<String>();
-		localTableHeads.add("F, ГГц");	
-		localTableHeads.add("Измер. знач. модуля");	
+		localTableHeads.add("F, ГГц");	//0
+		localTableHeads.add("Измер. знач. модуля");	//1
+		localTableHeads.add("Погрешность");
 		localTableHeads.add("Пред. пов. модуля");
-		localTableHeads.add("Допуск");		
-		localTableHeads.add("Погрешность");			
+		localTableHeads.add("\u03B4, %");
+		localTableHeads.add("Допуск");				
 		localTableHeads.add("Соответсвие\n\tНТД");	
 		
-		localTableHeads.add("Измер. знач.\nфазы, \u00B0");	
+		localTableHeads.add("Измер. знач.\nфазы, \u00B0"); //7
+		localTableHeads.add("Погрешность");
 		localTableHeads.add("Пред. пов.\nфазы, \u00B0");
-		localTableHeads.add("Допуск");
-		localTableHeads.add("Погрешность");	
+		localTableHeads.add("\u0394");
+		localTableHeads.add("Допуск");			
 		localTableHeads.add("Соответсвие\n\tНТД");
 	}
 	

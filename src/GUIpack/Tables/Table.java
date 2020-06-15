@@ -22,6 +22,7 @@ public interface Table {
 	
 	void setColumn(int index, List<String> columnValues);	
 	void setColumnFromDouble(int index, List<Double> columnValues);
+	void setColumnFromDouble(int index, List<Double> columnValues, int accuracy);
 	
 	void setVisible(boolean visibleStatus);
 

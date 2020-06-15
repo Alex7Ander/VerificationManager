@@ -42,6 +42,7 @@ public class MeasResult implements Includable<Element>, dbStorable{
 	}
 	public Map<String, Map<Double, Double>> values;
 	public Map<String, Map<Double, String>> suitabilityDecision;
+	public Map<String, Map<Double, Double>> differenceBetweenNominal;
 	public List<Double> freqs;
 	protected  ObservableList<String> paramsNames;
 	private String tableName;
@@ -52,7 +53,8 @@ public class MeasResult implements Includable<Element>, dbStorable{
 		this.myElement = ownerElement;
 		this.freqs = new ArrayList<Double>();
 		this.values = new LinkedHashMap<String, Map<Double, Double>>();
-		this.suitabilityDecision = new HashMap<String, Map<Double, String>>();		
+		this.suitabilityDecision = new HashMap<String, Map<Double, String>>();	
+		this.differenceBetweenNominal = new HashMap<String, Map<Double, Double>>();
 		ResultReaderManager resReader = new ResultReaderManager(fileWithResults);			
 		resReader.readResult(resultNumber, freqs, values);				
 		this.countOfParams = values.size();

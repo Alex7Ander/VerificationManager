@@ -93,8 +93,7 @@ public class VisualTable implements Table {
 	public String getCellValue(int col, int row) {
 		Set<Integer> keys = lines.get(row).values.keySet();
 		String key = keys.toArray()[col].toString();
-		String result = lines.get(row).values.get(key);
-		return result;
+		return lines.get(row).values.get(key);
 	}
 
 	@Override
@@ -154,19 +153,45 @@ public class VisualTable implements Table {
 
 	@Override
 	public void setColumnFromDouble(int index, List<Double> columnValues) {
-		int stopIndex = 0;
-		if (columnValues.size() > lines.size()) {
-			stopIndex = columnValues.size();
-		} 
-		else {
-			stopIndex = lines.size();
-		}
+		int stopIndex = setStopIndex(columnValues);
 		for (int i = 0; i < stopIndex; i++) {
 			String text = columnValues.get(i).toString();
 			setCellValue(index, i, text);
 		}		
 	}
+	
+	@Override
+	public void setColumnFromDouble(int index, List<Double> columnValues, int accuracy) {
+		int stopIndex = setStopIndex(columnValues);		
+		for (int i = 0; i < stopIndex; i++) {
+			String text = setFractionalTextPart(columnValues.get(i).toString(), accuracy);			
+			setCellValue(index, i, text);
+		}		
+	}
 
+	private int setStopIndex(List<Double> columnValues) {
+		int stopIndex = 0;
+		if (columnValues.size() > this.lines.size()) {
+			stopIndex = columnValues.size();
+		} 
+		else {
+			stopIndex = this.lines.size();
+		}
+		return stopIndex;
+	}
+	
+	private String setFractionalTextPart(String text, int accuracy) {
+		String fractional = text.substring(text.lastIndexOf('.') + 1);
+		int fractionalLength = fractional.length();
+		if(accuracy > fractionalLength) {
+			while (fractionalLength < accuracy) {
+				text = text.concat("0");
+				fractionalLength ++;
+			}
+		}
+		return text;
+	}
+	
 	@Override
 	public void delete() {
 		for (int i = 0; i < pane.getChildren().size(); i++) {
@@ -178,6 +203,8 @@ public class VisualTable implements Table {
 	public void setVisible(boolean visibleStatus) {
 		table.setVisible(visibleStatus);		
 	}
+
+
 
 	
 }

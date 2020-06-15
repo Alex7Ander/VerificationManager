@@ -1,6 +1,8 @@
 package ToleranceParamPack.StrategyPack;
 
+import java.util.Map;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import ToleranceParamPack.ParametrsPack.S_Parametr;
 import ToleranceParamPack.ParametrsPack.ToleranceParametrs;
@@ -12,22 +14,28 @@ public class upDownStrategy implements StrategyOfSuitability {
 		boolean resultOfCheck = true;
 		int currentCountOfFreq = result.getCountOfFreq();
 		for (int i=0; i < result.getMyOwner().getSParamsCout(); i++) {
-			HashMap<Double, String> decisions = new HashMap<Double, String>();
+			Map<Double, String> decisions = new LinkedHashMap<Double, String>();
+			Map<Double, Double> difference = new LinkedHashMap<Double, Double>();
+			
 			for (int j=0; j < currentCountOfFreq; j++) {
 				double cFreq = result.freqs.get(j);	
 				String key = tolerance.measUnitPart + "_" + S_Parametr.values()[i];
 				double res = result.values.get(key).get(cFreq);
-				double down = tolerance.values.get("DOWN_" + key).get(cFreq);
-				double up = tolerance.values.get("UP_" + key).get(cFreq);
+				double nominal = tolerance.getMyOwner().getNominal().values.get(key).get(cFreq);
+				double down = nominal + tolerance.values.get("DOWN_" + key).get(cFreq);
+				double up = nominal + tolerance.values.get("UP_" + key).get(cFreq);
 				if(res > up || res < down) {
-					decisions.put(cFreq, "Не годен");
+					decisions.put(cFreq, "Не соответствует");
 					resultOfCheck = false;
 				}
 				else {
-					decisions.put(cFreq, "Годен");
+					decisions.put(cFreq, "Соответствует");
 				}
-			}			
+				difference.put(cFreq, nominal - res);
+			}
+			
 			result.suitabilityDecision.put(tolerance.measUnitPart + "_" + S_Parametr.values()[i], decisions);
+			result.differenceBetweenNominal.put(tolerance.measUnitPart + "_" + S_Parametr.values()[i], difference);
 		}
 		return resultOfCheck;
 	}

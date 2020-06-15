@@ -498,10 +498,8 @@ public class DBEditController implements InfoRequestable {
 				dataPhase.add(new XYChart.Data<Number, Number>(cFreq, cPhase));
 			}
 			this.paintGraph(dataModule, dataPhase);		
-			this.measInfoLabel.setText("Результаты измерения " + unit + " проведенного " + date + " для \"" + currentResult.getMyOwner().getType() + " " +
-					currentResult.getMyOwner().getSerialNumber() + "\" ");
-			this.measInfoLabel2.setText("из состава \"" + currentResult.getMyOwner().getMyOwner().getName() + " " +
-					currentResult.getMyOwner().getMyOwner().getType() + " №" + currentResult.getMyOwner().getMyOwner().getSerialNumber() + "\".");
+			this.measInfoLabel.setText("Средство измерения:  " + currentResult.getMyOwner().getMyOwner().getName() + " №" +currentResult.getMyOwner().getMyOwner().getSerialNumber()); 
+			this.measInfoLabel2.setText("Измеренный параметр: "+ unit);
 		}
 		catch(SQLException sqlExp) {
 			AboutMessageWindow.createWindow("Ошибка", "Ошибка доступа к БД\nпри получении результатов измерения").show();

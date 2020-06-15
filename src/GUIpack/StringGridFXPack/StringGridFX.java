@@ -29,6 +29,12 @@ public class StringGridFX implements Table {
 	private double height;
 	private double celWidth;
 	
+	private static final String cellStyle = "-fx-background-radius:0; "
+										+ "-fx-border-color:black; "
+										+ "-fx-border-width:1;"
+										+ "-fx-font-family: Arial Narrow;"
+										+ "-fx-font-size: 12;";
+	
 	public StringGridFX(int ColCount, int RowCount, StringGridPosition position) {
 		myPosition = position;
 		celWidth = myPosition.getWidth()/ColCount - 1;
@@ -61,11 +67,7 @@ public class StringGridFX implements Table {
 			for (int j=0; j<ColCount; j++) {	
 				CellTextField cell = new CellTextField(i, j);
 				cell.setPrefWidth(celWidth-1);
-				cell.setStyle("-fx-background-radius:0; "
-							+ "-fx-border-color:black; "
-							+ "-fx-border-width:1;"
-							+ "-fx-font-family: Arial Narrow;"
-							+ "-fx-font-size: 12;");
+				cell.setStyle(cellStyle);
 				cell.setOnKeyPressed(new EventHandler<KeyEvent>(){
 			        @Override
 			        public void handle(KeyEvent key){
@@ -121,11 +123,7 @@ public class StringGridFX implements Table {
 		for (int j = 0; j < this.colCount; j++) {				
 			CellTextField cell = new CellTextField(cells.size(), j);
 			cell.setPrefWidth(celWidth-1);
-			cell.setStyle("-fx-background-radius:0; "
-						+ "-fx-border-color:black; "
-						+ "-fx-border-width:1;"
-						+ "-fx-font-family: Arial Narrow;"
-						+ "-fx-font-size: 12;");
+			cell.setStyle(cellStyle);
 			cell.setOnKeyPressed(new EventHandler<KeyEvent>(){
 		        @Override
 		        public void handle(KeyEvent key){
@@ -199,7 +197,7 @@ public class StringGridFX implements Table {
 			heads.get(index).setText(text);
 		}
 		catch(Exception exp) {
-			//
+			exp.printStackTrace();
 		}
 	}
 	
@@ -219,7 +217,7 @@ public class StringGridFX implements Table {
 			cells.get(row).get(col).setText(text);
 		}
 		catch(Exception exp) {
-			//
+			exp.printStackTrace();
 		}
 	}
 	
@@ -276,6 +274,11 @@ public class StringGridFX implements Table {
 	}
 	
 	@Override
+	public void setColumnFromDouble(int index, List<Double> columnValues, int accuracy) {
+		// TODO Auto-generated method stub		
+	}
+	
+	@Override
 	public void setVisible(boolean visibleStatus) {
 		myPosition.getAnchorContainer().setVisible(visibleStatus);
 	}
@@ -286,5 +289,7 @@ public class StringGridFX implements Table {
 			myPosition.getAnchorContainer().getChildren().remove(line);
 		}				
 	}
+
+
 
 }

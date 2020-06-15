@@ -132,10 +132,10 @@
                         </VBox>
                         <VBox prefHeight="895.0" prefWidth="796.0">
                            <children>
-                              <AnchorPane prefHeight="113.0" prefWidth="803.0">
+                              <AnchorPane prefHeight="76.0" prefWidth="796.0">
                                  <children>
-                                    <Label fx:id="measInfoLabel" layoutX="14.0" layoutY="14.0" stylesheets="@../application/commonLabel.css" text="Таблица результатов  измерений для " />
-                                    <Label fx:id="measInfoLabel2" layoutX="14.0" layoutY="42.0" stylesheets="@../../bin/application/commonLabel.css" text="___" />
+                                    <Label fx:id="measInfoLabel" layoutX="14.0" layoutY="6.0" stylesheets="@../application/commonLabel.css" text="Средство измерения:  " />
+                                    <Label fx:id="measInfoLabel2" layoutX="12.0" layoutY="36.0" stylesheets="@../../bin/application/commonLabel.css" text="Измеренный параметр:" />
                                  </children>
                               </AnchorPane>
                               <ScrollPane fx:id="resultsScrollPane" prefHeight="486.0" prefWidth="953.0">
