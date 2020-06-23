@@ -1,7 +1,6 @@
 package ToleranceParamPack.StrategyPack;
 
 import java.util.Map;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 import ToleranceParamPack.ParametrsPack.S_Parametr;
@@ -10,7 +9,7 @@ import VerificationPack.MeasResult;
 
 public class upDownStrategy implements StrategyOfSuitability {
 	@Override
-	public boolean checkResult(MeasResult result, ToleranceParametrs tolerance) {
+	public boolean checkResult(MeasResult result, ToleranceParametrs tolerance) {  
 		boolean resultOfCheck = true;
 		int currentCountOfFreq = result.getCountOfFreq();
 		for (int i=0; i < result.getMyOwner().getSParamsCout(); i++) {
@@ -25,13 +24,14 @@ public class upDownStrategy implements StrategyOfSuitability {
 				double down = nominal + tolerance.values.get("DOWN_" + key).get(cFreq);
 				double up = nominal + tolerance.values.get("UP_" + key).get(cFreq);
 				if(res > up || res < down) {
-					decisions.put(cFreq, "Не соответствует");
+					decisions.put(cFreq, "Не соотв.");
 					resultOfCheck = false;
 				}
 				else {
-					decisions.put(cFreq, "Соответствует");
+					decisions.put(cFreq, "Соотв.");
 				}
-				difference.put(cFreq, nominal - res);
+				double currentDifference = java.lang.Math.round((nominal - res)*1000);
+				difference.put(cFreq, currentDifference/1000);
 			}
 			
 			result.suitabilityDecision.put(tolerance.measUnitPart + "_" + S_Parametr.values()[i], decisions);

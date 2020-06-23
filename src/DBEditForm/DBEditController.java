@@ -6,10 +6,8 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import AboutMessageForm.AboutMessageWindow;
 import DataBasePack.DataBaseManager;
@@ -26,7 +24,6 @@ import ToleranceParamPack.ParametrsPack.MeasUnitPart;
 import ToleranceParamPack.ParametrsPack.S_Parametr;
 import VerificationPack.MeasResult;
 import YesNoDialogPack.YesNoWindow;
-import _tempHelpers.Adapter;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -76,9 +73,14 @@ public class DBEditController implements InfoRequestable {
 	//Правая часть окна
 	//Просмотр результатов измерений
 	@FXML
-	private Label measInfoLabel;
+	private Label deviceInfoLabel;
 	@FXML
-	private Label measInfoLabel2;
+	private Label elementInfoLabel;
+	@FXML
+	private Label dateInfoLabel;
+	@FXML
+	private Label unitInfoLabel;
+	
 	@FXML
 	private ListView<String> verificationDateListView;
 	private ObservableList<String> verificationDateList;	
@@ -149,6 +151,7 @@ public class DBEditController implements InfoRequestable {
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		this.mainAnchorPane.setMaxHeight(dim.height);
 		this.mainAnchorPane.setMaxWidth(dim.width);
+		
 	}
 	
 	private void createElemtnsListViewContextMenu() {
@@ -412,7 +415,7 @@ public class DBEditController implements InfoRequestable {
 				if (resIndex != nominalIndex)
 					item = "Поверка, проведенная " + this.verifications.get(i).get(1);
 				else 
-					item = "Номиналыные занчение, полученные " + this.verifications.get(i).get(1);
+					item = "Номинальные значения, полученные " + this.verifications.get(i).get(1);
 				this.verificationDateList.add(item);
 			}						
 			this.verificationDateListView.setItems(this.verificationDateList);			
@@ -498,8 +501,11 @@ public class DBEditController implements InfoRequestable {
 				dataPhase.add(new XYChart.Data<Number, Number>(cFreq, cPhase));
 			}
 			this.paintGraph(dataModule, dataPhase);		
-			this.measInfoLabel.setText("Средство измерения:  " + currentResult.getMyOwner().getMyOwner().getName() + " №" +currentResult.getMyOwner().getMyOwner().getSerialNumber()); 
-			this.measInfoLabel2.setText("Измеренный параметр: "+ unit);
+			
+			this.deviceInfoLabel.setText("Средство измерения:  " + currentResult.getMyOwner().getMyOwner().getName() + " №" +currentResult.getMyOwner().getMyOwner().getSerialNumber());
+			this.elementInfoLabel.setText(currentResult.getMyOwner().getType() + " " + currentResult.getMyOwner().getSerialNumber());
+			this.dateInfoLabel.setText("Дата проведения измерений:" + date);
+			this.unitInfoLabel.setText("Измеренный параметр: "+ unit);
 		}
 		catch(SQLException sqlExp) {
 			AboutMessageWindow.createWindow("Ошибка", "Ошибка доступа к БД\nпри получении результатов измерения").show();

@@ -24,11 +24,11 @@ public class percentStrategy implements StrategyOfSuitability {
 				double up = nominal + tolerance.values.get("UP_" + key).get(cFreq) * nominal / 100;
 				double down = nominal + tolerance.values.get("DOWN_" + key).get(cFreq) * nominal / 100;   				
 				if(res > up || res < down) {
-					decisions.put(cFreq, "Íå ñîîòâåòñòâóåò");
+					decisions.put(cFreq, "Íå ñîîòâ.");
 					resultOfCheck = false;
 				}
 				else {
-					decisions.put(cFreq, "Ñîîòâåòñòâóåò");
+					decisions.put(cFreq, "Ñîîòâ.");
 				}	
 				double currentDifference = java.lang.Math.round((nominal - res)*100/nominal*1000);
 				difference.put(cFreq, currentDifference/1000);

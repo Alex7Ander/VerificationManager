@@ -9,11 +9,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.usermodel.HeaderFooter;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.DataFormat;
 import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.Footer;
+//import org.apache.poi.ss.usermodel.HeaderFooter;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.PrintSetup;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -45,9 +51,19 @@ public class DocumetnsCreateService extends Service<Integer> {
 	private ArrayList<Row> rows;
 	//Стили шрифтов
 	private CellStyle borderCellStyle;
+	private CellStyle boldCellStyle;
 	private CellStyle headCellStyle;
 	private CellStyle ordinaryCellStyle;
-	private CellStyle boldCellStyle;
+	private CellStyle tableHeadCellStyle;
+	private CellStyle elementNameStyle;
+	
+	private CellStyle borderModuleCellStyle;
+	private CellStyle borderPhaseCellStyle;
+	
+	@SuppressWarnings("unused")
+	private final String moduleFormatPattern = "0.000";
+	@SuppressWarnings("unused")
+	private final String phaseFormatPattern = "0.00";
 	
 	public DocumetnsCreateService(String protocolFileName, 
 								String documetFileName, 
@@ -67,34 +83,86 @@ public class DocumetnsCreateService extends Service<Integer> {
 		this.wb = new HSSFWorkbook();
 		String strDate = protocoledResult.get(0).getDateOfMeasByString();
 		this.sh = wb.createSheet(WorkbookUtil.createSafeSheetName(strDate));
+		this.sh.setAutobreaks(true);
+		PrintSetup ps = sh.getPrintSetup();
+		ps.setFitWidth((short)1);
+		ps.setFitHeight((short)255);
+		Footer footer = sh.getFooter();
+		footer.setCenter(" Стр. " + HeaderFooter.page() + " из " + HeaderFooter.numPages() + "(Протокол поверки № " + verification.getProtocolNumber() + " от " + verification.getDateOfCreation().replace('-', '.') + ")");
 		this.rows = new ArrayList<Row>();
-		//Создадим стиль "граница ячеек"
-		this.borderCellStyle = wb.createCellStyle();
-		this.borderCellStyle.setBorderBottom(BorderStyle.THIN);
-		this.borderCellStyle.setBorderLeft(BorderStyle.THIN);
-		this.borderCellStyle.setBorderRight(BorderStyle.THIN);
-		this.borderCellStyle.setBorderTop(BorderStyle.THIN);
+		
+		//Шрифты
 		Font ordinaryfont = wb.createFont();
 		ordinaryfont.setFontName("Times New Roman");
-		ordinaryfont.setFontHeightInPoints((short)12);
-		this.borderCellStyle.setFont(ordinaryfont);				
-		//Стиль заголовок документа
-		this.headCellStyle = this.wb.createCellStyle();
-		Font headFont = this.wb.createFont();
-		headFont.setFontName("Times New Roman");
-		headFont.setFontHeightInPoints((short)14);
-		headFont.setBold(true);
-		this.headCellStyle.setFont(headFont);
-		this.headCellStyle.setAlignment(HorizontalAlignment.CENTER);		
-		//Простой стиль
-		this.ordinaryCellStyle = this.wb.createCellStyle();
-		this.ordinaryCellStyle.setFont(ordinaryfont);		
-		//Стиль - Жирный шрифт
-		this.boldCellStyle = this.wb.createCellStyle(); 
+		ordinaryfont.setFontHeightInPoints((short)10);
 		Font boldFont = this.wb.createFont();
 		boldFont.setFontName("Times New Roman");
 		boldFont.setFontHeightInPoints((short)12);
-		this.boldCellStyle.setFont(boldFont);
+		boldFont.setBold(true);
+		
+		//Создадим стиль "ячейки с границами"		
+		this.borderCellStyle = wb.createCellStyle();
+		this.borderModuleCellStyle = wb.createCellStyle();
+		this.borderPhaseCellStyle = wb.createCellStyle();
+		
+		this.borderCellStyle.setAlignment(HorizontalAlignment.RIGHT);
+		this.borderModuleCellStyle.setAlignment(HorizontalAlignment.RIGHT);
+		this.borderPhaseCellStyle.setAlignment(HorizontalAlignment.RIGHT);
+		
+		this.borderCellStyle.setBorderTop(BorderStyle.THIN);
+		this.borderModuleCellStyle.setBorderTop(BorderStyle.THIN);
+		this.borderPhaseCellStyle.setBorderTop(BorderStyle.THIN);
+		
+		this.borderCellStyle.setBorderBottom(BorderStyle.THIN);
+		this.borderModuleCellStyle.setBorderBottom(BorderStyle.THIN);
+		this.borderPhaseCellStyle.setBorderBottom(BorderStyle.THIN);
+		
+		this.borderCellStyle.setBorderLeft(BorderStyle.THIN);
+		this.borderModuleCellStyle.setBorderLeft(BorderStyle.THIN);
+		this.borderPhaseCellStyle.setBorderLeft(BorderStyle.THIN);
+		
+		this.borderCellStyle.setBorderRight(BorderStyle.THIN);
+		this.borderModuleCellStyle.setBorderRight(BorderStyle.THIN);
+		this.borderPhaseCellStyle.setBorderRight(BorderStyle.THIN);
+				
+		this.borderModuleCellStyle.setDataFormat(wb.createDataFormat().getFormat("0.000"));
+		this.borderPhaseCellStyle.setDataFormat(wb.createDataFormat().getFormat("0.00"));
+		
+		this.borderCellStyle.setFont(ordinaryfont);	
+		this.borderModuleCellStyle.setFont(ordinaryfont);
+		this.borderPhaseCellStyle.setFont(ordinaryfont);
+		
+		this.borderCellStyle.setWrapText(true);
+		this.borderModuleCellStyle.setWrapText(true);
+		this.borderPhaseCellStyle.setWrapText(true);
+		
+		//Стиль для названия нагрузки
+		this.elementNameStyle = this.wb.createCellStyle();
+		this.elementNameStyle.setFont(boldFont);
+		this.elementNameStyle.setAlignment(HorizontalAlignment.LEFT);
+		
+		//Стиль заголовок документа
+		this.headCellStyle = this.wb.createCellStyle();
+		this.headCellStyle.setFont(boldFont);
+		this.headCellStyle.setAlignment(HorizontalAlignment.CENTER);
+		
+		//Простой стиль
+		this.ordinaryCellStyle = this.wb.createCellStyle();
+		this.ordinaryCellStyle.setFont(ordinaryfont);	
+		
+		//Стиль заголовок таблиц
+		this.tableHeadCellStyle = this.wb.createCellStyle();
+		this.tableHeadCellStyle.setFont(ordinaryfont);
+		this.tableHeadCellStyle.setAlignment(HorizontalAlignment.CENTER);
+		this.tableHeadCellStyle.setBorderTop(BorderStyle.THIN);
+		this.tableHeadCellStyle.setBorderBottom(BorderStyle.THIN);
+		this.tableHeadCellStyle.setBorderRight(BorderStyle.THIN);
+		this.tableHeadCellStyle.setBorderLeft(BorderStyle.THIN);
+		this.tableHeadCellStyle.setWrapText(true);
+		
+		//Стиль - Жирный шрифт
+		this.boldCellStyle = this.wb.createCellStyle(); 
+		this.boldCellStyle.setFont(boldFont);		
 	}
 	
 	@Override
@@ -168,8 +236,11 @@ public class DocumetnsCreateService extends Service<Integer> {
 		//Создадим строки
 		int countOfRows = 21;
 		for (int i=0; i < protocoledResult.size(); i++) {
+			int currentParamsCount = 1;
+			if(protocoledResult.get(i).getMyOwner().getPoleCount()==4)
+				currentParamsCount = 4;
 			int freqCount = protocoledResult.get(i).getCountOfFreq();
-			countOfRows += (freqCount + 3);
+			countOfRows += ((freqCount + 3) * currentParamsCount);
 		}
 		for (int i=0; i < countOfRows; i++) {
 			Row row = sh.createRow(i); 
@@ -178,30 +249,31 @@ public class DocumetnsCreateService extends Service<Integer> {
 	}
 	
 	private void fillSheet() {
-		setCellValue(0, 0, "Протокол поверки № " + verification.getProtocolNumber(), headCellStyle);
-		setCellValue(1, 0, "к свидетельству о поверке (извещению о непригодности) № " + verification.getDocumentNumber(), headCellStyle);		
-		setCellValue(2, 0, "Средство измерений: " + verification.getDeviceInfo(), ordinaryCellStyle);
-		setCellValue(4, 0, "Заводской номер (номера): " + verification.getDeviceSerNumber(), ordinaryCellStyle);
-		setCellValue(6, 0, "Поверка проведена при следующих значениях влияющих факторов:", boldCellStyle);
-		setCellValue(7, 0, "температура окружающего воздуха " + verification.getTemperature() + " град. С", ordinaryCellStyle);
-		setCellValue(8, 0, "относительная   влажность " + verification.getAirHumidity() + " %", ordinaryCellStyle);
-		setCellValue(9, 0, "атмосферное давление " + verification.getAtmPreasure() + " мм рт. ст.", ordinaryCellStyle);
-		String s = null;
-		if (this.verification.isPrimary()) {
-			s = "первичной";
-		}
-		else {
-			s = "перодической";
-		}
-		setCellValue(11, 0, "И на основании результатов " + s + " поверки признано " + verification.getDecision(), ordinaryCellStyle);
-		setCellValue(12, 0, "1. Внешний осмотр: ", boldCellStyle);
-		setCellValue(13, 0, "Исправность средства измерений (внешний осмотр): Исправен.", ordinaryCellStyle);
-		setCellValue(14, 0, "на эксплуатационные и метрологические характеристики: не обнаружено.", ordinaryCellStyle);
-		setCellValue(15, 0, "Наличие маркировки согласно требованиям ЭД: маркировка присутствует.", ordinaryCellStyle);
-		setCellValue(16, 0, "2. Опробование: ", boldCellStyle);
-		setCellValue(17, 0, "Аппаратура работоспособна.", ordinaryCellStyle);
-		setCellValue(18, 0, "3. Метрологические характеристики: ", boldCellStyle);
-			
+		System.out.println("Процедура заполнения файла Excel:");
+		System.out.print("Основная информация: ");
+		setCellValue(0, 0, "Протокол поверки № " + verification.getProtocolNumber(), headCellStyle);		
+		setCellValue(1, 0, "от " + verification.getDateOfCreation().replace('-', '.'), headCellStyle);		
+		setCellValue(2, 0, verification.getEtalonString().trim() + ": " + verification.getDeviceInfo(), ordinaryCellStyle);
+		setCellValue(3, 0, "Заводской номер: " + verification.getDeviceSerNumber(), ordinaryCellStyle);
+		setCellValue(4, 0, "Принадлежащий: " + verification.getDeviceOwner(), ordinaryCellStyle);
+		
+		String weatherStr1 = "Условия поверки: температура " + verification.getTemperature() + " \u00B0C, относительная   влажность " + 
+								verification.getAirHumidity() + " %, давление " + verification.getAtmPreasure() + " мм рт. ст.";
+		setCellValue(6, 0, weatherStr1, ordinaryCellStyle);
+
+		setCellValue(8, 0, "Средства измерений:", ordinaryCellStyle);
+		setCellValue(9, 0, "военный эталон ВЭ-24-20", ordinaryCellStyle);
+		
+		setCellValue(11, 0, "Нормативно-техническая документация поверки:", ordinaryCellStyle);
+		setCellValue(12, 0, verification.getVerificatonMethodologyName(), ordinaryCellStyle);
+				
+		setCellValue(14, 0, "Результаты поверки:", ordinaryCellStyle);
+		setCellValue(15, 0, "1. Внешний осмотр: замечаний нет", ordinaryCellStyle);
+		setCellValue(16, 0, "Наличие маркировки согласно требованиям ЭД: маркировка присутствует", ordinaryCellStyle);
+		setCellValue(17, 0, "2. Опробование: аппаратура работоспособна", ordinaryCellStyle);
+		setCellValue(18, 0, "3. Метрологические характеристики: ", ordinaryCellStyle);
+		System.out.print("\tуспешно\n");
+					
 		int dRow = 19;
 		int countOfRes = protocoledResult.size();
 		for (int i = 0; i < countOfRes; i++) {
@@ -214,113 +286,186 @@ public class DocumetnsCreateService extends Service<Integer> {
 			//Строка про элемент
 			String head = currentRes.getMyOwner().getType() + " " + currentRes.getMyOwner().getSerialNumber();
 			setCellValue(dRow, 0, head, headCellStyle);
-			rowMerging(dRow, 0, 10);
+			rowMerging(dRow, 0, 12);
+			System.out.println(head);
 			dRow++;
 			
 			//Заполнение таблицы
 			String keys[] = {"S11", "S12", "S21", "S22"};
 			int stop = 1;
-			if (currentRes.getMyOwner().getPoleCount()==4) stop = 4;
+			if (currentRes.getMyOwner().getPoleCount() == 4) stop = 4;
 			for(int k = 0; k < stop; k++) {				
 				//Шапка для таблицы
-				String resType = currentRes.getMyOwner().getMeasUnit();
-				List<String> tableHeads = createtableHeads(resType, keys[k]);
-				for (int j = 0; j < tableHeads.size(); j++)
-					setCellValue(dRow, j, tableHeads.get(j), borderCellStyle);
+				List<String> tableHeads = createtableHeads(currentRes, keys[k]);
+				for (int th = 0; th < tableHeads.size(); th++) {
+					setCellValue(dRow, th, tableHeads.get(th), tableHeadCellStyle);
+					System.out.print("\t" + tableHeads.get(th));
+				}	
+				System.out.print("\n");
 				dRow++;
 				
 				for (int j = 0; j < currentRes.getCountOfFreq(); j++) {
 					//Частота
 					Double cFreq = currentRes.freqs.get(j);
-					setCellValue(dRow, 0, cFreq.toString(), borderCellStyle);
+					setCellValue(dRow, 0, cFreq, borderPhaseCellStyle);				
+					System.out.print("\t"+cFreq);
 					
 					//КСВН/Г
-					String vswr = currentRes.values.get("MODULE_" + keys[k]).get(cFreq).toString();
-					setCellValue(dRow, 1, vswr.replace('.', ','), borderCellStyle);
+					Double vswr = currentRes.values.get("MODULE_" + keys[k]).get(cFreq); //.toString();
+					setCellValue(dRow, 1, vswr, borderModuleCellStyle);		
+					System.out.print("\t"+vswr);
+					
+					//Погрешность КСВН/Г
+					Double vswrError = currentRes.values.get("ERROR_MODULE_" + keys[k]).get(cFreq);
+					setCellValue(dRow, 2, vswrError, borderModuleCellStyle);
+					System.out.print("\t"+vswrError);
 					
 					//Номинал КСВН/Г
-					String vswrNominal = currentNominal.values.get("MODULE_" + keys[k]).get(cFreq).toString();
-					setCellValue(dRow, 2, vswrNominal.replace('.', ','), borderCellStyle);
+					Double vswrNominal = currentNominal.values.get("MODULE_" + keys[k]).get(cFreq);
+					setCellValue(dRow, 3, vswrNominal, borderModuleCellStyle);
+					System.out.print("\t"+vswrNominal);
+					
+					//Дельты по модулю
+					Double moduleDelta = currentRes.differenceBetweenNominal.get("MODULE_" + keys[k]).get(cFreq);
+					setCellValue(dRow, 4, moduleDelta, borderModuleCellStyle);
+					System.out.print("\t"+moduleDelta);
 					
 					//Допуск КСВН/Г
 					String vswrTolerance = currentModuleTolerance.values.get("DOWN_MODULE_" + keys[k]).get(cFreq).toString();
 					vswrTolerance += ("/" + currentModuleTolerance.values.get("UP_MODULE_" + keys[k]).get(cFreq).toString());
-					setCellValue(dRow, 3, vswrTolerance, borderCellStyle);
-					
-					//Погрешность КСВН/Г
-					String vswrError = currentRes.values.get("ERROR_MODULE_" + keys[k]).get(cFreq).toString();
-					setCellValue(dRow, 4, vswrError.replace('.', ','), borderCellStyle);
+					setCellValue(dRow, 5, vswrTolerance, borderCellStyle);
+					System.out.print("\t"+vswrTolerance);
 					
 					//Годен/не годен по КСВН
 					String moduleDecision = currentRes.suitabilityDecision.get("MODULE_" + keys[k]).get(cFreq);
-					setCellValue(dRow, 5, moduleDecision, borderCellStyle);
+					setCellValue(dRow, 6, moduleDecision, borderCellStyle);
+					System.out.print("\t"+moduleDecision);
 					
-					//Фаза
-					String phase = currentRes.values.get("PHASE_" + keys[k]).get(cFreq).toString();
-					setCellValue(dRow, 6, phase.replace('.', ','), borderCellStyle);
-					
-					//Номинал Фазы
-					String phaseNominal = currentNominal.values.get("PHASE_" + keys[k]).get(cFreq).toString();
-					setCellValue(dRow, 7, phaseNominal.replace('.', ','), borderCellStyle);
-					
-					//Допуск Фазы
-					String phaseTolerance = currentPhaseTolerance.values.get("DOWN_PHASE_" + keys[k]).get(cFreq).toString();
-					phaseTolerance += ("/" + currentPhaseTolerance.values.get("UP_PHASE_" + keys[k]).get(cFreq).toString());
-					setCellValue(dRow, 8, phaseTolerance, borderCellStyle);
-					
-					//Погрешность Фазы
-					String phaseError = currentRes.values.get("ERROR_PHASE_" + keys[k]).get(cFreq).toString();
-					setCellValue(dRow, 9, phaseError.replace('.', ','), borderCellStyle);
-
-					//Годен/не годен по фазе
-					String phaseDecision = currentRes.suitabilityDecision.get("PHASE_" + keys[k]).get(cFreq);
-					setCellValue(dRow, 10, phaseDecision, borderCellStyle);
-					
+					if(!currentRes.getMyOwner().getType().contains("согласован")) {
+						//Фаза
+						Double phase = currentRes.values.get("PHASE_" + keys[k]).get(cFreq);
+						setCellValue(dRow, 7, phase, borderPhaseCellStyle);
+						System.out.print("\t"+phase);
+											
+						//Погрешность Фазы
+						Double phaseError = currentRes.values.get("ERROR_PHASE_" + keys[k]).get(cFreq);
+						setCellValue(dRow, 8, phaseError, borderPhaseCellStyle);
+						System.out.print("\t"+phaseError);
+						
+						//Номинал Фазы
+						Double phaseNominal = currentNominal.values.get("PHASE_" + keys[k]).get(cFreq);
+						setCellValue(dRow, 9, phaseNominal, borderPhaseCellStyle);
+						System.out.print("\t"+phaseNominal);
+						
+						//Дельты по модулю
+						Double phaseDelta = currentRes.differenceBetweenNominal.get("PHASE_" + keys[k]).get(cFreq);
+						setCellValue(dRow, 10, phaseDelta, borderPhaseCellStyle);
+						System.out.print("\t" +phaseDelta);
+						
+						//Допуск Фазы
+						String phaseTolerance = currentPhaseTolerance.values.get("DOWN_PHASE_" + keys[k]).get(cFreq).toString();
+						phaseTolerance += ("/" + currentPhaseTolerance.values.get("UP_PHASE_" + keys[k]).get(cFreq).toString());
+						setCellValue(dRow, 11, phaseTolerance, borderCellStyle);
+						System.out.print("\t" +phaseTolerance);
+						
+						//Годен/не годен по фазе
+						String phaseDecision = currentRes.suitabilityDecision.get("PHASE_" + keys[k]).get(cFreq);
+						setCellValue(dRow, 12, phaseDecision, borderCellStyle);	
+						System.out.print("\t" +phaseDecision);
+					}										
+					System.out.print("\n");					
 					dRow++;
-				}//end j			 
+				}//end j
+				setCellValue(dRow, 0, "", ordinaryCellStyle);
+				dRow++;
+				System.out.print("\n\n");
 			} //end k		
 		}//end i
+		
+		dRow++;
+		String s = null;
+		if (this.verification.isPrimary()) s = "первичной";
+		else s = "перодической";
+		
+		setCellValue(dRow, 0, "На основании результатов " + s + " признано " + this.verification.getDecision(), ordinaryCellStyle);
+		rowMerging(dRow, 0, 10);
+		dRow++;
+		setCellValue(dRow, 0, "Измерения выполнил: " + this.verification.getWorkerName(), ordinaryCellStyle);
+		rowMerging(dRow, 0, 10);
+		dRow++;
+		boldCellStyle.setAlignment(HorizontalAlignment.RIGHT);
+		setCellValue(dRow, 0, "Хранитель ВЭ-24-20: " + this.verification.getBossStatus() + " " + this.verification.getBossName(), ordinaryCellStyle);
+		rowMerging(dRow, 0, 10);
 	}
 	
-	private List<String> createtableHeads(String resType, String key) {
+	private List<String> createtableHeads(MeasResult currentRes, String key) {
+		String resType = currentRes.getMyOwner().getMeasUnit();
+		String currentModuleToleranceType = currentRes.getMyOwner().getModuleToleranceType();
+		
 		List<String> tableHeads = new ArrayList<>();
-		tableHeads.add("F, ГГц");
+		String paramStr = null;		
 		if(key.equals("S11")){
 			if (resType.equals("vswr")) {
-				tableHeads.add("КСВН 1-го порта");
+				paramStr = "КСВН\r\n(1 порт)";
 			} else {
-				tableHeads.add("|Г| 1-го порта");
+				paramStr = "|Г|\r\n(1 порт)";
 			}
 		}
 		else if(key.equals("S12")) {
-			tableHeads.add("Коэф. перед. S12");
+			paramStr = "Коэф. отраж.\r\nS12";
 		}
 		else if(key.equals("S21")) {
-			tableHeads.add("Коэф. перед. S21");
+			paramStr = "Коэф. отраж.\r\nS21";
 		}
 		else if(key.equals("S22")) {
 			if (resType.equals("vswr")) {
-				tableHeads.add("КСВН 2-го порта");
+				paramStr = "КСВН\r\n(2 порт)";
 			} else {
-				tableHeads.add("|Г| 2-го порта");
+				paramStr = "|Г|\r\n(2 порт)";
 			}
 		}
-		tableHeads.add("Пред.пов.");
-		tableHeads.add("Допуск");
-		tableHeads.add("Погрешность");
-		tableHeads.add("Соответсвие НТД");
 		
-		tableHeads.add("Фаза, \u00B0");
-		tableHeads.add("Пред.пов.");
-		tableHeads.add("Допуск");
-		tableHeads.add("Погрешность");
-		tableHeads.add("Соответсвие НТД");
+		String moduleDifference = null;
+		if(currentModuleToleranceType.equals("percent")) {
+			moduleDifference = "\u03B4, %";
+		} else {
+			moduleDifference = "\u0394";
+		}
+		
+		tableHeads.add("F, ГГц");
+		tableHeads.add(paramStr);
+		tableHeads.add("Погр-ть");
+		tableHeads.add("Пред.пов."); 		
+		tableHeads.add(moduleDifference);
+		tableHeads.add("Допуск");		
+		tableHeads.add("Соответсвие\r\nНТД");
+		
+		if(!currentRes.getMyOwner().getType().contains("согласован")){
+			tableHeads.add("Фаза, \u00B0");
+			tableHeads.add("Пог-ть");
+			tableHeads.add("Пред.пов., \u00B0");		
+			tableHeads.add("\u0394, \u00B0");
+			tableHeads.add("Допуск, \u00B0");
+			tableHeads.add("Соответсвие\r\nНТД");
+		}
+
 		return tableHeads;		
 	}
 	
 	private void setCellValue(int row, int col, String value, CellStyle style) {
 		Cell cell = rows.get(row).createCell(col);
+		cell.setCellValue(value);		
+		cell.setCellStyle(style);		
+	}	
+	
+	private void setCellValue(int row, int col, Double value, CellStyle style) {
+		Cell cell = rows.get(row).createCell(col);		
 		cell.setCellValue(value);
+		try {
+			cell.setCellType(CellType.NUMERIC);
+		} catch (Exception exp) {
+			exp.printStackTrace();
+		}		
 		cell.setCellStyle(style);
 	}
 	
@@ -333,7 +478,7 @@ public class DocumetnsCreateService extends Service<Integer> {
 	
 	private void topCellsMerging() {
 		for (int i=0; i<19; i++) {
-			sh.addMergedRegion(new CellRangeAddress(i, i, 0, 7));
+			sh.addMergedRegion(new CellRangeAddress(i, i, 0, 12));
 		}
 	}
 	

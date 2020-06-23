@@ -174,8 +174,7 @@ public class OldDocSearchController implements InfoRequestable {
 			int next = 0;
 			int stop = resultOfSearch.size();
 			for (int i = 0; i < stop; i++) {
-				//This object will be deleted from resultOfSerach if date of verification
-				//will not be between data "from" and "till"
+				//Этот объект будет удален из результатов поиска, если дата поверки не будет между значениями from и till
 				List<String> currentResultOfSerach = resultOfSearch.get(next);				
 				Date dateOfVer;
 				String strDateOfVer = currentResultOfSerach.get(0);

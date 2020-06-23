@@ -51,6 +51,8 @@ public class ProtocolCreateController {
 	private TextField bossNameTextFiled;
 	@FXML
 	private TextField workerNameTextField;
+	@FXML
+	private TextField verificatonMethodologyNameTextField;
 	
 	@FXML
 	private DatePicker verificationDate;
@@ -64,8 +66,6 @@ public class ProtocolCreateController {
 	private Label devSerNLabel;
 	@FXML
 	private Label devOwnerLabel;
-	@FXML
-	private Label verTypeLabel;
 	@FXML
 	private Label decisionLabel;
 	@FXML
@@ -178,7 +178,7 @@ public class ProtocolCreateController {
 		creteDocuments();	
 	}
 	
-	private void creteDocuments() {
+	private void creteDocuments() {	
 		//Создаем поток создания протокола
 		DocumetnsCreateService docService = new DocumetnsCreateService(this.newProtocolName, 
 																		this.newDocumentName, 
@@ -229,7 +229,7 @@ public class ProtocolCreateController {
 			public void handle(WorkerStateEvent event) {
 				infoBox.toFront();
 				infoBox.setOpacity(1.0);
-				progressPane.setVisible(false);  
+				progressPane.setVisible(false); 
 				AboutMessageWindow.createWindow("Ошибка", "Произошла ошибка при\nсоздании протокола.\nПовторите попытку.").show();
 				return;
 			}
@@ -325,6 +325,9 @@ public class ProtocolCreateController {
 		} else {
 			return "Средство измерения ";
 		}
+	}
+	public String getVerificatonMethodologyName() {
+		return this.verificatonMethodologyNameTextField.getText();
 	}
 	public String getDocType() { 
 		return this.docTypeComboBox.getSelectionModel().getSelectedItem().toString();

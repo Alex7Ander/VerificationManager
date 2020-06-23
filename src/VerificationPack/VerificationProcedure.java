@@ -37,6 +37,7 @@ public class VerificationProcedure {
 	private String deviceOwner;
 	private String dateOfCreation;
 	private String finishDate;
+	private String verificatonMethodologyName;
 
 	public String getTemperature() {
 		return strTemperature;
@@ -104,6 +105,9 @@ public class VerificationProcedure {
 	public String getFinishDate() {
 		return finishDate;
 	}
+	public String getVerificatonMethodologyName() {
+		return verificatonMethodologyName;
+	}
 
 	public boolean isPrimary(){
 		if (verificationTimeType.equals(TimeType.PRIMARY)){
@@ -145,6 +149,6 @@ public class VerificationProcedure {
 		this.dateOfCreation = prtCreateCtrl.getDateOfCreation();
 		this.finishDate = "Годен до " + prtCreateCtrl.getFinishDate();
 		this.militaryBaseName = prtCreateCtrl.getMilitryBaseName();
-	}
-	
+		this.verificatonMethodologyName = prtCreateCtrl.getVerificatonMethodologyName();
+	}	
 }

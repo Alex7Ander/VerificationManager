@@ -292,52 +292,9 @@ public class Element implements Includable<Device>, dbStorable{
 	
 	@Override
 	public void editInfoInDB(HashMap<String, String> editingValues) throws SQLException {
-		/*
-		String tableName = this.myDevice.getElementsTableName();
-		String sqlQuery = "UPDATE " + tableName + " SET ";
-		int count = 1;
-		for (String str: editingValues.keySet()) {
-			sqlQuery += (str + "='"+editingValues.get(str)+"'");
-			if (count != editingValues.size()) {
-				sqlQuery += ", ";
-			} 
-			else {
-				sqlQuery += " ";
-			}
-			count++;
-		}
-		sqlQuery += "WHERE ElementType='"+this.type+"' AND ElementSerNumber='"+this.serialNumber+"'";
-		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);	
-		*/
+		//
 	}
-	
-	public void rewriteTableNames() throws SQLException {
-		/*
-		//First of all we must rewrite table names for results of measurements		
-		List<String> measIndices = new ArrayList<String>();
-		String sqlQuery = "SELECT id FROM [" + listOfVerificationsTable + "]";
-		DataBaseManager.getDB().sqlQueryString(sqlQuery, "id", measIndices);		
-		for (int i = 0; i < measIndices.size(); i++) {
-			MeasResult measRes = new MeasResult(this, Integer.parseInt(measIndices.get(i)));
-			measRes.rewriteTableNames();
-		}
-		//Now we are rewriting name of the table with the list of verifications
-		String newListOfVerificationsTable = "Проведенные поверки для " + myDevice.getName() + " " + myDevice.getType() + " " + myDevice.getSerialNumber() + " " + type + " " + serialNumber;
-		sqlQuery = "ALTER TABLE [" + listOfVerificationsTable + "] RENAME TO [" + newListOfVerificationsTable + "]";
-		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
-		sqlQuery = "UPDATE [" + myDevice.getElementsTableName() + "] SET VerificationsTable='" + newListOfVerificationsTable + "' ";
-		sqlQuery += "WHERE ElementType = '" + type + "' AND ElementSerNumber='" + serialNumber + "'";
-		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
-		// Field listOfVerificationsTable takes new value only after successful query to DB
-		listOfVerificationsTable = newListOfVerificationsTable;
-		//And finally we are rewriting table names of tolerance parameters
-		primaryModuleToleranceParams.rewriteTableNames();
-		primaryPhaseToleranceParams.rewriteTableNames();
-		periodicModuleToleranceParams.rewriteTableNames();
-		periodicPhaseToleranceParams.rewriteTableNames();	
-		*/
-	}
-	
+		
 	public void rewriteParams(ToleranceParametrs newModulePrimaryParams, ToleranceParametrs newModulePeriodicParams,
 							  ToleranceParametrs newPhasePrimaryParams,  ToleranceParametrs newPhasePeriodicparams) throws SQLException, SavingException {
 		primaryModuleToleranceParams.deleteFromDB();
@@ -365,6 +322,5 @@ public class Element implements Includable<Device>, dbStorable{
 		DataBaseManager.getDB().sqlQueryString(sqlString, fieldName, arrayResults);			
 		return arrayResults;
 	}
-
 	
 }

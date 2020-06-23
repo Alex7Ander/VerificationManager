@@ -95,7 +95,7 @@ public class VerificationController implements InfoRequestable {
             phaseAccuracy = 2;
             phaseErrorAccuracy = 2;
         } catch (NumberFormatException nfExp) {
-        	System.err.println("ОШИБКА: неправильный формат дянных для преобразования");
+        	System.err.println("ОШИБКА: неправильный формат данных для преобразования");
             vswrAccuracy = 3;
             vswrErrorAccuracy = 3;
             phaseAccuracy = 2;
@@ -307,31 +307,26 @@ public class VerificationController implements InfoRequestable {
 		
 		//Вносим частоты в таблицу
 		this.resultTable.setColumnFromDouble(0, fr);
-		
-		//Определим количество знаков после запятой для КСВН
+							
+		//Измеренный значения КСВН/модуля Г
+		String key1 = keys.get(this.currentParamIndex*4);
 		List<Double> vswrColumn = Adapter.MapToArrayList(
-				this.verificationResult.get(this.currentElementIndex).values.get(keys.get(this.currentParamIndex*4)));
-					
-		//Измеренный значения КСВН/модуля Г		
+				this.verificationResult.get(this.currentElementIndex).values.get(key1));
 		this.resultTable.setColumnFromDouble(1, vswrColumn, vswrAccuracy);
 		
 		//Погрешность измерения КСВН/модуля Г
+		String key2 = keys.get(1 + this.currentParamIndex*4);
 		List<Double> column2 = Adapter.MapToArrayList(
-				this.verificationResult.get(this.currentElementIndex).values.get(keys.get(1 + this.currentParamIndex*4)));
+				this.verificationResult.get(this.currentElementIndex).values.get(key2));
 		this.resultTable.setColumnFromDouble(2, column2, vswrErrorAccuracy);
 		
 		//Значения предыдущей поверки для КСВН/модуля Г
-		List<Double> column3 = new ArrayList<>();
-		for (double currentFreq : this.verificationResult.get(currentElementIndex).freqs) {
-			String currentKey = keys.get(this.currentParamIndex*4); 
-			Double text = nominals.values.get(currentKey).get(currentFreq);
-			column3.add(text);
-		}		
+		List<Double> column3 = Adapter.MapToArrayList(nominals.values.get(key1));	
 		this.resultTable.setColumnFromDouble(3, column3, vswrAccuracy);
 		
 		//Расчет разницы результатов этой поверки и предыдущей
 		List<Double> column4 = Adapter.MapToArrayList(
-				this.verificationResult.get(this.currentElementIndex).differenceBetweenNominal.get(keys.get(this.currentParamIndex)));		
+				this.verificationResult.get(this.currentElementIndex).differenceBetweenNominal.get(key1));		
 		this.resultTable.setColumnFromDouble(4, column4, vswrAccuracy);
 		
 		//Допуск на КСВН/модуля Г
@@ -347,33 +342,31 @@ public class VerificationController implements InfoRequestable {
 		this.resultTable.setColumn(5, column5);
 				
 		//Решение годности по модолю
+		String key6 = keys.get(this.currentParamIndex);
 		List<String> column6 = Adapter.MapToArrayList(
-				this.verificationResult.get(this.currentElementIndex).suitabilityDecision.get(keys.get(this.currentParamIndex)));
+				this.verificationResult.get(this.currentElementIndex).suitabilityDecision.get(key1));
 		this.resultTable.setColumn(6, column6);
 								
 		//Измеренные значения фазы
-	
+		String key7 = keys.get(2 + this.currentParamIndex*4);
 		List<Double> phaseColumn = Adapter.MapToArrayList(
-				this.verificationResult.get(this.currentElementIndex).values.get(keys.get(2 + this.currentParamIndex*4)));
+				this.verificationResult.get(this.currentElementIndex).values.get(key7));
 		this.resultTable.setColumnFromDouble(7, phaseColumn, phaseAccuracy);
 		
 		//Погрешность измерения фазы
+		String key8 = keys.get(3 + this.currentParamIndex*4);
 		List<Double> column8 = Adapter.MapToArrayList(
-				this.verificationResult.get(this.currentElementIndex).values.get(keys.get(3 + this.currentParamIndex*4)));
+				this.verificationResult.get(this.currentElementIndex).values.get(key8));
 		this.resultTable.setColumnFromDouble(8, column8, phaseErrorAccuracy);
 		
-		//Значения предыдущей поверки
-		List<Double> column9 = new ArrayList<>();
-		for (double currentFreq : this.verificationResult.get(currentElementIndex).freqs) {
-			String currentKey = keys.get(2 + this.currentParamIndex*4);
-			Double text = nominals.values.get(currentKey).get(currentFreq);
-			column9.add(text);
-		}
+		//Значения предыдущей поверки		
+		List<Double> column9 = Adapter.MapToArrayList(nominals.values.get(key7));
 		this.resultTable.setColumnFromDouble(9, column9, phaseAccuracy);
 		
 		//Расчет разницы результатов этой поверки и предыдущей для фазы
+		String key10 = keys.get(2 + this.currentParamIndex);
 		List<Double> column10 = Adapter.MapToArrayList(
-				this.verificationResult.get(this.currentElementIndex).differenceBetweenNominal.get(keys.get(2 + this.currentParamIndex)));
+				this.verificationResult.get(this.currentElementIndex).differenceBetweenNominal.get(key7));
 		this.resultTable.setColumnFromDouble(10, column10, phaseAccuracy);
 		
 		//Допуск по фазе
@@ -389,8 +382,9 @@ public class VerificationController implements InfoRequestable {
 		this.resultTable.setColumn(11, column11);
 				
 		//Решения годности по фазе
+		String key12 = keys.get(2 + this.currentParamIndex);
 		List<String> column12 = Adapter.MapToArrayList(
-				this.verificationResult.get(this.currentElementIndex).suitabilityDecision.get(keys.get(2 + this.currentParamIndex)));
+				this.verificationResult.get(this.currentElementIndex).suitabilityDecision.get(key7));
 		this.resultTable.setColumn(12, column12);
 		
 		//Переписываем заголовки у таблицы для столбцов с допуском и погрешностью измерения
@@ -427,13 +421,14 @@ public class VerificationController implements InfoRequestable {
 		}
 		else {
 			newPhaseToleranceHeader = "Допуск, \u00B0";
-			differencePhaseHeader = "\u0394";			
+			differencePhaseHeader = "\u0394, \u00B0";			
 		}
 		this.resultTable.setHead(8, "Погрешность, \u00B0");
 		this.resultTable.setHead(10, differencePhaseHeader);
 		this.resultTable.setHead(11, newPhaseToleranceHeader);		
 	}	
 //---------------------------
+	@SuppressWarnings("unused")
 	private int getAccuracy(List<Double> values) {
 		int accuracy = 0;
 		for (Double value: values) {

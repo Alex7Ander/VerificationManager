@@ -2,10 +2,8 @@ package ToleranceParamPack.ParametrsPack;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import DataBasePack.DataBaseManager;
 import DataBasePack.dbStorable;
@@ -138,23 +136,7 @@ public class ToleranceParametrs implements Includable<Element>, dbStorable {
 	@Override
 	public void editInfoInDB(HashMap<String, String> editingValues) throws SQLException {
 		 // TODO Auto-generated method stub
-	}
-	
-	public void rewriteTableNames() throws SQLException {
-		/*
-		String newTableName = "Параметры допуска " + timeType.getTableNamePart() + " поверки " + measUnitPart.getTableNamePart() + " S параметров для " + myElement.getMyOwner().getName() + " " +
-				  			   myElement.getMyOwner().getType() + " " + myElement.getMyOwner().getSerialNumber() + " " + myElement.getType() + " " + myElement.getSerialNumber();
-		
-		String elementsOfTableName = myElement.getMyOwner().getElementsTableName();
-		String sqlQuery = "UPDATE [" + elementsOfTableName + "] SET " + getFieldInElementsOfTable() + "='" + newTableName + "' "
-						 + "WHERE ElementType='" + myElement.getType() + "' AND ElementSerNumber='" + myElement.getSerialNumber() + "'";
-		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
-		sqlQuery = "ALTER TABLE [" + tableName + "] RENAME TO [" + newTableName + "]";
-		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
-		tableName = newTableName;
-		*/
-	}
-	
+	}	
 	private Element myElement; 
 	@Override
 	public Element getMyOwner() {
@@ -171,21 +153,5 @@ public class ToleranceParametrs implements Includable<Element>, dbStorable {
 	}
 	public boolean checkResult(MeasResult result) {
 		 return this.strategy.checkResult(result, this);
-	}
-		 
-	private String getFieldInElementsOfTable() {
-		String result = null;
-		if (timeType.equals(TimeType.PRIMARY)) 
-			 result = "Primary";
-		else
-			 result = "Periodic";
-		
-		if (measUnitPart.equals(MeasUnitPart.MODULE))
-			 result += "Module";
-		else
-			 result += "Phase";
-		
-		result += "ParamTable";
-		return result;
 	}
 }

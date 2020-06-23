@@ -8,8 +8,16 @@ import java.util.TreeSet;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.Pane;
 
 public class VisualTable implements Table {
@@ -23,6 +31,9 @@ public class VisualTable implements Table {
 	
 	protected Pane pane;
 	
+	protected ContextMenu tableMenu = new ContextMenu();
+	protected MenuItem copyMenuItem = new MenuItem("Копировать");
+		
 	public VisualTable(List<String> headLabels, Pane pane){	
 		this.headLabels = headLabels;
 		for (int i = 0; i < headLabels.size(); i++) {
@@ -34,6 +45,41 @@ public class VisualTable implements Table {
 		}
 		table.getColumns().addAll(columns);	
 		table.setItems(lines);
+        table.getSelectionModel().setCellSelectionEnabled(true);
+        table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        
+        copyMenuItem.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                ObservableList<TablePosition> posList = table.getSelectionModel().getSelectedCells();               
+                int old_r = -1;
+                StringBuilder clipboardString = new StringBuilder();
+                for (TablePosition p : posList) {
+                    int r = p.getRow();
+                    int c = p.getColumn();
+                    Object cell = table.getColumns().get(c).getCellData(r);
+                    if (cell == null)
+                        cell = "";
+                    if (old_r == r)
+                        clipboardString.append('\t');
+                    else if (old_r != -1)
+                        clipboardString.append('\n');
+                    clipboardString.append(cell);
+                    old_r = r;
+                }
+                final ClipboardContent content = new ClipboardContent();
+                content.putString(clipboardString.toString());
+                Clipboard.getSystemClipboard().setContent(content);
+            }
+        });
+        
+        tableMenu.getItems().addAll(copyMenuItem);
+        table.setOnContextMenuRequested(event -> {
+        	double x = event.getScreenX();
+        	double y = event.getScreenY();
+        	tableMenu.show(table, x, y);
+        });
+        
 		pane.getChildren().add(table);
 	}
 	

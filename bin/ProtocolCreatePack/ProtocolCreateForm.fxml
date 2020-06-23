@@ -20,7 +20,7 @@
    <children>
       <StackPane fx:id="stackPane" prefHeight="702.0" prefWidth="489.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
          <children>
-            <VBox fx:id="infoBox" opacity="0.1" prefHeight="549.0" prefWidth="469.0">
+            <VBox fx:id="infoBox" prefHeight="549.0" prefWidth="469.0">
                <children>
                   <Pane prefHeight="30.0" prefWidth="200.0">
                      <children>
@@ -41,10 +41,12 @@
                      </children>
                   </Pane>
                   <Separator prefHeight="10.0" prefWidth="200.0" />
-                  <Label stylesheets="@../../bin/application/commonLabel.css" text="Наименование метрологической воинской части: " />
+                  <Label stylesheets="@../application/commonLabel.css" text="Наименование метрологической воинской части: " />
                   <TextField fx:id="militaryBaseName" promptText="Введите наименование воинской части" text="ВЧ № 0000" />
-                  <RadioButton fx:id="etalonRB" mnemonicParsing="false" prefHeight="28.0" prefWidth="415.0" style="-fx-font-family: Arial Narrow; -fx-font-weight: bold; -fx-font-size: 12;" text="Эталон" />
-                  <RadioButton fx:id="siRB" mnemonicParsing="false" prefHeight="29.0" prefWidth="414.0" style="-fx-font-family: Arial Narrow; -fx-font-weight: bold; -fx-font-size: 12;" text="Средство измерения" />
+                  <Label prefHeight="16.0" prefWidth="330.0" stylesheets="@../application/commonLabel.css" text="Нормативно-техническая документация поверки:" />
+                  <TextField fx:id="verificatonMethodologyNameTextField" text="Методика поверки на военном эталоне" />
+                  <RadioButton fx:id="etalonRB" mnemonicParsing="false" prefHeight="26.0" prefWidth="469.0" style="-fx-font-family: Arial Narrow; -fx-font-weight: bold; -fx-font-size: 12;" text="Эталон" />
+                  <RadioButton fx:id="siRB" mnemonicParsing="false" prefHeight="25.0" prefWidth="469.0" style="-fx-font-family: Arial Narrow; -fx-font-weight: bold; -fx-font-size: 12;" text="Средство измерения" />
                   <Label fx:id="devNameLabel" stylesheets="@../../bin/application/commonLabel.css" text="____________________________________________________" />
                   <HBox prefHeight="30.0" prefWidth="200.0">
                      <children>
@@ -107,7 +109,7 @@
                   <RadioButton fx:id="printRB" mnemonicParsing="false" prefHeight="31.0" prefWidth="468.0" styleClass="radiobutton" stylesheets="@../application/commonRadioButton.css" text="Открыть по созданию" />
                </children>
             </VBox>
-            <AnchorPane fx:id="progressPane" prefHeight="200.0" prefWidth="200.0">
+            <AnchorPane fx:id="progressPane" prefHeight="229.0" prefWidth="470.0" visible="false">
                <children>
                   <ProgressIndicator fx:id="progress" layoutY="216.0" minHeight="250.0" minWidth="470.0" />
                   <Label layoutX="14.0" layoutY="108.0" prefHeight="40.0" prefWidth="447.0" style="-fx-font-family: Arrial Narrow; -fx-font-size: 24; -fx-font-weight: bold;" text="Идет создание протокола. Ожидайте.">

@@ -45,7 +45,7 @@ public class MeasResult implements Includable<Element>, dbStorable{
 	public Map<String, Map<Double, Double>> differenceBetweenNominal;
 	public List<Double> freqs;
 	protected  ObservableList<String> paramsNames;
-	private String tableName;
+	//private String tableName;
 	
 //Constructors
 //FILE

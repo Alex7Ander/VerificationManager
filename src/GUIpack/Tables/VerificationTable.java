@@ -36,7 +36,7 @@ public class VerificationTable extends VisualTable {
 		localTableHeads.add("Измер. знач.\nфазы, \u00B0"); //7
 		localTableHeads.add("Погрешность");
 		localTableHeads.add("Пред. пов.\nфазы, \u00B0");
-		localTableHeads.add("\u0394");
+		localTableHeads.add("\u0394, \u00B0");
 		localTableHeads.add("Допуск");			
 		localTableHeads.add("Соответсвие\n\tНТД");
 	}
