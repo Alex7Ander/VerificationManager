@@ -4,12 +4,16 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import DevicePack.Element;
 import FileManagePack.FileManager;
 import FreqTablesPack.FreqTablesWindow;
 import GUIpack.StringGridFXPack.NewElementStringGridFX;
 import GUIpack.StringGridFXPack.StringGridPosition;
+import GUIpack.Tables.NewElementNominalsTable;
+import GUIpack.Tables.NewElementToleranceParamsTable;
+import GUIpack.Tables.Table;
 import ToleranceParamPack.ParametrsPack.MeasUnitPart;
 import ToleranceParamPack.ParametrsPack.S_Parametr;
 import ToleranceParamPack.ParametrsPack.TimeType;
@@ -69,10 +73,15 @@ public class NewElementController {
 	@FXML
 	private TextField upPhaseTextField;
 	
+	/*
 	@FXML
 	private Label moduleLabel;
 	@FXML
 	private Label phaseLable;
+	*/
+	@FXML
+	private Label tolParamsNameLabel;
+	
 	
 	@FXML 
 	private RadioButton primaryVerificationRB;	
@@ -113,6 +122,10 @@ public class NewElementController {
 
 //Tables
 	@FXML
+	private ScrollPane nominalsScrollPane;
+	@FXML
+	private AnchorPane nominalsTablePane;
+	@FXML
 	private StackPane tablesStack;
 	@FXML
 	private ScrollPane primaryScrollPane;
@@ -121,31 +134,30 @@ public class NewElementController {
 	@FXML
 	private ScrollPane periodicScrollPane;
 	@FXML
-	private AnchorPane periodicTablePane;	
-	private NewElementStringGridFX primaryParamsTable;  // Table with parametrs for primary verification
-	public NewElementStringGridFX getPrimaryParamsTable() {
-		return primaryParamsTable;
+	private AnchorPane periodicTablePane;
+	
+	private NewElementNominalsTable nominalsTable; //NewElementNominalsTable
+	private NewElementToleranceParamsTable primaryToleranceParamsTable;
+	private NewElementToleranceParamsTable periodicToleranceParamsTable; 
+	
+	private NewElementToleranceParamsTable visibleParamsTable; //ссылка на таблицу, отображаемую в данный момент времени
+	
+	public NewElementNominalsTable getNominalsTable() {
+		return nominalsTable;
+	}	
+	public NewElementToleranceParamsTable getPrimaryToleranceParamsTable() {
+		return primaryToleranceParamsTable;
 	}
-	private NewElementStringGridFX periodicParamsTable; // -//- for periodic verification
-	public NewElementStringGridFX getPeriodicParamsTable() {
-		return periodicParamsTable;
+	public NewElementToleranceParamsTable getPeriodicToleranceParamsTable() {
+		return periodicToleranceParamsTable;
 	}
-	private NewElementStringGridFX visibleParamsTable;  // reference to currently visible table 
 	
 	private ToggleGroup poleCountGroup;
 	private ToggleGroup measUnitGroup;
 	private ToggleGroup toleranceTypeGroup;
 	private ToggleGroup verificationTypeGroup;
 	private ToggleGroup phaseTolearnceTypeGroup;
-//************************************************
-	@FXML
-	private Button randomValuesBtn;
-	@FXML
-	private void setRandomValues() {
-		visibleParamsTable.setRandomValues();
-		visibleParamsTable.showParametr(currentS);
-	}
-//************************************************	
+	
 	//представляемый элемент	
 	private Element currentElement;
 	public void setElement(Element element) { 
@@ -155,11 +167,11 @@ public class NewElementController {
 			elemTypesComboBox.setValue(currentElement.getType());
 			setParams(currentTypeOfParams, currentElement.getSParamsCout());
 			
-			periodicParamsTable.setValuesFromElement(currentElement);
-			periodicParamsTable.showParametr(currentS);
+			periodicToleranceParamsTable.setValuesFromElement(currentElement);
+			periodicToleranceParamsTable.showParametr(currentS);
 			
-			primaryParamsTable.setValuesFromElement(currentElement);			
-			primaryParamsTable.showParametr(currentS);
+			primaryToleranceParamsTable.setValuesFromElement(currentElement);			
+			primaryToleranceParamsTable.showParametr(currentS);
 			
 			if (primaryVerificationRB.isSelected()) {
 				periodicScrollPane.toBack();
@@ -188,12 +200,12 @@ public class NewElementController {
 	
 	@FXML
 	private void initialize() {			
-		//Создаем таблицу		
-		StringGridPosition primaryParamsTablePosition = new StringGridPosition(850, 100, primaryScrollPane, primaryTablePane);
-		StringGridPosition periodicParamsTablePosition = new StringGridPosition(850, 100, periodicScrollPane, periodicTablePane);
-		primaryParamsTable = new NewElementStringGridFX(primaryParamsTablePosition, TimeType.PRIMARY);
-		periodicParamsTable = new NewElementStringGridFX(periodicParamsTablePosition, TimeType.PERIODIC);
-		visibleParamsTable = primaryParamsTable;
+		//Создаем таблицы
+		nominalsTable = new NewElementNominalsTable(nominalsTablePane);
+		primaryToleranceParamsTable = new NewElementToleranceParamsTable(primaryTablePane);
+		periodicToleranceParamsTable = new NewElementToleranceParamsTable(periodicTablePane); 
+		
+		visibleParamsTable = primaryToleranceParamsTable;
 		periodicScrollPane.toBack();
 		
 		currentS = S_Parametr.S11;
@@ -246,35 +258,11 @@ public class NewElementController {
 	}
 	
 	@FXML
-	private void autoDownModuleBtnClick() {
-		int stop = visibleParamsTable.getRowCount();
-		String text = this.downModuleTextField.getText();
-		for (int i=0; i<stop; i++) {
-			visibleParamsTable.setCellValue(1, i, text);
-		}
-	}
-	@FXML
 	private void autoModuleBtnClick() {
 		int stop = visibleParamsTable.getRowCount();
 		String text = this.moduleTextField.getText();
 		for (int i=0; i<stop; i++) {
-			visibleParamsTable.setCellValue(2, i, text);
-		}
-	}
-	@FXML
-	private void autoUpModuleBtnClick() {
-		int stop = visibleParamsTable.getRowCount();
-		String text = this.upModuleTextField.getText();
-		for (int i=0; i<stop; i++) {
-			visibleParamsTable.setCellValue(3, i, text);
-		}
-	}
-	@FXML
-	private void autoDownPhaseBtnClick() {
-		int stop = visibleParamsTable.getRowCount();
-		String text = this.downPhaseTextField.getText();
-		for (int i=0; i<stop; i++) {
-			visibleParamsTable.setCellValue(4, i, text);
+			this.nominalsTable.setCellValue(1, i, text);
 		}
 	}
 	@FXML
@@ -282,7 +270,32 @@ public class NewElementController {
 		int stop = visibleParamsTable.getRowCount();
 		String text = this.phaseTextField.getText();
 		for (int i=0; i<stop; i++) {
-			visibleParamsTable.setCellValue(5, i, text);
+			this.nominalsTable.setCellValue(2, i, text);
+		}
+	}
+	
+	@FXML
+	private void autoDownModuleBtnClick() {
+		int stop = visibleParamsTable.getRowCount();
+		String text = this.downModuleTextField.getText();
+		for (int i=0; i<stop; i++) {
+			visibleParamsTable.setCellValue(1, i, text);
+		}
+	}	
+	@FXML
+	private void autoUpModuleBtnClick() {
+		int stop = visibleParamsTable.getRowCount();
+		String text = this.upModuleTextField.getText();
+		for (int i=0; i<stop; i++) {
+			visibleParamsTable.setCellValue(2, i, text);
+		}
+	}
+	@FXML
+	private void autoDownPhaseBtnClick() {
+		int stop = visibleParamsTable.getRowCount();
+		String text = this.downPhaseTextField.getText();
+		for (int i=0; i<stop; i++) {
+			visibleParamsTable.setCellValue(3, i, text);
 		}
 	}
 	@FXML
@@ -290,7 +303,7 @@ public class NewElementController {
 		int stop = visibleParamsTable.getRowCount();
 		String text = this.upPhaseTextField.getText();
 		for (int i=0; i<stop; i++) {
-			visibleParamsTable.setCellValue(6, i, text);
+			visibleParamsTable.setCellValue(4, i, text);
 		}
 	}
 	
@@ -328,20 +341,22 @@ public class NewElementController {
 	
 	@FXML
 	private void primaryRBClick() {
-		visibleParamsTable = this.primaryParamsTable;
+		visibleParamsTable = this.primaryToleranceParamsTable;
 		periodicScrollPane.toBack();
 		if (!visibleParamsTable.getCurrentS().equals(currentS)) {
 			visibleParamsTable.changeSParametr(currentS);
-		}		
+		}
+		tolParamsNameLabel.setText("Таблица допусков для первичной поверки");
 	}
 	
 	@FXML
 	private void periodicRBClick() {
-		visibleParamsTable = this.periodicParamsTable;	
+		visibleParamsTable = this.periodicToleranceParamsTable;	
 		primaryScrollPane.toBack();
 		if (!visibleParamsTable.getCurrentS().equals(currentS)) {
 			visibleParamsTable.changeSParametr(currentS);
 		}
+		tolParamsNameLabel.setText("Таблица допусков для периодической поверки");
 	}
 				
 	@FXML
@@ -349,20 +364,39 @@ public class NewElementController {
 	    paramIndex = this.paramsComboBox.getSelectionModel().getSelectedIndex();
 	    if (paramIndex >= 0) {
 			currentS = S_Parametr.values()[paramIndex];
-			visibleParamsTable.changeSParametr(currentS);	    	
+			this.nominalsTable.changeSParametr(currentS);
+			this.primaryToleranceParamsTable.changeSParametr(currentS);			
+			this.periodicToleranceParamsTable.changeSParametr(currentS);	
+			
+			String sParamHeadText = this.paramsComboBox.getSelectionModel().getSelectedItem();
+			
+			this.nominalsTable.setHead(1, "Модуль\n" + sParamHeadText);
+			this.nominalsTable.setHead(2, "Фаза\n" + sParamHeadText);
+			
+			this.primaryToleranceParamsTable.setHead(1, "Нижний допуск модуля\n" + sParamHeadText);
+			this.primaryToleranceParamsTable.setHead(2, "Верхний допуск модуля\n" + sParamHeadText);
+			this.primaryToleranceParamsTable.setHead(3, "Нижний допуск фазы\n" + sParamHeadText);
+			this.primaryToleranceParamsTable.setHead(4, "Верхний допуск фазы\n" + sParamHeadText);
+			
+			this.periodicToleranceParamsTable.setHead(1, "Нижний допуск модуля\n" + sParamHeadText);
+			this.periodicToleranceParamsTable.setHead(2, "Верхний допуск модуля\n" + sParamHeadText);
+			this.periodicToleranceParamsTable.setHead(3, "Нижний допуск фазы\n" + sParamHeadText);
+			this.periodicToleranceParamsTable.setHead(4, "Верхний допуск фазы\n" + sParamHeadText);
 	    }
 	}
 	
 	@FXML 
 	private void addFreqBtnClick(ActionEvent event) {
-		primaryParamsTable.addRow();
-		periodicParamsTable.addRow();
+		this.nominalsTable.addRow();
+		this.primaryToleranceParamsTable.addRow();
+		this.periodicToleranceParamsTable.addRow();
 	}
 	
 	@FXML
 	private void delFreqBtnClick(ActionEvent event) {
-		primaryParamsTable.deleteRow(primaryParamsTable.getRowCount());
-		periodicParamsTable.deleteRow(periodicParamsTable.getRowCount());
+		this.nominalsTable.deleteRow(nominalsTable.getRowCount());
+		this.primaryToleranceParamsTable.deleteRow(primaryToleranceParamsTable.getRowCount());
+		this.periodicToleranceParamsTable.deleteRow(periodicToleranceParamsTable.getRowCount());
 	}
 	
 	@FXML
@@ -372,15 +406,23 @@ public class NewElementController {
 
 	@FXML
 	private void cloneS11ToS22BtnClick() {
-		String[] upDownArray = new String[] {"DOWN_", "", "UP_"};
+		String[] upDownArray = new String[] {"DOWN_", "UP_"};
 		for (String prefix : upDownArray) {
 			for (int i = 0; i < MeasUnitPart.values().length; i++) {
 				String key1 = prefix + MeasUnitPart.values()[i] + "_" + S_Parametr.S11;
 				String key2 = prefix + MeasUnitPart.values()[i] + "_" + S_Parametr.S22;
-				ArrayList<String> valuesArray = this.primaryParamsTable.values.get(key1);
-				this.primaryParamsTable.values.get(key2).clear();
-				for (String val : valuesArray) {
-					this.primaryParamsTable.values.get(key2).add(val);				
+				
+				ArrayList<String> primaryValuesArray = this.primaryToleranceParamsTable.values.get(key1);
+				ArrayList<String> periodicValuesArray = this.periodicToleranceParamsTable.values.get(key1);
+				
+				this.primaryToleranceParamsTable.values.get(key2).clear();
+				this.periodicToleranceParamsTable.values.get(key2).clear();
+				
+				for (String val : primaryValuesArray) {
+					this.primaryToleranceParamsTable.values.get(key2).add(val);				
+				}
+				for (String val : periodicValuesArray) {
+					this.primaryToleranceParamsTable.values.get(key2).add(val);				
 				}
 			}
 		}		
@@ -404,27 +446,30 @@ public class NewElementController {
 	}
 	
 	public void setFreqTable(ArrayList<Double> freqTable) {
-		ArrayList<String> columnFreqValues = new ArrayList<String>();
+		List<String> columnFreqValues = new ArrayList<>();
 		for (Double fr : freqTable) {
 			columnFreqValues.add(fr.toString());
 		}
 		
-		int currentRowCount = primaryParamsTable.getRowCount();
+		int currentRowCount = this.primaryToleranceParamsTable.getRowCount();
 		if (currentRowCount < freqTable.size()) {
-			while (primaryParamsTable.getRowCount() < freqTable.size()) {
-				primaryParamsTable.addRow();
-				periodicParamsTable.addRow();
+			while (this.primaryToleranceParamsTable.getRowCount() < freqTable.size()) {
+				this.nominalsTable.addRow();
+				this.primaryToleranceParamsTable.addRow();
+				this.periodicToleranceParamsTable.addRow();
 			}				
 		}
 		else if (currentRowCount > freqTable.size()) {
-			while (primaryParamsTable.getRowCount() > freqTable.size()) {
-				primaryParamsTable.deleteRow(primaryParamsTable.getRowCount());
-				periodicParamsTable.deleteRow(periodicParamsTable.getRowCount());
+			while (this.primaryToleranceParamsTable.getRowCount() > freqTable.size()) {
+				this.nominalsTable.deleteRow(this.nominalsTable.getRowCount());
+				this.primaryToleranceParamsTable.deleteRow(this.primaryToleranceParamsTable.getRowCount());
+				this.periodicToleranceParamsTable.deleteRow(this.periodicToleranceParamsTable.getRowCount());
 			}
 		}
 		
-		primaryParamsTable.setColumn(0, columnFreqValues);
-		periodicParamsTable.setColumn(0, columnFreqValues);
+		this.nominalsTable.setColumn(0, columnFreqValues);
+		this.primaryToleranceParamsTable.setColumn(0, columnFreqValues);
+		this.periodicToleranceParamsTable.setColumn(0, columnFreqValues);
 	}
 	
 //Methods for getting information about element
@@ -453,28 +498,28 @@ public class NewElementController {
 	}
 
 //Method for getting collections of parametrs	
-	public ArrayList<Double> getFreqsValues(){
-		return this.primaryParamsTable.getFreqs();
+	public List<Double> getFreqsValues(){
+		return this.nominalsTable.getFreqs();
 	}
 	
 	public Map<String, Map<Double, Double>> getNominalValues(){
 		LinkedHashMap<String, Map<Double, Double>> nominals = new LinkedHashMap<String, Map<Double, Double>>();
 		for (int i = 0; i < currentCountOfParams; i++) {
 			String key = MeasUnitPart.MODULE + "_" + S_Parametr.values()[i];
-			nominals.put(key, this.primaryParamsTable.getParametr(key));
+			nominals.put(key, this.nominalsTable.getParametr(key));
 			key = MeasUnitPart.PHASE + "_" + S_Parametr.values()[i];
-			nominals.put(key, this.primaryParamsTable.getParametr(key));
+			nominals.put(key, this.nominalsTable.getParametr(key));
 		}
 		return nominals;
 	}
 		
 	public Map<String, Map<Double, Double>> getToleranceParamsValues(TimeType timeType, MeasUnitPart unit){
 		LinkedHashMap<String, Map<Double, Double>> params = new LinkedHashMap<String, Map<Double, Double>>();
-		NewElementStringGridFX currentTable = null;
+		NewElementToleranceParamsTable currentTable = null;
 		if (timeType.equals(TimeType.PERIODIC)) {
-			currentTable = this.periodicParamsTable;
+			currentTable = this.periodicToleranceParamsTable;
 		} else if (timeType.equals(TimeType.PRIMARY)) {
-			currentTable = this.primaryParamsTable;
+			currentTable = this.primaryToleranceParamsTable;
 		}
 		else {
 			return null;
@@ -490,18 +535,21 @@ public class NewElementController {
 	
 	//Действия по закрытию окна	
 	public void saveValues() {
-		periodicParamsTable.changeSParametr(this.currentS);
-		primaryParamsTable.changeSParametr(this.currentS);
+		this.periodicToleranceParamsTable.changeSParametr(this.currentS);
+		this.primaryToleranceParamsTable.changeSParametr(this.currentS);
 	}
-	private boolean checkTable(NewElementStringGridFX table) {
+	private boolean checkTable(Table table) {
+		/*
 		table.changeSParametr(this.currentS);
 		return table.isFull(this.currentCountOfParams);
+		*/
+		return true;
 	}
 	public boolean checkPrimaryTable() {
-		return checkTable(this.primaryParamsTable);
+		return checkTable(this.primaryToleranceParamsTable);
 	}
 	public boolean checkPeriodicTable() {
-		return checkTable(this.periodicParamsTable);
+		return checkTable(this.periodicToleranceParamsTable);
 	}		
 	public MeasResult getNominals() {
 		if (this.gammaRB.isSelected()) {

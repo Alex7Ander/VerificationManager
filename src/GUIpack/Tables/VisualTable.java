@@ -18,6 +18,7 @@ import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.DataFormat;
 import javafx.scene.layout.Pane;
 
 public class VisualTable implements Table {
@@ -27,19 +28,23 @@ public class VisualTable implements Table {
 	
 	protected TableView<Line> table = new TableView<Line>();
 	protected ObservableList<Line> lines = FXCollections.observableArrayList();
-	protected ArrayList<TableColumn<Line, String>> columns = new ArrayList<>();
+	protected ArrayList<TableColumn<Line, String>> columns = new ArrayList<TableColumn<Line, String>>();
 	
 	protected Pane pane;
 	
 	protected ContextMenu tableMenu = new ContextMenu();
 	protected MenuItem copyMenuItem = new MenuItem("Копировать");
-		
+	protected MenuItem pasteMenuItem = new MenuItem("Вставить");
+	
 	public VisualTable(List<String> headLabels, Pane pane){	
 		this.headLabels = headLabels;
+		this.table.setEditable(true);
 		for (int i = 0; i < headLabels.size(); i++) {
 			TableColumn<Line, String> column = new TableColumn<Line, String>();
 			final int index = i;
 			column.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().values.get(index)));
+
+			
 			column.setText(headLabels.get(i));
 			columns.add(column);
 		}
@@ -47,7 +52,22 @@ public class VisualTable implements Table {
 		table.setItems(lines);
         table.getSelectionModel().setCellSelectionEnabled(true);
         table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        
+        /*
+		col1.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().values.get(0)));
+		col1.setCellFactory(TextFieldTableCell.<Line>forTableColumn());
+		col1.setOnEditCommit(event->{
+			if(event.getNewValue() == null) {
+				table.refresh();
+			}
+			else {
+				String newValue = event.getNewValue();
+				int col = event.getTablePosition().getColumn();
+				int row = event.getTablePosition().getRow();
+				this.lines.get(row).values.remove(col);
+				this.lines.get(row).values.put(col, newValue);
+			}
+		});
+        */
         copyMenuItem.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -73,7 +93,39 @@ public class VisualTable implements Table {
             }
         });
         
-        tableMenu.getItems().addAll(copyMenuItem);
+        pasteMenuItem.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+            	Object content = Clipboard.getSystemClipboard().getContent(DataFormat.PLAIN_TEXT);
+            	StringBuilder text = new StringBuilder(content.toString());
+            	text.append("\n");           	
+            	int i = 0;
+            	while(text.length() > 0) {
+            		List<String> textLine = new ArrayList<>();
+            		int index = text.indexOf("\n");
+            		StringBuilder currentTextLine = new StringBuilder(text.substring(0, index));
+            		currentTextLine.append("\t");
+            		while(currentTextLine.length() > 0) {
+            			int tabIndex = currentTextLine.indexOf("\t");
+            			String value = currentTextLine.substring(0, tabIndex);
+            			textLine.add(value);
+            			currentTextLine.delete(0, tabIndex + 1);
+            		}
+            		text.delete(0, index + 1);
+            		if(i < lines.size()) {
+            			lines.get(i).edit(textLine);
+            		}
+            		else {
+            			Line line = new Line(textLine);
+            			lines.add(line);
+            		}
+            		++i;
+            	} 
+            	table.refresh();
+            }
+        });
+        
+        tableMenu.getItems().addAll(copyMenuItem, pasteMenuItem);
         table.setOnContextMenuRequested(event -> {
         	double x = event.getScreenX();
         	double y = event.getScreenY();
@@ -248,9 +300,5 @@ public class VisualTable implements Table {
 	@Override
 	public void setVisible(boolean visibleStatus) {
 		table.setVisible(visibleStatus);		
-	}
-
-
-
-	
+	}	
 }

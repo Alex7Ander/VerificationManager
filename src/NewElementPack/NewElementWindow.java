@@ -27,15 +27,22 @@ public class NewElementWindow extends guiWindow {
 				countOfControlledParams = 1;
 			else 
 				countOfControlledParams = 4;
-			if (!ctrl.getPrimaryParamsTable().isFull(countOfControlledParams)) {
-				int answer = YesNoWindow.createYesNoWindow("Внимание", "Вы не полностью заполнили таблицу\nс параметрами первичной поверки.\nЖелаете продолжить редактирование?").showAndWait();
+			
+			if (!ctrl.getNominalsTable().isFull(countOfControlledParams)) {
+				int answer = YesNoWindow.createYesNoWindow("Внимание", "Вы не полностью заполнили таблицу\n номинальных значений\n(значений предыдущей поверки).\nЖелаете продолжить редактирование?").showAndWait();
+				if (answer == 0) {
+					event.consume();
+				}
+			}
+			if (!ctrl.getPrimaryToleranceParamsTable().isFull(countOfControlledParams)) {
+				int answer = YesNoWindow.createYesNoWindow("Внимание", "Вы не полностью заполнили таблицу\nс критериями годности для первичной поверки.\nЖелаете продолжить редактирование?").showAndWait();
 				if (answer == 0) {
 					event.consume();					
 				}
 				return;
 			}				
-			if (!ctrl.getPeriodicParamsTable().isFull(countOfControlledParams)) {
-				int answer = YesNoWindow.createYesNoWindow("Внимание", "Вы не полностью заполнили таблицу\nс параметрами периодической поверки.\nЖелаете продолжить редактирование?").showAndWait();
+			if (!ctrl.getPeriodicToleranceParamsTable().isFull(countOfControlledParams)) {
+				int answer = YesNoWindow.createYesNoWindow("Внимание", "Вы не полностью заполнили таблицу\nс критериями годности для периодической поверки.\nЖелаете продолжить редактирование?").showAndWait();
 				if (answer == 0) {
 					event.consume();
 				}

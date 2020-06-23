@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import DataBasePack.DataBaseManager;
 import DataBasePack.dbStorable;
@@ -20,7 +21,7 @@ public class ToleranceParametrs implements Includable<Element>, dbStorable {
 		return this.id;
 	}
 	public Map<String, Map<Double, Double>> values;
-	public ArrayList<Double> freqs;
+	public List<Double> freqs;
 	private String tableName;
 	public String getTableName(){
 		return this.tableName;

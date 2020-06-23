@@ -16,11 +16,11 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="666.0" prefWidth="1209.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="NewElementPack.NewElementController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="666.0" prefWidth="1492.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="NewElementPack.NewElementController">
    <children>
       <HBox prefHeight="549.0" prefWidth="1024.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
          <children>
-            <VBox prefHeight="549.0" prefWidth="875.0">
+            <VBox prefHeight="646.0" prefWidth="1439.0">
                <children>
                   <Label stylesheets="@../application/commonLabel.css" text="Параметры" />
                   <Separator prefWidth="200.0" />
@@ -48,121 +48,144 @@
                            </HBox.margin></Button>
                      </children>
                   </HBox>
-                  <AnchorPane prefHeight="28.0" prefWidth="721.0">
+                  <Label text="ВНИМАНИЕ! Значения нижнего допуска вносятся с учетом знака" underline="true">
+                     <font>
+                        <Font name="System Bold Italic" size="16.0" />
+                     </font>
+                     <opaqueInsets>
+                        <Insets left="5.0" />
+                     </opaqueInsets>
+                  </Label>
+                  <HBox prefHeight="571.0" prefWidth="1156.0">
                      <children>
-                        <Label fx:id="moduleLabel" layoutX="127.0" layoutY="6.0" stylesheets="@../application/commonLabel.css" text="КСВН 1- го порта" />
-                        <Label fx:id="phaseLable" layoutX="492.0" layoutY="6.0" stylesheets="@../application/commonLabel.css" text="Фаза" />
-                     </children>
-                  </AnchorPane>
-                  <HBox prefHeight="35.0" prefWidth="869.0">
-                     <children>
-                        <VBox prefHeight="200.0" prefWidth="120.0">
+                        <VBox prefHeight="578.0" prefWidth="358.0">
                            <children>
-                              <Button fx:id="randomValuesBtn" disable="true" mnemonicParsing="false" onAction="#setRandomValues" opacity="0.26" prefHeight="56.0" prefWidth="120.0" />
-                           </children></VBox>
-                        <VBox prefHeight="200.0" prefWidth="117.0">
-                           <children>
-                              <TextField fx:id="downModuleTextField" prefWidth="122.0">
-                                 <VBox.margin>
-                                    <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
-                                 </VBox.margin></TextField>
-                              <Button fx:id="autoDownModuleBtn" mnemonicParsing="false" onAction="#autoDownModuleBtnClick" prefWidth="120.0">
-                                 <VBox.margin>
-                                    <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
-                                 </VBox.margin></Button>
+                              <Label stylesheets="@../application/commonLabel.css" text="Таблица номиналов" />
+                              <HBox prefHeight="60.0" prefWidth="257.0">
+                                 <children>
+                                    <VBox prefHeight="200.0" prefWidth="60.0" />
+                                    <VBox prefHeight="200.0" prefWidth="140.0">
+                                       <children>
+                                          <TextField fx:id="moduleTextField">
+                                             <VBox.margin>
+                                                <Insets bottom="2.0" left="4.0" right="2.0" top="2.0" />
+                                             </VBox.margin>
+                                          </TextField>
+                                          <Button fx:id="autoModuleBtn" mnemonicParsing="false" onAction="#autoModuleBtnClick" prefHeight="25.0" prefWidth="138.0">
+                                             <VBox.margin>
+                                                <Insets bottom="2.0" left="4.0" right="2.0" top="2.0" />
+                                             </VBox.margin>
+                                          </Button>
+                                       </children>
+                                    </VBox>
+                                    <VBox prefHeight="200.0" prefWidth="145.0">
+                                       <children>
+                                          <TextField fx:id="phaseTextField">
+                                             <VBox.margin>
+                                                <Insets bottom="2.0" left="5.0" right="2.0" top="2.0" />
+                                             </VBox.margin>
+                                          </TextField>
+                                          <Button fx:id="autoPhaseBtn" mnemonicParsing="false" onAction="#autoPhaseBtnClick" prefHeight="25.0" prefWidth="138.0">
+                                             <VBox.margin>
+                                                <Insets bottom="2.0" left="5.0" right="2.0" top="2.0" />
+                                             </VBox.margin>
+                                          </Button>
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+                              <ScrollPane fx:id="nominalsScrollPane" prefHeight="500.0" prefWidth="358.0">
+                                <content>
+                                  <AnchorPane fx:id="nominalsTablePane" minHeight="0.0" minWidth="0.0" prefHeight="495.0" prefWidth="355.0" />
+                                </content>
+                              </ScrollPane>
                            </children>
                         </VBox>
-                        <VBox prefHeight="200.0" prefWidth="117.0">
+                        <VBox prefHeight="541.0" prefWidth="796.0">
                            <children>
-                              <TextField fx:id="moduleTextField">
-                                 <VBox.margin>
-                                    <Insets bottom="2.0" left="4.0" right="2.0" top="2.0" />
-                                 </VBox.margin></TextField>
-                              <Button fx:id="autoModuleBtn" mnemonicParsing="false" onAction="#autoModuleBtnClick" prefWidth="120.0">
-                                 <VBox.margin>
-                                    <Insets bottom="2.0" left="4.0" right="2.0" top="2.0" />
-                                 </VBox.margin></Button>
-                           </children>
-                        </VBox>
-                        <VBox prefHeight="200.0" prefWidth="117.0">
-                           <children>
-                              <TextField fx:id="upModuleTextField">
-                                 <VBox.margin>
-                                    <Insets bottom="2.0" left="5.0" right="2.0" top="2.0" />
-                                 </VBox.margin></TextField>
-                              <Button fx:id="autoUpModuleBtn" mnemonicParsing="false" onAction="#autoUpModuleBtnClick" prefWidth="120.0">
-                                 <VBox.margin>
-                                    <Insets bottom="2.0" left="5.0" right="2.0" top="2.0" />
-                                 </VBox.margin></Button>
-                           </children>
-                        </VBox>
-                        <VBox prefHeight="200.0" prefWidth="117.0">
-                           <children>
-                              <TextField fx:id="downPhaseTextField">
-                                 <VBox.margin>
-                                    <Insets bottom="2.0" left="5.0" right="2.0" top="2.0" />
-                                 </VBox.margin></TextField>
-                              <Button fx:id="autoDownPhaseBtn" mnemonicParsing="false" onAction="#autoDownPhaseBtnClick" prefWidth="120.0">
-                                 <VBox.margin>
-                                    <Insets bottom="2.0" left="5.0" right="2.0" top="2.0" />
-                                 </VBox.margin></Button>
-                           </children>
-                        </VBox>
-                        <VBox prefHeight="200.0" prefWidth="117.0">
-                           <children>
-                              <TextField fx:id="phaseTextField">
-                                 <VBox.margin>
-                                    <Insets bottom="2.0" left="5.0" right="2.0" top="2.0" />
-                                 </VBox.margin></TextField>
-                              <Button fx:id="autoPhaseBtn" mnemonicParsing="false" onAction="#autoPhaseBtnClick" prefWidth="120.0">
-                                 <VBox.margin>
-                                    <Insets bottom="2.0" left="5.0" right="2.0" top="2.0" />
-                                 </VBox.margin></Button>
-                           </children>
-                        </VBox>
-                        <VBox prefHeight="200.0" prefWidth="117.0">
-                           <children>
-                              <TextField fx:id="upPhaseTextField">
-                                 <VBox.margin>
-                                    <Insets bottom="2.0" left="5.0" right="2.0" top="2.0" />
-                                 </VBox.margin></TextField>
-                              <Button fx:id="autoUpPhaseBtn" mnemonicParsing="false" onAction="#autoUpPhaseBtnClick" prefWidth="120.0">
-                                 <VBox.margin>
-                                    <Insets bottom="2.0" left="5.0" right="2.0" top="2.0" />
-                                 </VBox.margin></Button>
+                              <Label fx:id="tolParamsNameLabel" contentDisplay="CENTER" prefHeight="17.0" prefWidth="621.0" stylesheets="@../application/commonLabel.css" text="Таблица допусков для первичной поверки" textAlignment="CENTER" />
+                              <HBox prefHeight="59.0" prefWidth="796.0">
+                                 <children>
+                                    <AnchorPane prefHeight="59.0" prefWidth="60.0" />
+                                    <VBox prefHeight="200.0" prefWidth="180.0">
+                                       <children>
+                                          <TextField fx:id="downModuleTextField" prefWidth="122.0">
+                                             <VBox.margin>
+                                                <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                             </VBox.margin>
+                                          </TextField>
+                                          <Button fx:id="autoDownModuleBtn" mnemonicParsing="false" onAction="#autoDownModuleBtnClick" prefHeight="25.0" prefWidth="176.0">
+                                             <VBox.margin>
+                                                <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                             </VBox.margin>
+                                          </Button>
+                                       </children>
+                                    </VBox>
+                                    <VBox prefHeight="200.0" prefWidth="180.0">
+                                       <children>
+                                          <TextField fx:id="upModuleTextField">
+                                             <VBox.margin>
+                                                <Insets bottom="2.0" left="5.0" right="2.0" top="2.0" />
+                                             </VBox.margin>
+                                          </TextField>
+                                          <Button fx:id="autoUpModuleBtn" mnemonicParsing="false" onAction="#autoUpModuleBtnClick" prefHeight="25.0" prefWidth="175.0">
+                                             <VBox.margin>
+                                                <Insets bottom="2.0" left="5.0" right="2.0" top="2.0" />
+                                             </VBox.margin>
+                                          </Button>
+                                       </children>
+                                    </VBox>
+                                    <VBox prefHeight="200.0" prefWidth="180.0">
+                                       <children>
+                                          <TextField fx:id="downPhaseTextField">
+                                             <VBox.margin>
+                                                <Insets bottom="2.0" left="5.0" right="2.0" top="2.0" />
+                                             </VBox.margin>
+                                          </TextField>
+                                          <Button fx:id="autoDownPhaseBtn" mnemonicParsing="false" onAction="#autoDownPhaseBtnClick" prefHeight="25.0" prefWidth="172.0">
+                                             <VBox.margin>
+                                                <Insets bottom="2.0" left="5.0" right="2.0" top="2.0" />
+                                             </VBox.margin>
+                                          </Button>
+                                       </children>
+                                    </VBox>
+                                    <VBox prefHeight="200.0" prefWidth="180.0">
+                                       <children>
+                                          <TextField fx:id="upPhaseTextField">
+                                             <VBox.margin>
+                                                <Insets bottom="2.0" left="5.0" right="2.0" top="2.0" />
+                                             </VBox.margin>
+                                          </TextField>
+                                          <Button fx:id="autoUpPhaseBtn" mnemonicParsing="false" onAction="#autoUpPhaseBtnClick" prefHeight="25.0" prefWidth="174.0">
+                                             <VBox.margin>
+                                                <Insets bottom="2.0" left="5.0" right="2.0" top="2.0" />
+                                             </VBox.margin>
+                                          </Button>
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+                              <StackPane fx:id="tablesStack" prefHeight="522.0" prefWidth="619.0">
+                                 <children>
+                                    <ScrollPane fx:id="primaryScrollPane" prefHeight="514.0" prefWidth="869.0">
+                                       <content>
+                                          <AnchorPane fx:id="primaryTablePane" prefHeight="495.0" prefWidth="785.0" />
+                                       </content>
+                                    </ScrollPane>
+                                    <ScrollPane fx:id="periodicScrollPane" prefHeight="514.0" prefWidth="869.0">
+                                       <content>
+                                          <AnchorPane fx:id="periodicTablePane" prefHeight="495.0" prefWidth="785.0" />
+                                       </content>
+                                    </ScrollPane>
+                                 </children>
+                              </StackPane>
                            </children>
                         </VBox>
                      </children>
                   </HBox>
-                  <AnchorPane prefHeight="45.0" prefWidth="875.0">
-                     <children>
-                        <Label text="ВНИМАНИЕ! Значения нижнего допуска вносятся с учетом знака" underline="true">
-                           <font>
-                              <Font name="System Bold Italic" size="16.0" />
-                           </font>
-                           <opaqueInsets>
-                              <Insets left="5.0" />
-                           </opaqueInsets>
-                        </Label>
-                     </children>
-                  </AnchorPane>
-                  <StackPane fx:id="tablesStack" prefHeight="517.0" prefWidth="873.0">
-                     <children>
-                        <ScrollPane fx:id="primaryScrollPane" prefHeight="514.0" prefWidth="869.0">
-                           <content>
-                              <AnchorPane fx:id="primaryTablePane" prefHeight="515.0" prefWidth="871.0" />
-                           </content>
-                        </ScrollPane>
-                        <ScrollPane fx:id="periodicScrollPane" prefHeight="514.0" prefWidth="869.0">
-                           <content>
-                              <AnchorPane fx:id="periodicTablePane" prefHeight="513.0" prefWidth="871.0" />
-                           </content>
-                        </ScrollPane>
-                     </children>
-                  </StackPane>
                </children>
             </VBox>
-            <VBox prefHeight="549.0" prefWidth="304.0">
+            <VBox prefHeight="646.0" prefWidth="599.0">
                <children>
                   <Label stylesheets="@../application/commonLabel.css" text="Тип:">
                      <VBox.margin>

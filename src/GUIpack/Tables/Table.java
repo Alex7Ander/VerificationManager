@@ -27,5 +27,4 @@ public interface Table {
 	void setVisible(boolean visibleStatus);
 
 	void delete();
-
 }
