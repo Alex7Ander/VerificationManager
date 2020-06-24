@@ -45,7 +45,7 @@ import javafx.scene.layout.HBox;
 public class DBEditController implements InfoRequestable {
 	
 	@FXML
-	private AnchorPane mainAnchorPane;
+	private ScrollPane mainPane;
 //Левая часть окна
 	@FXML
 	private Button searchDeviceBtn;
@@ -148,10 +148,9 @@ public class DBEditController implements InfoRequestable {
 		createElemtnsListViewContextMenu();		
 		createVerificationsDatesContextMenu();
 		
-		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-		this.mainAnchorPane.setMaxHeight(dim.height);
-		this.mainAnchorPane.setMaxWidth(dim.width);
-		
+		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();		
+		this.mainPane.setMaxHeight(dim.height);
+		this.mainPane.setMaxWidth(dim.width);		
 	}
 	
 	private void createElemtnsListViewContextMenu() {

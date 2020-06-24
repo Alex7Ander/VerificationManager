@@ -9,8 +9,6 @@ import java.util.Map;
 import DevicePack.Element;
 import FileManagePack.FileManager;
 import FreqTablesPack.FreqTablesWindow;
-import GUIpack.StringGridFXPack.NewElementStringGridFX;
-import GUIpack.StringGridFXPack.StringGridPosition;
 import GUIpack.Tables.NewElementNominalsTable;
 import GUIpack.Tables.NewElementToleranceParamsTable;
 import GUIpack.Tables.Table;
@@ -167,6 +165,15 @@ public class NewElementController {
 			elemTypesComboBox.setValue(currentElement.getType());
 			setParams(currentTypeOfParams, currentElement.getSParamsCout());
 			
+			while(currentElement.getNominal().freqs.size() > nominalsTable.getRowCount()) {
+				nominalsTable.addRow();
+				periodicToleranceParamsTable.addRow();
+				primaryToleranceParamsTable.addRow();
+			}
+			
+			nominalsTable.setValuesFromElement(currentElement);
+			nominalsTable.showParametr(currentS);
+			
 			periodicToleranceParamsTable.setValuesFromElement(currentElement);
 			periodicToleranceParamsTable.showParametr(currentS);
 			
@@ -202,8 +209,8 @@ public class NewElementController {
 	private void initialize() {			
 		//Создаем таблицы
 		nominalsTable = new NewElementNominalsTable(nominalsTablePane);
-		primaryToleranceParamsTable = new NewElementToleranceParamsTable(primaryTablePane);
-		periodicToleranceParamsTable = new NewElementToleranceParamsTable(periodicTablePane); 
+		primaryToleranceParamsTable = new NewElementToleranceParamsTable(primaryTablePane, TimeType.PRIMARY);
+		periodicToleranceParamsTable = new NewElementToleranceParamsTable(periodicTablePane, TimeType.PERIODIC); 
 		
 		visibleParamsTable = primaryToleranceParamsTable;
 		periodicScrollPane.toBack();
@@ -257,54 +264,85 @@ public class NewElementController {
 		paramsComboBox.setValue(listOfParams.get(0));		
 	}
 	
+	private boolean isCorrectValueForInputing(String value) {
+		try {
+			Double.parseDouble(value);
+			return true;
+		}
+		catch(NumberFormatException nfExp) {
+			return false;
+		}
+	}	
 	@FXML
 	private void autoModuleBtnClick() {
 		int stop = visibleParamsTable.getRowCount();
 		String text = this.moduleTextField.getText();
-		for (int i=0; i<stop; i++) {
-			this.nominalsTable.setCellValue(1, i, text);
+		text = text.replace(",", ".");
+		if(isCorrectValueForInputing(text)) {
+			for (int i=0; i<stop; i++) {
+				this.nominalsTable.setCellValue(1, i, text);
+			}
 		}
 	}
 	@FXML
 	private void autoPhaseBtnClick() {
 		int stop = visibleParamsTable.getRowCount();
 		String text = this.phaseTextField.getText();
-		for (int i=0; i<stop; i++) {
-			this.nominalsTable.setCellValue(2, i, text);
+		text = text.replace(",", ".");
+		if(isCorrectValueForInputing(text)) {
+			for (int i=0; i<stop; i++) {
+				this.nominalsTable.setCellValue(2, i, text);
+			}
 		}
-	}
-	
+
+	}	
 	@FXML
 	private void autoDownModuleBtnClick() {
 		int stop = visibleParamsTable.getRowCount();
 		String text = this.downModuleTextField.getText();
-		for (int i=0; i<stop; i++) {
-			visibleParamsTable.setCellValue(1, i, text);
+		text = text.replace(",", ".");
+		if(isCorrectValueForInputing(text)) {
+			for (int i=0; i<stop; i++) {
+				visibleParamsTable.setCellValue(1, i, text);
+			}
 		}
+
 	}	
 	@FXML
 	private void autoUpModuleBtnClick() {
 		int stop = visibleParamsTable.getRowCount();
 		String text = this.upModuleTextField.getText();
-		for (int i=0; i<stop; i++) {
-			visibleParamsTable.setCellValue(2, i, text);
+		text = text.replace(",", ".");
+		if(isCorrectValueForInputing(text)) {
+			for (int i=0; i<stop; i++) {
+				visibleParamsTable.setCellValue(2, i, text);
+			}			
 		}
+
 	}
 	@FXML
 	private void autoDownPhaseBtnClick() {
 		int stop = visibleParamsTable.getRowCount();
 		String text = this.downPhaseTextField.getText();
-		for (int i=0; i<stop; i++) {
-			visibleParamsTable.setCellValue(3, i, text);
+		text = text.replace(",", ".");
+		if(isCorrectValueForInputing(text)) {
+			for (int i=0; i<stop; i++) {
+				visibleParamsTable.setCellValue(3, i, text);
+			}
 		}
+
 	}
 	@FXML
 	private void autoUpPhaseBtnClick() {
 		int stop = visibleParamsTable.getRowCount();
 		String text = this.upPhaseTextField.getText();
-		for (int i=0; i<stop; i++) {
-			visibleParamsTable.setCellValue(4, i, text);
+		text = text.replace(",", ".");
+		if(isCorrectValueForInputing(text)) {
+			for (int i=0; i<stop; i++) {
+				visibleParamsTable.setCellValue(4, i, text);
+			}
 		}
+
 	}
 	
 	@FXML
@@ -503,7 +541,7 @@ public class NewElementController {
 	}
 	
 	public Map<String, Map<Double, Double>> getNominalValues(){
-		LinkedHashMap<String, Map<Double, Double>> nominals = new LinkedHashMap<String, Map<Double, Double>>();
+		Map<String, Map<Double, Double>> nominals = new LinkedHashMap<String, Map<Double, Double>>();
 		for (int i = 0; i < currentCountOfParams; i++) {
 			String key = MeasUnitPart.MODULE + "_" + S_Parametr.values()[i];
 			nominals.put(key, this.nominalsTable.getParametr(key));
@@ -535,6 +573,7 @@ public class NewElementController {
 	
 	//Действия по закрытию окна	
 	public void saveValues() {
+		this.nominalsTable.changeSParametr(currentS);
 		this.periodicToleranceParamsTable.changeSParametr(this.currentS);
 		this.primaryToleranceParamsTable.changeSParametr(this.currentS);
 	}

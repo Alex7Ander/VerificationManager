@@ -2,8 +2,6 @@ package GUIpack.Tables;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -69,9 +67,10 @@ public class VisualTable implements Table {
 		});
         */
         copyMenuItem.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
+            @SuppressWarnings("rawtypes")
+			@Override
             public void handle(ActionEvent event) {
-                ObservableList<TablePosition> posList = table.getSelectionModel().getSelectedCells();               
+				ObservableList<TablePosition> posList = table.getSelectionModel().getSelectedCells();               
                 int old_r = -1;
                 StringBuilder clipboardString = new StringBuilder();
                 for (TablePosition p : posList) {
@@ -189,18 +188,24 @@ public class VisualTable implements Table {
 
 	@Override
 	public String getCellValue(int col, int row) {
-		Set<Integer> keys = lines.get(row).values.keySet();
-		String key = keys.toArray()[col].toString();
-		return lines.get(row).values.get(key);
+		//Set<Integer> keys = lines.get(row).values.keySet();
+		//String key = keys.toArray()[col].toString();
+		return lines.get(row).values.get(col);
 	}
 
 	@Override
 	public void setCellValue(int col, int row, String text) {
-		Set<Integer> keys = lines.get(row).values.keySet();
-		int key = (int) keys.toArray()[col];
-		lines.get(row).values.remove(key);
-		lines.get(row).values.put(key, text);
-		table.refresh();
+		try {
+			lines.get(row).values.remove(col);
+			lines.get(row).values.put(col, text);
+		}
+		catch(IndexOutOfBoundsException iExp) {
+			System.out.println("Некоректная попытка установить значение в таблицу " + this.getClass().getName() + " в ячейку [col, row]= [" + col + ", " + row + "]");
+		}
+		finally {
+			table.refresh();
+		}
+		
 	}
 
 	@Override
@@ -208,11 +213,9 @@ public class VisualTable implements Table {
 		columnValues.clear();
 		if (lines.isEmpty()) {
 			return;
-		}
-		Set keys = (TreeSet) lines.get(0).values.keySet();
-		String key = keys.toArray()[index].toString();
+		}		
 		for (Line line : lines) {
-			columnValues.add(line.values.get(key));
+			columnValues.add(line.values.get(index));
 		}		
 	}
 
@@ -222,11 +225,9 @@ public class VisualTable implements Table {
 		if (lines.isEmpty()) {
 			return;
 		}
-		Set keys = (TreeSet) lines.get(0).values.keySet();
-		String key = keys.toArray()[index].toString();
 		for (Line line : lines) {
 			try {
-				columnValues.add(Double.parseDouble(line.values.get(key)));
+				columnValues.add(Double.parseDouble(line.values.get(index)));
 			}
 			catch (NumberFormatException nfExp) {
 				//
@@ -236,15 +237,15 @@ public class VisualTable implements Table {
 
 	@Override
 	public void setColumn(int index, List<String> columnValues) {
-		int stopIndex = 0;
-		if (columnValues.size() > lines.size()) {
-			stopIndex = columnValues.size();
-		} 
-		else {
-			stopIndex = lines.size();
-		}
+		int stopIndex = setStopIndex(columnValues);
 		for (int i = 0; i < stopIndex; i++) {
-			String text = columnValues.get(i);
+			String text = null;
+			if (columnValues.size() > i) {
+				text = columnValues.get(i);
+			}
+			else {
+				text = "-";
+			}
 			setCellValue(index, i, text);
 		}		
 	}
@@ -253,7 +254,13 @@ public class VisualTable implements Table {
 	public void setColumnFromDouble(int index, List<Double> columnValues) {
 		int stopIndex = setStopIndex(columnValues);
 		for (int i = 0; i < stopIndex; i++) {
-			String text = columnValues.get(i).toString();
+			String text = null;
+			if (columnValues.size() > i) {
+				text = columnValues.get(i).toString();
+			}
+			else {
+				text = "-";
+			}
 			setCellValue(index, i, text);
 		}		
 	}
@@ -267,7 +274,7 @@ public class VisualTable implements Table {
 		}		
 	}
 
-	private int setStopIndex(List<Double> columnValues) {
+	private int setStopIndex(List<?> columnValues) {
 		int stopIndex = 0;
 		if (columnValues.size() > this.lines.size()) {
 			stopIndex = columnValues.size();
