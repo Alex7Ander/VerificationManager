@@ -9,6 +9,9 @@ public class DBEditWindow extends guiWindow {
 	
 	private DBEditWindow() throws IOException {
 		super("ѕросмотр/редактирование базы данных", "DBEditForm.fxml");
+		stage.setOnCloseRequest(event -> {
+			delete();
+		});
 	}
 
 	public static DBEditWindow getDBEditWindow() throws IOException{
@@ -16,6 +19,10 @@ public class DBEditWindow extends guiWindow {
 			instanceDBEditWindow = new DBEditWindow();			
 		}
 		return instanceDBEditWindow;
+	}
+	
+	public void delete() {
+		instanceDBEditWindow = null;
 	}
 	
 }

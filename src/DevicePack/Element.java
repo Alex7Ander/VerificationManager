@@ -1,8 +1,10 @@
 package DevicePack;
 
+import java.lang.reflect.Field;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import DataBasePack.DataBaseManager;
@@ -29,7 +31,7 @@ public class Element implements Includable<Device>, dbStorable{
 	private ToleranceParametrs primaryPhaseToleranceParams;
 	private ToleranceParametrs periodicPhaseToleranceParams;
 	private String type;
-	private String serialNumber;
+	private String serNumber;
 	private int poleCount;
 	private int sParamsCount;
 	private String measUnit;
@@ -75,7 +77,7 @@ public class Element implements Includable<Device>, dbStorable{
 		return type;
 	}
 	public String getSerialNumber() {
-		return serialNumber;
+		return serNumber;
 	}
 	public int getPoleCount() {
 		return poleCount;
@@ -127,7 +129,7 @@ public class Element implements Includable<Device>, dbStorable{
 		primaryPhaseToleranceParams.setTableName();
 		periodicModuleToleranceParams.setTableName();
 		periodicPhaseToleranceParams.setTableName();
-		listOfVerificationsTable = "Проведенные поверки для " + myDevice.getName() + " " + myDevice.getType() + " " + myDevice.getSerialNumber() + " " + type + " " + serialNumber;
+		listOfVerificationsTable = "Проведенные поверки для " + myDevice.getName() + " " + myDevice.getType() + " " + myDevice.getSerialNumber() + " " + type + " " + serNumber;
 	}
 
 //DataBase
@@ -149,7 +151,7 @@ public class Element implements Includable<Device>, dbStorable{
 		DataBaseManager.getDB().sqlQueryString(sqlQuery, fieldName, arrayResults);
 		
 		this.type = arrayResults.get(0).get(0);
-		this.serialNumber = arrayResults.get(0).get(1);
+		this.serNumber = arrayResults.get(0).get(1);
 		this.poleCount = Integer.parseInt(arrayResults.get(0).get(2));
 		if (this.poleCount == 2) {
 			this.sParamsCount = 1;
@@ -198,7 +200,7 @@ public class Element implements Includable<Device>, dbStorable{
 //GUI	
 	public Element(NewElementController elCtrl) {			
 		this.type = elCtrl.getType();
-		this.serialNumber = elCtrl.getSerNum();
+		this.serNumber = elCtrl.getSerNum();
 		this.poleCount = elCtrl.getPoleCount();
 		if (poleCount == 2) {
 			this.sParamsCount = 1;
@@ -255,7 +257,7 @@ public class Element implements Includable<Device>, dbStorable{
 				+ "phaseToleranceType) VALUES ("		
 					+ this.myDevice.getId() + ",'"
 					+ type + "','" 												
-					+ serialNumber + "','" 										
+					+ serNumber + "','" 										
 					+ poleCount + "','" 										
 					+ measUnit + "','" 											
 					+ moduleToleranceType + "','" 								
@@ -264,7 +266,7 @@ public class Element implements Includable<Device>, dbStorable{
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
 		
 		//Getting id
-		sqlQuery = "SELECT id FROM [Elements] WHERE type='" + type + "' AND  serNumber='" + serialNumber + "' AND deviceId='" + this.myDevice.getId() + "'";
+		sqlQuery = "SELECT id FROM [Elements] WHERE type='" + type + "' AND  serNumber='" + serNumber + "' AND deviceId='" + this.myDevice.getId() + "'";
 		System.out.println("Получаем id сохраненного элемента запросом:\n" + sqlQuery);
 		this.id = DataBaseManager.getDB().sqlQueryCount(sqlQuery);
 		System.out.println("id = " + this.id);
@@ -292,7 +294,25 @@ public class Element implements Includable<Device>, dbStorable{
 	
 	@Override
 	public void editInfoInDB(HashMap<String, String> editingValues) throws SQLException {
-		//
+		String sqlQuery = "UPDATE Elements SET ";
+		Class<? extends Element> elementClass = this.getClass();		
+		Iterator<String> it = editingValues.keySet().iterator();
+		do {
+			String fieldName = it.next();
+			try {
+				Field anyField = elementClass.getDeclaredField(fieldName);
+				String oldAnyFieldValue = (String) anyField.get(this);
+				String newAnyFieldValue = editingValues.get(fieldName);
+				if(!oldAnyFieldValue.equals(newAnyFieldValue)) {
+					sqlQuery += (fieldName + "='"+newAnyFieldValue+"', ");
+				}
+			} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException exp) {
+				exp.printStackTrace();
+			}
+		} while(it.hasNext());
+		sqlQuery = sqlQuery.substring(0, sqlQuery.length()-2);
+		sqlQuery += " WHERE id=" + this.id;
+		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
 	}
 		
 	public void rewriteParams(ToleranceParametrs newModulePrimaryParams, ToleranceParametrs newModulePeriodicParams,
@@ -321,6 +341,11 @@ public class Element implements Includable<Device>, dbStorable{
 		List<List<String>> arrayResults = new ArrayList<List<String>>();		
 		DataBaseManager.getDB().sqlQueryString(sqlString, fieldName, arrayResults);			
 		return arrayResults;
+	}
+	
+	public void changePoleCount(int newPoleCount) throws SQLException {
+		String sqlQuery = "UPDATE Elements SET poleCount = '" + newPoleCount + "' WHERE id=" + this.id;
+		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);	
 	}
 	
 }

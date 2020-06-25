@@ -163,6 +163,28 @@ public class NewElementController {
 		if (currentElement != null) {
 			serNumberTextField.setText(currentElement.getSerialNumber());
 			elemTypesComboBox.setValue(currentElement.getType());
+			
+			//Уcтановим poleCount
+			if(element.getPoleCount() == 4) {
+				this.fourPoleRB.setSelected(true);
+			}
+			else {
+				this.twoPoleRB.setSelected(true);
+			}
+			//Установим типы допусков
+			if(element.getModuleToleranceType().equals("percent")) {
+				this.percentToleranceRB.setSelected(true);
+			}
+			else {
+				this.upDownToleranceRB.setSelected(true);
+			}
+			if(element.getMeasUnit().equals("vswr")) {
+				this.vswrRB.setSelected(true);
+			}
+			else {
+				this.gammaRB.setSelected(true);
+			}
+			
 			setParams(currentTypeOfParams, currentElement.getSParamsCout());
 			
 			while(currentElement.getNominal().freqs.size() > nominalsTable.getRowCount()) {

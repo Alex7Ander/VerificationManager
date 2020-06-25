@@ -29,12 +29,12 @@ public class Line {
 		values.put(key, "-");
 	}
 	
-	public void edit(List<String> textLine) {
-		for (int i = 0; i < values.size(); i++) {
+	public void edit(int startIndex, List<String> textLine) {
+		for (int i = 0; i < values.size() - startIndex; i++) {
 			try {
 				String value = textLine.get(i);
-				values.remove(i);
-				values.put(i, value);
+				values.remove(startIndex + i);
+				values.put(startIndex + i, value);
 			}
 			catch(IndexOutOfBoundsException iExp) {
 				break;

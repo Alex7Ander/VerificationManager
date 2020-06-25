@@ -2,6 +2,8 @@ package NewElementPack;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.HashMap;
+
 import AboutMessageForm.AboutMessageWindow;
 import DataBasePack.DataBaseManager;
 import DevicePack.Element;
@@ -59,6 +61,15 @@ public class NewElementWindow extends guiWindow {
 			int answer = YesNoWindow.createYesNoWindow("Сохранить изменения", "Сохранить внесенные вами изменения?").showAndWait();
 			//Если изменения необходимо сохранить:
 			if (answer == 0) {
+				//Проверим базовую информацию
+				HashMap<String, String> editingValues = new HashMap<String, String>();				
+				editingValues.put("type", ctrl.getType());
+				editingValues.put("serNumber", ctrl.getSerNum());
+				editingValues.put("serNumber", ctrl.getSerNum());
+				editingValues.put("measUnit", ctrl.getMeasUnit());
+				editingValues.put("moduleToleranceType", ctrl.getModuleToleranceType());
+				editingValues.put("phaseToleranceType", ctrl.getPhaseToleranceType());
+								
 				ToleranceParametrs newModulePrimaryTP = new ToleranceParametrs(TimeType.PRIMARY, MeasUnitPart.MODULE, ctrl, elm);
 				ToleranceParametrs newModulePeriodicTP = new ToleranceParametrs(TimeType.PERIODIC, MeasUnitPart.MODULE, ctrl, elm);
 				ToleranceParametrs newPhasePrimaryTP = new ToleranceParametrs(TimeType.PRIMARY, MeasUnitPart.PHASE, ctrl, elm);				
@@ -66,6 +77,10 @@ public class NewElementWindow extends guiWindow {
 				MeasResult newNominals = new MeasResult(ctrl, elm);
 				try {
 					DataBaseManager.getDB().BeginTransaction();
+					elm.editInfoInDB(editingValues);
+					if(elm.getPoleCount() != ctrl.getPoleCount()) {
+						elm.changePoleCount(ctrl.getPoleCount());
+					}
 					elm.rewriteParams(newModulePrimaryTP, newModulePeriodicTP, newPhasePrimaryTP, newPhasePeriodicTP);
 					if (!elm.getNominal().equals(newNominals)) {
 						elm.getNominal().deleteFromDB();

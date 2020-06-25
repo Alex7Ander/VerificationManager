@@ -26,7 +26,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-
 public class NewDeviceController  {
 
 	@FXML
@@ -66,23 +65,31 @@ public class NewDeviceController  {
 		listOfNames = FXCollections.observableArrayList();
 		elementsButton = new ArrayList<Button>();
 		elementsWindow = new ArrayList<NewElementWindow>();
+		countOfElements = 0;
 		setItemsOfNames();
 	}
 	
 	@FXML
-	public void createElementsBtnClick(ActionEvent event) {
-		for (int i=0; i<elementsButton.size(); i++) {
-			elementsButtonBox.getChildren().remove(elementsButton.get(i));
-		}
-		elementsButton.clear();
-		elementsWindow.clear();
+	public void createElementsBtnClick(ActionEvent event) throws IOException {
+		int newCountOfElements = 0;
 		try {			
-			countOfElements = Integer.parseInt(countOfElementsTextField.getText());
-			for (int i = 0; i < countOfElements; i++) {								
-				final int index = i;
-				String item = Integer.toString(i+1);		
+			newCountOfElements = Integer.parseInt(countOfElementsTextField.getText());
+		}
+		catch(NumberFormatException nfExp) {
+			AboutMessageWindow.createWindow("Ошибка", "Введенное Вами число элементов\nне является действительным числом!").show();
+			return;
+		}
+		
+		if(newCountOfElements == this.countOfElements) {
+			return;
+		}
+		else if(newCountOfElements > this.countOfElements) {
+			while(this.countOfElements != newCountOfElements) {
+				final int index = (countOfElements);
+				String item = Integer.toString(countOfElements + 1);		
 				//Cоздаем окно, которе будет принимать информацию для элемента
-				NewElementWindow elementWin = new NewElementWindow();
+				NewElementWindow elementWin;
+				elementWin = new NewElementWindow();
 				elementWin.setTitle(item);
 				elementsWindow.add(elementWin);	
 				
@@ -96,11 +103,19 @@ public class NewDeviceController  {
 						}
 				});
 				elementsButton.add(btn);
+				elementsButtonBox.getChildren().add(btn);
+				++countOfElements;
 			}
-			elementsButtonBox.getChildren().addAll(elementsButton);
 		}
-		catch(Exception exp) {
-			System.out.println(exp.getMessage());
+		else if(newCountOfElements < this.countOfElements) {
+			while(newCountOfElements != this.countOfElements) {
+				Button btn = elementsButton.get(countOfElements - 1);
+				elementsButton.remove(btn);
+				elementsButtonBox.getChildren().remove(btn);
+				elementsWindow.remove(countOfElements - 1);
+				--countOfElements;
+			}
+
 		}
 	}	
 	

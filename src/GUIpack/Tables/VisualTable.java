@@ -95,6 +95,8 @@ public class VisualTable implements Table {
         pasteMenuItem.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
+            	TablePosition pos = (TablePosition) table.getSelectionModel().getSelectedCells().get(0);
+            	int startColumnIndex = pos.getColumn();
             	Object content = Clipboard.getSystemClipboard().getContent(DataFormat.PLAIN_TEXT);
             	StringBuilder text = new StringBuilder(content.toString());
             	text.append("\n");           	
@@ -112,14 +114,14 @@ public class VisualTable implements Table {
             		}
             		text.delete(0, index + 1);
             		if(i < lines.size()) {
-            			lines.get(i).edit(textLine);
+            			lines.get(i).edit(startColumnIndex, textLine);
             		}
             		else {
             			Line line = new Line(textLine);
             			lines.add(line);
             		}
             		++i;
-            	} 
+            	}
             	table.refresh();
             }
         });
