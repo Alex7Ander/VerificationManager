@@ -10,6 +10,7 @@ import DevicePack.Element;
 import ToleranceParamPack.ParametrsPack.MeasUnitPart;
 import ToleranceParamPack.ParametrsPack.S_Parametr;
 import ToleranceParamPack.ParametrsPack.TimeType;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.Pane;
@@ -42,8 +43,9 @@ public class NewElementNominalsTable extends VisualTable {
 				String key = MeasUnitPart.values()[j] + "_" + S_Parametr.values()[i];
 				values.put(key, new ArrayList<String>());
 			}
-		}		
+		}	
 		
+		table.setPlaceholder(new Label("Таблица пуста"));
 		table.setPrefWidth(pane.getPrefWidth());
 		table.setPrefHeight(pane.getPrefHeight());	
 		table.getColumns().get(0).setPrefWidth(57);
@@ -58,12 +60,9 @@ public class NewElementNominalsTable extends VisualTable {
 			TableColumn<Line, String> column = (TableColumn<Line, String>) table.getColumns().get(i);
 			column.setCellFactory(TextFieldTableCell.<Line>forTableColumn());
 			column.setOnEditCommit(event->{
-				/*if(event.getNewValue() == null) {
-					table.refresh();
-				}*/
 				if(event.getNewValue() != null) {
 					String newValue = event.getNewValue();
-					newValue = newValue.replace(",",".");
+					newValue = newValue.replace(",", ".");
 					try {
 			    		 @SuppressWarnings("unused")
 						 Double value = Double.parseDouble(newValue);

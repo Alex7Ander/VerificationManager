@@ -9,6 +9,7 @@ import DevicePack.Element;
 import ToleranceParamPack.ParametrsPack.MeasUnitPart;
 import ToleranceParamPack.ParametrsPack.S_Parametr;
 import ToleranceParamPack.ParametrsPack.TimeType;
+import javafx.event.EventHandler;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.TextFieldTableCell;
@@ -37,8 +38,7 @@ public class NewElementToleranceParamsTable extends VisualTable {
 		super(localTableHeads, pane);
 		myTimeType = timeType;
 		currentS = S_Parametr.S11;
-		
-		
+				
 		values = new HashMap<String, ArrayList<String>>();
 		values.put("FREQS", new ArrayList<String>());
 		for (int i = 0; i < S_Parametr.values().length; i++) {
@@ -68,7 +68,7 @@ public class NewElementToleranceParamsTable extends VisualTable {
 			column.setOnEditCommit(event->{
 				if(event.getNewValue() != null) {
 					String newValue = event.getNewValue();
-					newValue = newValue.replace(",",".");
+					newValue = newValue.replace(",", ".");
 					try {
 			    		 @SuppressWarnings("unused")
 						 Double value = Double.parseDouble(newValue);
@@ -81,6 +81,9 @@ public class NewElementToleranceParamsTable extends VisualTable {
 					this.lines.get(rowIndex).values.remove(colIndex);
 					this.lines.get(rowIndex).values.put(colIndex, newValue);
 					
+					//table.getSelectionModel().getSelectedCells().get(colIndex);
+					//table.getFocusModel().focus(rowIndex + 1);
+					table.scrollTo(rowIndex + 1);
 				}
 				table.refresh();
 			});

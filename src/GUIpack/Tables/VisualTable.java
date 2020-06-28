@@ -41,7 +41,6 @@ public class VisualTable implements Table {
 			TableColumn<Line, String> column = new TableColumn<Line, String>();
 			final int index = i;
 			column.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().values.get(index)));
-
 			
 			column.setText(headLabels.get(i));
 			columns.add(column);
@@ -97,6 +96,7 @@ public class VisualTable implements Table {
             public void handle(ActionEvent event) {
             	TablePosition pos = (TablePosition) table.getSelectionModel().getSelectedCells().get(0);
             	int startColumnIndex = pos.getColumn();
+            	int startRowIndex = pos.getRow();
             	Object content = Clipboard.getSystemClipboard().getContent(DataFormat.PLAIN_TEXT);
             	StringBuilder text = new StringBuilder(content.toString());
             	text.append("\n");           	
@@ -113,13 +113,17 @@ public class VisualTable implements Table {
             			currentTextLine.delete(0, tabIndex + 1);
             		}
             		text.delete(0, index + 1);
-            		if(i < lines.size()) {
-            			lines.get(i).edit(startColumnIndex, textLine);
+            		
+            		int editableLineIndex = startRowIndex + i;
+            		if(editableLineIndex < lines.size()) {
+            			lines.get(editableLineIndex).edit(startColumnIndex, textLine);
             		}
+            		/*
             		else {
-            			Line line = new Line(textLine);
+            			Line line = new Line(startRowIndex, textLine);
             			lines.add(line);
             		}
+            		*/
             		++i;
             	}
             	table.refresh();

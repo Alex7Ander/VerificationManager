@@ -1,5 +1,6 @@
 package VerificationPack;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import DevicePack.Device;
 import DevicePack.Element;
@@ -9,6 +10,10 @@ import ToleranceParamPack.ParametrsPack.TimeType;
 
 public class VerificationProcedure {
 
+	public VerificationProcedure() {}
+	public VerificationProcedure(Element ownerElement, int index) throws SQLException {
+		//
+	}
 //Primary information:
 	private TimeType verificationTimeType;
 	private String strTemperature;

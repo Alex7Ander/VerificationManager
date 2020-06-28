@@ -19,10 +19,13 @@ import GUIpack.InfoRequestable;
 import GUIpack.Tables.ResultsTable;
 import NewElementPack.NewElementController;
 import NewElementPack.NewElementWindow;
+import ProtocolCreatePack.ProtocolCreateWindow;
 import SearchDevicePack.SearchDeviceWindow;
 import ToleranceParamPack.ParametrsPack.MeasUnitPart;
 import ToleranceParamPack.ParametrsPack.S_Parametr;
+import ToleranceParamPack.ParametrsPack.ToleranceParametrs;
 import VerificationPack.MeasResult;
+import VerificationPack.VerificationProcedure;
 import YesNoDialogPack.YesNoWindow;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -46,7 +49,7 @@ public class DBEditController implements InfoRequestable {
 	
 	@FXML
 	private ScrollPane mainPane;
-//Левая часть окна
+	//Левая часть окна
 	@FXML
 	private Button searchDeviceBtn;
 	@FXML
@@ -252,8 +255,8 @@ public class DBEditController implements InfoRequestable {
 		verificationsDatesListViewContextMenu = new ContextMenu();
 		MenuItem deleteResultItem = new MenuItem("Удалить результат");
 		MenuItem setAsNominalResultItem = new MenuItem("Установить как номинал");
-		verificationsDatesListViewContextMenu.getItems().addAll(deleteResultItem);
-		verificationsDatesListViewContextMenu.getItems().addAll(setAsNominalResultItem);
+		MenuItem createProtocolItem = new MenuItem("Выписать протокол поверки");
+		verificationsDatesListViewContextMenu.getItems().addAll(deleteResultItem, setAsNominalResultItem, createProtocolItem);
 		
 		deleteResultItem.setOnAction(event -> {						
 			int resIndex = Integer.parseInt(verifications.get(currentDateIndex).get(0));
@@ -297,6 +300,37 @@ public class DBEditController implements InfoRequestable {
 				sqlExp.printStackTrace();
 				AboutMessageWindow.createWindow("Ошибка", "Ошибка доступа к БД\nпри изменения номинала").show();
 			}
+		});
+		
+		createProtocolItem.setOnAction(event->{
+			int resIndex = Integer.parseInt(verifications.get(currentDateIndex).get(0));
+			String[] docTypes = new String[] {"Свидетельство о поверке", "Извещение о непригодности"};
+			
+			MeasResult results = null;
+			MeasResult nominals = null;
+			ToleranceParametrs protocoledModuleToleranceParams = null;
+			ToleranceParametrs protocoledPhaseToleranceParams = null; 
+			VerificationProcedure verification = null;
+			try {
+				verification = new VerificationProcedure(modDevice.includedElements.get(currentElementIndex), 0);
+				results = new MeasResult(modDevice.includedElements.get(currentElementIndex), resIndex);
+				nominals = modDevice.includedElements.get(currentElementIndex).getNominal();
+				if (verification.isPrimary()) {
+					protocoledModuleToleranceParams = modDevice.includedElements.get(currentElementIndex).getPrimaryModuleToleranceParams();
+					protocoledPhaseToleranceParams = modDevice.includedElements.get(currentElementIndex).getPrimaryPhaseToleranceParams();
+				}
+				else {
+					protocoledModuleToleranceParams = modDevice.includedElements.get(currentElementIndex).getPeriodicModuleToleranceParams();
+					protocoledPhaseToleranceParams = modDevice.includedElements.get(currentElementIndex).getPeriodicPhaseToleranceParams();				
+				}
+
+			} 
+			catch(SQLException sqlExp) {
+				sqlExp.printStackTrace();
+				AboutMessageWindow.createWindow("Ошибка", "Ошибка доступа к БД").show();
+			}
+			
+			ProtocolCreateWindow protocolCreateWindow = ProtocolCreateWindow.getProtocolCreateWindow(docTypes, results, nominals, protocoledModuleToleranceParams, protocoledPhaseToleranceParams, verification);
 		});
 		
 		verificationDateListView.setOnContextMenuRequested(event->{

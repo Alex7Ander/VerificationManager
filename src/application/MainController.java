@@ -79,7 +79,7 @@ public class MainController {
 //DB Edit button
 	@FXML
 	public void mouseOnDBEditBtn(MouseEvent event) {
-		helpTextArea.setText("Работа с базой данных измерительно установки: проссмотр результатов измерений,\n"
+		helpTextArea.setText("Работа с базой данных измерительной установки: просмотр результатов измерений,\n"
 				+ "редактирование критериев годности.");
 		try {
 			dbEditBtn.setOpacity(1.0);
@@ -241,14 +241,14 @@ public class MainController {
 	}
 	@FXML 
 	public void aboutBtnClick(ActionEvent event) {
-		helpTextArea.setText("Версия ПО 0.0.1");
-		AboutMessageWindow.createWindow("О программе", "Версия ПО: 0.0.1").show();
+		helpTextArea.setText("Версия ПО 1.0.1");
+		AboutMessageWindow.createWindow("О программе", "Версия ПО: 1.0.1").show();
 	}
 	
 //Exit button
 	@FXML
 	public void mouseOnExitBtn(MouseEvent event) {
-		helpTextArea.setText("Без комментариев");
+		helpTextArea.setText("Закрыть программу");
 		try {
 			exitBtn.setOpacity(1.0);
 		}
