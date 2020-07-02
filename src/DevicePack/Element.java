@@ -297,6 +297,7 @@ public class Element implements Includable<Device>, dbStorable{
 		String sqlQuery = "UPDATE Elements SET ";
 		Class<? extends Element> elementClass = this.getClass();		
 		Iterator<String> it = editingValues.keySet().iterator();
+		boolean isEdited = false;
 		do {
 			String fieldName = it.next();
 			try {
@@ -304,12 +305,17 @@ public class Element implements Includable<Device>, dbStorable{
 				String oldAnyFieldValue = (String) anyField.get(this);
 				String newAnyFieldValue = editingValues.get(fieldName);
 				if(!oldAnyFieldValue.equals(newAnyFieldValue)) {
+					isEdited = true;
 					sqlQuery += (fieldName + "='"+newAnyFieldValue+"', ");
 				}
 			} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException exp) {
 				exp.printStackTrace();
 			}
 		} while(it.hasNext());
+		
+		if(!isEdited) { 
+			return;
+		}
 		sqlQuery = sqlQuery.substring(0, sqlQuery.length()-2);
 		sqlQuery += " WHERE id=" + this.id;
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
@@ -333,7 +339,7 @@ public class Element implements Includable<Device>, dbStorable{
 		newPhasePeriodicparams.saveInDB();
 	}
 	
-	public List<List<String>> getListOfVerifications() throws SQLException {		
+	public List<List<String>> getMeasurementList() throws SQLException {		
 		String sqlString = "SELECT id, MeasDate FROM [Results] WHERE ElementId=" + this.id + "";		
 		ArrayList<String> fieldName = new ArrayList<String>();
 		fieldName.add("id");

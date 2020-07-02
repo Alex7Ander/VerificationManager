@@ -44,7 +44,7 @@
                   <Label stylesheets="@../application/commonLabel.css" text="Наименование метрологической воинской части: " />
                   <TextField fx:id="militaryBaseName" promptText="Введите наименование воинской части" text="ВЧ № 0000" />
                   <Label prefHeight="16.0" prefWidth="330.0" stylesheets="@../application/commonLabel.css" text="Нормативно-техническая документация поверки:" />
-                  <TextField fx:id="verificatonMethodologyNameTextField" text="Методика поверки на военном эталоне" />
+                  <TextField fx:id="verificatonMethodologyNameTextField" />
                   <RadioButton fx:id="etalonRB" mnemonicParsing="false" prefHeight="26.0" prefWidth="469.0" style="-fx-font-family: Arial Narrow; -fx-font-weight: bold; -fx-font-size: 12;" text="Эталон" />
                   <RadioButton fx:id="siRB" mnemonicParsing="false" prefHeight="25.0" prefWidth="469.0" style="-fx-font-family: Arial Narrow; -fx-font-weight: bold; -fx-font-size: 12;" text="Средство измерения" />
                   <Label fx:id="devNameLabel" stylesheets="@../../bin/application/commonLabel.css" text="____________________________________________________" />

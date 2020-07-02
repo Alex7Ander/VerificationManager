@@ -12,6 +12,7 @@ import java.util.Properties;
 import AboutMessageForm.AboutMessageWindow;
 import DevicePack.Device;
 import DevicePack.Element;
+import Exceptions.SavingException;
 import FileManagePack.FileManager;
 import GUIpack.InfoRequestable;
 import GUIpack.Tables.Table;
@@ -117,7 +118,7 @@ public class VerificationController implements InfoRequestable {
 //Процедура поверки
 	VerificationProcedure verification;
 //Результат поверки
-	private ArrayList<MeasResult> verificationResult;	
+	private List<MeasResult> verificationResult;	
 //Ссылка на поверяемое СИ
 	public Device verificatedDevice;		
 	private int currentElementIndex;
@@ -151,20 +152,50 @@ public class VerificationController implements InfoRequestable {
 		}
 	}
 	
-//Нажатие на кнопку сохранить
+	//Нажатие на кнопку сохранить
 	@FXML
-	private void saveBtnClick(ActionEvent event) throws IOException {
+	private void saveBtnClick(ActionEvent event) {
+		try {
+			saveResultsOfVerification();
+		}
+		catch(SavingException exp) {
+			AboutMessageWindow.createWindow("Ошибка", exp.getMessage()).show();
+		}		
+	}
+	
+	//Нажатие на кнопку создания протокола
+	@FXML
+	private void createProtocolBtnClick(ActionEvent event) throws IOException {
+		if (verificationResult.size() != 0) {
+			if(!resultSaved) {
+				try {
+					saveResultsOfVerification();
+					AboutMessageWindow.createWindow("Успешно", "Результаты поверки сохранены в БД").show();
+				}
+				catch(SavingException exp) {
+					AboutMessageWindow.createWindow("Ошибка", exp.getMessage()).show();
+				}			
+			}
+			String[] docTypes = {"Cвидетельство о поверке", "Извещение о непригодности"};	
+			createProtocol(docTypes);
+		}
+		else {
+			AboutMessageWindow.createWindow("Ошибка", "Процедура поверки еще не закончена").show();
+		}
+	}
+	
+	//Процедура сохранения результатов
+	private void saveResultsOfVerification() throws SavingException {
 		if (verificationResult.size() != 0) {
 			try {
 				for (int i = 0; i < verificationResult.size(); i++) {
 					verificationResult.get(i).saveInDB();
-				}
-				AboutMessageWindow.createWindow("Успешно", "Результаты поверки сохранены в БД").show();
+				}				
 				resultSaved = true;
 			}
 			catch(SQLException sqlExp) {
-				AboutMessageWindow.createWindow("Ошибка", "Не удалось сохранить результаты в БД");
 				resultSaved = false;
+				throw new SavingException("Не удалось сохранить результаты в БД:\n" + sqlExp.getMessage());				
 			}
 		}
 		else {
@@ -175,17 +206,6 @@ public class VerificationController implements InfoRequestable {
 		}
 	}
 	
-//Нажатие на кнопку создания протокола
-	@FXML
-	private void createProtocolBtnClick(ActionEvent event) throws IOException {
-		if (verificationResult.size() != 0) {
-			String[] docTypes = {"Cвидетельство о поверке", "Извещение о непригодности"};	
-			createProtocol(docTypes);
-		}
-		else {
-			AboutMessageWindow.createWindow("Ошибка","Процедура поверки еще не закончена").show();
-		}
-	}
 	public void createProtocol(String[] docTypes) throws IOException {
 		this.verification.setDeviceInformation(this.verificatedDevice);
 		
@@ -208,7 +228,8 @@ public class VerificationController implements InfoRequestable {
 			}
 		}
 
-		ProtocolCreateWindow.getProtocolCreateWindow(docTypes, 
+		ProtocolCreateWindow.getProtocolCreateWindow(this.verificatedDevice,
+													docTypes, 
 													this.verificationResult, 
 													nominals, 
 													protocoledModuleToleranceParams, 
@@ -342,7 +363,6 @@ public class VerificationController implements InfoRequestable {
 		this.resultTable.setColumn(5, column5);
 				
 		//Решение годности по модолю
-		String key6 = keys.get(this.currentParamIndex);
 		List<String> column6 = Adapter.MapToArrayList(
 				this.verificationResult.get(this.currentElementIndex).suitabilityDecision.get(key1));
 		this.resultTable.setColumn(6, column6);
@@ -364,7 +384,6 @@ public class VerificationController implements InfoRequestable {
 		this.resultTable.setColumnFromDouble(9, column9, phaseAccuracy);
 		
 		//Расчет разницы результатов этой поверки и предыдущей для фазы
-		String key10 = keys.get(2 + this.currentParamIndex);
 		List<Double> column10 = Adapter.MapToArrayList(
 				this.verificationResult.get(this.currentElementIndex).differenceBetweenNominal.get(key7));
 		this.resultTable.setColumnFromDouble(10, column10, phaseAccuracy);
@@ -382,7 +401,6 @@ public class VerificationController implements InfoRequestable {
 		this.resultTable.setColumn(11, column11);
 				
 		//Решения годности по фазе
-		String key12 = keys.get(2 + this.currentParamIndex);
 		List<String> column12 = Adapter.MapToArrayList(
 				this.verificationResult.get(this.currentElementIndex).suitabilityDecision.get(key7));
 		this.resultTable.setColumn(12, column12);
@@ -509,14 +527,6 @@ public class VerificationController implements InfoRequestable {
 	//Закрыть	
 	@FXML
 	private void closeBtnClick(ActionEvent event) {		
-		/*
-		if (!resultIsSaved()) {
-			int answer = YesNoWindow.createYesNoWindow("Результаты поверки не сохранены", "Результаты поверки не сохранениы в БД.\nВы уверены что хотите завершить поверку\nбез сохранения результатов?").showAndWait();
-			if (answer == 1) {
-				return;
-			}
-		}	
-		*/
 		myStage.close();
 	}
 		

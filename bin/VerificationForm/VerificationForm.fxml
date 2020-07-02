@@ -52,25 +52,25 @@
             </ScrollPane>
             <HBox prefHeight="32.0" prefWidth="1115.0">
                <children>
-                  <Button fx:id="searchDeviceBtn" mnemonicParsing="false" onAction="#searchDeviceBtnClick" prefWidth="200.0" stylesheets="@../../bin/application/commonButton.css" text="Выбрать поверяемое СИ">
+                  <Button fx:id="searchDeviceBtn" mnemonicParsing="false" onAction="#searchDeviceBtnClick" prefHeight="26.0" prefWidth="200.0" stylesheets="@../../bin/application/commonButton.css" text="Выбрать поверяемое СИ">
                      <HBox.margin>
                         <Insets bottom="2.0" left="2.0" right="4.0" top="2.0" />
                      </HBox.margin></Button>
-                  <Button fx:id="startBtn" mnemonicParsing="false" onAction="#startBtnClick" prefWidth="150.0" stylesheets="@../../bin/application/commonButton.css" text="Старт">
+                  <Button fx:id="startBtn" mnemonicParsing="false" onAction="#startBtnClick" prefHeight="26.0" prefWidth="200.0" stylesheets="@../../bin/application/commonButton.css" text="Старт">
                      <HBox.margin>
                         <Insets bottom="2.0" left="2.0" right="4.0" top="2.0" />
                      </HBox.margin></Button>
-                  <Button fx:id="saveBtn" mnemonicParsing="false" onAction="#saveBtnClick" prefWidth="150.0" stylesheets="@../../bin/application/commonButton.css" text="Сохранить">
+                  <Button fx:id="saveBtn" mnemonicParsing="false" onAction="#saveBtnClick" opacity="0.0" prefHeight="26.0" prefWidth="5.0" stylesheets="@../../bin/application/commonButton.css" text="Сохранить">
                      <HBox.margin>
                         <Insets bottom="2.0" left="2.0" right="4.0" top="2.0" />
                      </HBox.margin></Button>
-                  <Button fx:id="createProtocolBtn" mnemonicParsing="false" onAction="#createProtocolBtnClick" prefWidth="150.0" stylesheets="@../../bin/application/commonButton.css" text="Свидетельство">
+                  <Button fx:id="fileReadBtn" mnemonicParsing="false" onAction="#fileReadBtnClick" prefHeight="26.0" prefWidth="200.0" stylesheets="@../../bin/application/commonButton.css" text="Получить данные">
                      <HBox.margin>
                         <Insets bottom="2.0" left="2.0" right="4.0" top="2.0" />
                      </HBox.margin></Button>
-                  <Button fx:id="fileReadBtn" mnemonicParsing="false" onAction="#fileReadBtnClick" prefHeight="26.0" prefWidth="150.0" stylesheets="@../../bin/application/commonButton.css" text="Получить данные">
+                  <Button fx:id="createProtocolBtn" mnemonicParsing="false" onAction="#createProtocolBtnClick" prefHeight="26.0" prefWidth="250.0" stylesheets="@../../bin/application/commonButton.css" text="Сохранить и выписать свидетельство">
                      <HBox.margin>
-                        <Insets bottom="2.0" left="2.0" right="132.0" top="2.0" />
+                        <Insets bottom="2.0" left="2.0" right="50.0" top="2.0" />
                      </HBox.margin></Button>
                   <Button fx:id="closeBtn" mnemonicParsing="false" onAction="#closeBtnClick" prefWidth="150.0" stylesheets="@../../bin/application/commonButton.css" text="Скрыть">
                      <HBox.margin>

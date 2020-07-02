@@ -43,12 +43,14 @@ public class DocumetnsCreateService extends Service<Integer> {
 	private String protocolName;
 	private String documentName;
 	private String protoPathTo;
+	
 	//Книга
 	private Workbook wb;
 	//лист
 	private Sheet sh;
 	//Строки
-	private ArrayList<Row> rows;
+	private List<Row> rows;
+	
 	//Стили шрифтов
 	private CellStyle borderCellStyle;
 	private CellStyle boldCellStyle;
@@ -84,11 +86,15 @@ public class DocumetnsCreateService extends Service<Integer> {
 		String strDate = protocoledResult.get(0).getDateOfMeasByString();
 		this.sh = wb.createSheet(WorkbookUtil.createSafeSheetName(strDate));
 		this.sh.setAutobreaks(true);
+		this.sh.setMargin(Sheet.LeftMargin, 1);
+		this.sh.setMargin(Sheet.RightMargin, 1);
+		this.sh.setMargin(Sheet.BottomMargin, 0.4);
+		this.sh.setMargin(Sheet.TopMargin, 0.4);
+		
 		PrintSetup ps = sh.getPrintSetup();
 		ps.setFitWidth((short)1);
 		ps.setFitHeight((short)255);
-		Footer footer = sh.getFooter();
-		footer.setCenter(" Стр. " + HeaderFooter.page() + " из " + HeaderFooter.numPages() + "(Протокол поверки № " + verification.getProtocolNumber() + " от " + verification.getDateOfCreation().replace('-', '.') + ")");
+
 		this.rows = new ArrayList<Row>();
 		
 		//Шрифты
@@ -187,7 +193,7 @@ public class DocumetnsCreateService extends Service<Integer> {
 	}
 	
 	private void createProtocol() throws IOException {
-		prepareSheet();
+		//prepareSheet();
 		fillSheet();
 		topCellsMerging();
 		colScaling();
@@ -213,7 +219,7 @@ public class DocumetnsCreateService extends Service<Integer> {
 			writer.write(verification.getWorkerName() + "\n");				//10
 			writer.write(verification.getBossStatus() + " " + verification.getBossName() + "\n");		//11
 			writer.write(verification.getDecision() + "\n");				//12
-			writer.write(verification.getDateOfCreation() + "\n");			//13
+			writer.write(verification.getDateForDocuments() + "\n");			//13
 			writer.write(verification.getFinishDate() + "\n");				//14
 		} catch (IOException ioExp) {
 			ioExp.getStackTrace();
@@ -234,7 +240,7 @@ public class DocumetnsCreateService extends Service<Integer> {
 	
 	private void prepareSheet() {	
 		//Создадим строки
-		int countOfRows = 21;
+		int countOfRows = 14;
 		for (int i=0; i < protocoledResult.size(); i++) {
 			int currentParamsCount = 1;
 			if(protocoledResult.get(i).getMyOwner().getPoleCount()==4)
@@ -251,30 +257,31 @@ public class DocumetnsCreateService extends Service<Integer> {
 	private void fillSheet() {
 		System.out.println("Процедура заполнения файла Excel:");
 		System.out.print("Основная информация: ");
-		setCellValue(0, 0, "Протокол поверки № " + verification.getProtocolNumber(), headCellStyle);		
-		setCellValue(1, 0, "от " + verification.getDateOfCreation().replace('-', '.'), headCellStyle);		
-		setCellValue(2, 0, verification.getEtalonString().trim() + ": " + verification.getDeviceInfo(), ordinaryCellStyle);
-		setCellValue(3, 0, "Заводской номер: " + verification.getDeviceSerNumber(), ordinaryCellStyle);
-		setCellValue(4, 0, "Принадлежащий: " + verification.getDeviceOwner(), ordinaryCellStyle);
+		setCellValue(0, 0, "Протокол поверки № ________________________", headCellStyle);		
+		setCellValue(1, 0, "от " + verification.getDateForDocuments(), headCellStyle);		
+		setCellValue(2, 0, verification.getEtalonString().trim() + ": " + verification.getDeviceInfo().toLowerCase(), ordinaryCellStyle);
+		setCellValue(3, 0, "Заводской номер (номера): " + verification.getDeviceSerNumber(), ordinaryCellStyle);
+		setCellValue(4, 0, "Принадлежащего: " + verification.getDeviceOwner(), ordinaryCellStyle);
 		
 		String weatherStr1 = "Условия поверки: температура " + verification.getTemperature() + " \u00B0C, относительная   влажность " + 
 								verification.getAirHumidity() + " %, давление " + verification.getAtmPreasure() + " мм рт. ст.";
 		setCellValue(6, 0, weatherStr1, ordinaryCellStyle);
 
-		setCellValue(8, 0, "Средства измерений:", ordinaryCellStyle);
-		setCellValue(9, 0, "военный эталон ВЭ-24-20", ordinaryCellStyle);
+		setCellValue(7, 0, "Средства измерений: военный эталон ВЭ-24-20", ordinaryCellStyle);
 		
-		setCellValue(11, 0, "Нормативно-техническая документация поверки:", ordinaryCellStyle);
-		setCellValue(12, 0, verification.getVerificatonMethodologyName(), ordinaryCellStyle);
+		setCellValue(8, 0, "Нормативно-техническая документация поверки:", ordinaryCellStyle);
+		String verificatonMethodology = verification.getVerificatonMethodologyName();
+		if (verificatonMethodology == null) {
+			verificatonMethodology = "Методика поверки рабочих эталонов и средств измерений военного назначения на военном эталоне.";
+		}
+		setCellValue(9, 0, verificatonMethodology, ordinaryCellStyle);
 				
-		setCellValue(14, 0, "Результаты поверки:", ordinaryCellStyle);
-		setCellValue(15, 0, "1. Внешний осмотр: замечаний нет", ordinaryCellStyle);
-		setCellValue(16, 0, "Наличие маркировки согласно требованиям ЭД: маркировка присутствует", ordinaryCellStyle);
-		setCellValue(17, 0, "2. Опробование: аппаратура работоспособна", ordinaryCellStyle);
-		setCellValue(18, 0, "3. Метрологические характеристики: ", ordinaryCellStyle);
+		setCellValue(11, 0, "1. Внешний осмотр: замечаний нет", ordinaryCellStyle);
+		setCellValue(12, 0, "2. Опробование: аппаратура работоспособна", ordinaryCellStyle);
+		setCellValue(13, 0, "3. Метрологические характеристики: представлены в таблицах", ordinaryCellStyle);
 		System.out.print("\tуспешно\n");
 					
-		int dRow = 19;
+		int dRow = 14;
 		int countOfRes = protocoledResult.size();
 		for (int i = 0; i < countOfRes; i++) {
 			//Вносимые данные
@@ -285,7 +292,7 @@ public class DocumetnsCreateService extends Service<Integer> {
 			
 			//Строка про элемент
 			String head = currentRes.getMyOwner().getType() + " " + currentRes.getMyOwner().getSerialNumber();
-			setCellValue(dRow, 0, head, headCellStyle);
+			setCellValue(dRow, 0, head, ordinaryCellStyle);
 			rowMerging(dRow, 0, 12);
 			System.out.println(head);
 			dRow++;
@@ -308,93 +315,100 @@ public class DocumetnsCreateService extends Service<Integer> {
 					//Частота
 					Double cFreq = currentRes.freqs.get(j);
 					setCellValue(dRow, 0, cFreq, borderPhaseCellStyle);				
-					System.out.print("\t"+cFreq);
+					System.out.print("\t" + cFreq);
 					
 					//КСВН/Г
 					Double vswr = currentRes.values.get("MODULE_" + keys[k]).get(cFreq); //.toString();
 					setCellValue(dRow, 1, vswr, borderModuleCellStyle);		
-					System.out.print("\t"+vswr);
+					System.out.print("\t" + vswr);
 					
 					//Погрешность КСВН/Г
 					Double vswrError = currentRes.values.get("ERROR_MODULE_" + keys[k]).get(cFreq);
 					setCellValue(dRow, 2, vswrError, borderModuleCellStyle);
-					System.out.print("\t"+vswrError);
+					System.out.print("\t" + vswrError);
 					
 					//Номинал КСВН/Г
 					Double vswrNominal = currentNominal.values.get("MODULE_" + keys[k]).get(cFreq);
 					setCellValue(dRow, 3, vswrNominal, borderModuleCellStyle);
-					System.out.print("\t"+vswrNominal);
+					System.out.print("\t" + vswrNominal);
 					
 					//Дельты по модулю
 					Double moduleDelta = currentRes.differenceBetweenNominal.get("MODULE_" + keys[k]).get(cFreq);
 					setCellValue(dRow, 4, moduleDelta, borderModuleCellStyle);
-					System.out.print("\t"+moduleDelta);
+					System.out.print("\t" + moduleDelta);
 					
 					//Допуск КСВН/Г
 					String vswrTolerance = currentModuleTolerance.values.get("DOWN_MODULE_" + keys[k]).get(cFreq).toString();
 					vswrTolerance += ("/" + currentModuleTolerance.values.get("UP_MODULE_" + keys[k]).get(cFreq).toString());
-					setCellValue(dRow, 5, vswrTolerance, borderCellStyle);
-					System.out.print("\t"+vswrTolerance);
+					setCellValue(dRow, 5, vswrTolerance.replace('.', ','), borderCellStyle);
+					System.out.print("\t" + vswrTolerance);
 					
 					//Годен/не годен по КСВН
 					String moduleDecision = currentRes.suitabilityDecision.get("MODULE_" + keys[k]).get(cFreq);
 					setCellValue(dRow, 6, moduleDecision, borderCellStyle);
-					System.out.print("\t"+moduleDecision);
+					System.out.print("\t" + moduleDecision);
 					
-					if(!currentRes.getMyOwner().getType().contains("согласован")) {
+					if(!currentRes.getMyOwner().getType().contains("Нагрузка согласованная")) {
 						//Фаза
 						Double phase = currentRes.values.get("PHASE_" + keys[k]).get(cFreq);
 						setCellValue(dRow, 7, phase, borderPhaseCellStyle);
-						System.out.print("\t"+phase);
+						System.out.print("\t" + phase);
 											
 						//Погрешность Фазы
 						Double phaseError = currentRes.values.get("ERROR_PHASE_" + keys[k]).get(cFreq);
 						setCellValue(dRow, 8, phaseError, borderPhaseCellStyle);
-						System.out.print("\t"+phaseError);
+						System.out.print("\t" + phaseError);
 						
 						//Номинал Фазы
 						Double phaseNominal = currentNominal.values.get("PHASE_" + keys[k]).get(cFreq);
 						setCellValue(dRow, 9, phaseNominal, borderPhaseCellStyle);
-						System.out.print("\t"+phaseNominal);
+						System.out.print("\t" + phaseNominal);
 						
 						//Дельты по модулю
 						Double phaseDelta = currentRes.differenceBetweenNominal.get("PHASE_" + keys[k]).get(cFreq);
 						setCellValue(dRow, 10, phaseDelta, borderPhaseCellStyle);
-						System.out.print("\t" +phaseDelta);
+						System.out.print("\t" + phaseDelta);
 						
 						//Допуск Фазы
 						String phaseTolerance = currentPhaseTolerance.values.get("DOWN_PHASE_" + keys[k]).get(cFreq).toString();
 						phaseTolerance += ("/" + currentPhaseTolerance.values.get("UP_PHASE_" + keys[k]).get(cFreq).toString());
-						setCellValue(dRow, 11, phaseTolerance, borderCellStyle);
-						System.out.print("\t" +phaseTolerance);
+						setCellValue(dRow, 11, phaseTolerance.replace('.', ','), borderCellStyle);
+						System.out.print("\t" + phaseTolerance);
 						
 						//Годен/не годен по фазе
 						String phaseDecision = currentRes.suitabilityDecision.get("PHASE_" + keys[k]).get(cFreq);
 						setCellValue(dRow, 12, phaseDecision, borderCellStyle);	
-						System.out.print("\t" +phaseDecision);
+						System.out.print("\t" + phaseDecision);
 					}										
 					System.out.print("\n");					
 					dRow++;
 				}//end j
-				setCellValue(dRow, 0, "", ordinaryCellStyle);
+				
+				String currentElementDecision = "годен";
+				for(int freqIndex = 0; freqIndex < currentRes.getCountOfFreq(); freqIndex++) {
+					Double cFreq = currentRes.freqs.get(freqIndex);
+					if (currentRes.suitabilityDecision.get("MODULE_" + keys[k]).get(cFreq).contains("Не соотв")) {
+						currentElementDecision = "не годен";
+						break;
+					}
+					if(!currentRes.getMyOwner().getType().contains("Нагрузка согласованная") && currentRes.suitabilityDecision.get("PHASE_" + keys[k]).get(cFreq).contains("Не соотв")) {
+						currentElementDecision = "не годен";
+						break;
+					}
+				}
+				setCellValue(dRow, 0, "Результаты поверки: " + currentElementDecision, ordinaryCellStyle);
+				rowMerging(dRow, 0, 10);
 				dRow++;
 				System.out.print("\n\n");
 			} //end k		
 		}//end i
 		
 		dRow++;
-		String s = null;
-		if (this.verification.isPrimary()) s = "первичной";
-		else s = "перодической";
-		
-		setCellValue(dRow, 0, "На основании результатов " + s + " признано " + this.verification.getDecision(), ordinaryCellStyle);
-		rowMerging(dRow, 0, 10);
-		dRow++;
 		setCellValue(dRow, 0, "Измерения выполнил: " + this.verification.getWorkerName(), ordinaryCellStyle);
 		rowMerging(dRow, 0, 10);
 		dRow++;
 		boldCellStyle.setAlignment(HorizontalAlignment.RIGHT);
-		setCellValue(dRow, 0, "Хранитель ВЭ-24-20: " + this.verification.getBossStatus() + " " + this.verification.getBossName(), ordinaryCellStyle);
+		setCellValue(dRow, 0, "Ответственный за экплуатацию (хранитель эталона): " + this.verification.getBossStatus() + " " + this.verification.getBossName(), ordinaryCellStyle);
 		rowMerging(dRow, 0, 10);
 	}
 	
@@ -403,19 +417,45 @@ public class DocumetnsCreateService extends Service<Integer> {
 		String currentModuleToleranceType = currentRes.getMyOwner().getModuleToleranceType();
 		
 		List<String> tableHeads = new ArrayList<>();
-		String paramStr = null;		
+		
+		String paramStr = null;
+		String errorModuleHead = null;
+		String moduleDifference = null;
+		String nominalHead = null;
+		String tolleranceHead = null;
+		
 		if(key.equals("S11")){
 			if (resType.equals("vswr")) {
 				paramStr = "КСВН\r\n(1 порт)";
 			} else {
 				paramStr = "|Г|\r\n(1 порт)";
 			}
+			
+			if(currentModuleToleranceType.equals("percent")) {
+				errorModuleHead = "Погр-ть,\n%";
+				moduleDifference = "\u03B4, %";
+				tolleranceHead = "Допуск, %";
+			} else {
+				errorModuleHead = "Погр-ть";
+				moduleDifference = "\u0394";	
+				tolleranceHead = "Допуск";
+			}
+			
+			nominalHead = "Пред.пов.\nКСВН";
 		}
 		else if(key.equals("S12")) {
-			paramStr = "Коэф. отраж.\r\nS12";
+			paramStr = "Коэф.\r\nS12, дБ";
+			errorModuleHead = "Погр-ть, дБ";
+			moduleDifference = "\u0394, дБ";
+			nominalHead = "Пред.пов.\nкоэф. S12, дБ";
+			tolleranceHead = "Допуск, дБ";
 		}
 		else if(key.equals("S21")) {
-			paramStr = "Коэф. отраж.\r\nS21";
+			paramStr = "Коэф.\r\nS21, дБ";
+			errorModuleHead = "Погр-ть, дБ";
+			moduleDifference = "\u0394, дБ";
+			nominalHead = "Пред.пов.\nкоэф. S21, дБ";
+			tolleranceHead = "Допуск, дБ";
 		}
 		else if(key.equals("S22")) {
 			if (resType.equals("vswr")) {
@@ -423,26 +463,31 @@ public class DocumetnsCreateService extends Service<Integer> {
 			} else {
 				paramStr = "|Г|\r\n(2 порт)";
 			}
+			
+			if(currentModuleToleranceType.equals("percent")) {
+				errorModuleHead = "Погр-ть,\n%";
+				moduleDifference = "\u03B4, %";
+				tolleranceHead = "Допуск, %";
+			} else {
+				errorModuleHead = "Погр-ть";
+				moduleDifference = "\u0394";
+				tolleranceHead = "Допуск";
+			}
+			
+			nominalHead = "Пред.пов.\nКСВН";
 		}
-		
-		String moduleDifference = null;
-		if(currentModuleToleranceType.equals("percent")) {
-			moduleDifference = "\u03B4, %";
-		} else {
-			moduleDifference = "\u0394";
-		}
-		
+				
 		tableHeads.add("F, ГГц");
 		tableHeads.add(paramStr);
-		tableHeads.add("Погр-ть");
-		tableHeads.add("Пред.пов."); 		
+		tableHeads.add(errorModuleHead);
+		tableHeads.add(nominalHead); 		
 		tableHeads.add(moduleDifference);
-		tableHeads.add("Допуск");		
+		tableHeads.add(tolleranceHead);		
 		tableHeads.add("Соответсвие\r\nНТД");
 		
-		if(!currentRes.getMyOwner().getType().contains("согласован")){
+		if(!currentRes.getMyOwner().getType().contains("Нагрузка согласованная")){
 			tableHeads.add("Фаза, \u00B0");
-			tableHeads.add("Пог-ть");
+			tableHeads.add("Погр-ть, \u00B0");
 			tableHeads.add("Пред.пов., \u00B0");		
 			tableHeads.add("\u0394, \u00B0");
 			tableHeads.add("Допуск, \u00B0");
@@ -452,14 +497,26 @@ public class DocumetnsCreateService extends Service<Integer> {
 		return tableHeads;		
 	}
 	
-	private void setCellValue(int row, int col, String value, CellStyle style) {
-		Cell cell = rows.get(row).createCell(col);
+	private void setCellValue(int rowIndex, int colIndex, String value, CellStyle style) {
+		if(rowIndex >= this.rows.size()) {
+			while(this.rows.size()-1 != rowIndex) {
+				Row newRow = sh.createRow(rowIndex); 
+				rows.add(newRow);
+			}
+		}
+		Cell cell = rows.get(rowIndex).createCell(colIndex);
 		cell.setCellValue(value);		
 		cell.setCellStyle(style);		
 	}	
 	
-	private void setCellValue(int row, int col, Double value, CellStyle style) {
-		Cell cell = rows.get(row).createCell(col);		
+	private void setCellValue(int rowIndex, int colIndex, Double value, CellStyle style) {
+		if(rowIndex >= this.rows.size()) {
+			while(this.rows.size()-1 != rowIndex) {
+				Row newRow = sh.createRow(rowIndex); 
+				rows.add(newRow);
+			}
+		}
+		Cell cell = rows.get(rowIndex).createCell(colIndex);		
 		cell.setCellValue(value);
 		try {
 			cell.setCellType(CellType.NUMERIC);
@@ -477,7 +534,7 @@ public class DocumetnsCreateService extends Service<Integer> {
 	}
 	
 	private void topCellsMerging() {
-		for (int i=0; i<19; i++) {
+		for (int i = 0; i < 14; i++) {
 			sh.addMergedRegion(new CellRangeAddress(i, i, 0, 12));
 		}
 	}

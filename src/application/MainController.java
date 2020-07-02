@@ -44,7 +44,7 @@ public class MainController {
 	@FXML
 	private ImageView logoView;
 	
-//Verification button
+	//Verification button
 	@FXML
 	public void mouseOnVerificationBtn(MouseEvent event) {
 		helpTextArea.setText("Режим проведения поверки зарегистрированных приборов.");
@@ -109,7 +109,7 @@ public class MainController {
 		}
 	}
 	
-//New Deivce button
+	//New Deivce button
 	@FXML
 	public void mouseOnNewDeviceBtn(MouseEvent event) {
 		helpTextArea.setText("Регистрирование нового прибора.");
@@ -173,7 +173,7 @@ public class MainController {
 		}
 	}
 
-// IMC button
+	//IMC button
 	@FXML
 	private void mouseOnIMCBtn() {
 		helpTextArea.setText("Проведение независимой метрологической аттестации");
@@ -218,7 +218,7 @@ public class MainController {
 		}		
 	}
 	
-//About button
+	//About button
 	@FXML
 	public void mouseOnAboutBtn(MouseEvent event) {
 		helpTextArea.setText("Информация о версии программы.");
@@ -242,10 +242,10 @@ public class MainController {
 	@FXML 
 	public void aboutBtnClick(ActionEvent event) {
 		helpTextArea.setText("Версия ПО 1.0.1");
-		AboutMessageWindow.createWindow("О программе", "Версия ПО: 1.0.1").show();
+		AboutMessageWindow.createWindow("О программе", "Версия ПО: 1.0.3").show();
 	}
 	
-//Exit button
+	//Exit button
 	@FXML
 	public void mouseOnExitBtn(MouseEvent event) {
 		helpTextArea.setText("Закрыть программу");

@@ -13,6 +13,7 @@ import AboutMessageForm.AboutMessageWindow;
 import DataBasePack.DataBaseManager;
 import DevicePack.Device;
 import DevicePack.Element;
+import Exceptions.NoMeasResultDataForThisVerificationException;
 import Exceptions.SavingException;
 import FileManagePack.FileManager;
 import GUIpack.InfoRequestable;
@@ -183,8 +184,7 @@ public class DBEditController implements InfoRequestable {
 					DataBaseManager.getDB().RollBack();
 					AboutMessageWindow.createWindow("Ошибка", "Ошибка доступа к БД\nпри попытке удаления").show();
 				}				
-			}	
-			
+			}				
 		});
 		
 		//editing element
@@ -197,7 +197,7 @@ public class DBEditController implements InfoRequestable {
 				int currentModdeviceId = this.modDevice.getId();
 				this.modDevice = new Device(currentModdeviceId);							
 				this.verificationDateList.clear();
-				this.verifications = currentElement.getListOfVerifications();	
+				this.verifications = this.currentElement.getMeasurementList();	
 				int nominalIndex = this.currentElement.getNominalId();
 				for (int i = 0; i < this.verifications.size(); i++) {
 					String item = null;
@@ -302,35 +302,91 @@ public class DBEditController implements InfoRequestable {
 			}
 		});
 		
-		createProtocolItem.setOnAction(event->{
+		createProtocolItem.setOnAction(event->{			
+			System.out.println("Подготовка к выписке протокола");
 			int resIndex = Integer.parseInt(verifications.get(currentDateIndex).get(0));
-			String[] docTypes = new String[] {"Свидетельство о поверке", "Извещение о непригодности"};
-			
-			MeasResult results = null;
-			MeasResult nominals = null;
-			ToleranceParametrs protocoledModuleToleranceParams = null;
-			ToleranceParametrs protocoledPhaseToleranceParams = null; 
+			String[] docTypes = new String[] {"Cвидетельство о поверке", "Извещение о непригодности"};
+											  
+			List<MeasResult> results = new ArrayList<>();
+			List<MeasResult> nominals = new ArrayList<>();
+			List<ToleranceParametrs> protocoledModuleToleranceParams = new ArrayList<>();
+			List<ToleranceParametrs> protocoledPhaseToleranceParams = new ArrayList<>();
 			VerificationProcedure verification = null;
+			String statusString = null;
+			StringBuilder noResMessage = new StringBuilder();
 			try {
-				verification = new VerificationProcedure(modDevice.includedElements.get(currentElementIndex), 0);
-				results = new MeasResult(modDevice.includedElements.get(currentElementIndex), resIndex);
-				nominals = modDevice.includedElements.get(currentElementIndex).getNominal();
-				if (verification.isPrimary()) {
-					protocoledModuleToleranceParams = modDevice.includedElements.get(currentElementIndex).getPrimaryModuleToleranceParams();
-					protocoledPhaseToleranceParams = modDevice.includedElements.get(currentElementIndex).getPrimaryPhaseToleranceParams();
+				statusString = "- получение информации о проведенной поверке";
+				System.out.println(statusString);
+				
+				MeasResult checkedResult = new MeasResult(modDevice.includedElements.get(currentElementIndex), resIndex);
+				int verificationId = checkedResult.getVerificationId();
+				if(verificationId == 0) {
+					verification = new VerificationProcedure();
+					verification.setPeriodic();
+					verification.setStrTemperature("-");
+					verification.setStrAtmPreasure("-");
+					verification.setStrAirHumidity("-");
+					//AboutMessageWindow.createWindow("Невозможно создать протокол", "Для данных измерений нельзя создать\nпротокол поверки, поскольку он были сделаны\nне на ВЭ-24-20 или же\nв версия программы ранее 1.0.4.").show();
+					return;
 				}
 				else {
-					protocoledModuleToleranceParams = modDevice.includedElements.get(currentElementIndex).getPeriodicModuleToleranceParams();
-					protocoledPhaseToleranceParams = modDevice.includedElements.get(currentElementIndex).getPeriodicPhaseToleranceParams();				
+					verification = new VerificationProcedure(verificationId);
+					//verification
 				}
-
+							
+				for (Element elm : this.modDevice.includedElements) {	
+					statusString = "- получение информации об:\n" + elm.getType() + " №" + elm.getSerialNumber() + "\n";
+					System.out.println(statusString + " результатов поверки");
+					try {
+						int currentResultId = MeasResult.getResultIdsByVerificationForElement(verificationId, elm);
+						MeasResult result = new MeasResult(elm, currentResultId);
+						
+						if (verification.isPrimary()) {
+							elm.getPrimaryModuleToleranceParams().checkResult(result);
+							elm.getPrimaryPhaseToleranceParams().checkResult(result);
+						}
+						else {
+							elm.getPeriodicModuleToleranceParams().checkResult(result);
+							elm.getPeriodicPhaseToleranceParams().checkResult(result);
+						}
+						
+						results.add(result);
+					}					
+					catch(NoMeasResultDataForThisVerificationException ndExp) {
+						noResMessage.append(ndExp.getMessage() + "\n");
+					}
+					System.out.println(statusString + " номинальных значений");
+					nominals.add(elm.getNominal());  
+										
+					if (verification.isPrimary()) {
+						System.out.println(statusString + " критериев годности для превичной поверки");
+						protocoledModuleToleranceParams.add(elm.getPrimaryModuleToleranceParams()); 
+						protocoledPhaseToleranceParams.add(elm.getPrimaryPhaseToleranceParams());
+						
+					}
+					else {
+						System.out.println(statusString + " критериев годности для переодической поверки");
+						protocoledModuleToleranceParams.add(elm.getPeriodicModuleToleranceParams());
+						protocoledPhaseToleranceParams.add(elm.getPeriodicPhaseToleranceParams());				
+					}
+				}
 			} 
 			catch(SQLException sqlExp) {
 				sqlExp.printStackTrace();
-				AboutMessageWindow.createWindow("Ошибка", "Ошибка доступа к БД").show();
+				AboutMessageWindow.createWindow("Ошибка", "Ошибка доступа к БД на этапе:\n" + statusString).show();
+				return;
 			}
 			
-			ProtocolCreateWindow protocolCreateWindow = ProtocolCreateWindow.getProtocolCreateWindow(docTypes, results, nominals, protocoledModuleToleranceParams, protocoledPhaseToleranceParams, verification);
+			if(noResMessage.length() != 0) {
+				AboutMessageWindow.createWindow("Не найдены", "Не найдены результаты измерений для следующих элементов: " + noResMessage.toString()).show();
+			}
+			
+			try {
+				ProtocolCreateWindow.getProtocolCreateWindow(this.modDevice, docTypes, results, nominals, protocoledModuleToleranceParams, protocoledPhaseToleranceParams, verification).show();
+			} catch (IOException ioExp) {
+				ioExp.printStackTrace();
+				return;
+			}
 		});
 		
 		verificationDateListView.setOnContextMenuRequested(event->{
@@ -440,7 +496,7 @@ public class DBEditController implements InfoRequestable {
 		this.currentElement = this.modDevice.includedElements.get(currentElementIndex);
 		
 		try {
-			this.verifications = this.currentElement.getListOfVerifications();	
+			this.verifications = this.currentElement.getMeasurementList();	
 			int nominalIndex = this.currentElement.getNominalId();
 			for (int i = 0; i < this.verifications.size(); i++) {
 				String item = null;

@@ -30,7 +30,7 @@ public class upDownStrategy implements StrategyOfSuitability {
 				else {
 					decisions.put(cFreq, "Соотв.");
 				}
-				double currentDifference = java.lang.Math.round((nominal - res)*1000);
+				double currentDifference = java.lang.Math.round((res - nominal)*1000);
 				difference.put(cFreq, currentDifference/1000);
 			}
 			

@@ -11,6 +11,7 @@ import DataBasePack.DataBaseManager;
 import DataBasePack.dbStorable;
 import DevicePack.Element;
 import DevicePack.Includable;
+import Exceptions.NoMeasResultDataForThisVerificationException;
 import FileManagePack.ResultReaderManager;
 import NewElementPack.NewElementController;
 import javafx.collections.ObservableList;
@@ -33,6 +34,7 @@ public class MeasResult implements Includable<Element>, dbStorable{
 	protected Date dateOfMeas;
 	protected String dateOfMeasByString;
 	
+	protected int verificationId;
 	
 	public int getCountOfFreq() {return this.countOfFreq;}
 	public int getCountOfParams() {return this.countOfParams;}
@@ -73,20 +75,29 @@ public class MeasResult implements Includable<Element>, dbStorable{
 		this.dateOfMeas = Calendar.getInstance().getTime();
 		this.dateOfMeasByString = dateFormat.format(dateOfMeas);
 	}	
+	
 //DB
-	public MeasResult(Element ownerElement, int index) throws SQLException {	
+	public MeasResult(Element ownerElement, int index) throws SQLException {
 		System.out.println("\nПолучаем результаты c id = " + index);
 		this.id = index;
 		this.values = new LinkedHashMap<String, Map<Double, Double>>();
+		this.suitabilityDecision = new HashMap<String, Map<Double, String>>();
+		this.differenceBetweenNominal = new HashMap<String, Map<Double, Double>>();
 		this.freqs = new ArrayList<Double>();				
 		this.myElement = ownerElement;		
 		List<List<String>> results = new ArrayList<List<String>>();
-		List<String> fieldsNames = new ArrayList<String>();		
+		List<String> fieldsNames = new ArrayList<String>();	
 		String sqlQuery = "SELECT MeasDate FROM [Results] WHERE id='" + index + "'";
 		fieldsNames.add("measDate");
 		System.out.println(sqlQuery);
 		DataBaseManager.getDB().sqlQueryString(sqlQuery, fieldsNames, results);				
 		this.dateOfMeasByString = results.get(0).get(0);
+
+		sqlQuery = "SELECT verificationId FROM [Results] WHERE id='" + index + "'";
+		System.out.println(sqlQuery);
+		this.verificationId = DataBaseManager.getDB().sqlQueryCount(sqlQuery);
+		System.out.println("Результатам измерений с id = " + this.id + " соответствует поверка с id = " + this.verificationId);
+		
 		try {
 			this.dateOfMeas = dateFormat.parse(this.dateOfMeasByString);
 		}
@@ -114,6 +125,19 @@ public class MeasResult implements Includable<Element>, dbStorable{
 				continue;
 			}
 		}
+	}
+	
+	public static int getResultIdsByVerificationForElement(int verificationId, Element element) throws SQLException, NoMeasResultDataForThisVerificationException {
+		System.out.println("\nПолучаем результаты для поверки с id = " + verificationId);
+		List<Integer> resultsIds = new ArrayList<>();
+		String sqlQuery = "SELECT id FROM [Results] WHERE verificationId=" + verificationId + " AND elementId=" + element.getId();
+		DataBaseManager.getDB().sqlQueryInteger(sqlQuery, "id", resultsIds);
+		if (resultsIds.size() == 0) {
+			String msg = "Не найден результат измерений, проведенных\nв рамках поверки с id = " + verificationId + "\nдля элемента с id = " + element.getId();
+			System.err.println(msg);
+			throw new NoMeasResultDataForThisVerificationException(msg);
+		}
+		return resultsIds.get(0);
 	}
 		
 //Includable<Element>
@@ -181,19 +205,6 @@ public class MeasResult implements Includable<Element>, dbStorable{
 		// TODO Auto-generated method stub		
 	}
 	
-	/*
-	public void rewriteTableNames() throws SQLException {		
-		String strDateOfMeas = dateFormat.format(dateOfMeas);
-		String newTableName = "Результаты поверки для " +
-				myElement.getMyOwner().getName() + " " + myElement.getMyOwner().getType() + " " + myElement.getMyOwner().getSerialNumber() + " " + myElement.getType() + " " + myElement.getSerialNumber() +
-				" проведенной " + strDateOfMeas;	
-		String sqlQuery = "UPDATE [" + myElement.getListOfVerificationsTable() + "] SET resultsTableName='" + newTableName + "' WHERE dateOfVerification='" + strDateOfMeas + "'";
-		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
-		sqlQuery = "ALTER TABLE [" + tableName + "] RENAME TO [" + newTableName + "]";
-		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
-	}
-	*/
-	
 	public void setNominalStatus() throws SQLException {
 		if (this.myElement == null) {
 			return;
@@ -255,5 +266,18 @@ public class MeasResult implements Includable<Element>, dbStorable{
 			}
 		}		
 		return true;		
+	}
+	
+	public int getVerificationId() {
+		return verificationId;
+	}
+	
+	public void setVerificationId(int verificationId) throws SQLException {
+		String sqlQuery = "UPDATE [Results] SET verificationId=" + verificationId + " WHERE id = " + this.id;
+		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
+	}
+	
+	public void setElement(Element element) {
+		this.myElement = element;
 	}
 }

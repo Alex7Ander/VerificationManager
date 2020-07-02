@@ -21,17 +21,32 @@ public class percentStrategy implements StrategyOfSuitability {
 				String key = tolerance.measUnitPart + "_" + S_Parametr.values()[i];
 				double res = result.values.get(key).get(cFreq);
 				double nominal = tolerance.getMyOwner().getNominal().values.get(key).get(cFreq);
-				double up = nominal + tolerance.values.get("UP_" + key).get(cFreq) * nominal / 100;
-				double down = nominal + tolerance.values.get("DOWN_" + key).get(cFreq) * nominal / 100;   				
+				
+				double up = 0;
+				double down = 0;
+				double currentDifference = 0;
+				
+				//Åñëè ıòî S12 èëè S21
+				if(S_Parametr.values()[i].equals(S_Parametr.S12) || S_Parametr.values()[i].equals(S_Parametr.S21)) {
+					up = nominal + tolerance.values.get("UP_" + key).get(cFreq);
+					down = nominal + tolerance.values.get("DOWN_" + key).get(cFreq);	
+					currentDifference = java.lang.Math.round((res - nominal)*1000);
+				}
+				else {
+					up = nominal + tolerance.values.get("UP_" + key).get(cFreq) * nominal / 100;
+					down = nominal + tolerance.values.get("DOWN_" + key).get(cFreq) * nominal / 100; 
+					currentDifference = java.lang.Math.round(((res - nominal)*100/nominal)*1000);					
+				}
+				difference.put(cFreq, currentDifference/1000);
+				
 				if(res > up || res < down) {
 					decisions.put(cFreq, "Íå ñîîòâ.");
 					resultOfCheck = false;
 				}
 				else {
 					decisions.put(cFreq, "Ñîîòâ.");
-				}	
-				double currentDifference = java.lang.Math.round((nominal - res)*100/nominal*1000);
-				difference.put(cFreq, currentDifference/1000);
+				}	 
+				
 			}			
 			result.suitabilityDecision.put(tolerance.measUnitPart + "_" + S_Parametr.values()[i], decisions);
 			result.differenceBetweenNominal.put(tolerance.measUnitPart + "_" + S_Parametr.values()[i], difference);
