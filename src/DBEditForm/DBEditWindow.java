@@ -21,6 +21,10 @@ public class DBEditWindow extends guiWindow {
 		return instanceDBEditWindow;
 	}
 	
+	public DBEditController getController() {
+		return this.loader.getController();
+	}
+	
 	public void delete() {
 		instanceDBEditWindow = null;
 	}

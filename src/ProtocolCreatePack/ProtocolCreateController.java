@@ -11,11 +11,9 @@ import java.util.Date;
 import java.util.List;
 
 import AboutMessageForm.AboutMessageWindow;
-import DataBasePack.DataBaseManager;
 import DevicePack.Device;
 import Exceptions.SavingException;
 import FileManagePack.FileManager;
-import ToleranceParamPack.ParametrsPack.TimeType;
 import ToleranceParamPack.ParametrsPack.ToleranceParametrs;
 import VerificationForm.VerificationWindow;
 import VerificationPack.MeasResult;
@@ -43,7 +41,9 @@ public class ProtocolCreateController {
 	@FXML
 	private ComboBox<String> docTypeComboBox;
 	@FXML 
-	private ComboBox<String> militaryStatusComboBox;
+	private ComboBox<String> bossMilitaryStatusComboBox;
+	@FXML 
+	private ComboBox<String> standartGuardianMilitaryStatusComboBox;
 	
 	@FXML
 	private TextField docNumberTextField;	
@@ -52,10 +52,10 @@ public class ProtocolCreateController {
 	@FXML 
 	private TextField bossNameTextFiled;
 	@FXML
-	private TextField workerNameTextField;
+	private TextField standartGuardianNameTextField;
 	@FXML
-	private TextField verificatonMethodologyNameTextField;
-	
+	private TextField workerNameTextField;
+
 	@FXML
 	private DatePicker verificationDate;
 	
@@ -122,7 +122,8 @@ public class ProtocolCreateController {
 			this.militaryRanks.add("Подполковник");
 			this.militaryRanks.add("Майор");
 		}
-		this.militaryStatusComboBox.setItems(militaryRanks);
+		this.bossMilitaryStatusComboBox.setItems(militaryRanks);
+		this.standartGuardianMilitaryStatusComboBox.setItems(militaryRanks);
 		
 		this.docTypes = FXCollections.observableArrayList();	
 		this.reasonTextArea.setVisible(false);
@@ -132,12 +133,6 @@ public class ProtocolCreateController {
 		this.etalonRB.setToggleGroup(siGroup);
 		this.siRB.setToggleGroup(siGroup);
 		this.siRB.setSelected(true);
-		/*
-		Device device = VerificationWindow.getVerificationWindow().getController().verificatedDevice;
-		this.devNameLabel.setText(device.getName() + " " + device.getType());
-		this.devSerNLabel.setText(device.getSerialNumber());
-		this.devOwnerLabel.setText(device.getOwner());
-		*/
 	}
 	
 	public void setDevice(Device device) {
@@ -183,6 +178,7 @@ public class ProtocolCreateController {
 		this.infoBox.setOpacity(0.1);
 		this.progressPane.setVisible(true);	
 		this.verification.setFinallyInformation(this);
+
 		//Создаем документы
 		creteDocuments();	
 	}
@@ -204,16 +200,17 @@ public class ProtocolCreateController {
 				infoBox.setOpacity(1.0);
 				progressPane.setVisible(false);
 				try {
-					//Вносим запись в БД о созданных протоколе и документе
-					try {
-						//makeRecordInDB();
-						verification.saveInDB();
-					}
-					catch(SQLException sqlExp) {
-						AboutMessageWindow.createWindow("Ошибка", "Данные о созданном протоколе\n в БД не внесены.\n").show();
-					}
-					catch(SavingException exp) {
-						AboutMessageWindow.createWindow("Ошибка", exp.getMessage()).show();
+					//Вносим запись в БД о созданных протоколе и документе если необходимо
+					if(verification.isShouldBeSavedInDB()) {
+						try {
+							verification.saveInDB();
+						}
+						catch(SQLException sqlExp) {
+							AboutMessageWindow.createWindow("Ошибка", "Данные о созданном протоколе\n в БД не внесены.\n").show();
+						}
+						catch(SavingException exp) {
+							AboutMessageWindow.createWindow("Ошибка", exp.getMessage()).show();
+						}
 					}
 					
 					for(MeasResult result : protocoledResult) {
@@ -239,6 +236,15 @@ public class ProtocolCreateController {
 					//Показываем сообщение об успешном создании
 					String docType = docTypeComboBox.getSelectionModel().getSelectedItem();
 					AboutMessageWindow.createWindow("Успешно", "Протокол и " + docType + "\nуспешно созданы.").show();
+					
+					//И закрываем окно поверки
+					try {
+						VerificationWindow.getVerificationWindow().getController().zeroingLastVerificationsId();
+						VerificationWindow.getVerificationWindow().close();
+						VerificationWindow.getVerificationWindow().delete();
+					} catch (IOException ioExp) {
+						System.err.println("Не удалось автоматически закрыть окно поверки. " + ioExp.getMessage());
+					}
 				}
 				finally {
 					ProtocolCreateWindow.closeInstanceWindow();
@@ -259,70 +265,6 @@ public class ProtocolCreateController {
 		});
 		//Запускаем поток создания документов
 		docService.start();
-	}
-	
-	private void makeRecordInDB() throws SQLException, SavingException {		
-		/*
-		String date = this.protocoledResult.get(0).getDateOfMeasByString();
-		String devId = Integer.toString(protocoledResult.get(0).getMyOwner().getMyOwner().getId());
-		String pathToProtocol = "//Protocols//" + newProtocolName;
-		String pathToDocument = "//Documents//" + newDocumentName;
-		String docT = docTypeComboBox.getSelectionModel().getSelectedItem().toString();
-		
-		TimeType verificationTimeType = null;
-		
-		if (verification.isPrimary()) {
-			verificationTimeType = TimeType.PRIMARY;
-		}
-		else {
-			verificationTimeType = TimeType.PERIODIC;
-		}
-		
-		if (docT.equals("Cвидетельство о поверке")) {
-			docT = "Certificate";
-		}
-		else {
-			docT = "Notice";
-		}	
-		
-		String sqlQuery = "INSERT INTO Verifications (DeviceId, "
-				+ "VerificationDate, "
-				+ "PathOfDoc, "
-				+ "PathOfProtocol, "
-				+ "TypeOfDoc, "
-				+ "verificationTimeType, "
-				+ "temperature, "
-				+ "preasure, "
-				+ "humidity, "
-				+ "workerName, "
-				+ "bossStatus, "
-				+ "bossName, "
-				+ "militaryBaseName, "
-				+ "verificationMetodologyName, "
-				+ "rejectionReason, "
-				+ "tillTime, "
-				+ "isStandard) VALUES "
-					+"('"+devId+"',"
-					+ "'"+date+"',"
-					+ "'"+pathToDocument+"',"
-					+ "'"+pathToProtocol+"',"
-					+ "'"+docT+"',"
-					+ "'"+verificationTimeType+"',"
-					+ "'"+verification.getTemperature()+"',"
-					+ "'"+verification.getAtmPreasure()+"',"
-					+ "'"+verification.getAirHumidity()+"',"
-					+ "'"+verification.getWorkerName()+"',"
-					+ "'"+verification.getBossStatus()+"',"
-					+ "'"+verification.getBossName()+"',"
-					+ "'"+verification.getMilitaryBasename()+"',"
-					+ "'"+verification.getVerificatonMethodologyName()+"',"
-					+ "'"+verification.getDecision()+"',"
-					+ "'"+verification.getFinishDate()+"',"
-					+ "'"+verification.getEtalonString()+"')";
-		
-		System.out.println(sqlQuery);
-		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
-		*/
 	}
 	
 	public void setDocTypes(String[] types) {
@@ -357,25 +299,63 @@ public class ProtocolCreateController {
 	
 	public void setVerificationProcedure(VerificationProcedure verificationProc) {
 		this.verification = verificationProc;
-		setFieldsValues();
+		//setFieldsValues();
 	}
 	
 	public String getWorkerName() {
-		return this.workerNameTextField.getText();
+		String name = "";
+		if(this.workerNameTextField.getText() == null) {
+			name = "Фамилия Имя Отчество";
+		}
+		else {
+			name = this.workerNameTextField.getText();
+		}
+		return name;
 	}
 	public String getBossName() {
-		return this.bossNameTextFiled.getText();
+		String name = "";
+		if(this.bossNameTextFiled.getText() == null) {
+			name = "Фамилия Имя Отчество";
+		}
+		else {
+			name = this.bossNameTextFiled.getText();
+		}
+		return name;
 	}
+	
 	public String getBossStatus() {
-		String status = null;
+		String status = "";
 		try {
-			status = this.militaryStatusComboBox.getSelectionModel().getSelectedItem().toString();
+			status = this.bossMilitaryStatusComboBox.getSelectionModel().getSelectedItem().toString();
 		}
 		catch (NullPointerException npExp) {
 			status = "Полковник ";
 		}
 		return status;
 	}
+	
+	public String getStandartGuardianName() {
+		String name = "";
+		if(this.standartGuardianNameTextField.getText() == null) {
+			name = "Фамилия Имя Отчество";
+		}
+		else {
+			name = this.standartGuardianNameTextField.getText();
+		}
+		return name;
+	}
+	
+	public String getStandartGuardianStatus() {
+		String status = "";
+		try {
+			status = this.standartGuardianMilitaryStatusComboBox.getSelectionModel().getSelectedItem().toString();
+		}
+		catch (NullPointerException npExp) {
+			status = "Майор ";
+		}
+		return status;
+	}
+	
 	public String getResultDecision() {
 		if (docTypeComboBox.getSelectionModel().getSelectedItem().toString().equals("Cвидетельство о поверке")) {
 			return "годным";
@@ -397,41 +377,43 @@ public class ProtocolCreateController {
 			return "Средство измерения ";
 		}
 	}
-	public String getVerificatonMethodologyName() {
-		return this.verificatonMethodologyNameTextField.getText();
-	}
+
 	public String getDocType() { 
 		return this.docTypeComboBox.getSelectionModel().getSelectedItem().toString();
 	}
 	public String getDateOfCreation() {		
 		Date dt = new Date();
-		String strDate = new SimpleDateFormat("dd-MM-yyyy").format(dt);
+		String strDate = new SimpleDateFormat("dd.MM.yyyy").format(dt);
 		return strDate;
 	}
 	public String getFinishDate() {
 		Date dt = new Date();
-		String sdt = new SimpleDateFormat("dd-MM-yyyy").format(dt);
+		String sdt = new SimpleDateFormat("dd.MM.yyyy").format(dt);
 		Calendar calend = Calendar.getInstance();
 		try {
-			calend.setTime(new SimpleDateFormat("dd-MM-yyyy").parse(sdt));
+			calend.setTime(new SimpleDateFormat("dd.MM.yyyy").parse(sdt));
 		}
 		catch (ParseException pExp) {
 			pExp.getStackTrace();
 			calend.setTime(new Date());
 		}
 		calend.add(Calendar.YEAR, 1);
-		String strDate = new SimpleDateFormat("dd-MM-yyyy").format(calend.getTime());		
+		String strDate = new SimpleDateFormat("dd.MM.yyyy").format(calend.getTime());		
 		return strDate;
 	}
 	public String getMilitryBaseName() {
-		return this.militaryBaseName.getText();
+		String name = "";
+		if(this.militaryBaseName.getText() != null) {
+			name = this.militaryBaseName.getText();
+		}
+		return name;
 	}
 
+	/*
 	public void setFieldsValues() {		
 		this.devNameLabel.setText(verification.getDeviceInfo());
 		this.devSerNLabel.setText(verification.getDeviceSerNumber());
 		this.devOwnerLabel.setText(verification.getDeviceOwner());		
-		this.verificatonMethodologyNameTextField.setText(verification.getVerificatonMethodologyName());
 		this.militaryBaseName.setText(verification.getMilitaryBasename());
 		this.reasonTextArea.setText(verification.getDecision());		
 		this.workerNameTextField.setText(verification.getWorkerName());
@@ -449,7 +431,7 @@ public class ProtocolCreateController {
 			System.err.println("Ошибка: etalonString = null");
 		}		
 	}
-
+	*/
 	public String getPathOfDoc() {
 		return "//Documents//" + newDocumentName;
 	}

@@ -3,6 +3,7 @@ package StartVerificationPack;
 import java.io.IOException;
 
 import GUIpack.guiWindow;
+import VerificationForm.VerificationWindow;
 
 public class StartVerificationWindow  extends guiWindow {
 
@@ -20,6 +21,5 @@ public class StartVerificationWindow  extends guiWindow {
 		}
 		return instanceStartVerificationWindow;
 	}
-	
 	
 }

@@ -49,22 +49,7 @@ public class VisualTable implements Table {
 		table.setItems(lines);
         table.getSelectionModel().setCellSelectionEnabled(true);
         table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        /*
-		col1.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().values.get(0)));
-		col1.setCellFactory(TextFieldTableCell.<Line>forTableColumn());
-		col1.setOnEditCommit(event->{
-			if(event.getNewValue() == null) {
-				table.refresh();
-			}
-			else {
-				String newValue = event.getNewValue();
-				int col = event.getTablePosition().getColumn();
-				int row = event.getTablePosition().getRow();
-				this.lines.get(row).values.remove(col);
-				this.lines.get(row).values.put(col, newValue);
-			}
-		});
-        */
+
         copyMenuItem.setOnAction(new EventHandler<ActionEvent>() {
             @SuppressWarnings("rawtypes")
 			@Override
@@ -98,8 +83,9 @@ public class VisualTable implements Table {
             	int startColumnIndex = pos.getColumn();
             	int startRowIndex = pos.getRow();
             	Object content = Clipboard.getSystemClipboard().getContent(DataFormat.PLAIN_TEXT);
-            	StringBuilder text = new StringBuilder(content.toString());
-            	text.append("\n");           	
+            	String stringContent = content.toString().replace("\r", "");
+            	StringBuilder text = new StringBuilder(stringContent);
+            	text.append("\n");
             	int i = 0;
             	while(text.length() > 0) {
             		List<String> textLine = new ArrayList<>();
@@ -118,12 +104,6 @@ public class VisualTable implements Table {
             		if(editableLineIndex < lines.size()) {
             			lines.get(editableLineIndex).edit(startColumnIndex, textLine);
             		}
-            		/*
-            		else {
-            			Line line = new Line(startRowIndex, textLine);
-            			lines.add(line);
-            		}
-            		*/
             		++i;
             	}
             	table.refresh();
@@ -194,8 +174,6 @@ public class VisualTable implements Table {
 
 	@Override
 	public String getCellValue(int col, int row) {
-		//Set<Integer> keys = lines.get(row).values.keySet();
-		//String key = keys.toArray()[col].toString();
 		return lines.get(row).values.get(col);
 	}
 
@@ -313,5 +291,9 @@ public class VisualTable implements Table {
 	@Override
 	public void setVisible(boolean visibleStatus) {
 		table.setVisible(visibleStatus);		
-	}	
+	}
+	
+	public void setEditable(boolean editble) {
+		this.table.setEditable(editble);
+	}
 }

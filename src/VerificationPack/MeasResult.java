@@ -42,10 +42,10 @@ public class MeasResult implements Includable<Element>, dbStorable{
 	public String getDateOfMeasByString() {
 		return dateOfMeasByString; 
 	}
-	public Map<String, Map<Double, Double>> values;
-	public Map<String, Map<Double, String>> suitabilityDecision;
-	public Map<String, Map<Double, Double>> differenceBetweenNominal;
-	public List<Double> freqs;
+	public Map<String, Map<Double, Double>> values = new LinkedHashMap<String, Map<Double, Double>>();
+	public Map<String, Map<Double, String>> suitabilityDecision = new LinkedHashMap<String, Map<Double, String>>();
+	public Map<String, Map<Double, Double>> differenceBetweenNominal = new LinkedHashMap<String, Map<Double, Double>>();
+	public List<Double> freqs = new ArrayList<Double>();
 	protected  ObservableList<String> paramsNames;
 	//private String tableName;
 	
@@ -53,10 +53,6 @@ public class MeasResult implements Includable<Element>, dbStorable{
 //FILE
 	public MeasResult(String fileWithResults, int resultNumber, Element ownerElement) throws IOException {		
 		this.myElement = ownerElement;
-		this.freqs = new ArrayList<Double>();
-		this.values = new LinkedHashMap<String, Map<Double, Double>>();
-		this.suitabilityDecision = new HashMap<String, Map<Double, String>>();	
-		this.differenceBetweenNominal = new HashMap<String, Map<Double, Double>>();
 		ResultReaderManager resReader = new ResultReaderManager(fileWithResults);			
 		resReader.readResult(resultNumber, freqs, values);				
 		this.countOfParams = values.size();
@@ -79,11 +75,7 @@ public class MeasResult implements Includable<Element>, dbStorable{
 //DB
 	public MeasResult(Element ownerElement, int index) throws SQLException {
 		System.out.println("\nПолучаем результаты c id = " + index);
-		this.id = index;
-		this.values = new LinkedHashMap<String, Map<Double, Double>>();
-		this.suitabilityDecision = new HashMap<String, Map<Double, String>>();
-		this.differenceBetweenNominal = new HashMap<String, Map<Double, Double>>();
-		this.freqs = new ArrayList<Double>();				
+		this.id = index;						
 		this.myElement = ownerElement;		
 		List<List<String>> results = new ArrayList<List<String>>();
 		List<String> fieldsNames = new ArrayList<String>();	
@@ -114,7 +106,7 @@ public class MeasResult implements Includable<Element>, dbStorable{
 				ArrayList<Double> arrayResults = new ArrayList<Double>();
 				System.out.println(sqlQuery);
 				DataBaseManager.getDB().sqlQueryDouble(sqlQuery, key, arrayResults);				
-				HashMap<Double, Double> tempHM = new HashMap<Double, Double>();
+				Map<Double, Double> tempHM = new LinkedHashMap<Double, Double>();
 				for (int i=0; i<this.countOfFreq; i++) {
 					tempHM.put(freqs.get(i), arrayResults.get(i));
 				}
@@ -211,6 +203,17 @@ public class MeasResult implements Includable<Element>, dbStorable{
 		}
 		System.out.print("Устанавливаем статус номинала для результат измерений с id = " + this.id);
 		String sqlQuery = "UPDATE [Elements] SET nominalId='" + Integer.toString(this.id) + "' WHERE id=" + this.myElement.getId();
+		System.out.print(sqlQuery);
+		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
+		System.out.println("\t - Успешно");
+	}
+	
+	public void setLastVerificationStatus() throws SQLException {
+		if (this.myElement == null) {
+			return;
+		}
+		System.out.println("Устанавливаем статус начального номинала для результат измерений с id = " + this.id);
+		String sqlQuery = "UPDATE [Elements] SET lastVerificationId='" + Integer.toString(this.id) + "' WHERE id=" + this.myElement.getId();
 		System.out.print(sqlQuery);
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
 		System.out.println("\t - Успешно");

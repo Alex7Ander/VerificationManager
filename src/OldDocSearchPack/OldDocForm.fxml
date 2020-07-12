@@ -1,23 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.RadioButton?>
-<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="707.0" prefWidth="420.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="OldDocSearchPack.OldDocSearchController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="777.0" prefWidth="458.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="OldDocSearchPack.OldDocSearchController">
    <children>
-      <VBox layoutX="55.0" layoutY="23.0" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+      <VBox layoutX="55.0" layoutY="23.0" prefHeight="687.0" prefWidth="406.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
          <children>
-            <Label prefHeight="32.0" prefWidth="329.0" stylesheets="@../../bin/application/commonLabel.css" text="Список проведенных процедур" />
-            <Separator prefWidth="200.0" />
             <Label prefHeight="30.0" prefWidth="371.0" stylesheets="@../../bin/application/commonLabel.css" text="Введите временной интервал поиска" />
             <HBox prefHeight="38.0" prefWidth="400.0">
                <children>
@@ -28,15 +26,22 @@
                   <DatePicker fx:id="tillDTP" prefWidth="170.0" />
                </children>
             </HBox>
-            <RadioButton fx:id="gDocRB" mnemonicParsing="false" onAction="#gDocRBClick" prefHeight="30.0" prefWidth="401.0" styleClass="radiobutton" stylesheets="@../../bin/application/commonRadioButton.css" text="Свидетельсва о поверке" />
-            <RadioButton fx:id="bDocBtn" mnemonicParsing="false" onAction="#bDocRBClick" prefHeight="30.0" prefWidth="401.0" styleClass="radiobutton" stylesheets="@../../bin/application/commonRadioButton.css" text="Извещения о непригодности" />
-            <ToggleButton fx:id="deviceSearchTB" mnemonicParsing="false" onAction="#deviceSearchTBClick" prefHeight="39.0" prefWidth="401.0" styleClass="radiobutton" stylesheets="@../../bin/application/commonRadioButton.css" text="Выбрать средство измерения" />
-            <Pane prefHeight="18.0" prefWidth="400.0" />
-            <Button fx:id="searchBtn" mnemonicParsing="false" onAction="#searchBtnClick" prefHeight="39.0" prefWidth="432.0" stylesheets="@../../bin/application/commonButton.css" text="Поиск" />
+            <Label stylesheets="@../application/commonLabel.css" text="Осуществлять поиск документов для процедур поверки, закончившихся" />
+            <RadioButton fx:id="gDocRB" mnemonicParsing="false" onAction="#gDocRBClick" prefHeight="39.0" prefWidth="398.0" styleClass="radiobutton" stylesheets="@../../bin/application/commonRadioButton.css" text="положительным результатом &#10;и выпиской свидетельсва о поверке">
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin></RadioButton>
+            <RadioButton fx:id="bDocBtn" mnemonicParsing="false" onAction="#bDocRBClick" prefHeight="40.0" prefWidth="401.0" styleClass="radiobutton" stylesheets="@../../bin/application/commonRadioButton.css" text="отрицательным результатом &#10;и выпиской извещения о непригодности">
+               <opaqueInsets>
+                  <Insets bottom="10.0" />
+               </opaqueInsets></RadioButton>
+            <ToggleButton fx:id="deviceSearchTB" mnemonicParsing="false" onAction="#deviceSearchTBClick" prefHeight="48.0" prefWidth="431.0" styleClass="radiobutton" stylesheets="@../../bin/application/commonRadioButton.css" text="Выбрать средство измерения &#10;для которого следует осуществлять поиск протоколов" textAlignment="CENTER" />
+            <Pane prefHeight="9.0" prefWidth="438.0" />
+            <Button fx:id="searchBtn" mnemonicParsing="false" onAction="#searchBtnClick" prefHeight="39.0" prefWidth="432.0" stylesheets="@../../bin/application/commonButton.css" text="Найти протоколы поверок" />
             <Label prefHeight="36.0" prefWidth="271.0" stylesheets="@../../bin/application/commonLabel.css" text="Списко проведенных поверок:" />
-            <ListView fx:id="verificationListView" prefHeight="334.0" prefWidth="400.0" />
-            <Pane prefHeight="13.0" prefWidth="400.0" />
-            <Button fx:id="openBtn" mnemonicParsing="false" onAction="#openBtnClick" prefHeight="40.0" prefWidth="400.0" stylesheets="@../../bin/application/commonButton.css" text="Открыть для печати" />
+            <ListView fx:id="verificationListView" prefHeight="384.0" prefWidth="438.0" />
+            <Pane prefHeight="8.0" prefWidth="438.0" />
+            <Button fx:id="openBtn" mnemonicParsing="false" onAction="#openBtnClick" prefHeight="40.0" prefWidth="438.0" stylesheets="@../../bin/application/commonButton.css" text="Открыть протокол" />
          </children>
       </VBox>
    </children>

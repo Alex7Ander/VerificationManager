@@ -147,7 +147,7 @@ public class NewElementToleranceParamsTable extends VisualTable {
 				double currentValue = Double.parseDouble(values.get(key).get(i));
 				parametr.put(freq, currentValue);
 			} catch (NumberFormatException nfExp) {
-				//
+				System.err.println("Ошибка при попытке преобразования строк в числа: " + values.get("FREQS").get(i) + " или " + values.get(key).get(i) + ": " + nfExp.getMessage());
 			}			
 		}
 		return parametr;

@@ -2,22 +2,30 @@ package ProtocolCreatePack;
 
 import java.awt.Desktop;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.hssf.usermodel.HeaderFooter;
+
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.DataFormat;
 import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.Footer;
-//import org.apache.poi.ss.usermodel.HeaderFooter;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.PrintSetup;
 import org.apache.poi.ss.usermodel.Row;
@@ -26,6 +34,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.WorkbookUtil;
 
+import SecurityPack.FileEncrypterDecrypter;
 import ToleranceParamPack.ParametrsPack.ToleranceParametrs;
 import VerificationPack.MeasResult;
 import VerificationPack.VerificationProcedure;
@@ -46,7 +55,7 @@ public class DocumetnsCreateService extends Service<Integer> {
 	
 	//Книга
 	private Workbook wb;
-	//лист
+	//Лист
 	private Sheet sh;
 	//Строки
 	private List<Row> rows;
@@ -66,6 +75,9 @@ public class DocumetnsCreateService extends Service<Integer> {
 	private final String moduleFormatPattern = "0.000";
 	@SuppressWarnings("unused")
 	private final String phaseFormatPattern = "0.00";
+	
+	//Шифрование
+	private SecretKey secretKey;
 	
 	public DocumetnsCreateService(String protocolFileName, 
 								String documetFileName, 
@@ -168,7 +180,7 @@ public class DocumetnsCreateService extends Service<Integer> {
 		
 		//Стиль - Жирный шрифт
 		this.boldCellStyle = this.wb.createCellStyle(); 
-		this.boldCellStyle.setFont(boldFont);		
+		this.boldCellStyle.setFont(boldFont);
 	}
 	
 	@Override
@@ -197,11 +209,12 @@ public class DocumetnsCreateService extends Service<Integer> {
 		fillSheet();
 		topCellsMerging();
 		colScaling();
-		writeSheet();
+		writeSheet(this.verification.getSecretKey());
 	}
 	
 	private void createDocument() throws IOException {
 		FileWriter writer = new FileWriter("proto.txt");
+				
 		try {			
 			writer.write(documentName + "\n");								//1
 			writer.write(this.verification.getDocType() + "\n");			//2
@@ -257,7 +270,7 @@ public class DocumetnsCreateService extends Service<Integer> {
 	private void fillSheet() {
 		System.out.println("Процедура заполнения файла Excel:");
 		System.out.print("Основная информация: ");
-		setCellValue(0, 0, "Протокол поверки № ________________________", headCellStyle);		
+		setCellValue(0, 0, "Протокол № ________________________", headCellStyle);		
 		setCellValue(1, 0, "от " + verification.getDateForDocuments(), headCellStyle);		
 		setCellValue(2, 0, verification.getEtalonString().trim() + ": " + verification.getDeviceInfo().toLowerCase(), ordinaryCellStyle);
 		setCellValue(3, 0, "Заводской номер (номера): " + verification.getDeviceSerNumber(), ordinaryCellStyle);
@@ -270,11 +283,7 @@ public class DocumetnsCreateService extends Service<Integer> {
 		setCellValue(7, 0, "Средства измерений: военный эталон ВЭ-24-20", ordinaryCellStyle);
 		
 		setCellValue(8, 0, "Нормативно-техническая документация поверки:", ordinaryCellStyle);
-		String verificatonMethodology = verification.getVerificatonMethodologyName();
-		if (verificatonMethodology == null) {
-			verificatonMethodology = "Методика поверки рабочих эталонов и средств измерений военного назначения на военном эталоне.";
-		}
-		setCellValue(9, 0, verificatonMethodology, ordinaryCellStyle);
+		setCellValue(9, 0, "Методика поверки рабочих эталонов и средств измерений военного назначения на военном эталоне.", ordinaryCellStyle);
 				
 		setCellValue(11, 0, "1. Внешний осмотр: замечаний нет", ordinaryCellStyle);
 		setCellValue(12, 0, "2. Опробование: аппаратура работоспособна", ordinaryCellStyle);
@@ -397,19 +406,36 @@ public class DocumetnsCreateService extends Service<Integer> {
 					}
 				}
 				setCellValue(dRow, 0, "Результаты поверки: " + currentElementDecision, ordinaryCellStyle);
-				rowMerging(dRow, 0, 10);
+				rowMerging(dRow, 0, 12);
 				dRow++;
 				System.out.print("\n\n");
 			} //end k		
 		}//end i
 		
 		dRow++;
-		setCellValue(dRow, 0, "Измерения выполнил: " + this.verification.getWorkerName(), ordinaryCellStyle);
-		rowMerging(dRow, 0, 10);
+		
+		setCellValue(dRow, 0, "Измерения выполнил: 	", ordinaryCellStyle);
+		rowMerging(dRow, 0, 5);
+		setCellValue(dRow, 6, "", ordinaryCellStyle);
+		rowMerging(dRow, 6, 7);
+		setCellValue(dRow, 8, this.verification.getWorkerName(), ordinaryCellStyle);
+		rowMerging(dRow, 8, 12);
 		dRow++;
-		boldCellStyle.setAlignment(HorizontalAlignment.RIGHT);
-		setCellValue(dRow, 0, "Ответственный за экплуатацию (хранитель эталона): " + this.verification.getBossStatus() + " " + this.verification.getBossName(), ordinaryCellStyle);
-		rowMerging(dRow, 0, 10);
+		
+		setCellValue(dRow, 0, "", ordinaryCellStyle);
+		rowMerging(dRow, 0, 12);		
+		dRow++;
+		
+		setCellValue(dRow, 0, "Ответственный за экплуатацию (хранитель эталона): ", ordinaryCellStyle);
+		rowMerging(dRow, 0, 5);
+		setCellValue(dRow, 6, "", ordinaryCellStyle);
+		rowMerging(dRow, 6, 7);
+		setCellValue(dRow, 8, this.verification.getStandartGuardianStatus() + " " + this.verification.getStandartGuardianName(), ordinaryCellStyle);
+		rowMerging(dRow, 8, 12);
+		dRow++;
+		
+		setCellValue(dRow, 0, "", ordinaryCellStyle);
+		rowMerging(dRow, 0, 12);		
 	}
 	
 	private List<String> createtableHeads(MeasResult currentRes, String key) {
@@ -427,21 +453,22 @@ public class DocumetnsCreateService extends Service<Integer> {
 		if(key.equals("S11")){
 			if (resType.equals("vswr")) {
 				paramStr = "КСВН\r\n(1 порт)";
-			} else {
+				nominalHead = "Пред.пов.\nКСВН";
+			} 
+			else {
 				paramStr = "|Г|\r\n(1 порт)";
-			}
-			
+				nominalHead = "Пред.пов.\n|Г|";
+			}			
 			if(currentModuleToleranceType.equals("percent")) {
 				errorModuleHead = "Погр-ть,\n%";
 				moduleDifference = "\u03B4, %";
 				tolleranceHead = "Допуск, %";
-			} else {
+			} 
+			else {
 				errorModuleHead = "Погр-ть";
 				moduleDifference = "\u0394";	
 				tolleranceHead = "Допуск";
-			}
-			
-			nominalHead = "Пред.пов.\nКСВН";
+			}			
 		}
 		else if(key.equals("S12")) {
 			paramStr = "Коэф.\r\nS12, дБ";
@@ -460,21 +487,23 @@ public class DocumetnsCreateService extends Service<Integer> {
 		else if(key.equals("S22")) {
 			if (resType.equals("vswr")) {
 				paramStr = "КСВН\r\n(2 порт)";
-			} else {
+				nominalHead = "Пред.пов.\nКСВН";
+			} 
+			else {
 				paramStr = "|Г|\r\n(2 порт)";
+				nominalHead = "Пред.пов.\n|Г|";
 			}
 			
 			if(currentModuleToleranceType.equals("percent")) {
 				errorModuleHead = "Погр-ть,\n%";
 				moduleDifference = "\u03B4, %";
 				tolleranceHead = "Допуск, %";
-			} else {
+			} 
+			else {
 				errorModuleHead = "Погр-ть";
 				moduleDifference = "\u0394";
 				tolleranceHead = "Допуск";
-			}
-			
-			nominalHead = "Пред.пов.\nКСВН";
+			}			
 		}
 				
 		tableHeads.add("F, ГГц");
@@ -543,11 +572,31 @@ public class DocumetnsCreateService extends Service<Integer> {
 		sh.addMergedRegion(new CellRangeAddress(row, row, from, to));
 	}
 	
-	private void writeSheet() throws IOException {		
+	private void writeSheet(SecretKey secretKey) throws IOException {		
 		//Запись в файл
 		FileOutputStream fout = new FileOutputStream(protoPathTo);
 		wb.write(fout);
+					
+		String encProtoFileName = protocolName.substring(0, protocolName.lastIndexOf('.')) + ".enc"; 
+		String encProtoFilePathTo = new File(".").getAbsolutePath() + "\\files\\resurect\\" + encProtoFileName;
+
+		FileInputStream fis= new FileInputStream(protoPathTo);
+		byte[] buffer = new byte[fis.available()];
+		fis.read(buffer);
+		
+				
+		FileEncrypterDecrypter fileEncrypterDecrypter = null;
+		try {			
+			fileEncrypterDecrypter = new FileEncrypterDecrypter(secretKey);		//transformation: "AES/ECB/PKCS5Padding"
+			fileEncrypterDecrypter.encrypt(buffer, encProtoFilePathTo);
+		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException mExp) {
+			mExp.printStackTrace();
+		}	
+					        
+		fis.close();
 		fout.close();
+		
+		verification.setPathOfProtocol("\\files\\resurect\\" + encProtoFileName);
 	}
 
 }

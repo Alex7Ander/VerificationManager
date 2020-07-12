@@ -5,7 +5,10 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class DataBaseManager {
 
@@ -169,6 +172,11 @@ public class DataBaseManager {
     		String key = paramsNames.get(i);
     		mapResults.put(key, tempMap);
     	}
+    }
+    
+    public void zeroingAllElements() throws SQLException {
+    	String sqlString = "UPDATE [Elements] SET lastVerificationId=0";
+    	state.executeUpdate(sqlString);
     }
     
 }

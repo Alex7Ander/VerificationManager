@@ -2,22 +2,35 @@
 
 import java.awt.Desktop;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 import AboutMessageForm.AboutMessageWindow;
 import DataBasePack.DataBaseManager;
 import DevicePack.Device;
 import GUIpack.InfoRequestable;
 import SearchDevicePack.SearchDeviceWindow;
+import SecurityPack.FileEncrypterDecrypter;
+import VerificationPack.VerificationProcedure;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -30,6 +43,15 @@ import javafx.scene.control.ToggleGroup;
 
 public class OldDocSearchController implements InfoRequestable {
 
+	
+	/*
+	 * 
+	 * КАК ТОЛЬКО БУДЕТ ВОЗМОЖНОСЬ, НЕОБХОДИМО ПЕРЕПИСАТ МЕТОД setVerificationItems()
+	 * Необходимо убрать запрос к БД непосредственно из тела этого метода
+	 * Поиск процедур поверки делать через статический метод VerificationProcedure.getAllVerificationsProcedures()
+	 * А для поиска протоколов конкретного устройства написать метод VerificationProcedure.getAllVerificationsProceduresForDevice(Device device) 
+	 * 
+	 * */
 	@FXML
 	private Button searchBtn;
 	@FXML
@@ -53,7 +75,10 @@ public class OldDocSearchController implements InfoRequestable {
 	private DatePicker tillDTP;
 
 	private Device checkDevice;
-	private ObservableList<String> listOfVerifications;
+	private ObservableList<String> listOfVerificationsItems;
+	
+	private List<VerificationProcedure> listOfVerifications;
+	
 	List<List<String>> resultOfSearch; 
 	
 	private String typeOfDoc;
@@ -66,9 +91,9 @@ public class OldDocSearchController implements InfoRequestable {
 		this.docTypeGroup = new ToggleGroup();
 		this.gDocRB.setSelected(true);
 		this.gDocRB.setToggleGroup(docTypeGroup);
-		this.bDocBtn.setToggleGroup(docTypeGroup);
-		this.typeOfDoc = "Certificate";		
-		this.listOfVerifications = FXCollections.observableArrayList();
+		this.bDocBtn.setToggleGroup(docTypeGroup);		
+		this.typeOfDoc = "Cвидетельство о поверке";		
+		this.listOfVerificationsItems = FXCollections.observableArrayList();
 		this.resultOfSearch = new ArrayList<List<String>>();		
 		setVerificationItems();
 	}
@@ -86,12 +111,12 @@ public class OldDocSearchController implements InfoRequestable {
 	
 	@FXML
 	private void gDocRBClick() {
-		this.typeOfDoc = "Certificate";
+		this.typeOfDoc = "Cвидетельство о поверке";
 	}
 	
 	@FXML
 	private void bDocRBClick() {
-		this.typeOfDoc = "Notice";
+		this.typeOfDoc = "Извещение о непригодности";
 	}
 	
 	@FXML
@@ -101,15 +126,47 @@ public class OldDocSearchController implements InfoRequestable {
 	
 	@FXML
 	private void openBtnClick()  {
+		int index = this.verificationListView.getSelectionModel().getSelectedIndex();
+		//VerificationProcedure procedure = this.listOfVerifications.get(index);
 		try {
-			int index = this.verificationListView.getSelectionModel().getSelectedIndex();
 			String pathOfDoc = new File(".").getAbsolutePath() + resultOfSearch.get(index).get(1);
 			String pathOfProtocol = new File(".").getAbsolutePath() + resultOfSearch.get(index).get(2);
+			byte[] decodedKey = Base64.getDecoder().decode(resultOfSearch.get(index).get(3));
+			SecretKey originalKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES");
 			
 			File docFile = new File(pathOfDoc);
 			File protocolFile = new File(pathOfProtocol);
+			
+			FileEncrypterDecrypter fileEncrypterDecrypter = null;
+			try {			
+				fileEncrypterDecrypter = new FileEncrypterDecrypter(originalKey);	//, "AES/CBC/PKCS5Padding"		
+			} catch (NoSuchAlgorithmException | NoSuchPaddingException mExp) {
+				mExp.printStackTrace();
+			}	
+			byte[] decBuffer = null;
+			
+			int ind = pathOfProtocol.lastIndexOf('\\');
+			String nameOfNewFile = pathOfProtocol.substring(ind, pathOfProtocol.lastIndexOf('.'));
+	        String pathToNewFile = new File(".").getAbsolutePath() + nameOfNewFile + ".xls";
+	        
+	        FileOutputStream decfout = new FileOutputStream(pathToNewFile);
+			try {
+				decBuffer = fileEncrypterDecrypter.decrypt(pathOfProtocol);
+			} catch (InvalidKeyException e) {
+				e.printStackTrace();
+			} catch (IllegalBlockSizeException e) {
+				e.printStackTrace();
+			} catch (BadPaddingException e) {
+				e.printStackTrace();
+			} catch (InvalidAlgorithmParameterException e) {
+				e.printStackTrace();
+			}		
+	        decfout.write(decBuffer);
+	        decfout.close();
+	        File newProtocolFile = new File(pathToNewFile);
+	        
 			Desktop.getDesktop().open(docFile);
-			Desktop.getDesktop().open(protocolFile);
+			Desktop.getDesktop().open(newProtocolFile);
 		}
 		catch(IOException ioExp) {
 			AboutMessageWindow.createWindow("Ошибка", "Файл отсутствует").show();
@@ -126,12 +183,13 @@ public class OldDocSearchController implements InfoRequestable {
 	}
 	@Override
 	public void representRequestedInfo() {
-		String caption = checkDevice.getName() + " " + checkDevice.getType() + " пїЅ" + checkDevice.getSerialNumber();
+		String caption = checkDevice.getName() + " " + checkDevice.getType() + " №" + checkDevice.getSerialNumber();
 		this.deviceSearchTB.setText(caption);		
 	}
 	
-	private void setVerificationItems() {
-		this.listOfVerifications.clear();
+	private void setVerificationItems() {	
+		this.listOfVerificationsItems.clear();
+		
 		LocalDate lcFrom = fromDTP.getValue();
 		if (lcFrom != null) {
 			this.from = Date.from(lcFrom.atStartOfDay(ZoneId.systemDefault()).toInstant());
@@ -152,12 +210,41 @@ public class OldDocSearchController implements InfoRequestable {
 		calendarInstance.add(Calendar.DAY_OF_MONTH, 1);
 		this.till = calendarInstance.getTime();
 		
+		/*		
+		try {
+			listOfVerifications = VerificationProcedure.getAllVerificationsProcedures();
+		}
+		catch(SQLException sqlExp) {
+			sqlExp.printStackTrace();
+		}
+		
+		for (VerificationProcedure procedure : this.listOfVerifications) {
+			String strDateOfVer = procedure.getDate();
+			Date dateOfVer;
+			try {
+				dateOfVer = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(strDateOfVer); 
+			}
+			catch(ParseException pExp) {
+				dateOfVer = Calendar.getInstance().getTime();
+			}
+			
+			if (dateOfVer.after(this.from) && dateOfVer.before(this.till) && procedure.getDocType().equals(this.typeOfDoc)) { 
+				String item = procedure.getDate() + " " + procedure.getDeviceInfo();
+				listOfVerificationsItems.add(item);	
+			}
+			else {
+				this.listOfVerifications.remove(procedure);
+			}
+		}
+		*/
+						
 		String addFilters = "";
 		List<String> fieldsNames = new ArrayList<String>();
 				
 		fieldsNames.add("verificationDate");
 		fieldsNames.add("pathOfDoc");
-		fieldsNames.add("pathOfProtocol");				
+		fieldsNames.add("pathOfProtocol");	
+		fieldsNames.add("secretKeyString");
 		if (checkDevice != null) {
 			addFilters = (" AND DeviceId='" + checkDevice.getId() + "'");
 		}	
@@ -166,9 +253,10 @@ public class OldDocSearchController implements InfoRequestable {
 			fieldsNames.add("type");
 			fieldsNames.add("serialNumber");
 		}
-		String sqlQuery = "SELECT Verifications.verificationDate, Verifications.pathOfDoc, Verifications.pathOfProtocol, Devices.name, Devices.type, Devices.serialNumber";
-		sqlQuery += (" FROM Verifications INNER JOIN Devices ON Verifications.DeviceId = Devices.id WHERE Verifications.typeOfDoc='" + typeOfDoc + "'"); 
+		String sqlQuery = "SELECT Verifications.verificationDate, Verifications.pathOfDoc, Verifications.pathOfProtocol, Verifications.secretKeyString, Devices.name, Devices.type, Devices.serialNumber";
+		sqlQuery += (" FROM Verifications INNER JOIN Devices ON Verifications.DeviceId = Devices.id WHERE Verifications.typeOfDoc='" + typeOfDoc + "'" + addFilters); 
 		try {
+			resultOfSearch.clear();
 			DataBaseManager.getDB().sqlQueryString(sqlQuery, fieldsNames, resultOfSearch);
 			
 			int next = 0;
@@ -190,20 +278,21 @@ public class OldDocSearchController implements InfoRequestable {
 						item += (checkDevice.getName() + " " + checkDevice.getType() + " " + checkDevice.getSerialNumber());				
 					}
 					else {				
-						item += (currentResultOfSerach.get(3) + " " + currentResultOfSerach.get(4) + " " + currentResultOfSerach.get(5));
+						item += (currentResultOfSerach.get(4) + " " + currentResultOfSerach.get(5) + " " + currentResultOfSerach.get(6));
 					}
-					listOfVerifications.add(item);	
+					listOfVerificationsItems.add(item);	
 					next++;
 				}
 				else {
 					resultOfSearch.remove(currentResultOfSerach);
 				}
 			}
-			this.verificationListView.setItems(listOfVerifications);
+			this.verificationListView.setItems(listOfVerificationsItems);
 		}
 		catch(SQLException sqlExp) {
 			System.out.println(sqlExp.getMessage() + "\n\n" + sqlExp.getStackTrace());
 			AboutMessageWindow.createWindow("Ошибка", "База данных отсутствует или повреждена").show();
-		}		
+		}	
+		
 	}	
 }

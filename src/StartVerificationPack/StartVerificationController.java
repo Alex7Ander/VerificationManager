@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import AboutMessageForm.AboutMessageWindow;
+import DBEditForm.DBEditController;
+import DBEditForm.DBEditWindow;
+import DevicePack.Element;
 import FileManagePack.FileManager;
 import ToleranceParamPack.ParametrsPack.TimeType;
 import VerificationForm.VerificationController;
@@ -142,8 +145,33 @@ public class StartVerificationController {
 				this.goodWorkRB.setSelected(true);
 			}
 		}
+
 		if(VerificationWindow.getVerificationWindow() != null) {
 			VerificationController vCtrl = (VerificationController)VerificationWindow.getVerificationWindow().getControllerClass();
+			
+			if(this.periodicVerRB.isSelected()) {
+				StringBuilder notMarkedElementsList = new StringBuilder();
+				boolean hasNotMarkedElements = false;
+				for (Element elm : vCtrl.verificatedDevice.includedElements) {
+					if(elm.getLastVerificationId() == 0) {	
+						notMarkedElementsList.append("- " + elm.getType() + " " + elm.getSerialNumber() + "\n");
+						hasNotMarkedElements = true;
+					}
+				}
+				if(hasNotMarkedElements) {
+					DBEditController dbEditController = (DBEditController)DBEditWindow.getDBEditWindow().getController();
+					dbEditController.setDevice(vCtrl.verificatedDevice);
+					dbEditController.representRequestedInfo();
+					DBEditWindow.getDBEditWindow().show();
+					VerificationWindow.getVerificationWindow().close();
+					VerificationWindow.getVerificationWindow().delete();
+					String msg = "Для прибора, выбранного для поверки\nне указаны результаты, которые должны\nиспользоваться для сравнения в качестве\nрезультатов предыдущей поверки:\nСм. пункт Руководства оператора №";
+					AboutMessageWindow.createWindow("Ошибка", msg).show();
+					this.myWindow.close();
+					return;
+				}
+			}
+			
 			vCtrl.StartVerification();
 			boolean wait = false;
 			try {

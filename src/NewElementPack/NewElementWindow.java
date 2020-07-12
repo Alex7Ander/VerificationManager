@@ -1,8 +1,11 @@
 package NewElementPack;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.Properties;
 
 import AboutMessageForm.AboutMessageWindow;
 import DataBasePack.DataBaseManager;
@@ -17,6 +20,36 @@ import YesNoDialogPack.YesNoWindow;
 
 public class NewElementWindow extends guiWindow {
 
+	private static boolean nominalsEditingStatus;
+	
+	static {
+		FileInputStream fis;
+        Properties property = new Properties();
+        String propPath = new File(".").getAbsolutePath() + "/files/aksol.properties";
+        try {       	
+            fis = new FileInputStream(propPath);
+            property.load(fis);
+
+            int readValue = Integer.parseInt(property.getProperty("editable.nominals"));
+            if(readValue == 1) {
+            	nominalsEditingStatus = true;
+            }
+            else{
+            	nominalsEditingStatus = false;
+            }
+                         
+            System.out.println("editable.nominals: " + nominalsEditingStatus);
+            fis.close();
+
+        } catch (IOException e) {
+            System.err.println("ОШИБКА: Файл свойств по адресу " + propPath + " отсуствует!");
+            nominalsEditingStatus = false;
+        } catch (NumberFormatException nfExp) {
+        	System.err.println("ОШИБКА: неправильный формат данных для преобразования");
+        	nominalsEditingStatus = false;
+        }
+	}
+	
 	public NewElementWindow() throws IOException {
 		super("", "NewElementForm.fxml");
 		NewElementController ctrl = (NewElementController) loader.getController();
@@ -55,7 +88,8 @@ public class NewElementWindow extends guiWindow {
 	public NewElementWindow(Element elm) throws IOException {		
 		super(elm.getType(), "NewElementForm.fxml");
 		NewElementController ctrl = (NewElementController) loader.getController();
-		ctrl.setElement(elm);		
+		ctrl.setElement(elm);	
+		ctrl.setNominalTableEditable(nominalsEditingStatus);
 		stage.setOnCloseRequest( event -> {			
 			ctrl.saveValues();
 			int answer = YesNoWindow.createYesNoWindow("Сохранить изменения", "Сохранить внесенные вами изменения?").showAndWait();
@@ -83,7 +117,7 @@ public class NewElementWindow extends guiWindow {
 					}
 					elm.rewriteParams(newModulePrimaryTP, newModulePeriodicTP, newPhasePrimaryTP, newPhasePeriodicTP);
 					if (!elm.getNominal().equals(newNominals)) {
-						elm.getNominal().deleteFromDB();
+						//elm.getNominal().deleteFromDB();
 						newNominals.saveInDB();
 						newNominals.setNominalStatus();
 					}

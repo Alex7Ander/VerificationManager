@@ -12,6 +12,7 @@ import VerificationPack.MeasResult;
 public class ProtocolCreateWindow extends guiWindow{
 
 	private static ProtocolCreateWindow instanceProtocolCreateWindow;
+	private static ProtocolCreateController ctrl;
 	
 	private ProtocolCreateWindow(Device device, 
 								String[] docTypes, 
@@ -21,7 +22,7 @@ public class ProtocolCreateWindow extends guiWindow{
 								List<ToleranceParametrs> protocoledPhaseToleranceParams,
 								VerificationProcedure verification) throws IOException {
 		super("Создание протокола", "ProtocolCreateForm.fxml");
-		ProtocolCreateController ctrl = (ProtocolCreateController) this.loader.getController();
+		ctrl = (ProtocolCreateController) this.loader.getController();
 		ctrl.setDevice(device);
 		ctrl.setDocTypes(docTypes);
 		ctrl.setResults(results);
@@ -53,6 +54,10 @@ public class ProtocolCreateWindow extends guiWindow{
 	
 	public static void closeInstanceWindow() {
 		instanceProtocolCreateWindow.close();
+	}
+	
+	public static ProtocolCreateController getController() {
+		return ctrl;
 	}
 
 }

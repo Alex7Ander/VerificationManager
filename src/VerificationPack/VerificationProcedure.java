@@ -1,9 +1,15 @@
 package VerificationPack;
 
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
+
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 import DataBasePack.DataBaseManager;
 import DataBasePack.dbStorable;
@@ -25,14 +31,16 @@ public class VerificationProcedure implements dbStorable {
 	private String strAirHumidity;
 
 //Device Information
-	private String deviceMainInfo;
-	private String deviceSerNumber;
 	private int deviceId;
+	private String deviceMainInfo;
+	private String deviceSerNumber;	
 	private ArrayList<String> elementsMainInfo;
 	
 //Finally information:
 	private String bossName;
 	private String bossStatus;
+	private String standartGuardianName;
+	private String standartGuardianStatus;
 	private String workerName;
 	private String decision;
 	private String protocolNumber;
@@ -54,7 +62,26 @@ public class VerificationProcedure implements dbStorable {
 	private String pathOfDoc;
 	private String pathOfProtocol;
 	
-	public VerificationProcedure() {}
+	private SecretKey secretKey;
+	
+	private boolean shouldBeSavedInDB;
+	
+	public boolean isShouldBeSavedInDB() {
+		return this.shouldBeSavedInDB;
+	}
+	
+	public void setShouldBeSavedInDBStatus(boolean status) {
+		this.shouldBeSavedInDB = status;
+	}
+	
+	public VerificationProcedure() {
+		try {
+			secretKey = KeyGenerator.getInstance("AES").generateKey();
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
+		shouldBeSavedInDB = true;
+	}
 	
 	public VerificationProcedure(int id) throws SQLException {
 		System.out.println("\nФормирование объекта класса VerificationProcedure из БД");
@@ -75,7 +102,8 @@ public class VerificationProcedure implements dbStorable {
 				+ "verificationMetodologyName, "
 				+ "rejectionReason, "
 				+ "tillTime, "
-				+ "isStandard FROM [Verifications] WHERE id='"+id+"'";
+				+ "isStandard, "
+				+ "secretKeyString FROM [Verifications] WHERE id='"+id+"'";
 		ArrayList<String> fieldName = new ArrayList<String>();
 		fieldName.add("deviceId");				
 		fieldName.add("verificationDate");			
@@ -94,6 +122,7 @@ public class VerificationProcedure implements dbStorable {
 		fieldName.add("rejectionReason");		
 		fieldName.add("tillTime");
 		fieldName.add("isStandard");
+		fieldName.add("secretKeyString");
 		List<List<String>> arrayResults = new ArrayList<List<String>>();
 		System.out.println(sqlQuery);
 		DataBaseManager.getDB().sqlQueryString(sqlQuery, fieldName, arrayResults);
@@ -131,6 +160,12 @@ public class VerificationProcedure implements dbStorable {
 		this.decision = arrayResults.get(0).get(14);		
 		this.finishDate = arrayResults.get(0).get(15);
 		this.etalonString = arrayResults.get(0).get(16);
+		
+		String secretKeyString = arrayResults.get(0).get(17);
+		if(secretKeyString != null) {
+			byte[] decodedKey = Base64.getDecoder().decode(secretKeyString);
+			this.secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES");
+		}
 		
 		elementsMainInfo = new ArrayList<String>();
 		if(this.deviceId != 0) {
@@ -250,6 +285,8 @@ public class VerificationProcedure implements dbStorable {
 	public void setFinallyInformation(ProtocolCreateController prtCreateCtrl) {
 		this.bossName   = prtCreateCtrl.getBossName();
 		this.bossStatus = prtCreateCtrl.getBossStatus();
+		this.standartGuardianName = prtCreateCtrl.getStandartGuardianName();
+		this.standartGuardianStatus = prtCreateCtrl.getStandartGuardianStatus();
 		this.workerName = prtCreateCtrl.getWorkerName();
 		this.decision   = prtCreateCtrl.getResultDecision();	
 		this.protocolNumber = prtCreateCtrl.getProtocolNumber();
@@ -262,8 +299,7 @@ public class VerificationProcedure implements dbStorable {
 		
 		this.finishDate = prtCreateCtrl.getFinishDate();
 		this.militaryBaseName = prtCreateCtrl.getMilitryBaseName();
-		this.verificatonMethodologyName = prtCreateCtrl.getVerificatonMethodologyName();
-		
+				
 		this.pathOfDoc = prtCreateCtrl.getPathOfDoc();
 		this.pathOfProtocol = prtCreateCtrl.getPathOfProtocol();
 	}
@@ -285,7 +321,9 @@ public class VerificationProcedure implements dbStorable {
 	}
 	
 	@Override
-	public void saveInDB() throws SQLException, SavingException {	
+	public void saveInDB() throws SQLException, SavingException {
+		String secretKeyString = Base64.getEncoder().encodeToString(secretKey.getEncoded());
+		
 		String sqlQuery = "INSERT INTO Verifications (DeviceId, "
 				+ "VerificationDate, "
 				+ "PathOfDoc, "
@@ -302,7 +340,8 @@ public class VerificationProcedure implements dbStorable {
 				+ "verificationMetodologyName, "
 				+ "rejectionReason, "
 				+ "tillTime, "
-				+ "isStandard) VALUES "
+				+ "isStandard, "
+				+ "secretKeyString) VALUES "
 					+"('"+this.deviceId+"',"
 					+ "'"+this.date+"',"
 					+ "'"+this.pathOfDoc+"',"
@@ -319,7 +358,8 @@ public class VerificationProcedure implements dbStorable {
 					+ "'"+this.verificatonMethodologyName+"',"
 					+ "'"+this.decision+"',"
 					+ "'"+this.finishDate+"',"
-					+ "'"+this.etalonString+"')";		
+					+ "'"+this.etalonString+"',"
+					+ "'"+secretKeyString+"')";		
 		System.out.println(sqlQuery);
 		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
 		
@@ -332,6 +372,44 @@ public class VerificationProcedure implements dbStorable {
 		else {
 			System.out.println("Информация о поверке сохранена. Присвоен id = " + this.id);
 		}
+	}
+	
+	public List<MeasResult> getMeasResults() {
+		List<MeasResult> results = new ArrayList<>();
+		if(deviceId != 0) {
+			try {
+				Device device = new Device(deviceId);				
+				List<Integer> resultsId = new ArrayList<>();
+				String sqlQuery = "SELECT id FROM [Results] WHERE verificationId=" + this.id;
+				DataBaseManager.getDB().sqlQueryInteger(sqlQuery, "id", resultsId);
+				
+				for(int i = 0; i < resultsId.size();  i++) {
+					int currentResultId = resultsId.get(i); 
+					sqlQuery = "SELECT elementId FROM [Results] WHERE id=" + currentResultId;
+					int currentElementId = DataBaseManager.getDB().sqlQueryCount(sqlQuery);
+					for (Element elm : device.includedElements) {
+						if (elm.getId() == currentElementId) {
+							results.add(new MeasResult(elm, currentResultId));
+						}
+					}
+				}				 				
+			} catch (SQLException sqlExp) {
+				sqlExp.printStackTrace();
+			}
+		}
+		return results;
+	}
+	
+	public MeasResult getMeasResultForElement(Element elm) {
+		MeasResult result = null;		
+		try {
+			String sqlQuery = "SELECT id FROM [Results] WHERE verificationId=" + this.id + " AND elementId=" + elm.getId();
+			int currentResultId = DataBaseManager.getDB().sqlQueryCount(sqlQuery);
+			result = new MeasResult(elm, currentResultId);
+		} catch (SQLException sqlExp) {
+			System.err.println("Не найден результат поверки для устройства с id = " + elm.getId() + " соответствовавший бы поверке с id = " + this.id + ". " + sqlExp.getMessage());
+		}
+		return result;
 	}
 
 	@Override
@@ -450,6 +528,54 @@ public class VerificationProcedure implements dbStorable {
 
 	public void setPathOfProtocol(String pathOfProtocol) {
 		this.pathOfProtocol = pathOfProtocol;
+	}
+
+	public SecretKey getSecretKey() {
+		return secretKey;
+	}
+
+	public void setSecretKey(SecretKey secretKey) {
+		this.secretKey = secretKey;
+	}
+	
+	public static List<VerificationProcedure> getAllVerificationsProcedures() throws SQLException{
+		List<VerificationProcedure> procedures = new ArrayList<>();
+		List<Integer> arrayResults = new ArrayList<>();
+		String sqlQuery = "SELECT id FROM [Verifications]";
+		DataBaseManager.getDB().sqlQueryInteger(sqlQuery, "id", arrayResults);
+		
+		for (Integer id : arrayResults) {
+			procedures.add(new VerificationProcedure(id));
+		}
+		return procedures;	
+	}
+	
+	public static List<VerificationProcedure> getAllVerificationsProcedures(Device device) throws SQLException{
+		List<VerificationProcedure> procedures = new ArrayList<>();
+		List<Integer> arrayResults = new ArrayList<>();
+		String sqlQuery = "SELECT id FROM [Verifications] WHERE deviceId=" + device.getId();
+		DataBaseManager.getDB().sqlQueryInteger(sqlQuery, "id", arrayResults);
+		
+		for (Integer id : arrayResults) {
+			procedures.add(new VerificationProcedure(id));
+		}
+		return procedures;	
+	}
+
+	public String getStandartGuardianName() {
+		return standartGuardianName;
+	}
+
+	public void setStandartGuardianName(String standartGuardianName) {
+		this.standartGuardianName = standartGuardianName;
+	}
+
+	public String getStandartGuardianStatus() {
+		return standartGuardianStatus;
+	}
+
+	public void setStandartGuardianStatus(String standartGuardianStatus) {
+		this.standartGuardianStatus = standartGuardianStatus;
 	}
 		
 }

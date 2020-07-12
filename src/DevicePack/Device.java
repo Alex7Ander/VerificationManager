@@ -22,7 +22,6 @@ public class Device implements dbStorable {
 	private String owner;
 	private String gosNumber;	
 	private int countOfElements;
-	//private String elementsTableName;
 	
 	public ArrayList<Element> includedElements;
 	
@@ -44,9 +43,7 @@ public class Device implements dbStorable {
 	public String getGosNumber() {
 		return gosNumber;
 	}
-	/*public String getElementsTableName() { 
-		return elementsTableName;
-	}*/
+
 	public int getCountOfElements() {
 		return countOfElements;
 	}

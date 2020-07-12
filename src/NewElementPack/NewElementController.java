@@ -79,8 +79,7 @@ public class NewElementController {
 	*/
 	@FXML
 	private Label tolParamsNameLabel;
-	
-	
+		
 	@FXML 
 	private RadioButton primaryVerificationRB;	
 	@FXML 
@@ -167,9 +166,11 @@ public class NewElementController {
 			//Уcтановим poleCount
 			if(element.getPoleCount() == 4) {
 				this.fourPoleRB.setSelected(true);
+				this.currentCountOfParams = 4;
 			}
 			else {
 				this.twoPoleRB.setSelected(true);
+				this.currentCountOfParams = 1;
 			}
 			//Установим типы допусков
 			if(element.getModuleToleranceType().equals("percent")) {
@@ -352,7 +353,6 @@ public class NewElementController {
 				visibleParamsTable.setCellValue(3, i, text);
 			}
 		}
-
 	}
 	@FXML
 	private void autoUpPhaseBtnClick() {
@@ -364,7 +364,6 @@ public class NewElementController {
 				visibleParamsTable.setCellValue(4, i, text);
 			}
 		}
-
 	}
 	
 	@FXML
@@ -621,6 +620,15 @@ public class NewElementController {
 			VSWR_Result vr = new VSWR_Result(this, this.currentElement);
 			return vr;
 		}
+	}
+	
+	public void setNominalTableEditable(boolean editable) {
+		this.nominalsTable.setEditable(editable);
+		this.moduleTextField.setDisable(!editable); 
+		this.phaseTextField.setDisable(!editable);
+		
+		this.autoModuleBtn.setDisable(!editable);
+		this.autoPhaseBtn.setDisable(!editable);
 	}
 
 }

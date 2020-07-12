@@ -56,7 +56,7 @@
                      <HBox.margin>
                         <Insets bottom="2.0" left="2.0" right="4.0" top="2.0" />
                      </HBox.margin></Button>
-                  <Button fx:id="startBtn" mnemonicParsing="false" onAction="#startBtnClick" prefHeight="26.0" prefWidth="200.0" stylesheets="@../../bin/application/commonButton.css" text="Старт">
+                  <Button fx:id="startBtn" disable="true" mnemonicParsing="false" onAction="#startBtnClick" prefHeight="26.0" prefWidth="200.0" stylesheets="@../../bin/application/commonButton.css" text="Старт">
                      <HBox.margin>
                         <Insets bottom="2.0" left="2.0" right="4.0" top="2.0" />
                      </HBox.margin></Button>
@@ -64,11 +64,11 @@
                      <HBox.margin>
                         <Insets bottom="2.0" left="2.0" right="4.0" top="2.0" />
                      </HBox.margin></Button>
-                  <Button fx:id="fileReadBtn" mnemonicParsing="false" onAction="#fileReadBtnClick" prefHeight="26.0" prefWidth="200.0" stylesheets="@../../bin/application/commonButton.css" text="Получить данные">
+                  <Button fx:id="fileReadBtn" disable="true" mnemonicParsing="false" onAction="#fileReadBtnClick" prefHeight="26.0" prefWidth="200.0" stylesheets="@../../bin/application/commonButton.css" text="Получить данные">
                      <HBox.margin>
                         <Insets bottom="2.0" left="2.0" right="4.0" top="2.0" />
                      </HBox.margin></Button>
-                  <Button fx:id="createProtocolBtn" mnemonicParsing="false" onAction="#createProtocolBtnClick" prefHeight="26.0" prefWidth="250.0" stylesheets="@../../bin/application/commonButton.css" text="Сохранить и выписать свидетельство">
+                  <Button fx:id="createProtocolBtn" disable="true" mnemonicParsing="false" onAction="#createProtocolBtnClick" prefHeight="26.0" prefWidth="250.0" stylesheets="@../../bin/application/commonButton.css" text="Сохранить и выписать свидетельство">
                      <HBox.margin>
                         <Insets bottom="2.0" left="2.0" right="50.0" top="2.0" />
                      </HBox.margin></Button>

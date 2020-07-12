@@ -192,9 +192,13 @@ public class NewDeviceController  {
 			NewDeviceWindow.deleteNewDeviceWindow();
 		}
 		catch(SQLException sqlExp){
-			System.out.println(sqlExp.getCause());
+			System.err.println(sqlExp.getCause());
 			DataBaseManager.getDB().RollBack();
 			AboutMessageWindow.createWindow("Ошибка", "Ошибка: " + sqlExp.getMessage()).show();
+		}
+		catch(NumberFormatException nfExp) {
+			DataBaseManager.getDB().RollBack();
+			AboutMessageWindow.createWindow("Ошибка", "Ошибка при преобразовании чисел\nПроверьте корректность введенных Вами данных.").show();
 		}
 		catch(SavingException noExp) {
 			DataBaseManager.getDB().RollBack();

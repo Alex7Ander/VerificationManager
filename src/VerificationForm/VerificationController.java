@@ -145,7 +145,7 @@ public class VerificationController implements InfoRequestable {
 	@FXML
 	private void startBtnClick(ActionEvent event) throws IOException, InterruptedException {
 		if(verificatedDevice != null) {
-			StartVerificationWindow.getStartVerificationWindow().show();						
+			StartVerificationWindow.getStartVerificationWindow().show();	
 		}
 		else{
 			AboutMessageWindow.createWindow("Ошибка","Вы не выбрали средство измерения для поверки").show();
@@ -212,22 +212,20 @@ public class VerificationController implements InfoRequestable {
 		List<MeasResult> nominals = new ArrayList<>();
 		List<ToleranceParametrs> protocoledModuleToleranceParams = new ArrayList<>(); //Вносимые в протокол параметры пригодности
 		List<ToleranceParametrs> protocoledPhaseToleranceParams = new ArrayList<>();
-		for (Element elm : this.verificatedDevice.includedElements) {
-			nominals.add(elm.getNominal());
+		for (Element elm : this.verificatedDevice.includedElements) {			
 			if (this.verification.isPrimary()) {
-				protocoledModuleToleranceParams.add(
-						this.verificationResult.get(this.currentElementIndex).getMyOwner().getPrimaryModuleToleranceParams());
-				protocoledPhaseToleranceParams.add(
-						this.verificationResult.get(this.currentElementIndex).getMyOwner().getPrimaryPhaseToleranceParams());	
+				nominals.add(elm.getNominal());
+				protocoledModuleToleranceParams.add(elm.getPrimaryModuleToleranceParams());
+				protocoledPhaseToleranceParams.add(elm.getPrimaryPhaseToleranceParams());
 			}
 			else {
-				protocoledModuleToleranceParams.add(
-						this.verificationResult.get(this.currentElementIndex).getMyOwner().getPeriodicModuleToleranceParams());
-				protocoledPhaseToleranceParams.add(
-						this.verificationResult.get(this.currentElementIndex).getMyOwner().getPeriodicPhaseToleranceParams());
+				nominals.add(elm.getLastVerificationResult());
+				protocoledModuleToleranceParams.add(elm.getPeriodicModuleToleranceParams());
+				protocoledPhaseToleranceParams.add(elm.getPeriodicPhaseToleranceParams());
 			}
 		}
-
+		
+		this.verification.setShouldBeSavedInDBStatus(true);
 		ProtocolCreateWindow.getProtocolCreateWindow(this.verificatedDevice,
 													docTypes, 
 													this.verificationResult, 
@@ -280,6 +278,11 @@ public class VerificationController implements InfoRequestable {
 	}
 //---------------------------	
 	public void StartVerification() throws IOException {
+		this.fileReadBtn.setDisable(false);
+		this.startBtn.setDisable(true);
+		this.searchDeviceBtn.setDisable(true);
+		this.createProtocolBtn.setDisable(true);
+		
 		String absPath = new File(".").getAbsolutePath();
 		//Получение информации об окружающей среде
 		this.verification = new VerificationProcedure();
@@ -314,7 +317,13 @@ public class VerificationController implements InfoRequestable {
 		}
 
 		//Параметры годности прибора, который будут указываться в таблице
-		MeasResult nominals = this.verificationResult.get(this.currentElementIndex).getMyOwner().getNominal();
+		MeasResult nominals = null;
+		if(verification.isPrimary()) {
+			nominals = this.verificationResult.get(this.currentElementIndex).getMyOwner().getNominal();
+		}
+		else {
+			nominals = this.verificationResult.get(this.currentElementIndex).getMyOwner().getLastVerificationResult();
+		}
 		ToleranceParametrs representableModuleToleranceParams = null;
 		ToleranceParametrs representablePhaseToleranceParams = null;
 		if (this.verification.isPrimary()) {
@@ -469,24 +478,31 @@ public class VerificationController implements InfoRequestable {
 		verificationResult.clear();
 		try {
 			for (int i=0; i < verificatedDevice.getCountOfElements(); i++) {
+				Element currentElement = this.verificatedDevice.includedElements.get(i);
 				String absPath = new File(".").getAbsolutePath();
 				String resFilePath = absPath + "\\measurement\\protokol.ini";
-				MeasResult rs = new MeasResult(resFilePath, i+1, this.verificatedDevice.includedElements.get(i));				
+				MeasResult rs = new MeasResult(resFilePath, i+1, currentElement);				
 				verificationResult.add(rs);
 				//Verificating results
 				if (verification.isPrimary()) {
-					verificatedDevice.includedElements.get(i).getPrimaryModuleToleranceParams().checkResult(rs);
-					verificatedDevice.includedElements.get(i).getPrimaryPhaseToleranceParams().checkResult(rs);
+					verificatedDevice.includedElements.get(i).getPrimaryModuleToleranceParams().checkResult(currentElement.getNominal(), rs);
+					verificatedDevice.includedElements.get(i).getPrimaryPhaseToleranceParams().checkResult(currentElement.getNominal(), rs);
 				}
 				else {
-					verificatedDevice.includedElements.get(i).getPeriodicModuleToleranceParams().checkResult(rs);
-					verificatedDevice.includedElements.get(i).getPeriodicPhaseToleranceParams().checkResult(rs);
+					MeasResult lastVerRes = currentElement.getLastVerificationResult();
+					verificatedDevice.includedElements.get(i).getPeriodicModuleToleranceParams().checkResult(lastVerRes, rs);
+					verificatedDevice.includedElements.get(i).getPeriodicPhaseToleranceParams().checkResult(lastVerRes, rs);
 				}				
 				elementComboBox.setValue(listOfElements.get(0));
 				parametrComboBox.setValue(listOfParametrs.get(0));
 			}
 			saveBtn.setDisable(false);
 			resultSaved = false;
+			
+			this.createProtocolBtn.setDisable(false);
+			this.startBtn.setDisable(false);
+			this.startBtn.setText("Повторить измерения");
+			this.fileReadBtn.setDisable(true);
 		}
 		catch(IOException ioExp) {
 			AboutMessageWindow.createWindow("Ошибка", "Отсутствует или поврежден файл\n с результатами измерений").show();
@@ -520,7 +536,9 @@ public class VerificationController implements InfoRequestable {
 	}
 	
 	@Override
-	public void setDevice(Device device) {
+	public void setDevice(Device device) {		
+		this.startBtn.setDisable(false);
+		this.fileReadBtn.setDisable(true);
 		verificatedDevice = device;
 	}
 		
@@ -548,4 +566,18 @@ public class VerificationController implements InfoRequestable {
 		return resultSaved;
 	}
 	
+	public void zeroingLastVerificationsId() {
+		if(this.verificatedDevice == null) {
+			return;
+		}
+		System.out.println("По завершению поверки следующим элементам обнулен индекс последней поверки:");
+		for (Element elm : this.verificatedDevice.includedElements) {
+			try {
+				elm.setLastVerificationId(0);
+				System.out.println("- " + elm.getType() + " " + elm.getSerialNumber() + " - успешно");
+			} catch (SQLException sqlExp) {
+				System.err.println("- " + elm.getType() + " " + elm.getSerialNumber() + " - ОШИБКА: " + sqlExp.getMessage());
+			}
+		}
+	}
 }

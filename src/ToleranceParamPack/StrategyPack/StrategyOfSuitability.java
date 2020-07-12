@@ -4,5 +4,5 @@ import ToleranceParamPack.ParametrsPack.ToleranceParametrs;
 import VerificationPack.MeasResult;
 
 public interface StrategyOfSuitability {
-	boolean checkResult(MeasResult result, ToleranceParametrs tolerance);
+	boolean checkResult(MeasResult lastVerificationResults, MeasResult result, ToleranceParametrs tolerance);
 }

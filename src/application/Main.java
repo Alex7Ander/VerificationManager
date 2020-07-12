@@ -1,5 +1,8 @@
 package application;
 	
+import java.sql.SQLException;
+
+import DataBasePack.DataBaseManager;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
@@ -15,7 +18,13 @@ public class Main extends Application {
 			primaryStage.setScene(scene);
 			primaryStage.setResizable(false);
 			primaryStage.show();
-			primaryStage.setOnCloseRequest(event -> {
+			primaryStage.setOnCloseRequest(event -> {				
+				try {
+					DataBaseManager.getDB().zeroingAllElements();
+				} catch (SQLException sqlExp) {
+					System.out.println("Ошибка при попытке обнулить поле lastVerificationId в таблице Elements по закрытию программы. " + sqlExp.getMessage());
+					sqlExp.printStackTrace();
+				}
 				System.exit(0);
 			});
 		} catch(Exception e) {
@@ -26,5 +35,4 @@ public class Main extends Application {
 	public static void main(String[] args) {
 		launch(args);
 	}
-
 }

@@ -1,6 +1,7 @@
 package VerificationForm;
 
 import java.io.IOException;
+
 import GUIpack.guiWindow;
 import YesNoDialogPack.YesNoWindow;
 
@@ -19,6 +20,7 @@ public class VerificationWindow extends guiWindow{
 					event.consume();
 				}
 				else {
+					ctrl.zeroingLastVerificationsId();
 					delete();
 				}
 			}
@@ -28,6 +30,7 @@ public class VerificationWindow extends guiWindow{
 					event.consume();
 				}
 				else {
+					ctrl.zeroingLastVerificationsId();
 					delete();
 				}
 			}

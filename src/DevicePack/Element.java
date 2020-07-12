@@ -25,36 +25,31 @@ public class Element implements Includable<Device>, dbStorable{
 
 	private int id;
 	private Device myDevice; 		
-	private MeasResult nominal;		
+	private MeasResult nominal;	
+	private MeasResult lastVerificationResult;
 	private ToleranceParametrs primaryModuleToleranceParams;
 	private ToleranceParametrs periodicModuleToleranceParams;
 	private ToleranceParametrs primaryPhaseToleranceParams;
 	private ToleranceParametrs periodicPhaseToleranceParams;
 	private String type;
 	private String serNumber;
+	private String measUnit;
+	private String moduleToleranceType;
+	private String phaseToleranceType;
+		
 	private int poleCount;
 	private int sParamsCount;
-	private String measUnit;
 	private int nominalId;
+	private int lastVerificationId;
 	
+	/*
 	private String periodicModuleParamTable;
 	private String primaryModuleParamTable;
 	private String periodicPhaseParamTable;
 	private String primaryPhaseParamTable;	
-	private String nominalTable;
-	
+	private String nominalTable;	
 	private String listOfVerificationsTable;
-	private String moduleToleranceType;
-	private String phaseToleranceType;
-	public int getId() {
-		return this.id;
-	}
-	public String getModuleToleranceType() {
-		return moduleToleranceType;
-	}
-	public String getPhaseToleranceType() {
-		return phaseToleranceType;
-	}	
+
 	public String getPeriodicModuleParamTable() {
 		return periodicModuleParamTable;
 	}
@@ -69,10 +64,21 @@ public class Element implements Includable<Device>, dbStorable{
 	}	
 	public String getNominalTable() {
 		return nominalTable;
-	}
+	}	
 	public String getListOfVerificationsTable() {
 		return listOfVerificationsTable;
 	}
+	*/
+	public int getId() {
+		return this.id;
+	}
+	public String getModuleToleranceType() {
+		return moduleToleranceType;
+	}
+	public String getPhaseToleranceType() {
+		return phaseToleranceType;
+	}	
+
 	public String getType() {
 		return type;
 	}
@@ -125,11 +131,7 @@ public class Element implements Includable<Device>, dbStorable{
 	@Override
 	public void onAdding(Device Owner) {
 		myDevice = Owner;		
-		primaryModuleToleranceParams.setTableName();
-		primaryPhaseToleranceParams.setTableName();
-		periodicModuleToleranceParams.setTableName();
-		periodicPhaseToleranceParams.setTableName();
-		listOfVerificationsTable = "Проведенные поверки для " + myDevice.getName() + " " + myDevice.getType() + " " + myDevice.getSerialNumber() + " " + type + " " + serNumber;
+		//listOfVerificationsTable = "Проведенные поверки для " + myDevice.getName() + " " + myDevice.getType() + " " + myDevice.getSerialNumber() + " " + type + " " + serNumber;
 	}
 
 //DataBase
@@ -137,7 +139,7 @@ public class Element implements Includable<Device>, dbStorable{
 		System.out.println("\nБерем информацию на элемент с id = " + index);
 		this.id = index;
 		this.myDevice = deviceOwner;
-		String sqlQuery = "SELECT type, serNumber, poleCount, measUnit, moduleToleranceType, phaseToleranceType, nominalId FROM [Elements] WHERE id='"+index+"'";
+		String sqlQuery = "SELECT type, serNumber, poleCount, measUnit, moduleToleranceType, phaseToleranceType, nominalId, lastVerificationId FROM [Elements] WHERE id='"+index+"'";
 		ArrayList<String> fieldName = new ArrayList<String>();
 		fieldName.add("type");				
 		fieldName.add("serNumber");			
@@ -146,6 +148,7 @@ public class Element implements Includable<Device>, dbStorable{
 		fieldName.add("moduleToleranceType");		
 		fieldName.add("phaseToleranceType");		
 		fieldName.add("nominalId");
+		fieldName.add("lastVerificationId");
 		List<List<String>> arrayResults = new ArrayList<List<String>>();
 		System.out.println(sqlQuery);
 		DataBaseManager.getDB().sqlQueryString(sqlQuery, fieldName, arrayResults);
@@ -163,14 +166,20 @@ public class Element implements Includable<Device>, dbStorable{
 		this.moduleToleranceType = arrayResults.get(0).get(4);
 		this.phaseToleranceType = arrayResults.get(0).get(5);		
 		this.nominalId = Integer.parseInt(arrayResults.get(0).get(6));			
+		this.lastVerificationId = Integer.parseInt(arrayResults.get(0).get(7));
 		
-		//Let's take nominals from data base
-		System.out.println("Полуим номинальные значения его характеристик для данного элемента\n(они хранятся как результаты измерений)");
+		//Получим номинальные значения его характеристик для данного элемента и значения предыдущей поверки
+		System.out.println("Получим номинальные значения его характеристик для данного элемента (они хранятся как результаты измерений с id = "+this.nominalId+")"
+				+ "\nи значения предыдущей поверки (id="+this.lastVerificationId+")");
 		if (measUnit.equals("vswr")) {
 			this.nominal = new VSWR_Result(this, nominalId);
+			if(this.lastVerificationId != 0)
+				lastVerificationResult = new VSWR_Result(this, lastVerificationId); 
 		}
 		else {
 			this.nominal = new Gamma_Result(this, nominalId);
+			if(this.lastVerificationId != 0)
+				lastVerificationResult = new Gamma_Result(this, lastVerificationId);
 		}	
 			
 		//And now it's time for tolerance parametrs
@@ -276,7 +285,8 @@ public class Element implements Includable<Device>, dbStorable{
 		this.nominal.saveInDB();
 		System.out.println("\nУстанавливаем статус номинала");
 		this.nominal.setNominalStatus();
-		
+		this.setLastVerificationId(0);
+				
 		//Tolerance parametrs saving
 		System.out.println("\nНачинаем сохранение критериев пригодности");
 		this.primaryModuleToleranceParams.saveInDB();		
@@ -351,7 +361,19 @@ public class Element implements Includable<Device>, dbStorable{
 	
 	public void changePoleCount(int newPoleCount) throws SQLException {
 		String sqlQuery = "UPDATE Elements SET poleCount = '" + newPoleCount + "' WHERE id=" + this.id;
-		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);	
+		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery);
+		this.poleCount = newPoleCount;
+	}
+	public int getLastVerificationId() {
+		return lastVerificationId;
+	}
+	public void setLastVerificationId(int lastVerificationId) throws SQLException {
+		String sqlQuery = "UPDATE [Elements] SET lastVerificationId='" + Integer.toString(lastVerificationId) + "' WHERE id=" + this.id;
+		DataBaseManager.getDB().sqlQueryUpdate(sqlQuery); 
+		this.lastVerificationId = lastVerificationId;
+	}
+	public MeasResult getLastVerificationResult() {
+		return lastVerificationResult;
 	}
 	
 }

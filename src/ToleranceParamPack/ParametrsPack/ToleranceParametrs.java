@@ -20,31 +20,14 @@ public class ToleranceParametrs implements Includable<Element>, dbStorable {
 	public int getId() {
 		return this.id;
 	}
-	public Map<String, Map<Double, Double>> values;
-	public List<Double> freqs;
-	private String tableName;
-	public String getTableName(){
-		return this.tableName;
-	}
-	 
-	public void setTableName(){
-		 String addrStr = myElement.getMyOwner().getName() + " " +
-						myElement.getMyOwner().getType() + " " +
-						myElement.getMyOwner().getSerialNumber() + " " +
-						myElement.getType() + " " + myElement.getSerialNumber();
-		tableName = "Параметры допуска " + timeType.getTableNamePart() + " поверки " + measUnitPart.getTableNamePart() + " S параметров для " + addrStr;
-	}
+	public Map<String, Map<Double, Double>> values = new LinkedHashMap<String, Map<Double, Double>>();
+	public List<Double> freqs = new ArrayList<Double>();
 	 
 	public TimeType timeType;
 	public MeasUnitPart measUnitPart;
-//Constructors
-	ToleranceParametrs(){
-		this.values = new LinkedHashMap<String, Map<Double, Double>>();
-		this.freqs = new ArrayList<Double>();
-	}	 
+//Constructors 
 //GUI
 	public ToleranceParametrs(TimeType currentTimeType, MeasUnitPart currentUnitPart, NewElementController elCtrl, Element ownerElement){		
-		this();
 		this.myElement = ownerElement;
 		this.timeType = currentTimeType;
 		this.measUnitPart = currentUnitPart;		
@@ -52,8 +35,7 @@ public class ToleranceParametrs implements Includable<Element>, dbStorable {
 		this.values = elCtrl.getToleranceParamsValues(timeType, measUnitPart);
 	}
 //DataBase
-	public ToleranceParametrs(TimeType currentTimeType, MeasUnitPart currentUnitPart, Element ownerElement) throws SQLException {
-		this();	
+	public ToleranceParametrs(TimeType currentTimeType, MeasUnitPart currentUnitPart, Element ownerElement) throws SQLException {	
 		this.myElement = ownerElement;
 		this.timeType = currentTimeType;
 		this.measUnitPart = currentUnitPart;
@@ -122,8 +104,7 @@ public class ToleranceParametrs implements Includable<Element>, dbStorable {
 			} 
 			catch (SQLException sqlExp) {
 				throw new SavingException("Не удалось сохранить значения параметров на частоте\n ." +
-					freqs.get(i).toString() + " для " +
-					measUnitPart.getTableNamePart() + " S параметра при " +
+					freqs.get(i).toString() + "для S параметра при " +
 					timeType.getTableNamePart() + " поверке" );
 			}
 		}		
@@ -146,13 +127,12 @@ public class ToleranceParametrs implements Includable<Element>, dbStorable {
 	@Override
 	public void onAdding(Element Owner) {
 		this.myElement = Owner;
-		setTableName();
 	}
 	private StrategyOfSuitability strategy;
 	public void setStrategy(StrategyOfSuitability anyStrategy) {
 		this.strategy = anyStrategy;
 	}
-	public boolean checkResult(MeasResult result) {
-		 return this.strategy.checkResult(result, this);
+	public boolean checkResult(MeasResult nominals, MeasResult result) {
+		 return this.strategy.checkResult(nominals, result, this);
 	}
 }
