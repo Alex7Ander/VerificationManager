@@ -1,26 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.text.*?>
-<?import javafx.scene.control.*?>
-<?import java.lang.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="151.0" prefWidth="358.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="AboutMessageForm.MessageController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="398.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="AboutMessageForm.MessageController">
    <children>
       <BorderPane prefHeight="130.0" prefWidth="358.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
          <bottom>
             <VBox prefHeight="31.0" prefWidth="338.0" BorderPane.alignment="CENTER">
                <children>
                   <Separator prefWidth="200.0" />
-                  <Button fx:id="closeBtn" mnemonicParsing="false" onAction="#closeBtnClick" prefHeight="26.0" prefWidth="339.0" stylesheets="@../application/commonButton.css" text="Продолжить" />
+                  <Button fx:id="closeBtn" mnemonicParsing="false" onAction="#closeBtnClick" prefHeight="26.0" prefWidth="379.0" stylesheets="@../application/commonButton.css" text="Продолжить" />
                </children>
             </VBox>
          </bottom>
          <center>
-            <Label fx:id="infoLabel" text="Версия ПО: " BorderPane.alignment="CENTER">
+            <Label fx:id="infoLabel" prefHeight="148.0" prefWidth="371.0" text="Версия ПО: &#10;" textAlignment="JUSTIFY" BorderPane.alignment="CENTER">
                <font>
-                  <Font name="Arial Narrow Bold Italic" size="16.0" />
+                  <Font name="Calibri Bold" size="14.0" />
                </font>
             </Label>
          </center>

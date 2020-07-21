@@ -1,8 +1,10 @@
 package StartVerificationPack;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Properties;
 
 import AboutMessageForm.AboutMessageWindow;
 import DBEditForm.DBEditController;
@@ -61,6 +63,23 @@ public class StartVerificationController {
 	
 	private String envStatusString;
 	
+	private static String manualParagraph;
+	
+	static {
+		FileInputStream fis;
+        Properties property = new Properties();
+        String propPath = new File(".").getAbsolutePath() + "/files/aksol.properties";
+        try {       	
+            fis = new FileInputStream(propPath);
+            property.load(fis);
+            manualParagraph = property.getProperty("manual.paragraph.lastVerificatonIndex");           
+            fis.close();
+        } catch (IOException ioExp) {
+        	manualParagraph = "";
+        }		
+	}
+	
+	
 	@FXML
 	private Button startBtn;
 	
@@ -72,7 +91,7 @@ public class StartVerificationController {
 		verGroup = new ToggleGroup();
 		primaryVerRB.setToggleGroup(verGroup);
 		periodicVerRB.setToggleGroup(verGroup);
-		primaryVerRB.setSelected(true);
+		//primaryVerRB.setSelected(true);
 		
 		viewGroup = new ToggleGroup();
 		goodViewRB.setToggleGroup(viewGroup);
@@ -124,8 +143,8 @@ public class StartVerificationController {
 			//Признание прибора не годным по внешнему остмотру
 			int answer = YesNoWindow.createYesNoWindow("Отрицательный результат внешнего осмотра?", "Вы признали прибор негодным\n по результатам внешнеого осмотра?").showAndWait();
 			if (answer == 0) {
-				String[] docTypes = {"Извещение о непригодности"};
-				VerificationWindow.getVerificationWindow().getController().createProtocol(docTypes);
+				this.myWindow.close();
+				VerificationWindow.getVerificationWindow().getController().FinishVerificationBeforeMeasurment();				
 				return;
 			}
 			else {
@@ -136,9 +155,8 @@ public class StartVerificationController {
 			//Признание прибора не годным по опробованию
 			int answer = YesNoWindow.createYesNoWindow("Отрицательный результат опробования?", "Вы признали прибор негодным\n по результатам опробования?").showAndWait();
 			if (answer == 0) {
-				this.badWorkRB.setSelected(true);
-				String[] docTypes = {"Извещение о непригодности"};
-				VerificationWindow.getVerificationWindow().getController().createProtocol(docTypes);
+				this.myWindow.close();
+				VerificationWindow.getVerificationWindow().getController().FinishVerificationBeforeMeasurment();
 				return;
 			}
 			else {
@@ -165,7 +183,7 @@ public class StartVerificationController {
 					DBEditWindow.getDBEditWindow().show();
 					VerificationWindow.getVerificationWindow().close();
 					VerificationWindow.getVerificationWindow().delete();
-					String msg = "Для прибора, выбранного для поверки\nне указаны результаты, которые должны\nиспользоваться для сравнения в качестве\nрезультатов предыдущей поверки:\nСм. пункт Руководства оператора №";
+					String msg = "Для прибора, выбранного для поверки\nне указаны результаты, которые должны\nиспользоваться для сравнения в качестве\nрезультатов предыдущей поверки:\nСм. пункт Руководства оператора № " + manualParagraph;
 					AboutMessageWindow.createWindow("Ошибка", msg).show();
 					this.myWindow.close();
 					return;

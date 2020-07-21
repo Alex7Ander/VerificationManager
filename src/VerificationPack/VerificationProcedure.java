@@ -125,8 +125,7 @@ public class VerificationProcedure implements dbStorable {
 		fieldName.add("secretKeyString");
 		List<List<String>> arrayResults = new ArrayList<List<String>>();
 		System.out.println(sqlQuery);
-		DataBaseManager.getDB().sqlQueryString(sqlQuery, fieldName, arrayResults);
-		
+		DataBaseManager.getDB().sqlQueryString(sqlQuery, fieldName, arrayResults);		
 		try {
 			this.deviceId = Integer.parseInt(arrayResults.get(0).get(0));
 		}
@@ -263,13 +262,6 @@ public class VerificationProcedure implements dbStorable {
 		}
 	}
 
-	public void setPrimaryInformation(StartVerificationController verCtrl) {
-		this.verificationTimeType = verCtrl.getVerificationiTimeType();
-		this.strTemperature = verCtrl.getStrTemperatur();
-		this.strAirHumidity = verCtrl.getStrAirHumidity();
-		this.strAtmPreasure = verCtrl.getStrAtmPreasure();
-	}
-	
 	public void setDeviceInformation(Device device) {
 		this.deviceId = device.getId();
 		this.deviceMainInfo = device.getName() + " " + device.getType();
@@ -282,28 +274,6 @@ public class VerificationProcedure implements dbStorable {
 		this.deviceOwner = device.getOwner();
 	}
 	
-	public void setFinallyInformation(ProtocolCreateController prtCreateCtrl) {
-		this.bossName   = prtCreateCtrl.getBossName();
-		this.bossStatus = prtCreateCtrl.getBossStatus();
-		this.standartGuardianName = prtCreateCtrl.getStandartGuardianName();
-		this.standartGuardianStatus = prtCreateCtrl.getStandartGuardianStatus();
-		this.workerName = prtCreateCtrl.getWorkerName();
-		this.decision   = prtCreateCtrl.getResultDecision();	
-		this.protocolNumber = prtCreateCtrl.getProtocolNumber();
-		this.documentNumber = prtCreateCtrl.getDocumentNumber();	
-		this.etalonString = prtCreateCtrl.getEtalonString();
-		this.docType = prtCreateCtrl.getDocType();
-		
-		this.date = prtCreateCtrl.getDate();		
-		this.dateForDocuments = this.date.substring(0, date.indexOf(" ")).replace('/', '.');
-		
-		this.finishDate = prtCreateCtrl.getFinishDate();
-		this.militaryBaseName = prtCreateCtrl.getMilitryBaseName();
-				
-		this.pathOfDoc = prtCreateCtrl.getPathOfDoc();
-		this.pathOfProtocol = prtCreateCtrl.getPathOfProtocol();
-	}
-
 	public String getPathOfProtocol() {
 		return pathOfProtocol;
 	}
@@ -508,6 +478,7 @@ public class VerificationProcedure implements dbStorable {
 
 	public void setDate(String date) {
 		this.date = date;
+		this.dateForDocuments = this.date.substring(0, date.indexOf(" ")).replace('/', '.');
 	}
 
 	public void setDateForDocuments(String dateForDocuments) {
@@ -561,6 +532,23 @@ public class VerificationProcedure implements dbStorable {
 		}
 		return procedures;	
 	}
+	
+	public static List<VerificationProcedure> getVerificationsProceduresWithMeasResults(Device device) throws SQLException{
+		List<VerificationProcedure> procedures = new ArrayList<>();
+		List<Integer> arrayResults = new ArrayList<>();
+		String sqlQuery = "SELECT id FROM [Verifications] WHERE deviceId=" + device.getId();
+		DataBaseManager.getDB().sqlQueryInteger(sqlQuery, "id", arrayResults);
+		
+		for (Integer id : arrayResults) {
+			sqlQuery = "SELECT COUNT (*) FROM [Results] WHERE verificationId=" + id;
+			int countOfResults = DataBaseManager.getDB().sqlQueryCount(sqlQuery);
+			if(countOfResults <= 0) {
+				continue;
+			}
+			procedures.add(new VerificationProcedure(id));
+		}
+		return procedures;	
+	}
 
 	public String getStandartGuardianName() {
 		return standartGuardianName;
@@ -576,6 +564,42 @@ public class VerificationProcedure implements dbStorable {
 
 	public void setStandartGuardianStatus(String standartGuardianStatus) {
 		this.standartGuardianStatus = standartGuardianStatus;
+	}
+
+	public TimeType getVerificationTimeType() {
+		return verificationTimeType;
+	}
+
+	public void setVerificationTimeType(TimeType verificationTimeType) {
+		this.verificationTimeType = verificationTimeType;
+	}
+
+	public String getStrTemperature() {
+		return strTemperature;
+	}
+
+	public String getStrAtmPreasure() {
+		return strAtmPreasure;
+	}
+
+	public String getStrAirHumidity() {
+		return strAirHumidity;
+	}
+
+	public String getDeviceMainInfo() {
+		return deviceMainInfo;
+	}
+
+	public ArrayList<String> getElementsMainInfo() {
+		return elementsMainInfo;
+	}
+
+	public String getMilitaryBaseName() {
+		return militaryBaseName;
+	}
+
+	public void setShouldBeSavedInDB(boolean shouldBeSavedInDB) {
+		this.shouldBeSavedInDB = shouldBeSavedInDB;
 	}
 		
 }

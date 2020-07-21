@@ -65,6 +65,26 @@ public class VerificationController implements InfoRequestable {
 	private boolean resultSaved;
 	private Stage myStage;
 	
+
+	public void setStage(Stage stage) {
+		myStage = stage;
+	}
+//Таблица с результатами	
+	@FXML
+	private ScrollPane scrollPane;
+	@FXML
+	private AnchorPane tablePane;
+	private Table resultTable;
+
+//Процедура поверки
+	private VerificationProcedure verification = new VerificationProcedure();
+//Результат поверки
+	private List<MeasResult> verificationResult;	
+//Ссылка на поверяемое СИ
+	public Device verificatedDevice;		
+	private int currentElementIndex;
+	private int currentParamIndex;
+	
 	private static int vswrAccuracy;
 	private static int vswrErrorAccuracy;
 	private static int phaseAccuracy;
@@ -104,25 +124,6 @@ public class VerificationController implements InfoRequestable {
         }
 		
 	}
-	
-	public void setStage(Stage stage) {
-		myStage = stage;
-	}
-//Таблица с результатами	
-	@FXML
-	private ScrollPane scrollPane;
-	@FXML
-	private AnchorPane tablePane;
-	private Table resultTable;
-
-//Процедура поверки
-	VerificationProcedure verification;
-//Результат поверки
-	private List<MeasResult> verificationResult;	
-//Ссылка на поверяемое СИ
-	public Device verificatedDevice;		
-	private int currentElementIndex;
-	private int currentParamIndex;
 	
 	@FXML
 	private void initialize(){			
@@ -285,14 +286,40 @@ public class VerificationController implements InfoRequestable {
 		
 		String absPath = new File(".").getAbsolutePath();
 		//Получение информации об окружающей среде
-		this.verification = new VerificationProcedure();
-		this.verification.setPrimaryInformation((StartVerificationController)StartVerificationWindow.getStartVerificationWindow().getControllerClass());
+		//this.verification = new VerificationProcedure();
+		
+		StartVerificationController strtVerCtrl = (StartVerificationController)StartVerificationWindow.getStartVerificationWindow().getControllerClass();
+		this.verification.setVerificationTimeType(strtVerCtrl.getVerificationiTimeType());
+		this.verification.setStrTemperature(strtVerCtrl.getStrTemperatur());
+		this.verification.setStrAirHumidity(strtVerCtrl.getStrAirHumidity());
+		this.verification.setStrAtmPreasure(strtVerCtrl.getStrAtmPreasure());
+		
 		//Создание файла psi.ini
 		String psiFilePath = absPath + "\\measurement\\PSI.ini";
 		this.verificatedDevice.createIniFile(psiFilePath);
 		//Запуск программы measurement
 		File file = new File(absPath + "\\measurement\\Project1.exe");
 		Desktop.getDesktop().open(file);				
+	}
+	
+	public void FinishVerificationBeforeMeasurment() throws IOException {
+		StartVerificationController strtVerCtrl = (StartVerificationController)StartVerificationWindow.getStartVerificationWindow().getControllerClass();
+		this.verification.setVerificationTimeType(strtVerCtrl.getVerificationiTimeType());
+		this.verification.setStrTemperature(strtVerCtrl.getStrTemperatur());
+		this.verification.setStrAirHumidity(strtVerCtrl.getStrAirHumidity());
+		this.verification.setStrAtmPreasure(strtVerCtrl.getStrAtmPreasure());
+		
+		this.verification.setDeviceInformation(this.verificatedDevice);
+		
+		this.verification.setShouldBeSavedInDBStatus(true);
+		String docTypes[] = {"Извещение о непригодности"};
+		ProtocolCreateWindow.getProtocolCreateWindow(this.verificatedDevice,
+													docTypes, 
+													null, 
+													null, 
+													null, 
+													null,
+													this.verification).show();	
 	}
 		
 	private void fillTable() {
@@ -420,14 +447,24 @@ public class VerificationController implements InfoRequestable {
 		String newModuleToleranceHeader = null;
 		String newModuleErrorHeader = null;		
 		String differenceModuleHeader = null;
-		if (this.verificatedDevice.includedElements.get(currentElementIndex).getModuleToleranceType().equals("percent")) {
-			newModuleToleranceHeader = "Допуск, %";	
-			differenceModuleHeader = "\u03B4, %";			
+		
+		//Если отображаем S12 или S21
+		if(this.currentParamIndex == 1 || this.currentParamIndex == 2) {
+			newModuleToleranceHeader = "Допуск, дБ";
+			differenceModuleHeader = "\u0394, дБ";
 		}
-		else {
-			newModuleToleranceHeader = "Допуск";
-			differenceModuleHeader = "\u0394";
-		}		
+		else{
+			//Для S11 и S22 имеет значение, в чем задавался допуск 
+			if (this.verificatedDevice.includedElements.get(currentElementIndex).getModuleToleranceType().equals("percent")) {
+				newModuleToleranceHeader = "Допуск, %";	
+				differenceModuleHeader = "\u03B4, %";			
+			}
+			else {
+				newModuleToleranceHeader = "Допуск";
+				differenceModuleHeader = "\u0394";
+			}	
+		}
+	
 		if(newModuleResHeader.contains("КСВН")) 
 			newModuleErrorHeader = "Погрешность, %";
 		else 

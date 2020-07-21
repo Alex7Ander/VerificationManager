@@ -134,8 +134,10 @@ public class OldDocSearchController implements InfoRequestable {
 			byte[] decodedKey = Base64.getDecoder().decode(resultOfSearch.get(index).get(3));
 			SecretKey originalKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES");
 			
+			/*
 			File docFile = new File(pathOfDoc);
 			File protocolFile = new File(pathOfProtocol);
+			*/
 			
 			FileEncrypterDecrypter fileEncrypterDecrypter = null;
 			try {			
@@ -143,15 +145,20 @@ public class OldDocSearchController implements InfoRequestable {
 			} catch (NoSuchAlgorithmException | NoSuchPaddingException mExp) {
 				mExp.printStackTrace();
 			}	
-			byte[] decBuffer = null;
+			byte[] protBuffer = null;
+			byte[] docBuffer = null;
 			
 			int ind = pathOfProtocol.lastIndexOf('\\');
-			String nameOfNewFile = pathOfProtocol.substring(ind, pathOfProtocol.lastIndexOf('.'));
-	        String pathToNewFile = new File(".").getAbsolutePath() + nameOfNewFile + ".xls";
+			String nameOfNewProtocolFile = pathOfProtocol.substring(ind, pathOfProtocol.lastIndexOf('.'));
+	        String pathToNewProtocolFile = new File(".").getAbsolutePath() + nameOfNewProtocolFile + ".xls";
+	        String nameOfNewDocFile = pathOfDoc.substring(ind, pathOfProtocol.lastIndexOf('.'));
+	        String pathToNewDocFile = new File(".").getAbsolutePath() + nameOfNewDocFile + ".docx";
 	        
-	        FileOutputStream decfout = new FileOutputStream(pathToNewFile);
+	        FileOutputStream protfout = new FileOutputStream(pathToNewProtocolFile);
+	        FileOutputStream docfout = new FileOutputStream(pathToNewDocFile);
 			try {
-				decBuffer = fileEncrypterDecrypter.decrypt(pathOfProtocol);
+				protBuffer = fileEncrypterDecrypter.decrypt(pathOfProtocol);
+				docBuffer = fileEncrypterDecrypter.decrypt(pathOfDoc);
 			} catch (InvalidKeyException e) {
 				e.printStackTrace();
 			} catch (IllegalBlockSizeException e) {
@@ -161,12 +168,13 @@ public class OldDocSearchController implements InfoRequestable {
 			} catch (InvalidAlgorithmParameterException e) {
 				e.printStackTrace();
 			}		
-	        decfout.write(decBuffer);
-	        decfout.close();
-	        File newProtocolFile = new File(pathToNewFile);
+			protfout.write(protBuffer);
+			docfout.write(docBuffer);
+			protfout.close();
+			docfout.close();
 	        
-			Desktop.getDesktop().open(docFile);
-			Desktop.getDesktop().open(newProtocolFile);
+			Desktop.getDesktop().open(new File(pathToNewProtocolFile));
+			Desktop.getDesktop().open(new File(pathToNewDocFile));			
 		}
 		catch(IOException ioExp) {
 			AboutMessageWindow.createWindow("Ошибка", "Файл отсутствует").show();

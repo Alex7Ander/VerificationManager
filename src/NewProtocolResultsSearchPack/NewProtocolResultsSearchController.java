@@ -145,7 +145,7 @@ public class NewProtocolResultsSearchController {
 		deviceLabel.setText(labelText);
 		
 		try {
-			protocoledDeviceProcedures = VerificationProcedure.getAllVerificationsProcedures(protocoledDevice);
+			protocoledDeviceProcedures = VerificationProcedure.getVerificationsProceduresWithMeasResults(protocoledDevice);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

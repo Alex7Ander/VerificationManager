@@ -183,7 +183,6 @@ public class NewDeviceController  {
 		try{
 			DataBaseManager.getDB().BeginTransaction();
 			newDevice.saveInDB();
-			//Сохраняем элементы
 			//------------------
 			DataBaseManager.getDB().Commit();
 			AboutMessageWindow.createWindow("Успешно", "Успешное сохранение").show();

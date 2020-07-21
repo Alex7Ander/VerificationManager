@@ -1,20 +1,13 @@
 package ProtocolCreatePack;
 
-import java.awt.Desktop;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
-
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
 
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
@@ -33,6 +26,11 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.WorkbookUtil;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.apache.poi.xwpf.usermodel.XWPFParagraph;
+import org.apache.poi.xwpf.usermodel.XWPFTable;
+import org.apache.poi.xwpf.usermodel.XWPFTableCell;
+import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 
 import SecurityPack.FileEncrypterDecrypter;
 import ToleranceParamPack.ParametrsPack.ToleranceParametrs;
@@ -52,7 +50,7 @@ public class DocumetnsCreateService extends Service<Integer> {
 	private String protocolName;
 	private String documentName;
 	private String protoPathTo;
-	
+	private String docPathTo;
 	//Книга
 	private Workbook wb;
 	//Лист
@@ -76,27 +74,10 @@ public class DocumetnsCreateService extends Service<Integer> {
 	@SuppressWarnings("unused")
 	private final String phaseFormatPattern = "0.00";
 	
-	//Шифрование
-	private SecretKey secretKey;
-	
-	public DocumetnsCreateService(String protocolFileName, 
-								String documetFileName, 
-								List<MeasResult> result, 
-								List<MeasResult> nominals, 
-								List<ToleranceParametrs> protocoledModuleToleranceParams,
-								List<ToleranceParametrs> protocoledPhaseToleranceParams,
-								VerificationProcedure verificationProc){
-		this.verification = verificationProc;
-		this.protocoledResult = result;
-		this.nominals = nominals;
-		this.protocoledModuleToleranceParams = protocoledModuleToleranceParams;
-		this.protocoledPhaseToleranceParams = protocoledPhaseToleranceParams;
-		
-		this.protocolName = protocolFileName;
-		this.documentName = documetFileName;
+	public DocumetnsCreateService(){
 		this.wb = new HSSFWorkbook();
-		String strDate = protocoledResult.get(0).getDateOfMeasByString();
-		this.sh = wb.createSheet(WorkbookUtil.createSafeSheetName(strDate));
+		//String strDate = protocoledResult.get(0).getDateOfMeasByString();
+		this.sh = wb.createSheet(WorkbookUtil.createSafeSheetName("Протокол"));
 		this.sh.setAutobreaks(true);
 		this.sh.setMargin(Sheet.LeftMargin, 1);
 		this.sh.setMargin(Sheet.RightMargin, 1);
@@ -183,74 +164,160 @@ public class DocumetnsCreateService extends Service<Integer> {
 		this.boldCellStyle.setFont(boldFont);
 	}
 	
+	public void setDocumentName(String documentName) {
+		this.documentName = documentName;
+	}
+	public void setProtocolName (String protocolFileName) {
+		this.protocolName = protocolFileName;
+	}
+	public void setVerificationProcedure(VerificationProcedure verificationProc) {
+		this.verification = verificationProc;
+	}
+	public void setProtocoledResult(List<MeasResult> protocoledResult) {
+		this.protocoledResult = protocoledResult;
+	}
+	public void setNominals(List<MeasResult> nominals) {
+		this.nominals = nominals;
+	}
+	public void setProtocoledModuleToleranceParams(List<ToleranceParametrs> protocoledModuleToleranceParams) {
+		this.protocoledModuleToleranceParams = protocoledModuleToleranceParams;
+	}
+	public void setProtocoledPhaseToleranceParams(List<ToleranceParametrs> protocoledPhaseToleranceParams) {
+		this.protocoledPhaseToleranceParams = protocoledPhaseToleranceParams;
+	} 
+	
 	@Override
 	protected Task<Integer> createTask() {
 		return new Task<Integer>() {
 			@Override
-			protected Integer call() throws Exception {
-				protoPathTo = new File(".").getAbsolutePath() + "\\Protocols\\" + protocolName;
-				try {					
-					if (protocoledResult != null) {
-						createProtocol();
-					}	
+			protected Integer call() throws Exception {			
+				try {
+					docPathTo = new File(".").getAbsolutePath() + "\\Documents\\" + documentName;
+					System.out.println("docPathTo: " + docPathTo);
 					createDocument();
+					
+					protoPathTo = new File(".").getAbsolutePath() + "\\Protocols\\" + protocolName;
+					System.out.println("protoPathTo: " + protoPathTo);
+					if (protocoledResult != null) {						
+						createProtocol();
+					}
 					return 0;
 				}
 				catch(IOException ioExp) {
-					ioExp.getStackTrace();
+					ioExp.printStackTrace();
 					return 1;
 				}
 			}			
 		};
 	}
+		
+	private void createDocument() throws IOException {
+		XWPFDocument doc = null;			
+		if (verification.getDocType().equals("Cвидетельство о поверке")) {
+			doc = new XWPFDocument(new FileInputStream(new File(".").getAbsolutePath() + "\\files\\protocolsTemplates\\SVD.docx"));
+			fillCertificate(doc);
+		} else {
+			doc = new XWPFDocument(new FileInputStream(new File(".").getAbsolutePath() + "\\files\\protocolsTemplates\\PKM.docx"));
+			fillNotification(doc);
+		}						
+		FileOutputStream out = new FileOutputStream(new File(docPathTo));
+		doc.write(out);
+		out.close();
+		
+		String encDocFileName = documentName.substring(0, documentName.lastIndexOf('.')) + ".enc"; 
+		String encDocFilePathTo = new File(".").getAbsolutePath() + "\\files\\resurect\\" + encDocFileName;
+
+		FileInputStream fis= new FileInputStream(docPathTo);
+		byte[] buffer = new byte[fis.available()];
+		fis.read(buffer);
+						
+		FileEncrypterDecrypter fileEncrypterDecrypter = null;
+		try {			
+			fileEncrypterDecrypter = new FileEncrypterDecrypter(this.verification.getSecretKey());		//transformation: "AES/ECB/PKCS5Padding"
+			fileEncrypterDecrypter.encrypt(buffer, encDocFilePathTo);
+		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException mExp) {
+			mExp.printStackTrace();
+		}						        
+		fis.close();
+		
+		verification.setPathOfDoc("\\files\\resurect\\" + encDocFileName);
+	}
+	
+	private void fillCertificate(XWPFDocument doc) {
+		String verTypeStr = null;
+		if(verification.isPrimary()) {
+			verTypeStr = "первичной";
+		}
+		else {
+			verTypeStr = "периодической";
+		}
+		replaceText(doc, 0, 3, 1, verification.getMilitaryBasename());
+		replaceText(doc, 0, 3, 6, verification.getMilitaryBasename());
+		
+		replaceText(doc, 0, 11, 4, "Действительно до " + verification.getFinishDate());
+		
+		replaceText(doc, 0, 13, 0, verification.getEtalonString());
+		replaceText(doc, 0, 13, 1, verification.getDeviceInfo());				
+		replaceText(doc, 0, 13, 5, verification.getEtalonString());
+		replaceText(doc, 0, 13, 6, verification.getDeviceInfo());
+		
+		replaceText(doc, 0, 15, 1, verification.getDeviceSerNumber());
+		replaceText(doc, 0, 15, 6, verification.getDeviceSerNumber());
+		
+		replaceText(doc, 0, 17, 1, verification.getDeviceOwner());
+		replaceText(doc, 0, 17, 6, verification.getDeviceOwner());
+		
+		replaceText(doc, 0, 20, 1, verTypeStr);
+		replaceText(doc, 0, 20, 5, verTypeStr);
+		
+		replaceText(doc, 0, 24, 8, verification.getMilitaryBasename());
+		
+		replaceText(doc, 0, 27, 1, verification.getWorkerName());
+		replaceText(doc, 0, 28, 6, verification.getBossStatus() + " " + verification.getBossName());		
+		replaceText(doc, 0, 30, 0, verification.getDateForDocuments());
+		
+		replaceText(doc, 1, 1, 1, verification.getDeviceInfo());
+		replaceText(doc, 1, 3, 1, verification.getDecision());
+		replaceText(doc, 1, 22, 1, verification.getWorkerName());
+		replaceText(doc, 1, 24, 0, verification.getDateForDocuments());
+	}
+	
+	private void fillNotification(XWPFDocument doc) {
+		replaceText(doc, 0, 3, 1, verification.getMilitaryBasename());
+		replaceText(doc, 0, 3, 6, verification.getMilitaryBasename());
+		
+		replaceText(doc, 0, 11, 0, verification.getEtalonString());
+		replaceText(doc, 0, 11, 1, verification.getDeviceInfo());
+		replaceText(doc, 0, 11, 5, verification.getEtalonString());
+		replaceText(doc, 0, 11, 6, verification.getDeviceInfo());
+		
+		replaceText(doc, 0, 13, 1, verification.getDeviceSerNumber());
+		replaceText(doc, 0, 13, 6, verification.getDeviceSerNumber());
+		
+		replaceText(doc, 0, 15, 1, verification.getDeviceOwner());
+		replaceText(doc, 0, 15, 6, verification.getDeviceOwner());
+		
+		replaceText(doc, 0, 18, 1, verification.getDecision());
+		replaceText(doc, 0, 18, 6, verification.getDecision());
+		
+		replaceText(doc, 0, 23, 6, verification.getMilitaryBasename());
+		replaceText(doc, 0, 25, 6, verification.getBossStatus() + " " + verification.getBossName());		
+
+		replaceText(doc, 0, 23, 1, verification.getWorkerName());
+		replaceText(doc, 0, 27, 6, verification.getWorkerName());
+		
+		replaceText(doc, 0, 29, 0, verification.getDateForDocuments());
+		replaceText(doc, 0, 29, 4, verification.getDateForDocuments());
+	}
 	
 	private void createProtocol() throws IOException {
-		//prepareSheet();
 		fillSheet();
 		topCellsMerging();
 		colScaling();
 		writeSheet(this.verification.getSecretKey());
 	}
 	
-	private void createDocument() throws IOException {
-		FileWriter writer = new FileWriter("proto.txt");
-				
-		try {			
-			writer.write(documentName + "\n");								//1
-			writer.write(this.verification.getDocType() + "\n");			//2
-			if (this.verification.isPrimary()) {
-				writer.write("первичной \n");								//3
-			} else {
-				writer.write("периодической \n");							//3
-			}
-			writer.write(verification.getMilitaryBasename() + "\n");		//4
-			writer.write(verification.getDocumentNumber() + "\n");			//5
-			writer.write(verification.getDeviceInfo() + "\n");				//6
-			writer.write(verification.getEtalonString() + "\n");			//7
-			writer.write(verification.getDeviceSerNumber() + "\n");			//8
-			writer.write(verification.getDeviceOwner() + "\n");				//9
-			writer.write(verification.getWorkerName() + "\n");				//10
-			writer.write(verification.getBossStatus() + " " + verification.getBossName() + "\n");		//11
-			writer.write(verification.getDecision() + "\n");				//12
-			writer.write(verification.getDateForDocuments() + "\n");			//13
-			writer.write(verification.getFinishDate() + "\n");				//14
-		} catch (IOException ioExp) {
-			ioExp.getStackTrace();
-		} finally {
-			writer.close();
-		}	
-		String absPath = new File(".").getAbsolutePath();		
-		String scriptPath = null;
-		String doc = verification.getDocType();
-		if (doc.equals("Cвидетельство о поверке")) {
-			scriptPath = absPath + "\\cert.exe";
-		} else {
-			scriptPath = absPath + "\\notif.exe";
-		}
-		File file = new File(scriptPath);
-		Desktop.getDesktop().open(file);
-	}
-	
+	@SuppressWarnings("unused")
 	private void prepareSheet() {	
 		//Создадим строки
 		int countOfRows = 14;
@@ -575,16 +642,13 @@ public class DocumetnsCreateService extends Service<Integer> {
 	private void writeSheet(SecretKey secretKey) throws IOException {		
 		//Запись в файл
 		FileOutputStream fout = new FileOutputStream(protoPathTo);
-		wb.write(fout);
-					
+		wb.write(fout);						
 		String encProtoFileName = protocolName.substring(0, protocolName.lastIndexOf('.')) + ".enc"; 
 		String encProtoFilePathTo = new File(".").getAbsolutePath() + "\\files\\resurect\\" + encProtoFileName;
-
 		FileInputStream fis= new FileInputStream(protoPathTo);
 		byte[] buffer = new byte[fis.available()];
 		fis.read(buffer);
-		
-				
+						
 		FileEncrypterDecrypter fileEncrypterDecrypter = null;
 		try {			
 			fileEncrypterDecrypter = new FileEncrypterDecrypter(secretKey);		//transformation: "AES/ECB/PKCS5Padding"
@@ -597,6 +661,19 @@ public class DocumetnsCreateService extends Service<Integer> {
 		fout.close();
 		
 		verification.setPathOfProtocol("\\files\\resurect\\" + encProtoFileName);
+	}
+	
+	public void replaceText(XWPFDocument doc, int tableIndex, int rowIndex, int cellIndex, String newText) {
+		XWPFTable tbl = doc.getTables().get(tableIndex);
+		XWPFTableRow row = tbl.getRows().get(rowIndex);
+		XWPFTableCell cell = row.getTableCells().get(cellIndex);
+		XWPFParagraph p = cell.getParagraphs().get(0);
+		//XWPFRun r
+		for(int  i = 0; i < p.getRuns().size(); i++) {
+			p.removeRun(i);
+		}
+		p.createRun();
+		p.getRuns().get(0).setText(newText);
 	}
 
 }

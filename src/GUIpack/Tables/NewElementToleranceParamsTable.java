@@ -9,7 +9,6 @@ import DevicePack.Element;
 import ToleranceParamPack.ParametrsPack.MeasUnitPart;
 import ToleranceParamPack.ParametrsPack.S_Parametr;
 import ToleranceParamPack.ParametrsPack.TimeType;
-import javafx.event.EventHandler;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.TextFieldTableCell;
@@ -142,13 +141,17 @@ public class NewElementToleranceParamsTable extends VisualTable {
 	public Map<Double, Double> getParametr(String key) {
 		Map<Double, Double> parametr = new LinkedHashMap<Double, Double>();
 		for (int i=0; i < values.get("FREQS").size(); i++) {
+			double freq = 0;
+			double currentValue = 0;
 			try {
-				double freq = Double.parseDouble(values.get("FREQS").get(i));
-				double currentValue = Double.parseDouble(values.get(key).get(i));
-				parametr.put(freq, currentValue);
+				freq = Double.parseDouble(values.get("FREQS").get(i));
+				currentValue = Double.parseDouble(values.get(key).get(i));				
 			} catch (NumberFormatException nfExp) {
 				System.err.println("Ошибка при попытке преобразования строк в числа: " + values.get("FREQS").get(i) + " или " + values.get(key).get(i) + ": " + nfExp.getMessage());
-			}			
+			}	
+			finally {
+				parametr.put(freq, currentValue);
+			}
 		}
 		return parametr;
 	}

@@ -12,13 +12,13 @@ public class NewProtocolResultsSearchWindow extends guiWindow{
 	private NewProtocolResultsSearchWindow(Device device) throws IOException {
 		super("", "NewProtocolResultsSearchForm.fxml");
 		ctrl = (NewProtocolResultsSearchController) this.loader.getController();
+		ctrl.setDevice(device);
 	}
 
 	public static NewProtocolResultsSearchWindow getProtocolCreateWindow(Device device) throws IOException {
 		if (instanceNewProtocolResultsSearchWindow == null) {
 			instanceNewProtocolResultsSearchWindow = new NewProtocolResultsSearchWindow(device);
-		}
-		ctrl.setDevice(device);
+		}		
 		return instanceNewProtocolResultsSearchWindow;
 	}
 	

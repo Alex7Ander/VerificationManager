@@ -12,15 +12,15 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<ScrollPane fx:id="mainPane" prefHeight="900.0" prefWidth="1380.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="DBEditForm.DBEditController">
+<ScrollPane fx:id="mainPane" prefHeight="935.0" prefWidth="1380.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="DBEditForm.DBEditController">
    <content>
-      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="895.0" prefWidth="1354.0">
+      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="930.0" prefWidth="1354.0">
          <children>
-            <HBox prefHeight="895.0" prefWidth="1354.0">
+            <HBox prefHeight="930.0" prefWidth="1354.0">
                <children>
                   <VBox prefHeight="895.0" prefWidth="557.0">
                      <children>
-                        <Button fx:id="searchDeviceBtn" mnemonicParsing="false" onAction="#searchDeviceBtnClick" prefHeight="26.0" prefWidth="565.0" stylesheets="@../application/commonButton.css" text="Выбрать СИ" textAlignment="CENTER">
+                        <Button fx:id="searchDeviceBtn" mnemonicParsing="false" onAction="#searchDeviceBtnClick" prefHeight="26.0" prefWidth="565.0" stylesheets="@../application/commonButton.css" text="Поиск редактируемого СИ" textAlignment="CENTER">
                            <VBox.margin>
                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                            </VBox.margin>
@@ -91,17 +91,7 @@
                               </VBox>
                            </content>
                         </TitledPane>
-                        <Label stylesheets="@../application/commonLabel.css" text="Составные элементы данного СИ:">
-                           <VBox.margin>
-                              <Insets bottom="2.0" left="5.0" right="2.0" top="2.0" />
-                           </VBox.margin>
-                        </Label>
-                        <ListView fx:id="elementsListView" onEditStart="#elementsListViewClick" onMouseClicked="#elementsListViewClick" prefHeight="234.0" prefWidth="364.0">
-                           <VBox.margin>
-                              <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
-                           </VBox.margin>
-                        </ListView>
-                        <Label fx:id="dateLabel" stylesheets="@../application/commonLabel.css" text="Дата проведения поверки:">
+                        <Label fx:id="dateLabel" stylesheets="@../application/commonLabel.css" text="Для данного СИ проводились измерения в следующие даты:">
                            <VBox.margin>
                               <Insets bottom="2.0" left="5.0" right="2.0" top="2.0" />
                            </VBox.margin>
@@ -111,7 +101,17 @@
                               <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
                            </VBox.margin>
                         </ListView>
-                        <Label fx:id="measUnitLabel" stylesheets="@../application/commonLabel.css" text="Измеряемая величина:">
+                        <Label stylesheets="@../application/commonLabel.css" text="В состав данного СИ входят следующие элементы:">
+                           <VBox.margin>
+                              <Insets bottom="2.0" left="5.0" right="2.0" top="2.0" />
+                           </VBox.margin>
+                        </Label>
+                        <ListView fx:id="elementsListView" onEditStart="#elementsListViewClick" onMouseClicked="#elementsListViewClick" prefHeight="234.0" prefWidth="364.0">
+                           <VBox.margin>
+                              <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                           </VBox.margin>
+                        </ListView>
+                        <Label fx:id="measUnitLabel" stylesheets="@../application/commonLabel.css" text="Для выбранного элемента из состава редактируемого СИ измерялись следующие величины:">
                            <VBox.margin>
                               <Insets bottom="2.0" left="5.0" right="2.0" top="2.0" />
                            </VBox.margin>
@@ -121,6 +121,11 @@
                               <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
                            </VBox.margin>
                         </ListView>
+                        <Button fx:id="createNewProtocolBtn" mnemonicParsing="false" onAction="#createNewProtocolBtnClick" prefHeight="25.0" prefWidth="553.0" stylesheets="@../application/commonButton.css" text="Выписать новый протокол для редактируемого СИ">
+                           <VBox.margin>
+                              <Insets bottom="5.0" left="5.0" right="5.0" top="2.0" />
+                           </VBox.margin>
+                        </Button>
                         <Button fx:id="deleteDeviceBtn" mnemonicParsing="false" onAction="#deleteDeviceBtnClick" prefHeight="26.0" prefWidth="553.0" stylesheets="@../application/commonButton.css" text="Удалить СИ">
                            <VBox.margin>
                               <Insets bottom="5.0" left="5.0" right="5.0" top="2.0" />
@@ -138,16 +143,14 @@
                               <Label fx:id="dateInfoLabel" layoutX="12.0" layoutY="53.0" stylesheets="@../application/commonLabel.css" text="Дата проведения измерений:" />
                            </children>
                         </AnchorPane>
-                        <ScrollPane fx:id="resultsScrollPane" prefHeight="498.0" prefWidth="792.0">
+                        <ScrollPane fx:id="resultsScrollPane" prefHeight="789.0" prefWidth="792.0">
                            <content>
-                              <AnchorPane fx:id="resultsTablePane" minHeight="0.0" minWidth="0.0" prefHeight="491.0" prefWidth="782.0" />
+                              <AnchorPane fx:id="resultsTablePane" minHeight="0.0" minWidth="0.0" prefHeight="782.0" prefWidth="786.0" />
                            </content>
                            <VBox.margin>
                               <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
                            </VBox.margin>
                         </ScrollPane>
-                        <HBox fx:id="chartBox" prefHeight="266.0" prefWidth="796.0" />
-                        <HBox prefHeight="22.0" prefWidth="796.0" />
                      </children>
                   </VBox>
                </children>

@@ -242,7 +242,7 @@ public class MainController {
 	@FXML 
 	public void aboutBtnClick(ActionEvent event) {
 		helpTextArea.setText("Версия ПО 1.0.1");
-		AboutMessageWindow.createWindow("О программе", "Версия ПО: 1.0.3").show();
+		AboutMessageWindow.createWindow("О программе", "Версия ПО: 1.0.4").show();
 	}
 	
 	//Exit button

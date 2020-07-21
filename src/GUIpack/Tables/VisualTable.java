@@ -36,13 +36,14 @@ public class VisualTable implements Table {
 	
 	public VisualTable(List<String> headLabels, Pane pane){	
 		this.headLabels = headLabels;
-		this.table.setEditable(true);
+		table.setEditable(true);
 		for (int i = 0; i < headLabels.size(); i++) {
 			TableColumn<Line, String> column = new TableColumn<Line, String>();
 			final int index = i;
 			column.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().values.get(index)));
 			
 			column.setText(headLabels.get(i));
+			column.setSortable(false);
 			columns.add(column);
 		}
 		table.getColumns().addAll(columns);	

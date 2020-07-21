@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<ScrollPane fx:id="mainPane" prefHeight="700.0" prefWidth="1380.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="DBEditForm.DBEditController">
+<ScrollPane fx:id="mainPane" prefHeight="935.0" prefWidth="1380.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="DBEditForm.DBEditController">
    <content>
       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="930.0" prefWidth="1354.0">
          <children>

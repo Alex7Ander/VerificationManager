@@ -123,7 +123,7 @@
             <AnchorPane fx:id="progressPane" prefHeight="229.0" prefWidth="470.0" visible="false">
                <children>
                   <ProgressIndicator fx:id="progress" layoutY="216.0" minHeight="250.0" minWidth="470.0" />
-                  <Label layoutX="14.0" layoutY="108.0" prefHeight="40.0" prefWidth="447.0" style="-fx-font-family: Arrial Narrow; -fx-font-size: 24; -fx-font-weight: bold;" text="Идет создание протокола. Ожидайте.">
+                  <Label layoutX="14.0" layoutY="108.0" prefHeight="121.0" prefWidth="447.0" style="-fx-font-family: Arrial Narrow; -fx-font-size: 24; -fx-font-weight: bold;" text="Идет создание документов. &#10;Ожидайте.">
                      <font>
                         <Font size="24.0" />
                      </font></Label>

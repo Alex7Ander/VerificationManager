@@ -4,6 +4,7 @@ import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -45,8 +46,10 @@ public class ProtocolCreateController {
 	@FXML 
 	private ComboBox<String> standartGuardianMilitaryStatusComboBox;
 	
+	/*
 	@FXML
-	private TextField docNumberTextField;	
+	private TextField docNumberTextField;
+	*/	
 	@FXML
 	private TextField militaryBaseName;
 	@FXML 
@@ -165,33 +168,64 @@ public class ProtocolCreateController {
 		if (!checkDocType()) {
 			AboutMessageWindow.createWindow("Ошибка", "Вы не выбрали тип создаваемого документа").show();
 			return;
-		}		
-		Date dt = this.protocoledResult.get(0).getDateOfMeas();
-		String strDt = new SimpleDateFormat("dd-MM-yyyy HH-mm-ss").format(dt); //
-		String addStr = this.protocoledResult.get(0).getMyOwner().getMyOwner().getName() + " " +
-				this.protocoledResult.get(0).getMyOwner().getMyOwner().getType() + " " +
-				this.protocoledResult.get(0).getMyOwner().getMyOwner().getSerialNumber() + " от " + strDt;
-		this.newProtocolName = "Протокол поверки для " + addStr + ".xls";
-		this.newDocumentName = docTypeComboBox.getSelectionModel().getSelectedItem().toString() + " " + addStr + ".doc";		
+		}
+		
+		String addStr = "";
+		
+		if(this.protocoledResult != null) {
+			Date dt = this.protocoledResult.get(0).getDateOfMeas();
+			String strDt = new SimpleDateFormat("dd-MM-yyyy HH-mm-ss").format(dt); //
+			addStr = this.protocoledResult.get(0).getMyOwner().getMyOwner().getName() + " " +
+					this.protocoledResult.get(0).getMyOwner().getMyOwner().getType() + " " +
+					this.protocoledResult.get(0).getMyOwner().getMyOwner().getSerialNumber() + " от " + strDt;
+			this.newProtocolName = "Протокол поверки для " + addStr + ".xls";	
+		}
+		else {
+			Date dateOfCreation = Calendar.getInstance().getTime();
+			DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH-mm-ss");
+			addStr = dateFormat.format(dateOfCreation);
+			verification.setPathOfProtocol("-");
+		}
+		this.newDocumentName = docTypeComboBox.getSelectionModel().getSelectedItem().toString() + " " + addStr + ".docx";
+		
 		//Скрываем информационные поля и показываем прогресс индикатор
 		this.infoBox.toBack();
 		this.infoBox.setOpacity(0.1);
 		this.progressPane.setVisible(true);	
-		this.verification.setFinallyInformation(this);
-
+		
+		this.verification.setBossName(getBossName());
+		this.verification.setBossStatus(getBossStatus());
+		this.verification.setStandartGuardianName(getStandartGuardianName());
+		this.verification.setStandartGuardianStatus(getStandartGuardianStatus());
+		this.verification.setWorkerName(getWorkerName());
+		this.verification.setDecision(getResultDecision());	
+		
+		//this.verification.setProtocolNumber(getProtocolNumber());
+		//this.verification.setDocumentNumber(getDocumentNumber());
+		
+		this.verification.setEtalonString(getEtalonString());
+		this.verification.setDocType(getDocType());		
+		this.verification.setDate(getDate());		
+		this.verification.setFinishDate(getFinishDate());
+		this.verification.setMilitaryBaseName(getMilitryBaseName());			
+		this.verification.setPathOfDoc(getPathOfDoc());
+		this.verification.setPathOfProtocol(getPathOfProtocol());
+				
 		//Создаем документы
 		creteDocuments();	
 	}
 	
 	private void creteDocuments() {	
 		//Создаем поток создания протокола
-		DocumetnsCreateService docService = new DocumetnsCreateService(this.newProtocolName, 
-																		this.newDocumentName, 
-																		this.protocoledResult, 
-																		this.nominals, 
-																		this.protocoledModuleToleranceParams,
-																		this.protocoledPhaseToleranceParams,
-																		this.verification);
+		DocumetnsCreateService docService = new DocumetnsCreateService();		
+		docService.setProtocolName(this.newProtocolName);
+		docService.setDocumentName(this.newDocumentName);
+		docService.setProtocoledResult(this.protocoledResult);
+		docService.setNominals(this.nominals);
+		docService.setProtocoledModuleToleranceParams(this.protocoledModuleToleranceParams);
+		docService.setProtocoledPhaseToleranceParams(this.protocoledPhaseToleranceParams);
+		docService.setVerificationProcedure(this.verification);
+		
 		//Устанавливаем действие при успешном завершении
 		docService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 			@Override
@@ -213,30 +247,39 @@ public class ProtocolCreateController {
 						}
 					}
 					
-					for(MeasResult result : protocoledResult) {
-						try {
-							result.setVerificationId(verification.getId());
-						} catch (SQLException sqlExp) {
-							System.err.println("Не удалось установить id поверки для сохраненных результатов поверки (с id = " + result.getId() + ")");
-							sqlExp.printStackTrace();
+					//Показываем сообщение об успешном создании
+					String docType = docTypeComboBox.getSelectionModel().getSelectedItem();
+					AboutMessageWindow.createWindow("Успешно", "Документы успешно созданы.").show();
+					
+					//Соотносим результаты измерений с самой поверкой
+					if(protocoledResult != null) {
+						for(MeasResult result : protocoledResult) {
+							try {
+								int currentVerId = verification.getId();
+								result.setVerificationId(currentVerId);
+							} catch (SQLException sqlExp) {
+								System.err.println("Не удалось установить id поверки для сохраненных результатов поверки (с id = " + result.getId() + ")");
+								sqlExp.printStackTrace();
+							}
 						}
 					}
-					
+										
 					//Открываем созданный файл, если требуется
 					if (printRB.isSelected()) {
-						String path = new File(".").getAbsoluteFile() + "//Protocols//" + newProtocolName;
-						File protocol = new File(path);
+						String protocolPath = new File(".").getAbsoluteFile() + "//Protocols//" + newProtocolName;
+						String documentPath = new File(".").getAbsoluteFile() + "//Documents//" + newDocumentName;
+						File protocol = new File(protocolPath);
+						File document = new File(documentPath);
 						try {
-							Desktop.getDesktop().open(protocol);
+							Desktop.getDesktop().open(document);
+							if(protocoledResult != null) {
+								Desktop.getDesktop().open(protocol);
+							}														
 						}
 						catch(IOException ioExp) {
 							ioExp.getStackTrace();
 						}			
 					}
-					//Показываем сообщение об успешном создании
-					String docType = docTypeComboBox.getSelectionModel().getSelectedItem();
-					AboutMessageWindow.createWindow("Успешно", "Протокол и " + docType + "\nуспешно созданы.").show();
-					
 					//И закрываем окно поверки
 					try {
 						VerificationWindow.getVerificationWindow().getController().zeroingLastVerificationsId();
@@ -244,7 +287,7 @@ public class ProtocolCreateController {
 						VerificationWindow.getVerificationWindow().delete();
 					} catch (IOException ioExp) {
 						System.err.println("Не удалось автоматически закрыть окно поверки. " + ioExp.getMessage());
-					}
+					}					
 				}
 				finally {
 					ProtocolCreateWindow.closeInstanceWindow();
@@ -256,10 +299,9 @@ public class ProtocolCreateController {
 		docService.setOnFailed(new EventHandler<WorkerStateEvent>() {
 			@Override
 			public void handle(WorkerStateEvent event) {
-				infoBox.toFront();
 				infoBox.setOpacity(1.0);
 				progressPane.setVisible(false); 
-				AboutMessageWindow.createWindow("Ошибка", "Произошла ошибка при\nсоздании протокола.\nПовторите попытку.").show();
+				AboutMessageWindow.createWindow("Ошибка", "Произошла ошибка при\nсоздании документов.\nПовторите попытку.").show();
 				return;
 			}
 		});
@@ -358,18 +400,20 @@ public class ProtocolCreateController {
 	
 	public String getResultDecision() {
 		if (docTypeComboBox.getSelectionModel().getSelectedItem().toString().equals("Cвидетельство о поверке")) {
-			return "годным";
+			return "признано годным";
 		}
 		else {
 			return this.reasonTextArea.getText();
 		}
 	}
+	/*
 	public String getProtocolNumber() {
 		return docNumberTextField.getText();
 	}
 	public String getDocumentNumber() {
 		return docNumberTextField.getText();
 	}
+	*/
 	public String getEtalonString() { 
 		if (etalonRB.isSelected()) {
 			return "Эталон";
@@ -441,7 +485,16 @@ public class ProtocolCreateController {
 	}
 
 	public String getDate() {
-		return this.protocoledResult.get(0).getDateOfMeasByString();
+		String dateStr = null;
+		if(this.protocoledResult != null) {
+			dateStr = this.protocoledResult.get(0).getDateOfMeasByString();
+		}
+		else {
+			Date dateOfCreation = Calendar.getInstance().getTime();
+			DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+			dateStr = dateFormat.format(dateOfCreation);
+		}
+		return dateStr;
 	}
 
 

@@ -3,7 +3,6 @@ package StartVerificationPack;
 import java.io.IOException;
 
 import GUIpack.guiWindow;
-import VerificationForm.VerificationWindow;
 
 public class StartVerificationWindow  extends guiWindow {
 
@@ -13,6 +12,11 @@ public class StartVerificationWindow  extends guiWindow {
 		super("Подготовка к поверке", "StartVerificationForm.fxml");
 		StartVerificationController ctrl = (StartVerificationController) this.loader.getController();
 		ctrl.setWindow(this);
+		/*
+		stage.setOnCloseRequest(event -> {
+			delete();
+		});
+		*/
 	}
 		
 	public static StartVerificationWindow getStartVerificationWindow() throws IOException {
@@ -20,6 +24,10 @@ public class StartVerificationWindow  extends guiWindow {
 			instanceStartVerificationWindow = new StartVerificationWindow();			
 		}
 		return instanceStartVerificationWindow;
+	}
+	
+	public void delete() {
+		instanceStartVerificationWindow = null;
 	}
 	
 }

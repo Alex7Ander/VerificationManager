@@ -244,12 +244,12 @@ public class DBEditController implements InfoRequestable {
 				List<MeasResult> currentVerificationResults = checkedProcedure.getMeasResults();
 				for (MeasResult result : currentVerificationResults) {
 					try {
-						result.setLastVerificationStatus();		
-						resetDevice();
+						result.setLastVerificationStatus();								
 					} catch (SQLException sqlExp) {
 						System.err.println("Ошибка при попытке установить результат с id = " + result.getId() + " статус результата предыдущей поверки. " + sqlExp.getMessage());
 					}
-				}							
+				}	
+				resetDevice();
 			}
 			else { 
 				for (Element elm : this.modDevice.includedElements) {
@@ -385,7 +385,7 @@ public class DBEditController implements InfoRequestable {
 		modDevice = device;	
 		try {
 			verificationDateList2.clear();
-			modDeviceVerificationProcedures = VerificationProcedure.getAllVerificationsProcedures(modDevice);			
+			modDeviceVerificationProcedures = VerificationProcedure.getVerificationsProceduresWithMeasResults(modDevice);			
 			if(this.modDevice.includedElements.get(0).getNominalId() == this.modDevice.includedElements.get(0).getLastVerificationId()) {
 				verificationDateList2.add("Номинальные значения - исп. для сравнения при след. поверке");
 			}
@@ -396,6 +396,9 @@ public class DBEditController implements InfoRequestable {
 				StringBuilder item = new StringBuilder("Поверка (дата проведения " + procedure.getDate() + ")");
 				
 				MeasResult measResultFirstElement = procedure.getMeasResultForElement(this.modDevice.includedElements.get(0));
+				if(measResultFirstElement == null){
+					continue;
+				}
 				if(measResultFirstElement.getId() == this.modDevice.includedElements.get(0).getLastVerificationId()){
 					item.append(" - исп. для сравнения при след. поверке");
 				}				
