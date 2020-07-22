@@ -38,7 +38,7 @@
             <ToggleButton fx:id="deviceSearchTB" mnemonicParsing="false" onAction="#deviceSearchTBClick" prefHeight="48.0" prefWidth="431.0" styleClass="radiobutton" stylesheets="@../../bin/application/commonRadioButton.css" text="Выбрать средство измерения &#10;для которого следует осуществлять поиск протоколов" textAlignment="CENTER" />
             <Pane prefHeight="9.0" prefWidth="438.0" />
             <Button fx:id="searchBtn" mnemonicParsing="false" onAction="#searchBtnClick" prefHeight="39.0" prefWidth="432.0" stylesheets="@../../bin/application/commonButton.css" text="Найти протоколы поверок" />
-            <Label prefHeight="36.0" prefWidth="271.0" stylesheets="@../../bin/application/commonLabel.css" text="Списко проведенных поверок:" />
+            <Label prefHeight="36.0" prefWidth="271.0" stylesheets="@../../bin/application/commonLabel.css" text="Список проведенных поверок:" />
             <ListView fx:id="verificationListView" prefHeight="384.0" prefWidth="438.0" />
             <Pane prefHeight="8.0" prefWidth="438.0" />
             <Button fx:id="openBtn" mnemonicParsing="false" onAction="#openBtnClick" prefHeight="40.0" prefWidth="438.0" stylesheets="@../../bin/application/commonButton.css" text="Открыть протокол" />

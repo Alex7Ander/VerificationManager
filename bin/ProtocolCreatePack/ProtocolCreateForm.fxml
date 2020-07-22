@@ -30,12 +30,6 @@
                   </Pane>
                   <Pane prefHeight="30.0" prefWidth="200.0">
                      <children>
-                        <Label layoutX="88.0" layoutY="6.0" stylesheets="@../../bin/application/commonLabel.css" text="№" />
-                        <TextField fx:id="docNumberTextField" layoutX="118.0" layoutY="4.0" prefHeight="25.0" prefWidth="253.0" promptText="введите номер" text="1" />
-                     </children>
-                  </Pane>
-                  <Pane prefHeight="30.0" prefWidth="200.0">
-                     <children>
                         <Label fx:id="workTillLabel" layoutX="188.0" layoutY="6.0" stylesheets="@../../bin/application/commonLabel.css" text="действителе до:" />
                         <DatePicker fx:id="verificationDate" layoutX="295.0" layoutY="4.0" />
                      </children>
@@ -70,7 +64,7 @@
                         <Label fx:id="decisionLabel" stylesheets="@../../bin/application/commonLabel.css" text="признан  пригодным к применению" />
                      </children>
                   </HBox>
-                  <TextArea fx:id="reasonTextArea" prefHeight="139.0" prefWidth="469.0" />
+                  <TextArea fx:id="reasonTextArea" prefHeight="159.0" prefWidth="469.0" />
                   <Pane prefHeight="82.0" prefWidth="469.0">
                      <children>
                         <Label layoutX="70.0" layoutY="7.0" stylesheets="@../../bin/application/commonLabel.css" text="Начальник:" />

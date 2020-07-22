@@ -91,7 +91,7 @@ public class StartVerificationController {
 		verGroup = new ToggleGroup();
 		primaryVerRB.setToggleGroup(verGroup);
 		periodicVerRB.setToggleGroup(verGroup);
-		//primaryVerRB.setSelected(true);
+		periodicVerRB.setSelected(true);
 		
 		viewGroup = new ToggleGroup();
 		goodViewRB.setToggleGroup(viewGroup);
@@ -141,7 +141,7 @@ public class StartVerificationController {
 		}
 		if (!checkView()) {
 			//Признание прибора не годным по внешнему остмотру
-			int answer = YesNoWindow.createYesNoWindow("Отрицательный результат внешнего осмотра?", "Вы признали прибор негодным\n по результатам внешнеого осмотра?").showAndWait();
+			int answer = YesNoWindow.createYesNoWindow("Отрицательный результат внешнего осмотра?", "Вы признали прибор негодным\nпо результатам внешнеого осмотра?").showAndWait();
 			if (answer == 0) {
 				this.myWindow.close();
 				VerificationWindow.getVerificationWindow().getController().FinishVerificationBeforeMeasurment();				
@@ -153,7 +153,7 @@ public class StartVerificationController {
 		}
 		if (!checkWork()) {
 			//Признание прибора не годным по опробованию
-			int answer = YesNoWindow.createYesNoWindow("Отрицательный результат опробования?", "Вы признали прибор негодным\n по результатам опробования?").showAndWait();
+			int answer = YesNoWindow.createYesNoWindow("Отрицательный результат опробования?", "Вы признали прибор негодным\nпо результатам опробования?").showAndWait();
 			if (answer == 0) {
 				this.myWindow.close();
 				VerificationWindow.getVerificationWindow().getController().FinishVerificationBeforeMeasurment();

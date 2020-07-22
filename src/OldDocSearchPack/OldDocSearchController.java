@@ -30,7 +30,6 @@ import DevicePack.Device;
 import GUIpack.InfoRequestable;
 import SearchDevicePack.SearchDeviceWindow;
 import SecurityPack.FileEncrypterDecrypter;
-import VerificationPack.VerificationProcedure;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -42,8 +41,6 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 
 public class OldDocSearchController implements InfoRequestable {
-
-	
 	/*
 	 * 
 	 * КАК ТОЛЬКО БУДЕТ ВОЗМОЖНОСЬ, НЕОБХОДИМО ПЕРЕПИСАТ МЕТОД setVerificationItems()
@@ -76,8 +73,6 @@ public class OldDocSearchController implements InfoRequestable {
 
 	private Device checkDevice;
 	private ObservableList<String> listOfVerificationsItems;
-	
-	private List<VerificationProcedure> listOfVerifications;
 	
 	List<List<String>> resultOfSearch; 
 	
@@ -127,17 +122,11 @@ public class OldDocSearchController implements InfoRequestable {
 	@FXML
 	private void openBtnClick()  {
 		int index = this.verificationListView.getSelectionModel().getSelectedIndex();
-		//VerificationProcedure procedure = this.listOfVerifications.get(index);
 		try {
 			String pathOfDoc = new File(".").getAbsolutePath() + resultOfSearch.get(index).get(1);
 			String pathOfProtocol = new File(".").getAbsolutePath() + resultOfSearch.get(index).get(2);
 			byte[] decodedKey = Base64.getDecoder().decode(resultOfSearch.get(index).get(3));
 			SecretKey originalKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES");
-			
-			/*
-			File docFile = new File(pathOfDoc);
-			File protocolFile = new File(pathOfProtocol);
-			*/
 			
 			FileEncrypterDecrypter fileEncrypterDecrypter = null;
 			try {			
@@ -148,17 +137,20 @@ public class OldDocSearchController implements InfoRequestable {
 			byte[] protBuffer = null;
 			byte[] docBuffer = null;
 			
-			int ind = pathOfProtocol.lastIndexOf('\\');
-			String nameOfNewProtocolFile = pathOfProtocol.substring(ind, pathOfProtocol.lastIndexOf('.'));
+			int ind1 = pathOfProtocol.lastIndexOf('\\');
+			int ind2 = pathOfDoc.lastIndexOf('\\');
+			String nameOfNewProtocolFile = pathOfProtocol.substring(ind1, pathOfProtocol.lastIndexOf('.'));
 	        String pathToNewProtocolFile = new File(".").getAbsolutePath() + nameOfNewProtocolFile + ".xls";
-	        String nameOfNewDocFile = pathOfDoc.substring(ind, pathOfProtocol.lastIndexOf('.'));
+	        
+	        String nameOfNewDocFile = pathOfDoc.substring(ind2, pathOfDoc.lastIndexOf('.'));
 	        String pathToNewDocFile = new File(".").getAbsolutePath() + nameOfNewDocFile + ".docx";
 	        
 	        FileOutputStream protfout = new FileOutputStream(pathToNewProtocolFile);
 	        FileOutputStream docfout = new FileOutputStream(pathToNewDocFile);
+	        
 			try {
-				protBuffer = fileEncrypterDecrypter.decrypt(pathOfProtocol);
 				docBuffer = fileEncrypterDecrypter.decrypt(pathOfDoc);
+				docfout.write(docBuffer);
 			} catch (InvalidKeyException e) {
 				e.printStackTrace();
 			} catch (IllegalBlockSizeException e) {
@@ -167,14 +159,29 @@ public class OldDocSearchController implements InfoRequestable {
 				e.printStackTrace();
 			} catch (InvalidAlgorithmParameterException e) {
 				e.printStackTrace();
-			}		
-			protfout.write(protBuffer);
-			docfout.write(docBuffer);
-			protfout.close();
+			} 
 			docfout.close();
-	        
+			Desktop.getDesktop().open(new File(pathToNewDocFile));
+			
+			if(pathOfProtocol.contains("null")) {
+				protfout.close();
+				AboutMessageWindow.createWindow("Протокол отсутвует", "Протокол для данной поверки не создавался.").show();
+				return;
+			}
+			try {
+				protBuffer = fileEncrypterDecrypter.decrypt(pathOfProtocol);
+				protfout.write(protBuffer);
+			} catch (InvalidKeyException e) {
+				e.printStackTrace();
+			} catch (IllegalBlockSizeException e) {
+				e.printStackTrace();
+			} catch (BadPaddingException e) {
+				e.printStackTrace();
+			} catch (InvalidAlgorithmParameterException e) {
+				e.printStackTrace();
+			}
+			protfout.close();
 			Desktop.getDesktop().open(new File(pathToNewProtocolFile));
-			Desktop.getDesktop().open(new File(pathToNewDocFile));			
 		}
 		catch(IOException ioExp) {
 			AboutMessageWindow.createWindow("Ошибка", "Файл отсутствует").show();
@@ -217,34 +224,6 @@ public class OldDocSearchController implements InfoRequestable {
 		calendarInstance.setTime(this.till); 
 		calendarInstance.add(Calendar.DAY_OF_MONTH, 1);
 		this.till = calendarInstance.getTime();
-		
-		/*		
-		try {
-			listOfVerifications = VerificationProcedure.getAllVerificationsProcedures();
-		}
-		catch(SQLException sqlExp) {
-			sqlExp.printStackTrace();
-		}
-		
-		for (VerificationProcedure procedure : this.listOfVerifications) {
-			String strDateOfVer = procedure.getDate();
-			Date dateOfVer;
-			try {
-				dateOfVer = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(strDateOfVer); 
-			}
-			catch(ParseException pExp) {
-				dateOfVer = Calendar.getInstance().getTime();
-			}
-			
-			if (dateOfVer.after(this.from) && dateOfVer.before(this.till) && procedure.getDocType().equals(this.typeOfDoc)) { 
-				String item = procedure.getDate() + " " + procedure.getDeviceInfo();
-				listOfVerificationsItems.add(item);	
-			}
-			else {
-				this.listOfVerifications.remove(procedure);
-			}
-		}
-		*/
 						
 		String addFilters = "";
 		List<String> fieldsNames = new ArrayList<String>();
