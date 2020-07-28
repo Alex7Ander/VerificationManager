@@ -8,6 +8,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
@@ -33,6 +34,7 @@ import org.apache.poi.xwpf.usermodel.XWPFTableCell;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 
 import SecurityPack.FileEncrypterDecrypter;
+import ToleranceParamPack.ParametrsPack.PhaseStandardizableCondition;
 import ToleranceParamPack.ParametrsPack.ToleranceParametrs;
 import VerificationPack.MeasResult;
 import VerificationPack.VerificationProcedure;
@@ -394,19 +396,19 @@ public class DocumetnsCreateService extends Service<Integer> {
 					System.out.print("\t" + cFreq);
 					
 					//КСВН/Г
-					Double vswr = currentRes.values.get("MODULE_" + keys[k]).get(cFreq); //.toString();
-					setCellValue(dRow, 1, vswr, borderModuleCellStyle);		
-					System.out.print("\t" + vswr);
+					Double module = currentRes.values.get("MODULE_" + keys[k]).get(cFreq); //.toString();
+					setCellValue(dRow, 1, module, borderModuleCellStyle);		
+					System.out.print("\t" + module);
 					
 					//Погрешность КСВН/Г
-					Double vswrError = currentRes.values.get("ERROR_MODULE_" + keys[k]).get(cFreq);
-					setCellValue(dRow, 2, vswrError, borderModuleCellStyle);
-					System.out.print("\t" + vswrError);
+					Double moduleError = currentRes.values.get("ERROR_MODULE_" + keys[k]).get(cFreq);
+					setCellValue(dRow, 2, moduleError, borderModuleCellStyle);
+					System.out.print("\t" + moduleError);
 					
 					//Номинал КСВН/Г
-					Double vswrNominal = currentNominal.values.get("MODULE_" + keys[k]).get(cFreq);
-					setCellValue(dRow, 3, vswrNominal, borderModuleCellStyle);
-					System.out.print("\t" + vswrNominal);
+					Double moduleNominal = currentNominal.values.get("MODULE_" + keys[k]).get(cFreq);
+					setCellValue(dRow, 3, moduleNominal, borderModuleCellStyle);
+					System.out.print("\t" + moduleNominal);
 					
 					//Дельты по модулю
 					Double moduleDelta = currentRes.differenceBetweenNominal.get("MODULE_" + keys[k]).get(cFreq);
@@ -414,17 +416,18 @@ public class DocumetnsCreateService extends Service<Integer> {
 					System.out.print("\t" + moduleDelta);
 					
 					//Допуск КСВН/Г
-					String vswrTolerance = currentModuleTolerance.values.get("DOWN_MODULE_" + keys[k]).get(cFreq).toString();
-					vswrTolerance += ("/" + currentModuleTolerance.values.get("UP_MODULE_" + keys[k]).get(cFreq).toString());
-					setCellValue(dRow, 5, vswrTolerance.replace('.', ','), borderCellStyle);
-					System.out.print("\t" + vswrTolerance);
+					String moduleTolerance = currentModuleTolerance.values.get("DOWN_MODULE_" + keys[k]).get(cFreq).toString();
+					moduleTolerance += ("/" + currentModuleTolerance.values.get("UP_MODULE_" + keys[k]).get(cFreq).toString());
+					setCellValue(dRow, 5, moduleTolerance.replace('.', ','), borderCellStyle);
+					System.out.print("\t" + moduleTolerance);
 					
 					//Годен/не годен по КСВН
 					String moduleDecision = currentRes.suitabilityDecision.get("MODULE_" + keys[k]).get(cFreq);
 					setCellValue(dRow, 6, moduleDecision, borderCellStyle);
 					System.out.print("\t" + moduleDecision);
-					
-					if(!currentRes.getMyOwner().getType().contains("Нагрузка согласованная")) {
+										
+					Predicate<Double> std = PhaseStandardizableCondition.getStandardizableCondition(currentRes.getMyOwner());									
+					if(std.test(module)) {
 						//Фаза
 						Double phase = currentRes.values.get("PHASE_" + keys[k]).get(cFreq);
 						setCellValue(dRow, 7, phase, borderPhaseCellStyle);
@@ -455,7 +458,26 @@ public class DocumetnsCreateService extends Service<Integer> {
 						String phaseDecision = currentRes.suitabilityDecision.get("PHASE_" + keys[k]).get(cFreq);
 						setCellValue(dRow, 12, phaseDecision, borderCellStyle);	
 						System.out.print("\t" + phaseDecision);
-					}										
+					}
+					else {
+						setCellValue(dRow, 7, "Не нормируется", borderPhaseCellStyle);
+						System.out.print("\tНе нормируется");
+											
+						setCellValue(dRow, 8, "Не нормируется", borderPhaseCellStyle);
+						System.out.print("\tНе нормируется");
+						
+						setCellValue(dRow, 9, "Не нормируется", borderPhaseCellStyle);
+						System.out.print("\tНе нормируется");
+						
+						setCellValue(dRow, 10, "Не нормируется", borderPhaseCellStyle);
+						System.out.print("\tНе нормируется");
+
+						setCellValue(dRow, 11, "Не нормируется", borderCellStyle);
+						System.out.print("\tНе нормируется");
+
+						setCellValue(dRow, 12, "Не нормируется", borderCellStyle);	
+						System.out.print("\tНе нормируется");
+					}					
 					System.out.print("\n");					
 					dRow++;
 				}//end j

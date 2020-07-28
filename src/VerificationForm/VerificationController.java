@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.function.Predicate;
 
 import AboutMessageForm.AboutMessageWindow;
 import DevicePack.Device;
@@ -22,6 +23,7 @@ import SearchDevicePack.SearchDeviceWindow;
 import StartVerificationPack.StartVerificationController;
 import StartVerificationPack.StartVerificationWindow;
 import ToleranceParamPack.ParametrsPack.MeasUnitPart;
+import ToleranceParamPack.ParametrsPack.PhaseStandardizableCondition;
 import ToleranceParamPack.ParametrsPack.S_Parametr;
 import ToleranceParamPack.ParametrsPack.ToleranceParametrs;
 import VerificationPack.MeasResult;
@@ -402,27 +404,29 @@ public class VerificationController implements InfoRequestable {
 		List<String> column6 = Adapter.MapToArrayList(
 				this.verificationResult.get(this.currentElementIndex).suitabilityDecision.get(key1));
 		this.resultTable.setColumn(6, column6);
-								
+				
+		//Получим условие, при котором нормируется значнение фазы измеряемого параметра
+		Predicate<Double> std = PhaseStandardizableCondition.getStandardizableCondition(this.verificationResult.get(this.currentElementIndex).getMyOwner());		
 		//Измеренные значения фазы
 		String key7 = keys.get(2 + this.currentParamIndex*4);
 		List<Double> phaseColumn = Adapter.MapToArrayList(
 				this.verificationResult.get(this.currentElementIndex).values.get(key7));
-		this.resultTable.setColumnFromDouble(7, phaseColumn, phaseAccuracy);
+		this.resultTable.setColumnFromDoubleWithCondition(7, phaseColumn, vswrColumn, phaseAccuracy, std); //setColumnFromDouble(7, phaseColumn, phaseAccuracy);
 		
 		//Погрешность измерения фазы
 		String key8 = keys.get(3 + this.currentParamIndex*4);
 		List<Double> column8 = Adapter.MapToArrayList(
 				this.verificationResult.get(this.currentElementIndex).values.get(key8));
-		this.resultTable.setColumnFromDouble(8, column8, phaseErrorAccuracy);
+		this.resultTable.setColumnFromDoubleWithCondition(8, column8, vswrColumn, phaseErrorAccuracy, std);
 		
 		//Значения предыдущей поверки		
 		List<Double> column9 = Adapter.MapToArrayList(nominals.values.get(key7));
-		this.resultTable.setColumnFromDouble(9, column9, phaseAccuracy);
+		this.resultTable.setColumnFromDoubleWithCondition(9, column9, vswrColumn, phaseAccuracy, std);
 		
 		//Расчет разницы результатов этой поверки и предыдущей для фазы
 		List<Double> column10 = Adapter.MapToArrayList(
 				this.verificationResult.get(this.currentElementIndex).differenceBetweenNominal.get(key7));
-		this.resultTable.setColumnFromDouble(10, column10, phaseAccuracy);
+		this.resultTable.setColumnFromDoubleWithCondition(10, column10, vswrColumn, phaseAccuracy, std);
 		
 		//Допуск по фазе
 		List<String> column11 = new ArrayList<>();
@@ -434,12 +438,12 @@ public class VerificationController implements InfoRequestable {
 			text += representablePhaseToleranceParams.values.get("UP_" + currentKey).get(currentFreq);
 			column11.add(text);
 		}
-		this.resultTable.setColumn(11, column11);
+		this.resultTable.setColumnWithCondition(11, column11, vswrColumn, std);
 				
 		//Решения годности по фазе
 		List<String> column12 = Adapter.MapToArrayList(
 				this.verificationResult.get(this.currentElementIndex).suitabilityDecision.get(key7));
-		this.resultTable.setColumn(12, column12);
+		this.resultTable.setColumnWithCondition(12, column12, vswrColumn, std);
 		
 		//Переписываем заголовки у таблицы для столбцов с допуском и погрешностью измерения
 		//для модуля
@@ -491,6 +495,34 @@ public class VerificationController implements InfoRequestable {
 		this.resultTable.setHead(10, differencePhaseHeader);
 		this.resultTable.setHead(11, newPhaseToleranceHeader);		
 	}	
+	
+	/*
+	private Standardizable getStandardizableCondition() {
+		Standardizable std = null;
+		if(this.verificationResult.get(this.currentElementIndex).getMyOwner().getMeasUnit().equals("vswr")) {
+			std = (double currentModuleValue) -> {
+				if(currentModuleValue >= 1.05) {
+					return true;
+				}
+				else {
+					return false;
+				}
+			};
+			
+		}
+		else {
+			std = (double currentModuleValue) -> {
+				if(currentModuleValue >= 1.05) {
+					return true;
+				}
+				else {
+					return false;
+				}
+			};
+		}
+		return std;
+	}
+	*/
 //---------------------------
 	@SuppressWarnings("unused")
 	private int getAccuracy(List<Double> values) {

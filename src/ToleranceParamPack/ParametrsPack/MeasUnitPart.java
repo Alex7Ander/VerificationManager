@@ -3,6 +3,7 @@ package ToleranceParamPack.ParametrsPack;
 public enum MeasUnitPart implements ToleranceParametrCharacteristic {
     MODULE, PHASE;
 
+	@Override
     public String getTableNamePart(){
         String res = null;
         switch(this) {

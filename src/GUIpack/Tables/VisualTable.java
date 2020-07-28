@@ -2,6 +2,7 @@ package GUIpack.Tables;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -234,6 +235,27 @@ public class VisualTable implements Table {
 			setCellValue(index, i, text);
 		}		
 	}
+	
+	@Override
+	public void setColumnWithCondition(int index, List<String> columnValues, List<Double> conditionValues, Predicate<Double> std) {
+		int stopIndex = setStopIndex(columnValues);
+		for (int i = 0; i < stopIndex; i++) {
+			String text = null;
+			boolean isStandardized = std.test(conditionValues.get(i));
+			if ( columnValues.size() > i) {
+				if(isStandardized) {
+					text = columnValues.get(i);
+				}
+				else {
+					text = "Не нормируется";
+				}
+			}
+			else {
+				text = "-";
+			}
+			setCellValue(index, i, text);
+		}		
+	}
 
 	@Override
 	public void setColumnFromDouble(int index, List<Double> columnValues) {
@@ -258,8 +280,29 @@ public class VisualTable implements Table {
 			setCellValue(index, i, text);
 		}		
 	}
+	
+	@Override
+	public void setColumnFromDoubleWithCondition(int index, List<Double> columnValues, List<Double> conditionValues, int accuracy, Predicate<Double> std) {
+		int stopIndex = setStopIndex(columnValues);
+		for (int i = 0; i < stopIndex; i++) {
+			String text = null;
+			boolean isStandardized = std.test(conditionValues.get(i));
+			if (columnValues.size() > i) {
+				if(isStandardized) {
+					text = columnValues.get(i).toString();
+				}
+				else {
+					text = "Не нормируется";	
+				}
+			}
+			else {
+				text = "-";
+			}
+			setCellValue(index, i, text);
+		}		
+	}
 
-	private int setStopIndex(List<?> columnValues) {
+	protected int setStopIndex(List<?> columnValues) {
 		int stopIndex = 0;
 		if (columnValues.size() > this.lines.size()) {
 			stopIndex = columnValues.size();
@@ -270,7 +313,7 @@ public class VisualTable implements Table {
 		return stopIndex;
 	}
 	
-	private String setFractionalTextPart(String text, int accuracy) {
+	protected String setFractionalTextPart(String text, int accuracy) {
 		String fractional = text.substring(text.lastIndexOf('.') + 1);
 		int fractionalLength = fractional.length();
 		if(accuracy > fractionalLength) {

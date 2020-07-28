@@ -97,5 +97,5 @@ public class ResultsTable extends VisualTable {
 		setColumnFromDouble(3,  Adapter.MapToArrayList(result.values.get(MeasUnitPart.PHASE + "_" + sParam)), phaseAccuracy);
 		setColumnFromDouble(4,  Adapter.MapToArrayList(result.values.get("ERROR_" + MeasUnitPart.PHASE + "_" + sParam)), phaseErrorAccuracy);
 	}
-
+	
 }
